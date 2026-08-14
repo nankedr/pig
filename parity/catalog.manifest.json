@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "catalog_version": "1.0.0",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "catalog": "catalog.jsonl",
+  "schema": "catalog.schema.json",
+  "generated_report": "reports/catalog.md",
+  "entry_count": 11,
+  "status_counts": {
+    "inventoried": 0,
+    "scaffolded": 9,
+    "partial": 0,
+    "implemented": 0,
+    "verified": 0,
+    "deferred": 2
+  }
+}

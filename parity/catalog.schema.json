@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/nankedr/pig/parity/catalog.schema.json",
+  "version": "1.0.0",
+  "title": "Parity Catalog Entry",
+  "description": "One Parity Catalog entry. parity/catalog.jsonl holds exactly one object of this shape per line. The catalog is the single machine-readable authority for scope, mapping, capability status, deviation and evidence (docs/specs/parity-verification.md). This document is the human/tooling contract; internal/catalog enforces the rules in Go without a JSON-schema runtime.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "upstream",
+    "mapping",
+    "status",
+    "milestone",
+    "classification"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Version of this entry schema. Bump in lockstep with $id/version and the manifest."
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable unique identifier. The JSONL is sorted by this field for determinism."
+    },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "repository", "commit", "reference"],
+      "description": "Fixed Pi baseline provenance. At M0.3 the reference is at module granularity; #20/#21 refine it to files and symbols.",
+      "properties": {
+        "module": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Upstream Pi module name, e.g. ai, agent, coding-agent, telemetry, tui, protocol, client, server."
+        },
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Upstream repository URL (https://github.com/badlogic/pi-mono)."
+        },
+        "commit": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Pinned baseline commit; must equal the manifest baseline_commit."
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Upstream locator; module granularity at M0.3, file+symbol later."
+        }
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "target", "kind"],
+      "description": "Where the upstream artifact maps in Pig.",
+      "properties": {
+        "module": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Pig module bucket, e.g. ai, agent, codingagent, telemetry, tui, protocol, client."
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Go import path or symbol the entry maps to."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["package", "command", "symbol", "contract"],
+          "description": "Granularity of the mapping target."
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "inventoried",
+        "scaffolded",
+        "partial",
+        "implemented",
+        "verified",
+        "deferred"
+      ],
+      "description": "Capability Status lifecycle: inventoried -> scaffolded -> partial -> implemented -> verified, branching to deferred."
+    },
+    "milestone": {
+      "type": "string",
+      "enum": [
+        "M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7",
+        "M8", "M9", "M10", "M11", "M12", "M13", "M14"
+      ],
+      "description": "Target roadmap milestone (docs/roadmap.md)."
+    },
+    "classification": {
+      "type": "string",
+      "enum": [
+        "direct-entry",
+        "public-api",
+        "private-impl",
+        "dormant-test-support"
+      ],
+      "description": "Extraction category, aligned with issue #20."
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Repeatable verification material. Required (non-empty) when status is implemented or verified.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "ref", "baseline"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "Evidence kind, e.g. go-test, fixture, oracle, manual."
+          },
+          "ref": {
+            "type": "string",
+            "description": "Locator for the evidence, e.g. a test path or case id."
+          },
+          "baseline": {
+            "type": "string",
+            "description": "Baseline the evidence was captured against."
+          }
+        }
+      }
+    },
+    "deviation": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "Approved deviation and the ADR authorising it.",
+      "required": ["adr", "reason"],
+      "properties": {
+        "adr": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "partial": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "Required when status is partial: both supported and unsupported branches must be listed.",
+      "required": ["supported", "unsupported"],
+      "properties": {
+        "supported": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "unsupported": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+      }
+    },
+    "deferred": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "Required when status is deferred: must point to an ADR and a target milestone.",
+      "required": ["adr", "milestone", "reason"],
+      "properties": {
+        "adr": { "type": "string", "minLength": 1 },
+        "milestone": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string" }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-form clarification; never authoritative on its own."
+    }
+  }
+}
