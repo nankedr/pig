@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1.0",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "status": "pending-capture",
+  "generation": {
+    "generated_at": null,
+    "generator_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "tool_versions": {},
+    "input_sources": []
+  },
+  "capture": {
+    "reason": "Pi commit 936aff00918de1187f085f123c2812d8f2d67745 does not commit the full chat-model data; the release process generates model shards over the network. Reproducing the provider, model IDs, APIs, pricing, context windows, max tokens, and compatibility metadata requires a controlled network+Node capture using that commit's generator. That controlled capture has not yet been performed, so no artifacts, hashes, or generation timestamps exist. Fabricating them is forbidden; this manifest stays in pending-capture until a real capture runs.",
+    "required_step": "docs/specs/model-catalog.md",
+    "tracked_by": "M0 catalog-capture (future task)"
+  },
+  "artifacts": [],
+  "providers": 0,
+  "models": 0,
+  "attribution": {
+    "license": "MIT",
+    "holder": "Mario Zechner",
+    "source": "https://github.com/badlogic/pi-mono"
+  },
+  "excludes_secrets": true
+}
