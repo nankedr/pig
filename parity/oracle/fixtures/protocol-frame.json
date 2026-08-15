@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "id": "protocol/frame",
+  "catalog_id": "contract:protocol/frame",
+  "baseline_id": "pi-936aff0-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "upstream": {
+    "module": "protocol",
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/protocol/src/framing.ts#encodeFrame"
+  },
+  "input": {
+    "description": "Canonical ClientHello: the mandatory first client protocol message (ClientHelloSchema, PROTOCOL_VERSION=1).",
+    "message": {
+      "type": "hello",
+      "version": 1
+    },
+    "encoding": "encodeFrame(encodeCbor(message, { maxByteLength }))"
+  },
+  "raw_output": {
+    "encoding": "hex",
+    "cbor_hex": "a264747970656568656c6c6f6776657273696f6e01",
+    "cbor_length": 21,
+    "frame_hex": "00000015a264747970656568656c6c6f6776657273696f6e01",
+    "frame_length": 25,
+    "header_hex": "00000015",
+    "header_length": 4
+  },
+  "hash": {
+    "algorithm": "sha256",
+    "frame_sha256": "645eb27af58427c5e92d657609e81e6d2b0652c233b6b37d14403ac7c3f59d5f"
+  },
+  "env": {
+    "node_version": "v24.14.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "exec_method": "node-native-typescript-import"
+}
