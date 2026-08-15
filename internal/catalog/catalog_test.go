@@ -1,6 +1,7 @@
 package catalog_test
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"os"
@@ -13,11 +14,18 @@ import (
 	"github.com/nankedr/pig/internal/catalog"
 )
 
-// updateGolden regenerates parity/reports/catalog.md from the committed catalog
-// when set (go test ./internal/catalog/ -run Golden -update). The report is a
-// generated artifact, so this keeps it in sync via the generator rather than by
-// hand-editing.
-var updateGolden = flag.Bool("update", false, "regenerate the committed catalog report golden")
+// update regenerates the committed generated catalog artifacts when set:
+//   - go test ./internal/catalog -run GenerateCatalog -update
+//     regenerates parity/catalog.jsonl, catalog.manifest.json and the report
+//     from the hand-authored overlay (parity/catalog.overlay.jsonl).
+//   - go test ./internal/catalog -run Golden -update
+//     regenerates only parity/reports/catalog.md from the committed catalog.
+//
+// The catalog, manifest and report are all generated artifacts, so this keeps
+// them in sync via the generator rather than by hand-editing. Regeneration is
+// pure-Go and offline: it reads only committed files, needing no Node and no Pi
+// checkout.
+var update = flag.Bool("update", false, "regenerate the committed generated catalog artifacts")
 
 const baselineCommit = "936aff00918de1187f085f123c2812d8f2d67745"
 
@@ -405,7 +413,7 @@ func TestGenerateReportGoldenMatchesCommitted(t *testing.T) {
 	}
 	got := catalog.GenerateReport(entries)
 	goldenPath := filepath.Join(root, "parity", "reports", "catalog.md")
-	if *updateGolden {
+	if *update {
 		if err := os.MkdirAll(filepath.Dir(goldenPath), 0o755); err != nil {
 			t.Fatalf("mkdir report dir: %v", err)
 		}
@@ -440,4 +448,90 @@ func loadManifest(t *testing.T, path string) catalog.Manifest {
 		t.Fatalf("parse manifest: %v", err)
 	}
 	return m
+}
+
+// TestGenerateCatalog regenerates the committed catalog artifacts from the
+// hand-authored overlay when run with -update (go test ./internal/catalog -run
+// GenerateCatalog -update): it runs Generate(nil, overlay) to produce the
+// entries, then writes catalog.jsonl, catalog.manifest.json and reports/catalog.md
+// in one consistent shot. Without -update it still runs as a live consistency
+// check: the committed catalog.jsonl, manifest and report must equal what the
+// overlay regenerates, so a hand-edit to any generated artifact is caught. It is
+// pure-Go and offline.
+func TestGenerateCatalog(t *testing.T) {
+	root := repoRoot(t)
+	parity := filepath.Join(root, "parity")
+
+	overlay, err := catalog.LoadOverlay(filepath.Join(parity, "catalog.overlay.jsonl"))
+	if err != nil {
+		t.Fatalf("LoadOverlay: %v", err)
+	}
+	entries, err := catalog.Generate(nil, overlay)
+	if err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	manifest := catalog.BuildManifest(entries, baselineCommit, catalog.DefaultManifestPaths)
+
+	// The regenerated catalog must satisfy the validator before it is written.
+	if err := catalog.Validate(entries, manifest); err != nil {
+		t.Fatalf("regenerated catalog fails Validate: %v", err)
+	}
+
+	catalogData, err := catalog.EncodeEntries(entries)
+	if err != nil {
+		t.Fatalf("EncodeEntries: %v", err)
+	}
+	manifestData, err := catalog.EncodeManifest(manifest)
+	if err != nil {
+		t.Fatalf("EncodeManifest: %v", err)
+	}
+	report := catalog.GenerateReport(entries)
+
+	catalogPath := filepath.Join(parity, "catalog.jsonl")
+	manifestPath := filepath.Join(parity, "catalog.manifest.json")
+	reportPath := filepath.Join(parity, "reports", "catalog.md")
+
+	if *update {
+		if err := os.MkdirAll(filepath.Dir(reportPath), 0o755); err != nil {
+			t.Fatalf("mkdir report dir: %v", err)
+		}
+		writes := []struct {
+			path string
+			data []byte
+		}{
+			{catalogPath, catalogData},
+			{manifestPath, manifestData},
+			{reportPath, []byte(report)},
+		}
+		for _, w := range writes {
+			if err := os.WriteFile(w.path, w.data, 0o644); err != nil {
+				t.Fatalf("write %s: %v", w.path, err)
+			}
+		}
+		t.Logf("regenerated catalog: %d entries", len(entries))
+		return
+	}
+
+	// Live consistency: the committed generated artifacts must equal the
+	// overlay-derived output byte-for-byte.
+	for _, w := range []struct {
+		name string
+		path string
+		want []byte
+	}{
+		{"catalog.jsonl", catalogPath, catalogData},
+		{"catalog.manifest.json", manifestPath, manifestData},
+		{"reports/catalog.md", reportPath, []byte(report)},
+	} {
+		got, err := os.ReadFile(w.path)
+		if err != nil {
+			t.Fatalf("read %s: %v", w.name, err)
+		}
+		if !bytes.Equal(got, w.want) {
+			t.Fatalf("committed %s differs from overlay-regenerated output.\n"+
+				"Regenerate with: go test ./internal/catalog -run GenerateCatalog -update\n"+
+				"--- committed (%d bytes) ---\n%s\n--- regenerated (%d bytes) ---\n%s",
+				w.name, len(got), string(got), len(w.want), string(w.want))
+		}
+	}
 }

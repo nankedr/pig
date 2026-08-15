@@ -75,7 +75,9 @@ type Deferred struct {
 }
 
 // Entry is a single Parity Catalog record. The canonical JSONL holds exactly
-// one such object per line.
+// one such object per line. The optional blocks carry omitempty so a generated
+// entry without an approved deviation, partial split, deferral or notes stays
+// byte-clean and diff-minimal (see EncodeEntries).
 type Entry struct {
 	SchemaVersion  string     `json:"schema_version"`
 	ID             string     `json:"id"`
@@ -84,11 +86,11 @@ type Entry struct {
 	Status         string     `json:"status"`
 	Milestone      string     `json:"milestone"`
 	Classification string     `json:"classification"`
-	Evidence       []Evidence `json:"evidence"`
-	Deviation      *Deviation `json:"deviation"`
-	Partial        *Partial   `json:"partial"`
-	Deferred       *Deferred  `json:"deferred"`
-	Notes          string     `json:"notes"`
+	Evidence       []Evidence `json:"evidence,omitempty"`
+	Deviation      *Deviation `json:"deviation,omitempty"`
+	Partial        *Partial   `json:"partial,omitempty"`
+	Deferred       *Deferred  `json:"deferred,omitempty"`
+	Notes          string     `json:"notes,omitempty"`
 }
 
 // Manifest is the versioned catalog manifest.
@@ -432,4 +434,189 @@ func GenerateReport(entries []Entry) string {
 	}
 
 	return b.String()
+}
+
+// EncodeEntries serialises entries as canonical catalog JSONL: one compact
+// object per line, sorted by id, with HTML escaping disabled so ids and
+// references (which contain <, >, & in generics like Promise<T> or Map<K,V>)
+// stay byte-clean and the diff stays minimal.
+func EncodeEntries(entries []Entry) ([]byte, error) {
+	sorted := append([]Entry(nil), entries...)
+	sort.Slice(sorted, func(i, j int) bool { return sorted[i].ID < sorted[j].ID })
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	for _, entry := range sorted {
+		if err := enc.Encode(entry); err != nil {
+			return nil, err
+		}
+	}
+	return buf.Bytes(), nil
+}
+
+// GenerateError reports a problem while generating the catalog from extracted
+// facts and a hand-authored overlay.
+type GenerateError struct {
+	ID     string
+	Reason string
+}
+
+func (e *GenerateError) Error() string {
+	if e.ID == "" {
+		return "catalog: generate: " + e.Reason
+	}
+	return "catalog: generate: id=" + e.ID + ": " + e.Reason
+}
+
+// Generate merges extracted base facts with a hand-authored, id-keyed overlay
+// into the final catalog entries, sorted by id. The overlay is the single
+// human-input surface: it may add new entries (e.g. kind:contract decisions) and
+// override fields of a matching base entry (an overlay field wins only when it
+// is set, so extraction-owned provenance survives unless deliberately replaced).
+//
+// Generate fails, rather than silently defaulting, when an entry lacks a
+// required human decision: every entry must carry a milestone (no implicit M0),
+// and every overlay entry must carry an id. The merged result is not validated
+// here; callers pass it to Validate.
+func Generate(base, overlay []Entry) ([]Entry, error) {
+	merged := make(map[string]Entry, len(base)+len(overlay))
+	order := make([]string, 0, len(base)+len(overlay))
+	seen := map[string]bool{}
+	remember := func(id string) {
+		if !seen[id] {
+			seen[id] = true
+			order = append(order, id)
+		}
+	}
+
+	for _, b := range base {
+		if b.ID == "" {
+			return nil, &GenerateError{Reason: "base entry has empty id"}
+		}
+		merged[b.ID] = b
+		remember(b.ID)
+	}
+
+	for _, o := range overlay {
+		if o.ID == "" {
+			return nil, &GenerateError{Reason: "overlay entry has empty id"}
+		}
+		if existing, ok := merged[o.ID]; ok {
+			merged[o.ID] = mergeEntry(existing, o)
+		} else {
+			merged[o.ID] = o
+		}
+		remember(o.ID)
+	}
+
+	entries := make([]Entry, 0, len(merged))
+	for _, id := range order {
+		e := merged[id]
+		if e.Milestone == "" {
+			return nil, &GenerateError{ID: id, Reason: "missing milestone (no implicit M0 default)"}
+		}
+		entries = append(entries, e)
+	}
+	sort.Slice(entries, func(i, j int) bool { return entries[i].ID < entries[j].ID })
+	return entries, nil
+}
+
+// mergeEntry overlays set fields of o onto b. A string field wins when non-empty;
+// a pointer or slice field wins when non-nil. This lets the overlay refine an
+// extracted base entry (e.g. attach a milestone or deferral) without discarding
+// extraction-owned provenance it leaves unset.
+func mergeEntry(b, o Entry) Entry {
+	if o.SchemaVersion != "" {
+		b.SchemaVersion = o.SchemaVersion
+	}
+	if o.Upstream != (Upstream{}) {
+		b.Upstream = o.Upstream
+	}
+	if o.Mapping != (Mapping{}) {
+		b.Mapping = o.Mapping
+	}
+	if o.Status != "" {
+		b.Status = o.Status
+	}
+	if o.Milestone != "" {
+		b.Milestone = o.Milestone
+	}
+	if o.Classification != "" {
+		b.Classification = o.Classification
+	}
+	if o.Evidence != nil {
+		b.Evidence = o.Evidence
+	}
+	if o.Deviation != nil {
+		b.Deviation = o.Deviation
+	}
+	if o.Partial != nil {
+		b.Partial = o.Partial
+	}
+	if o.Deferred != nil {
+		b.Deferred = o.Deferred
+	}
+	if o.Notes != "" {
+		b.Notes = o.Notes
+	}
+	return b
+}
+
+// LoadOverlay parses a hand-authored overlay JSONL file (same line format as the
+// catalog). It reuses the catalog loader, so malformed lines are reported with
+// their line number.
+func LoadOverlay(path string) ([]Entry, error) {
+	return LoadCatalog(path)
+}
+
+// ManifestPaths carries the fixed relative paths the catalog manifest records.
+// They are stable repository conventions, so BuildManifest takes them as one
+// value rather than several positional strings.
+type ManifestPaths struct {
+	Catalog         string
+	Schema          string
+	GeneratedReport string
+}
+
+// DefaultManifestPaths are the committed relative paths under parity/.
+var DefaultManifestPaths = ManifestPaths{
+	Catalog:         "catalog.jsonl",
+	Schema:          "catalog.schema.json",
+	GeneratedReport: "reports/catalog.md",
+}
+
+// BuildManifest derives the catalog manifest from entries. status_counts always
+// lists every status in StatusOrder (zeros included) so the manifest shape is
+// stable and diff-minimal as statuses come and go.
+func BuildManifest(entries []Entry, baselineCommit string, paths ManifestPaths) Manifest {
+	counts := make(map[string]int, len(StatusOrder))
+	for _, s := range StatusOrder {
+		counts[s] = 0
+	}
+	for _, e := range entries {
+		counts[e.Status]++
+	}
+	return Manifest{
+		SchemaVersion:   SchemaVersion,
+		CatalogVersion:  SchemaVersion,
+		BaselineCommit:  baselineCommit,
+		Catalog:         paths.Catalog,
+		Schema:          paths.Schema,
+		GeneratedReport: paths.GeneratedReport,
+		EntryCount:      len(entries),
+		StatusCounts:    counts,
+	}
+}
+
+// EncodeManifest serialises the manifest as pretty JSON with a trailing newline,
+// matching the committed formatting (two-space indent, HTML escaping off).
+func EncodeManifest(m Manifest) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(m); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
