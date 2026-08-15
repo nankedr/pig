@@ -5,9 +5,11 @@
 // normal Pig build/test never runs this and stays pure-Go with no Node.
 //
 // It resolves each in-scope module's public entry points from package.json
-// (main/types/exports + bin), walks the export surface through the TypeScript
-// Compiler API, and emits one canonical JSONL record per unique exported symbol
-// (deduped by declaration site) with its public members nested. The Go side
+// (main/types/exports + bin, wildcard export subpaths expanded, and — for
+// packages with no "exports" gate — every technically reachable src deep
+// import), walks the export surface through the TypeScript Compiler API, and
+// emits one canonical JSONL record per unique exported symbol (deduped by
+// declaration site) with its public members nested. The Go side
 // (internal/surface) loads and validates this generated authority offline; it is
 // the machine-readable surface view, parallel to parity/inventory/files.jsonl.
 //
@@ -15,7 +17,7 @@
 // Default out: ../surface/symbols.jsonl relative to this file.
 
 import ts from "typescript";
-import { readFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -49,7 +51,8 @@ function parseArgs(argv) {
 
 // distTargetToSrc maps a built dist target (e.g. "./dist/providers/openai.js")
 // back to its TypeScript source under the module, mirroring the Go walker's
-// resolution. Glob targets ("*") are expanded by the caller.
+// resolution. A wildcard target ("./dist/providers/*.js") is expanded against
+// the source tree so every technically reachable deep-import file is covered.
 function distTargetToSrc(moduleAbs, target) {
 	let rel = target
 		.replace(/^\.\//, "")
@@ -59,12 +62,47 @@ function distTargetToSrc(moduleAbs, target) {
 		.replace(/\.ts$/, "");
 	if (!rel || rel === "package.json") return [];
 	if (rel.includes("*")) {
-		return []; // glob subpaths are resolved from the filesystem in resolveEntries
+		return expandGlobSrc(moduleAbs, rel);
 	}
 	for (const cand of [`src/${rel}.ts`, `src/${rel}.tsx`, `${rel}.ts`, `${rel}.d.ts`]) {
 		if (existsSync(join(moduleAbs, cand))) return [{ src: cand, subpath: rel }];
 	}
 	return [];
+}
+
+// expandGlobSrc resolves a single-"*" subpath target (e.g. "providers/*") to the
+// matching source files under src/, so wildcard exports contribute their real
+// public deep-import surface rather than nothing. Each result carries the "*"
+// capture (star) so the caller can form the concrete public subpath.
+function expandGlobSrc(moduleAbs, relPattern) {
+	const star = relPattern.indexOf("*");
+	if (star < 0 || relPattern.indexOf("*", star + 1) >= 0) return []; // only single "*"
+	const prefix = relPattern.slice(0, star); // e.g. "providers/"
+	const suffix = relPattern.slice(star + 1); // usually ""
+	const dirRel = prefix.endsWith("/") ? prefix.slice(0, -1) : dirname(prefix);
+	const dirAbs = join(moduleAbs, "src", dirRel);
+	if (!existsSync(dirAbs)) return [];
+	const out = [];
+	for (const name of readdirSync(dirAbs)) {
+		const cap = matchStar(name, prefix.slice(dirRel ? dirRel.length + 1 : 0), suffix);
+		if (cap === null) continue;
+		const src = join("src", dirRel, name).split("\\").join("/");
+		out.push({ src, star: cap });
+	}
+	return out;
+}
+
+// matchStar returns the "*" capture for a filename against prefix+"*"+suffix,
+// stripping a .ts/.tsx source extension, or null when it does not match a
+// concrete TypeScript source (skips .d.ts and non-source files).
+function matchStar(name, prefix, suffix) {
+	let stem = name;
+	if (stem.endsWith(".d.ts")) return null;
+	if (stem.endsWith(".tsx")) stem = stem.slice(0, -4);
+	else if (stem.endsWith(".ts")) stem = stem.slice(0, -3);
+	else return null;
+	if (!stem.startsWith(prefix) || !stem.endsWith(suffix)) return null;
+	return stem.slice(prefix.length, stem.length - suffix.length);
 }
 
 function collectExportEntries(exportsField) {
@@ -95,6 +133,11 @@ function collectBinTargets(bin) {
 
 // resolveEntries returns the module's public entry source files, each tagged
 // with the export subpath it backs and whether it is a bin (direct) entry.
+//
+// A package with no "exports" field is not encapsulated: Node lets consumers
+// deep-import any built file, so every src module is a technically reachable
+// public entry (this is how the TUI surface is consumed). Packages that declare
+// "exports" are gated to their listed subpaths.
 function resolveEntries(moduleAbs) {
 	const pkg = JSON.parse(readFileSync(join(moduleAbs, "package.json"), "utf8"));
 	const entries = new Map(); // src -> {subpath, isBin}
@@ -106,12 +149,47 @@ function resolveEntries(moduleAbs) {
 	if (pkg.types) for (const e of distTargetToSrc(moduleAbs, pkg.types)) add(e.src, ".", false);
 	if (pkg.main) for (const e of distTargetToSrc(moduleAbs, pkg.main)) add(e.src, ".", false);
 	for (const { subpath, target } of collectExportEntries(pkg.exports || {})) {
-		for (const e of distTargetToSrc(moduleAbs, target)) add(e.src, subpath, false);
+		for (const e of distTargetToSrc(moduleAbs, target)) {
+			// Wildcard export keys ("./providers/*") resolve to a concrete
+			// public subpath per matched file ("./providers/anthropic").
+			const concrete = e.star !== undefined ? subpath.replace("*", e.star) : subpath;
+			add(e.src, concrete, false);
+		}
 	}
 	for (const target of collectBinTargets(pkg.bin)) {
 		for (const e of distTargetToSrc(moduleAbs, target)) add(e.src, "bin", true);
 	}
+	if (!pkg.exports) {
+		for (const { src, subpath } of walkSrcFiles(moduleAbs)) add(src, subpath, false);
+	}
 	return entries;
+}
+
+// walkSrcFiles returns every TypeScript source module under src/, each tagged
+// with the deep-import subpath it backs (its src-relative path without the
+// extension). Declaration files and test/story files are skipped: they are not
+// public runtime deep-import targets. Used only for unencapsulated packages.
+function walkSrcFiles(moduleAbs) {
+	const srcAbs = join(moduleAbs, "src");
+	if (!existsSync(srcAbs)) return [];
+	const out = [];
+	const walk = (dirAbs) => {
+		for (const ent of readdirSync(dirAbs, { withFileTypes: true })) {
+			const abs = join(dirAbs, ent.name);
+			if (ent.isDirectory()) {
+				walk(abs);
+				continue;
+			}
+			if (ent.name.endsWith(".d.ts")) continue;
+			if (/\.(test|spec|stories)\.tsx?$/.test(ent.name)) continue;
+			if (!/\.tsx?$/.test(ent.name)) continue;
+			const src = relative(moduleAbs, abs).split("\\").join("/");
+			const subpath = src.replace(/^src\//, "").replace(/\.tsx?$/, "");
+			out.push({ src, subpath });
+		}
+	};
+	walk(srcAbs);
+	return out;
 }
 
 function symbolKind(sym, checker) {
@@ -148,7 +226,9 @@ function declarationRef(sym, piRoot) {
 }
 
 // memberNames returns the sorted public member names of a symbol's declared
-// type (properties and methods), skipping private/internal (leading "_") names.
+// type (properties and methods). It skips members that are not part of the
+// public surface: ECMAScript #private fields (name begins with "#"), the
+// TypeScript "private" modifier, and the leading-"_" internal convention.
 function memberNames(sym, checker) {
 	let target = sym;
 	try {
@@ -157,13 +237,26 @@ function memberNames(sym, checker) {
 		const names = [];
 		for (const p of t.getProperties()) {
 			const name = p.getName();
-			if (name.startsWith("_")) continue;
+			if (name.startsWith("_") || name.startsWith("#")) continue;
+			if (isPrivateMember(p)) continue;
 			names.push(name);
 		}
 		return [...new Set(names)].sort();
 	} catch {
 		return [];
 	}
+}
+
+// isPrivateMember reports whether a property symbol is declared with the
+// TypeScript "private" (or "protected") access modifier on any declaration.
+function isPrivateMember(prop) {
+	const decls = prop.getDeclarations && prop.getDeclarations();
+	if (!decls) return false;
+	for (const d of decls) {
+		const mods = ts.getCombinedModifierFlags(d);
+		if (mods & (ts.ModifierFlags.Private | ts.ModifierFlags.Protected)) return true;
+	}
+	return false;
 }
 
 function main() {

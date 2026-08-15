@@ -11,11 +11,11 @@
 
 | Status | Count |
 | --- | --- |
-| inventoried | 14 |
+| inventoried | 15 |
 | scaffolded | 9 |
 | partial | 0 |
 | implemented | 0 |
-| verified | 1 |
+| verified | 0 |
 | deferred | 2 |
 
 ## Entries by module
@@ -65,9 +65,9 @@
 | ID | Status | Milestone | Kind | Target | Upstream |
 | --- | --- | --- | --- | --- | --- |
 | contract:protocol/cbor | inventoried | M9 | contract | github.com/nankedr/pig/protocol | protocol |
+| contract:protocol/frame | inventoried | M9 | contract | github.com/nankedr/pig/protocol | protocol |
 | contract:protocol/version | inventoried | M9 | contract | github.com/nankedr/pig/protocol | protocol |
 | module-protocol | scaffolded | M9 | package | github.com/nankedr/pig/protocol | protocol |
-| contract:protocol/frame | verified | M9 | contract | github.com/nankedr/pig/protocol | protocol |
 
 ### telemetry
 

@@ -21,11 +21,14 @@
 // Usage:
 //   node run.mjs [<pi-checkout-root>] [--out <path>]   capture the fixture
 //   node run.mjs --check [<pi-checkout-root>]           verify it reproduces
+//   node run.mjs --fetch [<pi-checkout-root>]           fetch the baseline first
 // Default checkout: <repo>/.upstream/pi. Default out: ./fixtures/protocol-frame.json.
+// The default managed checkout is fetched on demand when absent; an explicitly
+// supplied checkout is only verified (never modified). --fetch forces a fetch.
 
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -33,20 +36,26 @@ const SCHEMA_VERSION = "1.0.0";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, "..", "..");
+const defaultPiRoot = join(repoRoot, ".upstream", "pi");
 
 function parseArgs(argv) {
 	const args = {
 		piRoot: null,
 		out: join(here, "fixtures", "protocol-frame.json"),
 		check: false,
+		fetch: false,
 	};
 	const rest = argv.slice(2);
 	for (let i = 0; i < rest.length; i++) {
 		if (rest[i] === "--check") args.check = true;
+		else if (rest[i] === "--fetch") args.fetch = true;
 		else if (rest[i] === "--out") args.out = rest[++i];
 		else if (!args.piRoot) args.piRoot = rest[i];
 	}
-	if (!args.piRoot) args.piRoot = join(repoRoot, ".upstream", "pi");
+	// A checkout the user names explicitly is theirs: verify it, never fetch into
+	// it. The default managed checkout under .upstream/pi may be fetched on demand.
+	args.managed = !args.piRoot;
+	if (!args.piRoot) args.piRoot = defaultPiRoot;
 	return args;
 }
 
@@ -77,6 +86,39 @@ function assertCheckoutAtLock(piRoot, expectedCommit) {
 			`checkout HEAD ${head} != locked commit ${expectedCommit}; the Oracle only runs against the frozen baseline`,
 		);
 	}
+}
+
+// headAt returns the checkout's HEAD commit, or null when piRoot is not a git
+// checkout yet (so the caller can decide whether to fetch it).
+function headAt(piRoot) {
+	try {
+		return execFileSync("git", ["-C", piRoot, "rev-parse", "HEAD"], {
+			encoding: "utf8",
+			stdio: ["ignore", "pipe", "ignore"],
+		}).trim();
+	} catch {
+		return null;
+	}
+}
+
+// fetchBaseline provisions the managed .upstream/pi checkout at exactly the
+// locked commit: a shallow, single-commit fetch by SHA from the locked
+// repository. It is only ever pointed at the managed default path, is a no-op
+// when HEAD already matches, and leaves the working tree detached at the lock.
+// This is the "按需获取" half of the Oracle's checkout contract (#22); a
+// user-supplied checkout is never fetched into.
+function fetchBaseline(piRoot, lock) {
+	if (headAt(piRoot) === lock.commit) return;
+	const git = (...cmd) => execFileSync("git", cmd, { stdio: "inherit" });
+	mkdirSync(piRoot, { recursive: true });
+	if (headAt(piRoot) === null && !existsSync(join(piRoot, ".git"))) {
+		git("-C", piRoot, "init", "-q");
+		git("-C", piRoot, "remote", "add", "origin", `${lock.repository}.git`);
+	}
+	// Fetch just the locked commit (GitHub allows fetch-by-SHA) at depth 1, then
+	// detach onto it, so the checkout is pinned to the frozen baseline.
+	git("-C", piRoot, "fetch", "--depth", "1", "origin", lock.commit);
+	git("-C", piRoot, "checkout", "-q", "--detach", lock.commit);
 }
 
 // encodeCase drives the canonical ClientHello through Pi's real codec, returning
@@ -157,6 +199,16 @@ function protocolFacts(fixture) {
 async function main() {
 	const args = parseArgs(process.argv);
 	const lock = readLock();
+
+	// Checkout contract: accept only a lock-matching checkout, supporting both a
+	// user-supplied path (verify only) and on-demand acquisition of the managed
+	// .upstream/pi checkout. The managed checkout is fetched when missing or off
+	// the lock; --fetch forces it and is rejected for a user-supplied path.
+	if (args.managed && (args.fetch || headAt(args.piRoot) !== lock.commit)) {
+		fetchBaseline(args.piRoot, lock);
+	} else if (args.fetch && !args.managed) {
+		throw new Error("--fetch only provisions the managed .upstream/pi checkout, not a supplied path");
+	}
 	assertCheckoutAtLock(args.piRoot, lock.commit);
 
 	const encoded = await encodeCase(args.piRoot);
