@@ -1,5 +1,10 @@
 /.upstream/
 
+# Parity extraction toolchain (Node is only used on-demand for TS surface
+# extraction and the Pi Oracle; normal Pig build/test stays pure-Go).
+parity/extract/node_modules/
+.npmcache/
+
 # Binaries for programs and plugins
 *.exe
 *.exe~

@@ -1,0 +1,17 @@
+{
+  "name": "pig-parity-extract",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "On-demand parity extraction toolchain. Node + the locked TypeScript Compiler are used ONLY to extract Pi's public surface (#21) and to capture Pi Oracle fixtures (#22) against the frozen baseline. Normal Pig build/test never runs this and stays pure-Go with no Node dependency.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "surface": "node surface.mjs",
+    "oracle": "node ../oracle/run.mjs"
+  },
+  "dependencies": {
+    "typescript": "5.9.3"
+  }
+}
