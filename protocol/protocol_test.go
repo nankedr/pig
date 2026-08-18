@@ -303,8 +303,6 @@ func TestCommandAndMessagePublicShapeCoversEveryWireVariant(t *testing.T) {
 			t.Fatalf("results[%d].ResultCommandName() = %q, want %q", i, got, wantCommandNames[i])
 		}
 	}
-	var _ protocol.ResultForCommand[protocol.ListCommand] = protocol.ListResult{}
-
 	clientMessages := []protocol.ClientMessage{
 		protocol.ClientHello{Type: protocol.MessageTypeHello, Version: protocol.ProtocolVersion},
 		protocol.RequestEnvelope{Type: protocol.MessageTypeRequest, ID: "r1", Request: commands[0]},
@@ -714,7 +712,7 @@ var (
 	_ protocol.Schema[protocol.RequestEnvelope]                                   = protocol.RequestEnvelopeSchema              // upstream: RequestEnvelopeSchema
 	_ protocol.ResponseEnvelope                                                   = protocol.SuccessResponseEnvelope{}          // upstream: ResponseEnvelope
 	_ protocol.Schema[protocol.ResponseEnvelope]                                  = protocol.ResponseEnvelopeSchema             // upstream: ResponseEnvelopeSchema
-	_ protocol.ResultForCommand[protocol.ListCommand]                             = protocol.ListResult{}                       // upstream: ResultForCommand
+	_ protocol.CommandResult                                                      = protocol.ListResult{}                       // upstream: ResultForCommand; closed union plus command discriminator
 	_ protocol.ServerEvent                                                        = protocol.ServerSnapshotEvent{}              // upstream: ServerEvent
 	_ protocol.Schema[protocol.ServerEvent]                                       = protocol.ServerEventSchema                  // upstream: ServerEventSchema
 	_ protocol.ServerHello                                                                                                      // upstream: ServerHello
@@ -757,19 +755,4 @@ var (
 	_ protocol.Schema[protocol.UserContent]                                       = protocol.UserContentSchema                  // upstream: UserContentSchema
 	_ protocol.UserTranscriptItem                                                                                               // upstream: UserTranscriptItem
 	_ protocol.Schema[protocol.UserTranscriptItem]                                = protocol.UserTranscriptItemSchema           // upstream: UserTranscriptItemSchema
-)
-
-// Compile-time command/result pairing parity for ResultForCommand. These
-// assertions strengthen the single upstream surface mapping above without
-// adding duplicate upstream-name markers.
-var (
-	_ protocol.ResultForCommand[protocol.ListCommand]        = protocol.ListResult{}
-	_ protocol.ResultForCommand[protocol.CreateCommand]      = protocol.CreateResult{}
-	_ protocol.ResultForCommand[protocol.AttachCommand]      = protocol.AttachResult{}
-	_ protocol.ResultForCommand[protocol.DetachCommand]      = protocol.DetachResult{}
-	_ protocol.ResultForCommand[protocol.PromptCommand]      = protocol.PromptResult{}
-	_ protocol.ResultForCommand[protocol.SteerCommand]       = protocol.SteerResult{}
-	_ protocol.ResultForCommand[protocol.AbortCommand]       = protocol.AbortResult{}
-	_ protocol.ResultForCommand[protocol.SetModelCommand]    = protocol.SetModelResult{}
-	_ protocol.ResultForCommand[protocol.SetThinkingCommand] = protocol.SetThinkingResult{}
 )

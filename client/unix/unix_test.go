@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -95,6 +96,37 @@ func TestNewTransportFactoryValidatesOptionsWithoutFilesystemAccess(t *testing.T
 				t.Fatalf("NewTransportFactory(%#v) factory != nil", test.options)
 			}
 		})
+	}
+}
+
+func TestNewTransportFactoryRejectsPendingBytesAboveJavaScriptSafeInteger(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Unix transport is not available on Windows")
+	}
+	if strconv.IntSize < 64 {
+		t.Skip("values above JavaScript's maximum safe integer do not fit in int")
+	}
+	maxSafeInteger64 := int64(1)<<53 - 1
+	maxSafeInteger := int(maxSafeInteger64)
+	factory, err := clientunix.NewTransportFactory(clientunix.Options{
+		Path:            "missing.sock",
+		MaxPendingBytes: &maxSafeInteger,
+	})
+	if err != nil || factory == nil {
+		t.Fatalf("NewTransportFactory(max safe integer) = (%v, %v), want non-nil factory and nil error", factory, err)
+	}
+
+	aboveSafeInteger64 := int64(1) << 53
+	aboveSafeInteger := int(aboveSafeInteger64)
+	factory, err = clientunix.NewTransportFactory(clientunix.Options{
+		Path:            "missing.sock",
+		MaxPendingBytes: &aboveSafeInteger,
+	})
+	if err == nil {
+		t.Fatal("NewTransportFactory error = nil")
+	}
+	if factory != nil {
+		t.Fatal("NewTransportFactory factory != nil")
 	}
 }
 

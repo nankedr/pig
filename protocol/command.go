@@ -99,18 +99,12 @@ type SetThinkingCommand struct {
 func (SetThinkingCommand) command()                   {}
 func (c SetThinkingCommand) CommandName() CommandName { return c.Command }
 
-// CommandResult is a closed union of command results.
+// CommandResult is a closed union of command results. Concrete result variants
+// correlate with commands through their CommandName discriminator; Pig does not
+// reproduce the upstream TypeScript conditional type.
 type CommandResult interface {
 	commandResult()
 	ResultCommandName() CommandName
-}
-
-// ResultForCommand preserves the command-to-result relationship expressed by
-// the upstream conditional type. Only the result paired with TCommand
-// satisfies the interface.
-type ResultForCommand[TCommand Command] interface {
-	CommandResult
-	resultFor(TCommand)
 }
 
 type ListResult struct {
@@ -120,7 +114,6 @@ type ListResult struct {
 
 func (ListResult) commandResult()                   {}
 func (r ListResult) ResultCommandName() CommandName { return r.Command }
-func (ListResult) resultFor(ListCommand)            {}
 
 type CreateResult struct {
 	Command CommandName     `json:"command"`
@@ -129,7 +122,6 @@ type CreateResult struct {
 
 func (CreateResult) commandResult()                   {}
 func (r CreateResult) ResultCommandName() CommandName { return r.Command }
-func (CreateResult) resultFor(CreateCommand)          {}
 
 type AttachResult struct {
 	Command CommandName     `json:"command"`
@@ -138,7 +130,6 @@ type AttachResult struct {
 
 func (AttachResult) commandResult()                   {}
 func (r AttachResult) ResultCommandName() CommandName { return r.Command }
-func (AttachResult) resultFor(AttachCommand)          {}
 
 type DetachResult struct {
 	Command   CommandName `json:"command"`
@@ -147,7 +138,6 @@ type DetachResult struct {
 
 func (DetachResult) commandResult()                   {}
 func (r DetachResult) ResultCommandName() CommandName { return r.Command }
-func (DetachResult) resultFor(DetachCommand)          {}
 
 type PromptResult struct {
 	Command CommandName     `json:"command"`
@@ -156,7 +146,6 @@ type PromptResult struct {
 
 func (PromptResult) commandResult()                   {}
 func (r PromptResult) ResultCommandName() CommandName { return r.Command }
-func (PromptResult) resultFor(PromptCommand)          {}
 
 type SteerResult struct {
 	Command CommandName     `json:"command"`
@@ -165,7 +154,6 @@ type SteerResult struct {
 
 func (SteerResult) commandResult()                   {}
 func (r SteerResult) ResultCommandName() CommandName { return r.Command }
-func (SteerResult) resultFor(SteerCommand)           {}
 
 type AbortResult struct {
 	Command CommandName     `json:"command"`
@@ -174,7 +162,6 @@ type AbortResult struct {
 
 func (AbortResult) commandResult()                   {}
 func (r AbortResult) ResultCommandName() CommandName { return r.Command }
-func (AbortResult) resultFor(AbortCommand)           {}
 
 type SetModelResult struct {
 	Command CommandName     `json:"command"`
@@ -183,7 +170,6 @@ type SetModelResult struct {
 
 func (SetModelResult) commandResult()                   {}
 func (r SetModelResult) ResultCommandName() CommandName { return r.Command }
-func (SetModelResult) resultFor(SetModelCommand)        {}
 
 type SetThinkingResult struct {
 	Command CommandName     `json:"command"`
@@ -192,4 +178,3 @@ type SetThinkingResult struct {
 
 func (SetThinkingResult) commandResult()                   {}
 func (r SetThinkingResult) ResultCommandName() CommandName { return r.Command }
-func (SetThinkingResult) resultFor(SetThinkingCommand)     {}

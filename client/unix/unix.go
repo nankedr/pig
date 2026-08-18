@@ -15,11 +15,13 @@ import (
 	"github.com/nankedr/pig/client"
 )
 
+const maxSafeInteger int64 = 1<<53 - 1
+
 // Options maps the upstream UnixTransportOptions export.
 type Options struct {
 	Path string
 	// MaxPendingBytes is absent for four times the protocol frame default. A
-	// present value must be positive.
+	// present value must be a positive JavaScript safe integer.
 	MaxPendingBytes *int
 }
 
@@ -36,8 +38,8 @@ func NewTransportFactory(options Options) (client.ByteTransportFactory, error) {
 	if len(options.Path) > maxPathBytes {
 		return nil, fmt.Errorf("unix transport path is too long; maximum is %d UTF-8 bytes", maxPathBytes)
 	}
-	if options.MaxPendingBytes != nil && *options.MaxPendingBytes <= 0 {
-		return nil, errors.New("unix transport max pending bytes must be positive")
+	if options.MaxPendingBytes != nil && (*options.MaxPendingBytes <= 0 || int64(*options.MaxPendingBytes) > maxSafeInteger) {
+		return nil, errors.New("unix transport max pending bytes must be a positive safe integer")
 	}
 	if runtime.GOOS == "windows" {
 		return nil, errors.New("unix transport is not supported on Windows")

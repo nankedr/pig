@@ -355,9 +355,9 @@ var (
 		OnError: func(error) {},
 	}
 
-	_ client.ConnectionState = client.ConnectionStateDisconnected // ConnectionState
-	_                        = client.ConnectionStateChange{State: client.ConnectionStateDisconnected, Error: nil}
-	_                        = client.CreateSessionOptions{ // CreateSessionOptions
+	_ client.ConnectionState = client.ConnectionStateDisconnected                                                  // ConnectionState
+	_                        = client.ConnectionStateChange{State: client.ConnectionStateDisconnected, Error: nil} // ConnectionStateChange
+	_                        = client.CreateSessionOptions{                                                        // CreateSessionOptions
 		CWD:           protocol.None[string](),
 		Name:          protocol.None[string](),
 		Model:         protocol.None[protocol.ModelRef](),
