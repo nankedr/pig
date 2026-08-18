@@ -7,12 +7,12 @@
 
 ## Summary
 
-- Total entries: 26
+- Total entries: 28
 
 | Status | Count |
 | --- | --- |
-| inventoried | 15 |
-| scaffolded | 9 |
+| inventoried | 12 |
+| scaffolded | 14 |
 | partial | 0 |
 | implemented | 0 |
 | verified | 0 |
@@ -39,6 +39,7 @@
 
 | ID | Status | Milestone | Kind | Target | Upstream |
 | --- | --- | --- | --- | --- | --- |
+| contract:client/request-cancellation | scaffolded | M9 | contract | github.com/nankedr/pig/client | client |
 | module-client | scaffolded | M9 | package | github.com/nankedr/pig/client | client |
 
 ### codingagent
@@ -64,9 +65,10 @@
 
 | ID | Status | Milestone | Kind | Target | Upstream |
 | --- | --- | --- | --- | --- | --- |
-| contract:protocol/cbor | inventoried | M9 | contract | github.com/nankedr/pig/protocol | protocol |
-| contract:protocol/frame | inventoried | M9 | contract | github.com/nankedr/pig/protocol | protocol |
-| contract:protocol/version | inventoried | M9 | contract | github.com/nankedr/pig/protocol | protocol |
+| contract:protocol/cbor | scaffolded | M9 | contract | github.com/nankedr/pig/protocol | protocol |
+| contract:protocol/frame | scaffolded | M9 | contract | github.com/nankedr/pig/protocol | protocol |
+| contract:protocol/schema-codec | scaffolded | M9 | contract | github.com/nankedr/pig/protocol | protocol |
+| contract:protocol/version | scaffolded | M9 | contract | github.com/nankedr/pig/protocol | protocol |
 | module-protocol | scaffolded | M9 | package | github.com/nankedr/pig/protocol | protocol |
 
 ### telemetry

@@ -5,13 +5,13 @@
   "catalog": "catalog.jsonl",
   "schema": "catalog.schema.json",
   "generated_report": "reports/catalog.md",
-  "entry_count": 26,
+  "entry_count": 28,
   "status_counts": {
     "deferred": 2,
     "implemented": 0,
-    "inventoried": 15,
+    "inventoried": 12,
     "partial": 0,
-    "scaffolded": 9,
+    "scaffolded": 14,
     "verified": 0
   }
 }
