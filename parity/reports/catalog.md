@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 28
+- Total entries: 36
 
 | Status | Count |
 | --- | --- |
 | inventoried | 12 |
-| scaffolded | 14 |
-| partial | 0 |
+| scaffolded | 17 |
+| partial | 5 |
 | implemented | 0 |
 | verified | 0 |
 | deferred | 2 |
@@ -33,7 +33,15 @@
 | --- | --- | --- | --- | --- | --- |
 | contract:auth/pig-ai/login-cli | inventoried | M11 | contract | github.com/nankedr/pig/cmd/pig-ai | ai |
 | cmd-pig-ai | scaffolded | M11 | command | github.com/nankedr/pig/cmd/pig-ai | ai |
+| contract:ai/api-adapter | scaffolded | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/model | scaffolded | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/provider | scaffolded | M1 | contract | github.com/nankedr/pig/ai | ai |
 | module-ai | scaffolded | M1 | package | github.com/nankedr/pig/ai | ai |
+| contract:ai/content | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/event-stream | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/message | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/options | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/tool | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 
 ### client
 
