@@ -24,6 +24,67 @@ func TestKnownAPIAdapterConstructorsBindConcreteOptions(t *testing.T) {
 	exerciseKnownAPIAdapter(t, ai.APIPiMessages, ai.NewPiMessagesAPIAdapter)
 }
 
+func TestAPIAdapterConstructorsTurnNilStreamsIntoCapabilityStubs(t *testing.T) {
+	t.Parallel()
+
+	exerciseNilAPIAdapterStub(t, ai.NewAnthropicAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewAzureOpenAIResponsesAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewBedrockAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewGoogleAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewGoogleVertexAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewMistralAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewOpenAICodexResponsesAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewOpenAICompletionsAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewOpenAIResponsesAPIAdapter)
+	exerciseNilAPIAdapterStub(t, ai.NewPiMessagesAPIAdapter)
+	exerciseNilAPIAdapterStub(t, func(stream ai.APIStreamFunction[json.RawMessage]) ai.APIAdapterDescriptor[json.RawMessage] {
+		return ai.NewCustomAPIAdapter(ai.API("acme-wire-v1"), stream)
+	})
+}
+
+func exerciseNilAPIAdapterStub[TOptions any](
+	t *testing.T,
+	constructor func(ai.APIStreamFunction[TOptions]) ai.APIAdapterDescriptor[TOptions],
+) {
+	t.Helper()
+
+	descriptor := constructor(nil)
+	if descriptor.Stream == nil {
+		t.Fatal("descriptor Stream is nil, want callable Capability Stub")
+	}
+	typedStream := descriptor.Stream(context.Background(), ai.Model{}, ai.Context{}, *new(TOptions))
+	if typedStream == nil {
+		t.Fatal("typed Capability Stub returned a nil stream")
+	}
+	if _, ok, err := typedStream.Next(context.Background()); err != nil || ok {
+		t.Fatalf("typed Capability Stub Next() = (_, %v, %v), want no event and nil waiter error", ok, err)
+	}
+	if _, err := typedStream.Result(context.Background()); err == nil {
+		t.Fatal("typed Capability Stub Result() error = nil, want ErrNotImplemented")
+	} else {
+		assertAPIAdapterNotImplemented(t, err)
+	}
+
+	stream, err := ai.EraseAPIAdapter(descriptor).Stream(
+		context.Background(), ai.Model{}, ai.Context{}, json.RawMessage(`{`),
+	)
+	if stream != nil || !errors.Is(err, ai.ErrNotImplemented) {
+		t.Fatalf("erased Capability Stub Stream() = (%v, %v), want nil and ErrNotImplemented", stream, err)
+	}
+	assertAPIAdapterNotImplemented(t, err)
+}
+
+func assertAPIAdapterNotImplemented(t *testing.T, err error) {
+	t.Helper()
+	if !errors.Is(err, ai.ErrNotImplemented) {
+		t.Fatalf("Capability Stub error = %v, want ErrNotImplemented", err)
+	}
+	var notImplemented *ai.NotImplementedError
+	if !errors.As(err, &notImplemented) || notImplemented.Module != "ai" || notImplemented.Operation != "APIAdapter.Stream" {
+		t.Fatalf("Capability Stub error = %#v, want ai/APIAdapter.Stream NotImplementedError", err)
+	}
+}
+
 func exerciseKnownAPIAdapter[TOptions any](
 	t *testing.T,
 	wantAPI ai.API,

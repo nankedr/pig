@@ -22,10 +22,12 @@ type StreamFunction = APIStreamFunction[StreamOptions]
 // wrong options type, including descriptors assembled with a struct literal.
 //
 // The zero value is only a declaration value; its Stream field is nil and must
-// not be called. Constructors return descriptors with a non-nil Stream field.
+// not be called. Constructors return descriptors with a non-nil Stream field;
+// passing nil to a constructor installs a side-effect-free Capability Stub.
 type APIAdapterDescriptor[TOptions any] struct {
 	API    API
 	Stream APIStreamFunction[TOptions]
+	stub   bool
 }
 
 // NewAnthropicAPIAdapter binds the Anthropic Messages API to AnthropicOptions.
@@ -91,8 +93,11 @@ func NewCustomAPIAdapter(api API, stream APIStreamFunction[json.RawMessage]) API
 func newAPIAdapterDescriptor[TOptions any](api API, stream APIStreamFunction[TOptions]) APIAdapterDescriptor[TOptions] {
 	if stream == nil {
 		stream = func(context.Context, Model, Context, TOptions) *AssistantMessageEventStream {
-			return nil
+			failed := NewAssistantMessageEventStream()
+			failed.stream.endWithError(newNotImplemented("APIAdapter.Stream"))
+			return failed
 		}
+		return APIAdapterDescriptor[TOptions]{API: api, Stream: stream, stub: true}
 	}
 	return APIAdapterDescriptor[TOptions]{API: api, Stream: stream}
 }
@@ -116,6 +121,9 @@ func EraseAPIAdapter[TOptions any](descriptor APIAdapterDescriptor[TOptions]) Er
 	return ErasedAPIAdapter{
 		API: descriptor.API,
 		Stream: func(ctx context.Context, model Model, input Context, raw json.RawMessage) (*AssistantMessageEventStream, error) {
+			if descriptor.stub || descriptor.Stream == nil {
+				return nil, newNotImplemented("APIAdapter.Stream")
+			}
 			if optionsTypeErr != nil {
 				return nil, optionsTypeErr
 			}
@@ -127,9 +135,6 @@ func EraseAPIAdapter[TOptions any](descriptor APIAdapterDescriptor[TOptions]) Er
 				*rawTarget = append(json.RawMessage(nil), raw...)
 			} else if err := json.Unmarshal(raw, &options); err != nil {
 				return nil, fmt.Errorf("decode %s API options: %w", descriptor.API, err)
-			}
-			if descriptor.Stream == nil {
-				return nil, newNotImplemented("APIAdapter.Stream")
 			}
 			stream := descriptor.Stream(ctx, model, input, options)
 			if stream == nil {

@@ -156,13 +156,17 @@ func (s *EventStream[T, R]) signalLocked() {
 }
 
 func (s *EventStream[T, R]) fail(err error) {
+	s.endWithError(errors.Join(ErrEventStreamInvariant, err))
+}
+
+func (s *EventStream[T, R]) endWithError(err error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.done {
 		return
 	}
 	s.done = true
-	s.resultErr = errors.Join(ErrEventStreamInvariant, err)
+	s.resultErr = err
 	s.signalLocked()
 }
 
