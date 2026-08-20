@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 36
+- Total entries: 37
 
 | Status | Count |
 | --- | --- |
 | inventoried | 12 |
 | scaffolded | 17 |
-| partial | 5 |
+| partial | 6 |
 | implemented | 0 |
 | verified | 0 |
 | deferred | 2 |
@@ -37,6 +37,7 @@
 | contract:ai/model | scaffolded | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/provider | scaffolded | M1 | contract | github.com/nankedr/pig/ai | ai |
 | module-ai | scaffolded | M1 | package | github.com/nankedr/pig/ai | ai |
+| contract:ai/auth | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/content | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/event-stream | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/message | partial | M1 | contract | github.com/nankedr/pig/ai | ai |

@@ -14,7 +14,10 @@
 // Stub.
 //
 // This package is an M0 contract scaffold. Pure value, codec, and in-memory
-// stream behavior is available. Provider I/O, authentication, model catalogs,
-// and protocol-specific implementations remain later-milestone capabilities
-// and must fail with ErrNotImplemented rather than performing side effects.
+// stream behavior is available, including the credential union, the in-memory
+// CredentialStore, and auth resolution orchestration. Provider I/O, ambient
+// environment and filesystem access, model catalogs, OAuth and provider login
+// flows, and protocol-specific implementations remain later-milestone
+// capabilities and must fail with ErrNotImplemented rather than performing side
+// effects.
 package ai
