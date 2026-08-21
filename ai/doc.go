@@ -21,6 +21,11 @@
 // providers exist, but built-in model lists and generated-at provenance remain
 // absent until the real catalog snapshot is captured.
 //
+// The M0.11 surface also includes API and Provider factories, lazy-loading,
+// legacy OAuth and ambient-auth entry points, image registries, Faux shapes,
+// and compat/deprecated aliases. Pure registry and value behavior is live;
+// unavailable execution paths are explicit Capability Stubs.
+//
 // Real provider side effects remain later-milestone capabilities. Ambient
 // environment and filesystem access, provider/catalog network refresh, real
 // provider stream I/O, OAuth refresh/login flows, and protocol-specific
