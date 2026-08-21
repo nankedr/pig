@@ -13,11 +13,18 @@
 // representations, internal invariant failures, or an explicit M0 Capability
 // Stub.
 //
-// This package is an M0 contract scaffold. Pure value, codec, and in-memory
-// stream behavior is available, including the credential union, the in-memory
-// CredentialStore, and auth resolution orchestration. Provider I/O, ambient
-// environment and filesystem access, model catalogs, OAuth and provider login
-// flows, and protocol-specific implementations remain later-milestone
-// capabilities and must fail with ErrNotImplemented rather than performing side
-// effects.
+// This package is a partial M1 AI contract/runtime. Pure value and codec
+// behavior is live, along with the in-memory CredentialStore and ModelsStore,
+// provider/model runtime composition, built-in provider/model registry
+// assembly, and model catalog/query helpers. Those helpers intentionally keep
+// the fixed baseline model snapshot in honest pending-capture state: built-in
+// providers exist, but built-in model lists and generated-at provenance remain
+// absent until the real catalog snapshot is captured.
+//
+// Real provider side effects remain later-milestone capabilities. Ambient
+// environment and filesystem access, provider/catalog network refresh, real
+// provider stream I/O, OAuth refresh/login flows, and protocol-specific
+// implementations must still fail with ErrNotImplemented or other structured
+// non-success outcomes rather than touching the network, process environment,
+// or filesystem.
 package ai

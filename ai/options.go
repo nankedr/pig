@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/nankedr/pig/telemetry"
 )
@@ -82,7 +83,83 @@ type StreamOptions struct {
 }
 
 type APIStreamOptions = StreamOptions
-type ProviderStreamOptions = StreamOptions
+
+// CustomAPIOptions is the public runtime carrier for extension APIs. Raw keeps
+// the extension-owned JSON bytes intact while StreamOptions carries the same
+// authentication, transport, hook, sampling, and session fields available to
+// built-in adapters. It is intentionally a package-defined implementation of
+// ProviderStreamOptions so extension callers do not need to implement the
+// closed known-API carrier themselves.
+type CustomAPIOptions struct {
+	StreamOptions
+	Raw json.RawMessage `json:"-"`
+}
+
+// NewCustomAPIOptions copies raw extension options for later validated
+// dispatch. Empty input represents an empty JSON object.
+func NewCustomAPIOptions(options StreamOptions, raw json.RawMessage) CustomAPIOptions {
+	if len(bytes.TrimSpace(raw)) == 0 {
+		raw = json.RawMessage(`{}`)
+	}
+	return CustomAPIOptions{StreamOptions: options, Raw: append(json.RawMessage(nil), raw...)}
+}
+
+// ProviderStreamOptions is the closed runtime carrier for generic and known
+// API-specific stream options. Concrete option structs embed StreamOptions,
+// retain their typed fields, and can be forwarded without JSON conversion.
+type ProviderStreamOptions interface {
+	providerStreamOptions()
+	streamOptions() StreamOptions
+	withStreamOptions(StreamOptions) ProviderStreamOptions
+	providerRequestOptions() ProviderRequestOptions
+	withProviderRequestOptions(ProviderRequestOptions) ProviderStreamOptions
+}
+
+// isNilRuntimeValue recognizes both a nil interface and an interface holding
+// a typed nil. Public option carriers permit pointer instantiations, so a
+// direct interface comparison alone is not sufficient at runtime boundaries.
+func isNilRuntimeValue(value any) bool {
+	if value == nil {
+		return true
+	}
+	reflected := reflect.ValueOf(value)
+	switch reflected.Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice:
+		return reflected.IsNil()
+	default:
+		return false
+	}
+}
+
+func (o StreamOptions) providerStreamOptions()       {}
+func (o StreamOptions) streamOptions() StreamOptions { return o }
+func (o StreamOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	return options
+}
+func (o StreamOptions) providerRequestOptions() ProviderRequestOptions {
+	return o.ProviderRequestOptions
+}
+func (o StreamOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+
+func (o CustomAPIOptions) providerStreamOptions()       {}
+func (o CustomAPIOptions) streamOptions() StreamOptions { return o.StreamOptions }
+func (o CustomAPIOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	o.Raw = append(json.RawMessage(nil), o.Raw...)
+	return o
+}
+func (o CustomAPIOptions) providerRequestOptions() ProviderRequestOptions {
+	return o.ProviderRequestOptions
+}
+func (o CustomAPIOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	o.Raw = append(json.RawMessage(nil), o.Raw...)
+	return o
+}
+
 type APIOptionsMap map[API]json.RawMessage
 
 type ThinkingBudgets struct {
@@ -1384,6 +1461,15 @@ type AnthropicOptions struct {
 	Client               any                       `json:"-"`
 }
 
+func (o AnthropicOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o AnthropicOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
+}
+
 func (o *AnthropicOptions) UnmarshalJSON(data []byte) error {
 	type plain AnthropicOptions
 	var wire struct {
@@ -1416,6 +1502,15 @@ type AzureOpenAIResponsesOptions struct {
 	AzureDeploymentName *string                          `json:"azureDeploymentName,omitempty"`
 }
 
+func (o AzureOpenAIResponsesOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o AzureOpenAIResponsesOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
+}
+
 type BedrockOptions struct {
 	StreamOptions
 	Region              *string                 `json:"region,omitempty"`
@@ -1427,6 +1522,15 @@ type BedrockOptions struct {
 	ThinkingDisplay     *BedrockThinkingDisplay `json:"thinkingDisplay,omitempty"`
 	RequestMetadata     map[string]string       `json:"requestMetadata,omitempty"`
 	BearerToken         *string                 `json:"bearerToken,omitempty"`
+}
+
+func (o BedrockOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o BedrockOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
 }
 
 func (o *BedrockOptions) UnmarshalJSON(data []byte) error {
@@ -1463,6 +1567,15 @@ type GoogleOptions struct {
 	Thinking   *GoogleThinkingOptions `json:"thinking,omitempty"`
 }
 
+func (o GoogleOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o GoogleOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
+}
+
 type GoogleVertexOptions struct {
 	StreamOptions
 	ToolChoice *GoogleToolChoice      `json:"toolChoice,omitempty"`
@@ -1471,11 +1584,29 @@ type GoogleVertexOptions struct {
 	Location   *string                `json:"location,omitempty"`
 }
 
+func (o GoogleVertexOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o GoogleVertexOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
+}
+
 type MistralOptions struct {
 	StreamOptions
 	ToolChoice      MistralToolChoice       `json:"toolChoice,omitempty"`
 	PromptMode      *MistralPromptMode      `json:"promptMode,omitempty"`
 	ReasoningEffort *MistralReasoningEffort `json:"reasoningEffort,omitempty"`
+}
+
+func (o MistralOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o MistralOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
 }
 
 func (o *MistralOptions) UnmarshalJSON(data []byte) error {
@@ -1509,11 +1640,29 @@ type OpenAICodexResponsesOptions struct {
 	ToolChoice       *CodexToolChoice                `json:"toolChoice,omitempty"`
 }
 
+func (o OpenAICodexResponsesOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o OpenAICodexResponsesOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
+}
+
 type OpenAICompletionsOptions struct {
 	StreamOptions
 	ToolChoice      OpenAIChatToolChoice   `json:"toolChoice,omitempty"`
 	ReasoningEffort *OpenAIReasoningEffort `json:"reasoningEffort,omitempty"`
 	ThinkingBudgets *ThinkingBudgets       `json:"thinkingBudgets,omitempty"`
+}
+
+func (o OpenAICompletionsOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o OpenAICompletionsOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
 }
 
 func (o *OpenAICompletionsOptions) UnmarshalJSON(data []byte) error {
@@ -1546,6 +1695,15 @@ type OpenAIResponsesOptions struct {
 	ToolChoice       OpenAIResponsesToolChoice        `json:"toolChoice,omitempty"`
 }
 
+func (o OpenAIResponsesOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o OpenAIResponsesOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
+}
+
 func (o *OpenAIResponsesOptions) UnmarshalJSON(data []byte) error {
 	type plain OpenAIResponsesOptions
 	var wire struct {
@@ -1573,6 +1731,15 @@ type PiMessagesOptions struct {
 	Reasoning  *ThinkingLevel       `json:"reasoning,omitempty"`
 	ToolChoice PiMessagesToolChoice `json:"toolChoice,omitempty"`
 	Debug      *bool                `json:"debug,omitempty"`
+}
+
+func (o PiMessagesOptions) withProviderRequestOptions(request ProviderRequestOptions) ProviderStreamOptions {
+	o.ProviderRequestOptions = request
+	return o
+}
+func (o PiMessagesOptions) withStreamOptions(options StreamOptions) ProviderStreamOptions {
+	o.StreamOptions = options
+	return o
 }
 
 func (o *PiMessagesOptions) UnmarshalJSON(data []byte) error {

@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -84,9 +85,18 @@ func NewPiMessagesAPIAdapter(stream APIStreamFunction[PiMessagesOptions]) APIAda
 	return newAPIAdapterDescriptor(APIPiMessages, stream)
 }
 
-// NewCustomAPIAdapter constructs the separate raw-options authoring seam for
-// extension APIs. The raw JSON is validated and copied before Stream is called.
+// NewCustomAPIAdapter constructs the raw extension-API authoring seam. It
+// retains the original fixed signature so an untyped nil still creates a
+// Capability Stub. Use NewCustomProviderAPIAdapter when composing through a
+// Provider or Models runtime.
 func NewCustomAPIAdapter(api API, stream APIStreamFunction[json.RawMessage]) APIAdapterDescriptor[json.RawMessage] {
+	return newAPIAdapterDescriptor(api, stream)
+}
+
+// NewCustomProviderAPIAdapter constructs an extension adapter for Provider and
+// Models composition. CustomAPIOptions carries both exact raw JSON and generic
+// request options such as transport and lifecycle hooks.
+func NewCustomProviderAPIAdapter(api API, stream APIStreamFunction[CustomAPIOptions]) APIAdapterDescriptor[CustomAPIOptions] {
 	return newAPIAdapterDescriptor(api, stream)
 }
 
@@ -111,6 +121,10 @@ type ErasedAPIStreamFunction func(context.Context, Model, Context, json.RawMessa
 type ErasedAPIAdapter struct {
 	API    API
 	Stream ErasedAPIStreamFunction
+
+	providerStream  providerTypedStreamFunction
+	optionsType     reflect.Type
+	registrationErr error
 }
 
 // EraseAPIAdapter validates and decodes dynamic JSON options before invoking
@@ -118,8 +132,11 @@ type ErasedAPIAdapter struct {
 // A json.RawMessage option type receives an exact copy of the source bytes.
 func EraseAPIAdapter[TOptions any](descriptor APIAdapterDescriptor[TOptions]) ErasedAPIAdapter {
 	optionsTypeErr := validateKnownAPIOptionsType[TOptions](descriptor.API)
+	providerOptionsTypeErr := validateProviderOptionsType(descriptor.API, reflect.TypeFor[TOptions]())
 	return ErasedAPIAdapter{
-		API: descriptor.API,
+		API:             descriptor.API,
+		optionsType:     reflect.TypeFor[TOptions](),
+		registrationErr: providerOptionsTypeErr,
 		Stream: func(ctx context.Context, model Model, input Context, raw json.RawMessage) (*AssistantMessageEventStream, error) {
 			if descriptor.stub || descriptor.Stream == nil {
 				return nil, newNotImplemented("APIAdapter.Stream")
@@ -133,6 +150,11 @@ func EraseAPIAdapter[TOptions any](descriptor APIAdapterDescriptor[TOptions]) Er
 					return nil, fmt.Errorf("decode %s API options: invalid JSON", descriptor.API)
 				}
 				*rawTarget = append(json.RawMessage(nil), raw...)
+			} else if customTarget, ok := any(&options).(*CustomAPIOptions); ok {
+				if !json.Valid(raw) {
+					return nil, fmt.Errorf("decode %s API options: invalid JSON", descriptor.API)
+				}
+				customTarget.Raw = append(json.RawMessage(nil), raw...)
 			} else if err := json.Unmarshal(raw, &options); err != nil {
 				return nil, fmt.Errorf("decode %s API options: %w", descriptor.API, err)
 			}
@@ -142,15 +164,61 @@ func EraseAPIAdapter[TOptions any](descriptor APIAdapterDescriptor[TOptions]) Er
 			}
 			return stream, nil
 		},
+		providerStream: func(ctx context.Context, model Model, input Context, options ProviderStreamOptions) *AssistantMessageEventStream {
+			if descriptor.stub || descriptor.Stream == nil {
+				return failedProviderStream(newNotImplemented("APIAdapter.Stream"))
+			}
+			if optionsTypeErr != nil {
+				return failedProviderStream(optionsTypeErr)
+			}
+			typed, ok := any(options).(TOptions)
+			if !ok {
+				if generic, isGeneric := options.(StreamOptions); isGeneric && reflect.TypeFor[TOptions]().Kind() != reflect.Pointer {
+					var zero TOptions
+					if carrier, isCarrier := any(zero).(ProviderStreamOptions); isCarrier {
+						typed, ok = any(carrier.withStreamOptions(generic)).(TOptions)
+					}
+				}
+			}
+			if !ok {
+				return failedProviderStream(fmt.Errorf(
+					"%w: Provider stream options type %T does not match %v for API %q",
+					ErrEventStreamInvariant, options, reflect.TypeFor[TOptions](), model.API,
+				))
+			}
+			if custom, isCustom := any(typed).(CustomAPIOptions); isCustom {
+				if len(bytes.TrimSpace(custom.Raw)) == 0 {
+					custom.Raw = json.RawMessage(`{}`)
+				}
+				if !json.Valid(custom.Raw) {
+					return failedProviderStream(fmt.Errorf(
+						"%w: invalid JSON options for custom API %q",
+						ErrEventStreamInvariant, model.API,
+					))
+				}
+				custom.Raw = append(json.RawMessage(nil), custom.Raw...)
+				typed = any(custom).(TOptions)
+			}
+			stream := descriptor.Stream(ctx, model, input, typed)
+			if stream == nil {
+				return failedProviderStream(fmt.Errorf(
+					"%w: adapter %q returned a nil stream", ErrEventStreamInvariant, descriptor.API,
+				))
+			}
+			return stream
+		},
 	}
 }
 
 func validateKnownAPIOptionsType[TOptions any](api API) error {
+	return validateKnownAPIOptionsReflect(api, reflect.TypeFor[TOptions]())
+}
+
+func validateKnownAPIOptionsReflect(api API, got reflect.Type) error {
 	want, known := knownAPIOptionsType(api)
 	if !known {
 		return nil
 	}
-	got := reflect.TypeFor[TOptions]()
 	if got == want {
 		return nil
 	}
@@ -158,6 +226,19 @@ func validateKnownAPIOptionsType[TOptions any](api API) error {
 		"%w: API adapter %q requires options %s, got %s",
 		ErrEventStreamInvariant, api, want, got,
 	)
+}
+
+func validateProviderOptionsType(api API, got reflect.Type) error {
+	if err := validateKnownAPIOptionsReflect(api, got); err != nil {
+		return err
+	}
+	if got == nil || !got.Implements(reflect.TypeFor[ProviderStreamOptions]()) {
+		return fmt.Errorf(
+			"%w: API adapter %q options %v cannot enter Provider runtime; use CustomAPIOptions for extension APIs",
+			ErrEventStreamInvariant, api, got,
+		)
+	}
+	return nil
 }
 
 func knownAPIOptionsType(api API) (reflect.Type, bool) {
@@ -187,6 +268,27 @@ func knownAPIOptionsType(api API) (reflect.Type, bool) {
 	}
 }
 
+func knownAPIForOptionsType(optionsType reflect.Type) (API, bool) {
+	for _, api := range []API{
+		APIAnthropicMessages,
+		APIAzureOpenAIResponses,
+		APIBedrockConverseStream,
+		APIGoogleGenerativeAI,
+		APIGoogleVertex,
+		APIMistralConversations,
+		APIOpenAICodexResponses,
+		APIOpenAICompletions,
+		APIOpenAIResponses,
+		APIPiMessages,
+	} {
+		want, _ := knownAPIOptionsType(api)
+		if optionsType == want {
+			return api, true
+		}
+	}
+	return "", false
+}
+
 // NewStubAPIAdapter declares an API boundary that is not implemented in the
 // current milestone. It returns before decoding options or invoking hooks.
 func NewStubAPIAdapter(api API) ErasedAPIAdapter {
@@ -194,6 +296,9 @@ func NewStubAPIAdapter(api API) ErasedAPIAdapter {
 		API: api,
 		Stream: func(context.Context, Model, Context, json.RawMessage) (*AssistantMessageEventStream, error) {
 			return nil, newNotImplemented("APIAdapter.Stream")
+		},
+		providerStream: func(context.Context, Model, Context, ProviderStreamOptions) *AssistantMessageEventStream {
+			return failedProviderStream(newNotImplemented("APIAdapter.Stream"))
 		},
 	}
 }
@@ -209,15 +314,69 @@ type ProviderDescriptor struct {
 	AdapterAPIs     []API
 }
 
-// ProviderStreams is the erased API capability bundle used by future Provider
-// composition. Optional deferred operations remain explicit Capability Stubs.
-// Its zero value has nil function fields and is not callable; construct a
-// complete unimplemented bundle with NewStubProviderStreams.
+// ProviderStreamFunction is the runtime Provider stream seam. Unlike an
+// ErasedAPIAdapter, it preserves the complete Go request options, including
+// transport and lifecycle hooks.
+type ProviderStreamFunction func(context.Context, Model, Context, StreamOptions) *AssistantMessageEventStream
+
+// providerTypedStreamFunction is the heterogeneous runtime wrapper installed
+// by NewTypedProviderStreams. It stays private so API adapter implementations
+// continue to author against one concrete option type.
+type providerTypedStreamFunction func(context.Context, Model, Context, ProviderStreamOptions) *AssistantMessageEventStream
+
+// ProviderSimpleStreamFunction is the simplified runtime Provider stream
+// seam. It likewise preserves the complete Go request options.
+type ProviderSimpleStreamFunction func(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream
+
+// ProviderStreams is the runtime API capability bundle used by Provider
+// composition. It is intentionally distinct from the raw-JSON API Adapter
+// seam. Optional deferred operations remain explicit Capability Stubs. Its
+// zero value has nil function fields and is not callable; construct a complete
+// unimplemented bundle with NewStubProviderStreams.
 type ProviderStreams struct {
-	Stream         ErasedAPIStreamFunction
-	StreamSimple   ErasedAPIStreamFunction
+	Stream         ProviderStreamFunction
+	StreamSimple   ProviderSimpleStreamFunction
 	FetchDeferred  func(context.Context, Model, DeferredHandle, DeferredFetchOptions) (*AssistantMessageEventStream, error)
 	CancelDeferred func(context.Context, Model, DeferredHandle, DeferredCancelOptions) error
+
+	streamTyped        providerTypedStreamFunction
+	fetchDeferredStub  bool
+	cancelDeferredStub bool
+	api                API
+	optionsType        reflect.Type
+	registrationErr    error
+}
+
+// NewProviderStreams composes a validated, type-erased API adapter into a
+// Provider runtime bundle while retaining its direct Go dispatch path. Known
+// options remain concrete; CustomAPIOptions keeps raw extension JSON and
+// generic request hooks without a JSON round trip.
+func NewProviderStreams(adapter ErasedAPIAdapter) ProviderStreams {
+	registrationErr := adapter.registrationErr
+	if adapter.optionsType != nil {
+		registrationErr = validateProviderOptionsType(adapter.API, adapter.optionsType)
+	}
+	if adapter.providerStream == nil && registrationErr == nil {
+		registrationErr = fmt.Errorf(
+			"%w: erased API adapter %q has no Provider dispatch path",
+			ErrEventStreamInvariant, adapter.API,
+		)
+	}
+	return ProviderStreams{
+		api:             adapter.API,
+		optionsType:     adapter.optionsType,
+		registrationErr: registrationErr,
+		streamTyped:     adapter.providerStream,
+	}
+}
+
+// NewTypedProviderStreams adapts one concrete API option type to the
+// heterogeneous Provider runtime without JSON conversion. Passing a different
+// concrete option type produces a terminal stream invariant instead of a
+// panic. Optional simple and deferred capabilities may be assigned separately.
+func NewTypedProviderStreams[T ProviderStreamOptions](stream APIStreamFunction[T]) ProviderStreams {
+	api, _ := knownAPIForOptionsType(reflect.TypeFor[T]())
+	return NewProviderStreams(EraseAPIAdapter(newAPIAdapterDescriptor(api, stream)))
 }
 
 // NewStubProviderStreams returns a complete, side-effect-free Provider stream
@@ -225,11 +384,11 @@ type ProviderStreams struct {
 // without decoding options or invoking transports and lifecycle hooks.
 func NewStubProviderStreams() ProviderStreams {
 	return ProviderStreams{
-		Stream: func(context.Context, Model, Context, json.RawMessage) (*AssistantMessageEventStream, error) {
-			return nil, newNotImplemented("ProviderStreams.Stream")
+		Stream: func(context.Context, Model, Context, StreamOptions) *AssistantMessageEventStream {
+			return failedProviderStream(newNotImplemented("ProviderStreams.Stream"))
 		},
-		StreamSimple: func(context.Context, Model, Context, json.RawMessage) (*AssistantMessageEventStream, error) {
-			return nil, newNotImplemented("ProviderStreams.StreamSimple")
+		StreamSimple: func(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
+			return failedProviderStream(newNotImplemented("ProviderStreams.StreamSimple"))
 		},
 		FetchDeferred: func(context.Context, Model, DeferredHandle, DeferredFetchOptions) (*AssistantMessageEventStream, error) {
 			return nil, newNotImplemented("ProviderStreams.FetchDeferred")
@@ -237,7 +396,15 @@ func NewStubProviderStreams() ProviderStreams {
 		CancelDeferred: func(context.Context, Model, DeferredHandle, DeferredCancelOptions) error {
 			return newNotImplemented("ProviderStreams.CancelDeferred")
 		},
+		fetchDeferredStub:  true,
+		cancelDeferredStub: true,
 	}
+}
+
+func failedProviderStream(err error) *AssistantMessageEventStream {
+	failed := NewAssistantMessageEventStream()
+	failed.stream.endWithError(err)
+	return failed
 }
 
 // ImagesFunction is the image-generation callable contract. Provider failures

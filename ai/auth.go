@@ -451,20 +451,45 @@ type ModelsError struct {
 	Code    ModelsErrorCode
 	Message string
 	Cause   error
+
+	// displayMessage is the constructor-controlled projection safe to render.
+	// Message and Cause remain exported for compatibility and error inspection,
+	// but callers can populate them with secrets, so rendering never reads them.
+	displayMessage string
 }
 
 func (e *ModelsError) Error() string {
-	if e.Cause != nil {
-		return string(e.Code) + ": " + e.Message + ": " + e.Cause.Error()
-	}
-	return string(e.Code) + ": " + e.Message
+	return e.safeErrorMessage()
 }
 
 // Unwrap exposes the underlying cause for errors.Is/errors.As.
 func (e *ModelsError) Unwrap() error { return e.Cause }
 
+// safeErrorMessage returns the constructor-controlled rendering that may cross
+// a terminal/session boundary. It deliberately ignores the exported Message
+// and Cause fields because externally constructed values can put secrets there.
+func (e *ModelsError) safeErrorMessage() string {
+	if e == nil {
+		return string(ModelsErrorCodeProvider) + ": request failed"
+	}
+	code := safeModelsErrorCode(e.Code)
+	if e.displayMessage == "" {
+		return string(code) + ": request failed"
+	}
+	return string(code) + ": " + e.displayMessage
+}
+
+func safeModelsErrorCode(code ModelsErrorCode) ModelsErrorCode {
+	switch code {
+	case ModelsErrorCodeModelSource, ModelsErrorCodeModelValidation, ModelsErrorCodeProvider, ModelsErrorCodeStream, ModelsErrorCodeAuth, ModelsErrorCodeOAuth:
+		return code
+	default:
+		return ModelsErrorCodeProvider
+	}
+}
+
 func newModelsError(code ModelsErrorCode, message string, cause error) *ModelsError {
-	return &ModelsError{Code: code, Message: message, Cause: cause}
+	return &ModelsError{Code: code, Message: message, Cause: cause, displayMessage: message}
 }
 
 // Default OAuth resolution windows, mirroring the upstream contract.
@@ -603,7 +628,32 @@ func readStoredCredential(ctx context.Context, credentials CredentialStore, prov
 	if err != nil {
 		return nil, newModelsError(ModelsErrorCodeAuth, fmt.Sprintf("credential store read failed for %s", providerID), err)
 	}
+	if err := validateStoredCredential(providerID, stored); err != nil {
+		return nil, err
+	}
 	return stored, nil
+}
+
+func validateStoredCredential(providerID ProviderID, credential Credential) error {
+	if credential == nil {
+		return nil
+	}
+	want, ok := credentialVariantType(credential)
+	if !ok || isNilClosedUnion(credential) {
+		return newModelsError(
+			ModelsErrorCodeAuth,
+			fmt.Sprintf("credential store returned unsupported concrete type %T for %s", credential, providerID),
+			nil,
+		)
+	}
+	if got := credential.CredentialType(); got != want {
+		return newModelsError(
+			ModelsErrorCodeAuth,
+			fmt.Sprintf("stored credential discriminator %q for %s does not match concrete type %T (want %q)", got, providerID, credential, want),
+			nil,
+		)
+	}
+	return nil
 }
 
 func resolveAPIKey(
@@ -616,7 +666,13 @@ func resolveAPIKey(
 	if apiKey.Resolve == nil {
 		return Absent[AuthResult](), newModelsError(ModelsErrorCodeAuth, fmt.Sprintf("api key auth for %s has no resolve", providerID), nil)
 	}
-	result, err := apiKey.Resolve(ctx, APIKeyResolveInput{Context: authContext, Credential: credential})
+	var callbackCredential *APIKeyCredential
+	if credential != nil {
+		copy := *credential
+		copy.Env = cloneProviderEnv(copy.Env)
+		callbackCredential = &copy
+	}
+	result, err := apiKey.Resolve(ctx, APIKeyResolveInput{Context: authContext, Credential: callbackCredential})
 	if err != nil {
 		return Absent[AuthResult](), newModelsError(ModelsErrorCodeAuth, fmt.Sprintf("API key auth failed for provider %s", providerID), err)
 	}
@@ -646,6 +702,9 @@ func resolveStoredOAuth(
 	credential := stored
 	if expiresSoon(credential) {
 		post, err := credentials.Modify(ctx, providerID, func(modifyCtx context.Context, current Credential) (Credential, error) {
+			if err := validateStoredCredential(providerID, current); err != nil {
+				return nil, err
+			}
 			currentOAuth, ok := current.(OAuthCredential)
 			if !ok {
 				return nil, nil // logged out meanwhile
@@ -658,9 +717,20 @@ func resolveStoredOAuth(
 			}
 			refreshCtx, cancel := context.WithTimeout(modifyCtx, DefaultOAuthRefreshTimeout)
 			defer cancel()
-			refreshed, refreshErr := oauth.Refresh(refreshCtx, currentOAuth)
+			callbackCredential := currentOAuth
+			callbackCredential.Extra = cloneRawMessageMap(callbackCredential.Extra)
+			refreshed, refreshErr := oauth.Refresh(refreshCtx, callbackCredential)
 			if refreshErr != nil {
 				return nil, newModelsError(ModelsErrorCodeOAuth, fmt.Sprintf("OAuth refresh failed for %s", providerID), refreshErr)
+			}
+			if refreshed.Type == "" {
+				refreshed.Type = AuthTypeOAuth
+			} else if refreshed.Type != AuthTypeOAuth {
+				return nil, newModelsError(
+					ModelsErrorCodeOAuth,
+					fmt.Sprintf("OAuth refresh returned credential discriminator %q for %s, want %q", refreshed.Type, providerID, AuthTypeOAuth),
+					nil,
+				)
 			}
 			return refreshed, nil
 		}, AuthOperationOptions{})
@@ -670,6 +740,9 @@ func resolveStoredOAuth(
 				return Absent[AuthResult](), modelsErr
 			}
 			return Absent[AuthResult](), newModelsError(ModelsErrorCodeAuth, fmt.Sprintf("credential store modify failed for %s", providerID), err)
+		}
+		if err := validateStoredCredential(providerID, post); err != nil {
+			return Absent[AuthResult](), err
 		}
 		refreshedOAuth, ok := post.(OAuthCredential)
 		if !ok {
@@ -684,7 +757,9 @@ func resolveStoredOAuth(
 	if oauth.ToAuth == nil {
 		return Absent[AuthResult](), newModelsError(ModelsErrorCodeOAuth, fmt.Sprintf("OAuth auth derivation failed for %s", providerID), newNotImplemented("OAuthAuth.ToAuth"))
 	}
-	auth, err := oauth.ToAuth(ctx, credential)
+	callbackCredential := credential
+	callbackCredential.Extra = cloneRawMessageMap(callbackCredential.Extra)
+	auth, err := oauth.ToAuth(ctx, callbackCredential)
 	if err != nil {
 		return Absent[AuthResult](), newModelsError(ModelsErrorCodeOAuth, fmt.Sprintf("OAuth auth derivation failed for %s", providerID), err)
 	}

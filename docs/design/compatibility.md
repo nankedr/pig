@@ -77,6 +77,7 @@ OpenAI Chat Completions 的完整类型和 options 在 M0 就声明，并逐字�
 - `pig-ai` 使用与 `pig` 共享的 canonical auth store，而不是固定 `pi-ai` 的 cwd `auth.json`。
 - 不默认连接或归因到 `pi.dev`、`radius.pi.dev`、Earendil release 等 Pi 运营服务。
 - V1 不实现 Pig Server，也不支持 browser/WebAssembly。
+- 同一 Provider 的 `ModelsPublication.Update` 是同步 generation commit；为弥合 JavaScript 单线程 turn 与 Go 可重入阻塞调用的差异，Update 返回前对同一 Provider 再调用 `Models.Refresh` 会返回结构化错误，不启动新一代 refresh。见 ADR-0013。
 
 这些偏离应在 Parity Catalog 中标记为已决策 deviation，而不是伪装成 verified 的相同实现。
 
