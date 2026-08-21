@@ -37,6 +37,8 @@ Provider 的 authoring API 保持强类型：模型、Provider 选项和 API ada
 
 M1 的真实链路是 DeepSeek Provider 复用 OpenAI Chat Completions API adapter，并同时提供确定性的 Faux Provider。`stream` 是事件真源，`Models.complete`、`completeSimple` 及相应 compat helper 消费该事件流得到相同最终消息；Pig 不虚构一个名为 `ChatCompletion` 的上游 helper。其余 Provider 先注册接口和元数据，调用未实现操作时返回本文第 8 节规定的错误。
 
+模型目录 refresh 按 Provider 使用 generation 取消旧请求；持久化完成后，只有仍为当前 generation 的 publication 才能同步执行 `Update`。`Update` 是该 generation 的提交临界区，不得在返回前同步调用同一 Provider 的 `Models.Refresh`；Pig 将这种可重入调用分类为结构化 `model_source` 错误。不同 Provider 的 refresh 不受影响。Provider 的 refresh、store 与 auth 回调必须观察传入 context 并在取消后尽快返回；Go 运行时不能强制终止任意不合作的进程内回调。该 Go 并发边界见 ADR-0013。
+
 ## 5. Agent 事件和 turn 边界
 
 无工具的典型 run 顺序为：

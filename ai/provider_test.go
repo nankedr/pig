@@ -42,6 +42,18 @@ func TestAPIAdapterConstructorsTurnNilStreamsIntoCapabilityStubs(t *testing.T) {
 	})
 }
 
+func TestNewCustomAPIAdapterAcceptsUntypedNil(t *testing.T) {
+	t.Parallel()
+
+	descriptor := ai.NewCustomAPIAdapter(ai.API("future-custom-api"), nil)
+	if descriptor.Stream == nil {
+		t.Fatal("NewCustomAPIAdapter(api, nil) returned a nil Stream")
+	}
+	if _, err := descriptor.Stream(context.Background(), ai.Model{}, ai.Context{}, nil).Result(context.Background()); !errors.Is(err, ai.ErrNotImplemented) {
+		t.Fatalf("custom nil adapter error = %v, want ErrNotImplemented", err)
+	}
+}
+
 func exerciseNilAPIAdapterStub[TOptions any](
 	t *testing.T,
 	constructor func(ai.APIStreamFunction[TOptions]) ai.APIAdapterDescriptor[TOptions],
@@ -209,18 +221,6 @@ func TestStubProviderCapabilitiesAreCompleteAndSideEffectFree(t *testing.T) {
 		t.Fatalf("stub ProviderStreams contains a nil operation: %#v", streams)
 	}
 
-	stream, err := streams.Stream(context.Background(), ai.Model{}, ai.Context{}, json.RawMessage(`{`))
-	if stream != nil {
-		t.Fatalf("stub Stream() returned %v, want nil", stream)
-	}
-	assertNotImplementedOperation(t, err, "ProviderStreams.Stream")
-
-	stream, err = streams.StreamSimple(context.Background(), ai.Model{}, ai.Context{}, json.RawMessage(`{`))
-	if stream != nil {
-		t.Fatalf("stub StreamSimple() returned %v, want nil", stream)
-	}
-	assertNotImplementedOperation(t, err, "ProviderStreams.StreamSimple")
-
 	sideEffects := 0
 	requestOptions := ai.ProviderRequestOptions{
 		Fetch: func(context.Context, ai.FetchRequest) (ai.FetchResponse, error) {
@@ -236,8 +236,33 @@ func TestStubProviderCapabilitiesAreCompleteAndSideEffectFree(t *testing.T) {
 			return nil
 		},
 	}
+	streamOptions := ai.StreamOptions{ProviderRequestOptions: requestOptions}
+	stream := streams.Stream(context.Background(), ai.Model{}, ai.Context{}, streamOptions)
+	if stream == nil {
+		t.Fatal("stub Stream() returned nil, want a failed stream")
+	}
+	if _, err := stream.Result(context.Background()); err == nil {
+		t.Fatal("stub Stream() Result error = nil, want ErrNotImplemented")
+	} else {
+		assertNotImplementedOperation(t, err, "ProviderStreams.Stream")
+	}
 
-	stream, err = streams.FetchDeferred(
+	stream = streams.StreamSimple(
+		context.Background(),
+		ai.Model{},
+		ai.Context{},
+		ai.SimpleStreamOptions{StreamOptions: streamOptions},
+	)
+	if stream == nil {
+		t.Fatal("stub StreamSimple() returned nil, want a failed stream")
+	}
+	if _, err := stream.Result(context.Background()); err == nil {
+		t.Fatal("stub StreamSimple() Result error = nil, want ErrNotImplemented")
+	} else {
+		assertNotImplementedOperation(t, err, "ProviderStreams.StreamSimple")
+	}
+
+	stream, err := streams.FetchDeferred(
 		context.Background(),
 		ai.Model{},
 		ai.DeferredHandle{},

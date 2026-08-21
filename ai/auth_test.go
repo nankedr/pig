@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -355,14 +356,30 @@ func TestLazyOAuthReportsNotImplementedWithoutLoader(t *testing.T) {
 func TestModelsErrorWrapsCauseAndCarriesCode(t *testing.T) {
 	t.Parallel()
 
-	cause := errors.New("boom")
-	err := &ai.ModelsError{Code: ai.ModelsErrorCodeAuth, Message: "resolve failed", Cause: cause}
+	const secret = "secret-provider-response"
+	cause := errors.New(secret)
+	err := &ai.ModelsError{Code: ai.ModelsErrorCodeAuth, Message: secret, Cause: cause}
 	if !errors.Is(err, cause) {
 		t.Fatal("errors.Is(ModelsError, cause) = false, want the cause reachable")
 	}
 	var target *ai.ModelsError
 	if !errors.As(err, &target) || target.Code != ai.ModelsErrorCodeAuth {
 		t.Fatalf("errors.As(*ModelsError) = %#v, want code auth", target)
+	}
+	if got := err.Error(); got != "auth: request failed" {
+		t.Fatalf("ModelsError.Error() = %q, want redacted fallback", got)
+	} else if strings.Contains(got, secret) {
+		t.Fatalf("ModelsError.Error() leaked externally supplied fields: %q", got)
+	}
+}
+
+func TestModelsErrorRenderingRejectsExternalCodeText(t *testing.T) {
+	t.Parallel()
+
+	const secret = "sk-secret-error-code"
+	err := &ai.ModelsError{Code: ai.ModelsErrorCode(secret), Message: secret, Cause: errors.New(secret)}
+	if got := err.Error(); got != "provider: request failed" {
+		t.Fatalf("ModelsError.Error() = %q, want safe fallback for unknown code", got)
 	}
 }
 
@@ -410,6 +427,106 @@ func TestResolveProviderAuthStoredCredentialOwnsProvider(t *testing.T) {
 	got, _ := result.Value()
 	if key, _ := got.Auth.APIKey.Value(); key != "stored" {
 		t.Fatalf("resolved apiKey = %q, want stored (no ambient fallback)", key)
+	}
+}
+
+func TestResolveProviderAuthRejectsForgedStoredCredentialDiscriminators(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		credential ai.Credential
+	}{
+		{
+			name:       "api key concrete type tagged oauth",
+			credential: ai.APIKeyCredential{Type: ai.AuthTypeOAuth, Key: ai.Some("must-not-resolve")},
+		},
+		{
+			name:       "api key concrete type with empty discriminator",
+			credential: ai.APIKeyCredential{Key: ai.Some("must-not-resolve")},
+		},
+		{
+			name: "oauth concrete type tagged api key",
+			credential: ai.OAuthCredential{
+				OAuthCredentials: ai.OAuthCredentials{Refresh: "must-not-refresh", Access: "must-not-resolve", Expires: farFuture()},
+				Type:             ai.AuthTypeAPIKey,
+			},
+		},
+		{
+			name: "oauth concrete type with empty discriminator",
+			credential: ai.OAuthCredential{
+				OAuthCredentials: ai.OAuthCredentials{Refresh: "must-not-refresh", Access: "must-not-resolve", Expires: farFuture()},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			ctx := context.Background()
+			store := ai.NewInMemoryCredentialStore()
+			if _, err := store.Modify(ctx, "forged", func(context.Context, ai.Credential) (ai.Credential, error) {
+				return test.credential, nil
+			}, ai.AuthOperationOptions{}); err != nil {
+				t.Fatalf("seed store error = %v", err)
+			}
+
+			apiKey := ai.APIKeyAuth{Resolve: func(context.Context, ai.APIKeyResolveInput) (ai.Optional[ai.AuthResult], error) {
+				t.Fatal("APIKeyAuth.Resolve called for forged stored credential")
+				return ai.Absent[ai.AuthResult](), nil
+			}}
+			oauth := ai.OAuthAuth{
+				Refresh: func(context.Context, ai.OAuthCredential) (ai.OAuthCredential, error) {
+					t.Fatal("OAuthAuth.Refresh called for forged stored credential")
+					return ai.OAuthCredential{}, nil
+				},
+				ToAuth: func(context.Context, ai.OAuthCredential) (ai.ModelAuth, error) {
+					t.Fatal("OAuthAuth.ToAuth called for forged stored credential")
+					return ai.ModelAuth{}, nil
+				},
+			}
+			target := ai.ProviderAuthTarget{ID: "forged", Auth: ai.ProviderAuth{APIKey: &apiKey, OAuth: &oauth}}
+
+			_, err := ai.ResolveProviderAuth(ctx, target, store, ai.DefaultProviderAuthContext(), ai.AuthResolutionOverrides{})
+			assertModelsErrorCode(t, err, ai.ModelsErrorCodeAuth)
+		})
+	}
+}
+
+func TestResolveProviderAuthDoesNotExposeStoredAPIKeyCredentialToResolve(t *testing.T) {
+	ctx := context.Background()
+	store := ai.NewInMemoryCredentialStore()
+	if _, err := store.Modify(ctx, "isolated-resolve", func(context.Context, ai.Credential) (ai.Credential, error) {
+		return ai.APIKeyCredential{
+			Type: ai.AuthTypeAPIKey,
+			Key:  ai.Some("stored-key"),
+			Env:  ai.ProviderEnv{"account": "stored"},
+		}, nil
+	}, ai.AuthOperationOptions{}); err != nil {
+		t.Fatalf("seed store error = %v", err)
+	}
+
+	callbackErr := errors.New("resolve failed")
+	auth := ai.APIKeyAuth{
+		Name: "Mutating resolver",
+		Resolve: func(_ context.Context, input ai.APIKeyResolveInput) (ai.Optional[ai.AuthResult], error) {
+			input.Credential.Env["account"] = "mutated"
+			return ai.Absent[ai.AuthResult](), callbackErr
+		},
+	}
+	target := ai.ProviderAuthTarget{ID: "isolated-resolve", Auth: ai.ProviderAuth{APIKey: &auth}}
+
+	if _, err := ai.ResolveProviderAuth(ctx, target, store, ai.DefaultProviderAuthContext(), ai.AuthResolutionOverrides{}); !errors.Is(err, callbackErr) {
+		t.Fatalf("ResolveProviderAuth() error = %v, want wrapped callback error", err)
+	}
+	stored, err := store.Read(ctx, "isolated-resolve", ai.AuthOperationOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	credential, ok := stored.(ai.APIKeyCredential)
+	if !ok || credential.Env["account"] != "stored" {
+		t.Fatalf("stored credential after failed Resolve = %#v, want original env", stored)
 	}
 }
 
@@ -514,6 +631,90 @@ func TestResolveProviderAuthRefreshesExpiringOAuthUnderLock(t *testing.T) {
 	}
 }
 
+func TestResolveProviderAuthDoesNotExposeStoredOAuthCredentialToRefresh(t *testing.T) {
+	ctx := context.Background()
+	store := ai.NewInMemoryCredentialStore()
+	if _, err := store.Modify(ctx, "isolated-oauth-refresh", func(context.Context, ai.Credential) (ai.Credential, error) {
+		return ai.OAuthCredential{
+			OAuthCredentials: ai.OAuthCredentials{
+				Refresh: "refresh-token",
+				Access:  "expired",
+				Expires: 0,
+				Extra:   map[string]json.RawMessage{"account": json.RawMessage(`"stored"`)},
+			},
+			Type: ai.AuthTypeOAuth,
+		}, nil
+	}, ai.AuthOperationOptions{}); err != nil {
+		t.Fatalf("seed store error = %v", err)
+	}
+
+	callbackErr := errors.New("refresh failed")
+	oauth := ai.OAuthAuth{
+		Name: "Mutating refresh",
+		Refresh: func(_ context.Context, credential ai.OAuthCredential) (ai.OAuthCredential, error) {
+			credential.Extra["account"] = json.RawMessage(`"mutated"`)
+			return ai.OAuthCredential{}, callbackErr
+		},
+		ToAuth: func(context.Context, ai.OAuthCredential) (ai.ModelAuth, error) {
+			return ai.ModelAuth{}, nil
+		},
+	}
+	target := ai.ProviderAuthTarget{ID: "isolated-oauth-refresh", Auth: ai.ProviderAuth{OAuth: &oauth}}
+
+	if _, err := ai.ResolveProviderAuth(ctx, target, store, ai.DefaultProviderAuthContext(), ai.AuthResolutionOverrides{}); !errors.Is(err, callbackErr) {
+		t.Fatalf("ResolveProviderAuth() error = %v, want wrapped callback error", err)
+	}
+	stored, err := store.Read(ctx, "isolated-oauth-refresh", ai.AuthOperationOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	credential, ok := stored.(ai.OAuthCredential)
+	if !ok || string(credential.Extra["account"]) != `"stored"` {
+		t.Fatalf("stored credential after failed Refresh = %#v, want original extra", stored)
+	}
+}
+
+func TestResolveProviderAuthRejectsMismatchedRefreshDiscriminator(t *testing.T) {
+	ctx := context.Background()
+	store := ai.NewInMemoryCredentialStore()
+	if _, err := store.Modify(ctx, "mismatched-refresh", func(context.Context, ai.Credential) (ai.Credential, error) {
+		return ai.OAuthCredential{
+			OAuthCredentials: ai.OAuthCredentials{Refresh: "refresh-token", Access: "old", Expires: 0},
+			Type:             ai.AuthTypeOAuth,
+		}, nil
+	}, ai.AuthOperationOptions{}); err != nil {
+		t.Fatalf("seed store error = %v", err)
+	}
+
+	oauth := ai.OAuthAuth{
+		Name: "Mismatched refresh",
+		Refresh: func(context.Context, ai.OAuthCredential) (ai.OAuthCredential, error) {
+			return ai.OAuthCredential{
+				OAuthCredentials: ai.OAuthCredentials{Refresh: "rotated", Access: "new", Expires: farFuture()},
+				Type:             ai.AuthTypeAPIKey,
+			}, nil
+		},
+		ToAuth: func(context.Context, ai.OAuthCredential) (ai.ModelAuth, error) {
+			return ai.ModelAuth{}, nil
+		},
+	}
+	target := ai.ProviderAuthTarget{ID: "mismatched-refresh", Auth: ai.ProviderAuth{OAuth: &oauth}}
+
+	_, err := ai.ResolveProviderAuth(ctx, target, store, ai.DefaultProviderAuthContext(), ai.AuthResolutionOverrides{})
+	var modelsErr *ai.ModelsError
+	if !errors.As(err, &modelsErr) || modelsErr.Code != ai.ModelsErrorCodeOAuth {
+		t.Fatalf("ResolveProviderAuth() error = %v, want oauth ModelsError", err)
+	}
+	stored, readErr := store.Read(ctx, "mismatched-refresh", ai.AuthOperationOptions{})
+	if readErr != nil {
+		t.Fatal(readErr)
+	}
+	credential, ok := stored.(ai.OAuthCredential)
+	if !ok || credential.Access != "old" || credential.Type != ai.AuthTypeOAuth {
+		t.Fatalf("stored credential = %#v, want original OAuth credential", stored)
+	}
+}
+
 func TestResolveProviderAuthSkipsRefreshForValidOAuth(t *testing.T) {
 	t.Parallel()
 
@@ -548,6 +749,46 @@ func TestResolveProviderAuthSkipsRefreshForValidOAuth(t *testing.T) {
 	got, _ := result.Value()
 	if key, _ := got.Auth.APIKey.Value(); key != "valid" {
 		t.Fatalf("derived apiKey = %q, want valid", key)
+	}
+}
+
+func TestResolveProviderAuthDoesNotExposeStoredOAuthCredentialToToAuth(t *testing.T) {
+	ctx := context.Background()
+	store := ai.NewInMemoryCredentialStore()
+	if _, err := store.Modify(ctx, "isolated-oauth-to-auth", func(context.Context, ai.Credential) (ai.Credential, error) {
+		return ai.OAuthCredential{
+			OAuthCredentials: ai.OAuthCredentials{
+				Refresh: "refresh-token",
+				Access:  "valid",
+				Expires: farFuture(),
+				Extra:   map[string]json.RawMessage{"account": json.RawMessage(`"stored"`)},
+			},
+			Type: ai.AuthTypeOAuth,
+		}, nil
+	}, ai.AuthOperationOptions{}); err != nil {
+		t.Fatalf("seed store error = %v", err)
+	}
+
+	callbackErr := errors.New("auth derivation failed")
+	oauth := ai.OAuthAuth{
+		Name: "Mutating auth derivation",
+		ToAuth: func(_ context.Context, credential ai.OAuthCredential) (ai.ModelAuth, error) {
+			credential.Extra["account"] = json.RawMessage(`"mutated"`)
+			return ai.ModelAuth{}, callbackErr
+		},
+	}
+	target := ai.ProviderAuthTarget{ID: "isolated-oauth-to-auth", Auth: ai.ProviderAuth{OAuth: &oauth}}
+
+	if _, err := ai.ResolveProviderAuth(ctx, target, store, ai.DefaultProviderAuthContext(), ai.AuthResolutionOverrides{}); !errors.Is(err, callbackErr) {
+		t.Fatalf("ResolveProviderAuth() error = %v, want wrapped callback error", err)
+	}
+	stored, err := store.Read(ctx, "isolated-oauth-to-auth", ai.AuthOperationOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	credential, ok := stored.(ai.OAuthCredential)
+	if !ok || string(credential.Extra["account"]) != `"stored"` {
+		t.Fatalf("stored credential after failed ToAuth = %#v, want original extra", stored)
 	}
 }
 
