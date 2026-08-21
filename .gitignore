@@ -32,6 +32,7 @@ vendor/
 
 # Build and cache output
 /build/
+.gocache/
 
 # Environment variable files
 .env
