@@ -1,11 +1,106 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/nankedr/pig/parity/catalog.schema.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "Parity Catalog Entry",
   "description": "One Parity Catalog entry. parity/catalog.jsonl holds exactly one object of this shape per line. The catalog is the single machine-readable authority for scope, mapping, capability status, deviation and evidence (docs/specs/parity-verification.md). This document is the human/tooling contract; internal/catalog enforces the rules in Go without a JSON-schema runtime.",
   "type": "object",
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mapping": {
+            "properties": { "kind": { "enum": ["field", "behavior"] } },
+            "required": ["kind"]
+          }
+        },
+        "required": ["mapping"]
+      },
+      "then": {
+        "required": ["matrix"],
+        "properties": { "matrix": { "$ref": "#/$defs/capabilityMatrix" } }
+      }
+    },
+    {
+      "if": {
+        "properties": { "matrix": { "type": "object" } },
+        "required": ["matrix"]
+      },
+      "then": {
+        "properties": {
+          "mapping": {
+            "properties": { "kind": { "enum": ["field", "behavior", "symbol"] } }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "partial" } }, "required": ["status"] },
+      "then": { "required": ["partial"], "properties": { "partial": { "type": "object" } } }
+    },
+    {
+      "if": { "properties": { "status": { "const": "deferred" } }, "required": ["status"] },
+      "then": { "required": ["deferred"], "properties": { "deferred": { "type": "object" } } }
+    },
+    {
+      "if": { "properties": { "status": { "enum": ["implemented", "verified"] } }, "required": ["status"] },
+      "then": { "required": ["evidence"], "properties": { "evidence": { "minItems": 1 } } }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "verified" },
+          "matrix": { "type": "object" }
+        },
+        "required": ["status", "matrix"]
+      },
+      "then": {
+        "properties": {
+          "evidence": {
+            "items": { "$ref": "#/$defs/verifiedMatrixEvidence" }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "matrix": {
+            "properties": { "category": { "const": "entrypoint" } },
+            "required": ["category"]
+          }
+        },
+        "required": ["matrix"]
+      },
+      "then": {
+        "properties": {
+          "mapping": {
+            "properties": { "kind": { "const": "symbol" } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mapping": {
+            "properties": { "kind": { "const": "symbol" } },
+            "required": ["kind"]
+          },
+          "matrix": { "type": "object" }
+        },
+        "required": ["mapping", "matrix"]
+      },
+      "then": {
+        "properties": {
+          "matrix": {
+            "properties": { "category": { "const": "entrypoint" } }
+          }
+        }
+      }
+    }
+  ],
   "required": [
     "schema_version",
     "id",
@@ -18,7 +113,7 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "1.0.0",
+      "const": "1.1.0",
       "description": "Version of this entry schema. Bump in lockstep with $id/version and the manifest."
     },
     "id": {
@@ -72,7 +167,7 @@
         },
         "kind": {
           "type": "string",
-          "enum": ["package", "command", "symbol", "contract"],
+          "enum": ["package", "command", "symbol", "contract", "field", "behavior"],
           "description": "Granularity of the mapping target."
         }
       }
@@ -126,6 +221,35 @@
           "baseline": {
             "type": "string",
             "description": "Baseline the evidence was captured against."
+          },
+          "case_id": {
+            "type": "string",
+            "description": "Stable case identifier within the referenced fixture or test."
+          },
+          "input_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "description": "Hash of the canonical input exercised by this case."
+          },
+          "execution_method": {
+            "type": "string",
+            "description": "Exact command or deterministic mechanism used to reproduce the evidence."
+          },
+          "expected": {
+            "type": "string",
+            "description": "Expected observable semantics."
+          },
+          "actual": {
+            "type": "string",
+            "description": "Observed result from the recorded execution."
+          },
+          "platform": {
+            "type": "string",
+            "description": "Platform scope on which this evidence applies."
+          },
+          "catalog_id": {
+            "type": "string",
+            "description": "Catalog entry this evidence verifies; must equal the containing entry id."
           }
         }
       }
@@ -161,9 +285,105 @@
         "reason": { "type": "string" }
       }
     },
+    "matrix": {
+      "oneOf": [
+        { "$ref": "#/$defs/capabilityMatrix" },
+        { "type": "null" }
+      ],
+      "description": "Optional capability matrix metadata. Required for field and behavior mappings; symbol mappings use it only for entrypoints."
+    },
     "notes": {
       "type": "string",
       "description": "Free-form clarification; never authoritative on its own."
+    }
+  },
+  "$defs": {
+    "matrixField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string", "pattern": "\\S" },
+        "type": { "type": "string", "pattern": "\\S" }
+      }
+    },
+    "matrixValueSemantics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["states", "description"],
+      "properties": {
+        "states": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["absent", "null", "false", "zero", "empty", "default", "value"]
+          }
+        },
+        "description": { "type": "string", "pattern": "\\S" }
+      }
+    },
+    "verifiedMatrixEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind", "ref", "baseline", "case_id", "input_hash",
+        "execution_method", "expected", "actual", "platform", "catalog_id"
+      ],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "ref": { "type": "string", "minLength": 1 },
+        "baseline": { "type": "string", "minLength": 1 },
+        "case_id": { "type": "string", "minLength": 1 },
+        "input_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "execution_method": { "type": "string", "minLength": 1 },
+        "expected": { "type": "string", "minLength": 1 },
+        "actual": { "type": "string", "minLength": 1 },
+        "platform": { "type": "string", "minLength": 1 },
+        "catalog_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "matrixEvidenceRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "assertion"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["go-test", "fixture", "oracle", "local-server", "smoke"]
+        },
+        "assertion": { "type": "string", "pattern": "\\S" }
+      }
+    },
+    "capabilityMatrix": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "api", "surface", "category", "pi", "go", "direction",
+        "pre_target_behavior", "value_semantics", "evidence_requirements"
+      ],
+      "properties": {
+        "api": { "type": "string", "pattern": "\\S" },
+        "surface": { "type": "string", "enum": ["public-api", "internal-wire", "fixture"] },
+        "category": {
+          "type": "string",
+          "enum": [
+            "entrypoint", "message", "content", "tool", "tool-choice", "event",
+            "usage", "error", "option", "request", "header", "sse", "delta", "compat"
+          ]
+        },
+        "pi": { "$ref": "#/$defs/matrixField" },
+        "go": { "$ref": "#/$defs/matrixField" },
+        "direction": { "type": "string", "enum": ["request", "response", "bidirectional"] },
+        "pre_target_behavior": { "type": "string", "enum": ["err-not-implemented", "ignore", "no-op"] },
+        "value_semantics": { "$ref": "#/$defs/matrixValueSemantics" },
+        "evidence_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/matrixEvidenceRequirement" }
+        }
+      }
     }
   }
 }

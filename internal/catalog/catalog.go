@@ -11,6 +11,7 @@ package catalog
 import (
 	"bufio"
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,7 +22,7 @@ import (
 )
 
 // SchemaVersion is the current catalog entry/manifest schema version.
-const SchemaVersion = "1.0.0"
+const SchemaVersion = "1.1.0"
 
 // NonAuthoritativeBanner is emitted verbatim at the top of the generated
 // report. It must make clear the report is a non-authoritative, generated view
@@ -48,11 +49,60 @@ type Mapping struct {
 	Kind   string `json:"kind"`
 }
 
-// Evidence binds a catalog entry to repeatable verification material.
+// MatrixField names the Pi and Go sides of a capability-matrix row. Field rows
+// use declared members, symbol rows use entrypoints, and behavior rows use
+// stable branch names. Type is intentionally source-shaped text: public rows
+// name the exact declared type while internal-wire and fixture rows name the
+// semantic type without forcing a particular private implementation.
+type MatrixField struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+// MatrixValueSemantics records the observable states a field must preserve.
+// Description says what those states mean for this particular row.
+type MatrixValueSemantics struct {
+	States      []string `json:"states"`
+	Description string   `json:"description"`
+}
+
+// MatrixEvidenceRequirement describes evidence that must exist before a
+// matrix row may advance to verified. It is prospective and distinct from an
+// Entry's Evidence, which records evidence that already exists.
+type MatrixEvidenceRequirement struct {
+	Kind      string `json:"kind"`
+	Assertion string `json:"assertion"`
+}
+
+// CapabilityMatrix is the field, entrypoint, or behavior-level contract for one
+// API capability. The enclosing Entry supplies Pi provenance, Go target,
+// milestone, status and any evidence already collected.
+type CapabilityMatrix struct {
+	API                  string                      `json:"api"`
+	Surface              string                      `json:"surface"`
+	Category             string                      `json:"category"`
+	Pi                   MatrixField                 `json:"pi"`
+	Go                   MatrixField                 `json:"go"`
+	Direction            string                      `json:"direction"`
+	PreTargetBehavior    string                      `json:"pre_target_behavior"`
+	ValueSemantics       MatrixValueSemantics        `json:"value_semantics"`
+	EvidenceRequirements []MatrixEvidenceRequirement `json:"evidence_requirements"`
+}
+
+// Evidence binds a catalog entry to repeatable verification material. Verified
+// matrix rows carry the full replay record required by parity-verification.md;
+// older scaffold evidence may retain the compact provenance-only form.
 type Evidence struct {
-	Kind     string `json:"kind"`
-	Ref      string `json:"ref"`
-	Baseline string `json:"baseline"`
+	Kind            string `json:"kind"`
+	Ref             string `json:"ref"`
+	Baseline        string `json:"baseline"`
+	CaseID          string `json:"case_id,omitempty"`
+	InputHash       string `json:"input_hash,omitempty"`
+	ExecutionMethod string `json:"execution_method,omitempty"`
+	Expected        string `json:"expected,omitempty"`
+	Actual          string `json:"actual,omitempty"`
+	Platform        string `json:"platform,omitempty"`
+	CatalogID       string `json:"catalog_id,omitempty"`
 }
 
 // Deviation records an approved deviation and the ADR that authorises it.
@@ -79,18 +129,19 @@ type Deferred struct {
 // entry without an approved deviation, partial split, deferral or notes stays
 // byte-clean and diff-minimal (see EncodeEntries).
 type Entry struct {
-	SchemaVersion  string     `json:"schema_version"`
-	ID             string     `json:"id"`
-	Upstream       Upstream   `json:"upstream"`
-	Mapping        Mapping    `json:"mapping"`
-	Status         string     `json:"status"`
-	Milestone      string     `json:"milestone"`
-	Classification string     `json:"classification"`
-	Evidence       []Evidence `json:"evidence,omitempty"`
-	Deviation      *Deviation `json:"deviation,omitempty"`
-	Partial        *Partial   `json:"partial,omitempty"`
-	Deferred       *Deferred  `json:"deferred,omitempty"`
-	Notes          string     `json:"notes,omitempty"`
+	SchemaVersion  string            `json:"schema_version"`
+	ID             string            `json:"id"`
+	Upstream       Upstream          `json:"upstream"`
+	Mapping        Mapping           `json:"mapping"`
+	Status         string            `json:"status"`
+	Milestone      string            `json:"milestone"`
+	Classification string            `json:"classification"`
+	Evidence       []Evidence        `json:"evidence,omitempty"`
+	Deviation      *Deviation        `json:"deviation,omitempty"`
+	Partial        *Partial          `json:"partial,omitempty"`
+	Deferred       *Deferred         `json:"deferred,omitempty"`
+	Matrix         *CapabilityMatrix `json:"matrix,omitempty"`
+	Notes          string            `json:"notes,omitempty"`
 }
 
 // Manifest is the versioned catalog manifest.
@@ -150,6 +201,106 @@ var mappingKindEnum = map[string]bool{
 	"command":  true,
 	"symbol":   true,
 	"contract": true,
+	"field":    true,
+	"behavior": true,
+}
+
+// Capability-matrix enum values. They are exported so catalog producers and
+// tests do not duplicate wire strings.
+const (
+	MatrixSurfacePublicAPI    = "public-api"
+	MatrixSurfaceInternalWire = "internal-wire"
+	MatrixSurfaceFixture      = "fixture"
+
+	MatrixCategoryEntrypoint = "entrypoint"
+	MatrixCategoryMessage    = "message"
+	MatrixCategoryContent    = "content"
+	MatrixCategoryTool       = "tool"
+	MatrixCategoryToolChoice = "tool-choice"
+	MatrixCategoryEvent      = "event"
+	MatrixCategoryUsage      = "usage"
+	MatrixCategoryError      = "error"
+	MatrixCategoryOption     = "option"
+	MatrixCategoryRequest    = "request"
+	MatrixCategoryHeader     = "header"
+	MatrixCategorySSE        = "sse"
+	MatrixCategoryDelta      = "delta"
+	MatrixCategoryCompat     = "compat"
+
+	MatrixDirectionRequest       = "request"
+	MatrixDirectionResponse      = "response"
+	MatrixDirectionBidirectional = "bidirectional"
+
+	MatrixBehaviorErrNotImplemented = "err-not-implemented"
+	MatrixBehaviorIgnore            = "ignore"
+	MatrixBehaviorNoOp              = "no-op"
+
+	MatrixValueAbsent  = "absent"
+	MatrixValueNull    = "null"
+	MatrixValueFalse   = "false"
+	MatrixValueZero    = "zero"
+	MatrixValueEmpty   = "empty"
+	MatrixValueDefault = "default"
+	MatrixValueValue   = "value"
+
+	MatrixEvidenceGoTest      = "go-test"
+	MatrixEvidenceFixture     = "fixture"
+	MatrixEvidenceOracle      = "oracle"
+	MatrixEvidenceLocalServer = "local-server"
+	MatrixEvidenceSmoke       = "smoke"
+)
+
+var matrixSurfaceEnum = map[string]bool{
+	MatrixSurfacePublicAPI:    true,
+	MatrixSurfaceInternalWire: true,
+	MatrixSurfaceFixture:      true,
+}
+
+var matrixCategoryEnum = map[string]bool{
+	MatrixCategoryEntrypoint: true,
+	MatrixCategoryMessage:    true,
+	MatrixCategoryContent:    true,
+	MatrixCategoryTool:       true,
+	MatrixCategoryToolChoice: true,
+	MatrixCategoryEvent:      true,
+	MatrixCategoryUsage:      true,
+	MatrixCategoryError:      true,
+	MatrixCategoryOption:     true,
+	MatrixCategoryRequest:    true,
+	MatrixCategoryHeader:     true,
+	MatrixCategorySSE:        true,
+	MatrixCategoryDelta:      true,
+	MatrixCategoryCompat:     true,
+}
+
+var matrixDirectionEnum = map[string]bool{
+	MatrixDirectionRequest:       true,
+	MatrixDirectionResponse:      true,
+	MatrixDirectionBidirectional: true,
+}
+
+var matrixBehaviorEnum = map[string]bool{
+	MatrixBehaviorErrNotImplemented: true,
+	MatrixBehaviorIgnore:            true,
+	MatrixBehaviorNoOp:              true,
+}
+
+var matrixValueStateEnum = map[string]bool{
+	MatrixValueAbsent:  true,
+	MatrixValueNull:    true,
+	MatrixValueFalse:   true,
+	MatrixValueZero:    true,
+	MatrixValueEmpty:   true,
+	MatrixValueDefault: true,
+	MatrixValueValue:   true,
+}
+
+var matrixEvidenceKindEnum = map[string]bool{
+	MatrixEvidenceGoTest:      true,
+	MatrixEvidenceFixture:     true,
+	MatrixEvidenceOracle:      true,
+	MatrixEvidenceLocalServer: true,
+	MatrixEvidenceSmoke:       true,
 }
 
 func statusIndex(status string) int {
@@ -178,6 +329,9 @@ const (
 	KindDeferredWithoutADR ErrorKind = "deferred_without_adr"
 	KindIncompletePartial  ErrorKind = "incomplete_partial"
 	KindMissingEvidence    ErrorKind = "missing_evidence"
+	KindIncompleteMatrix   ErrorKind = "incomplete_matrix"
+	KindIllegalMatrixValue ErrorKind = "illegal_matrix_value"
+	KindDuplicateMatrix    ErrorKind = "duplicate_matrix"
 	KindManifestMismatch   ErrorKind = "manifest_mismatch"
 	KindSchemaVersion      ErrorKind = "schema_version"
 )
@@ -194,6 +348,9 @@ var (
 	ErrDeferredWithoutADR = errors.New("deferred entry missing adr or target milestone")
 	ErrIncompletePartial  = errors.New("partial entry missing supported or unsupported branches")
 	ErrMissingEvidence    = errors.New("implemented or verified entry missing evidence")
+	ErrIncompleteMatrix   = errors.New("capability matrix entry is incomplete")
+	ErrIllegalMatrixValue = errors.New("illegal capability matrix value")
+	ErrDuplicateMatrix    = errors.New("duplicate capability matrix coordinate")
 	ErrManifestMismatch   = errors.New("manifest counts do not match entries")
 	ErrSchemaVersion      = errors.New("entry schema version missing or inconsistent")
 	ErrMalformedLine      = errors.New("malformed catalog line")
@@ -293,16 +450,23 @@ func ParseManifest(data []byte) (Manifest, error) {
 // and unsupported branches; implemented/verified entries without evidence; and
 // manifests whose entry_count or status_counts disagree with the entries.
 func Validate(entries []Entry, manifest Manifest) error {
-	if manifest.SchemaVersion == "" {
-		return newValidationError(KindSchemaVersion, ErrSchemaVersion, "", "manifest schema_version missing")
+	if manifest.SchemaVersion != SchemaVersion {
+		return newValidationError(KindSchemaVersion, ErrSchemaVersion, "",
+			fmt.Sprintf("manifest schema_version=%q want=%q", manifest.SchemaVersion, SchemaVersion))
+	}
+	if manifest.CatalogVersion != SchemaVersion {
+		return newValidationError(KindSchemaVersion, ErrSchemaVersion, "",
+			fmt.Sprintf("manifest catalog_version=%q want=%q", manifest.CatalogVersion, SchemaVersion))
 	}
 
 	seen := make(map[string]bool, len(entries))
+	seenMatrix := make(map[string]string, len(entries))
 	counts := make(map[string]int, len(StatusOrder))
 
 	for _, entry := range entries {
-		if entry.SchemaVersion == "" {
-			return newValidationError(KindSchemaVersion, ErrSchemaVersion, entry.ID, "entry schema_version missing")
+		if entry.SchemaVersion != SchemaVersion {
+			return newValidationError(KindSchemaVersion, ErrSchemaVersion, entry.ID,
+				fmt.Sprintf("entry schema_version=%q want=%q", entry.SchemaVersion, SchemaVersion))
 		}
 		if entry.ID == "" {
 			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "entry id missing")
@@ -326,12 +490,16 @@ func Validate(entries []Entry, manifest Manifest) error {
 		}
 
 		switch {
+		case entry.Upstream.Module == "":
+			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "upstream.module")
 		case entry.Upstream.Repository == "":
 			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "upstream.repository")
 		case entry.Upstream.Commit == "":
 			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "upstream.commit")
 		case entry.Upstream.Reference == "":
 			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "upstream.reference")
+		case entry.Mapping.Module == "":
+			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "mapping.module")
 		case entry.Mapping.Target == "":
 			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "mapping.target")
 		}
@@ -341,9 +509,12 @@ func Validate(entries []Entry, manifest Manifest) error {
 		}
 
 		if entry.Status == StatusDeferred {
-			if entry.Deferred == nil || entry.Deferred.ADR == "" || entry.Deferred.Milestone == "" {
+			if entry.Deferred == nil || strings.TrimSpace(entry.Deferred.ADR) == "" || strings.TrimSpace(entry.Deferred.Milestone) == "" || strings.TrimSpace(entry.Deferred.Reason) == "" {
 				return newValidationError(KindDeferredWithoutADR, ErrDeferredWithoutADR, entry.ID, "")
 			}
+		}
+		if entry.Deviation != nil && (strings.TrimSpace(entry.Deviation.ADR) == "" || strings.TrimSpace(entry.Deviation.Reason) == "") {
+			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "deviation adr and reason are required")
 		}
 
 		if entry.Status == StatusPartial {
@@ -356,6 +527,23 @@ func Validate(entries []Entry, manifest Manifest) error {
 			if len(entry.Evidence) == 0 {
 				return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID, entry.Status)
 			}
+		}
+		if err := validateEvidence(entry, manifest.BaselineCommit); err != nil {
+			return err
+		}
+
+		if (entry.Mapping.Kind == "field" || entry.Mapping.Kind == "behavior") && entry.Matrix == nil {
+			return newValidationError(KindIncompleteMatrix, ErrIncompleteMatrix, entry.ID, entry.Mapping.Kind+" mapping requires matrix metadata")
+		}
+		if entry.Matrix != nil {
+			if err := validateCapabilityMatrix(entry); err != nil {
+				return err
+			}
+			coordinate := strings.Join([]string{entry.Matrix.API, entry.Matrix.Surface, entry.Matrix.Category, entry.Matrix.Pi.Name}, "\x00")
+			if previousID, ok := seenMatrix[coordinate]; ok {
+				return newValidationError(KindDuplicateMatrix, ErrDuplicateMatrix, entry.ID, "same api/surface/category/Pi name as "+previousID)
+			}
+			seenMatrix[coordinate] = entry.ID
 		}
 
 		counts[entry.Status]++
@@ -370,6 +558,124 @@ func Validate(entries []Entry, manifest Manifest) error {
 	}
 
 	return nil
+}
+
+func validateCapabilityMatrix(entry Entry) error {
+	matrix := entry.Matrix
+	if entry.Mapping.Kind != "field" && entry.Mapping.Kind != "behavior" && entry.Mapping.Kind != "symbol" {
+		return newValidationError(KindIncompleteMatrix, ErrIncompleteMatrix, entry.ID, "matrix mapping.kind must be field, behavior, or symbol")
+	}
+	if matrix.Category == MatrixCategoryEntrypoint && entry.Mapping.Kind != "symbol" {
+		return newValidationError(KindIncompleteMatrix, ErrIncompleteMatrix, entry.ID, "entrypoint matrix rows require symbol mappings")
+	}
+	if entry.Mapping.Kind == "symbol" && matrix.Category != MatrixCategoryEntrypoint {
+		return newValidationError(KindIncompleteMatrix, ErrIncompleteMatrix, entry.ID, "symbol matrix rows require entrypoint category")
+	}
+	if strings.TrimSpace(matrix.API) == "" || strings.TrimSpace(matrix.Pi.Name) == "" || strings.TrimSpace(matrix.Pi.Type) == "" || strings.TrimSpace(matrix.Go.Name) == "" || strings.TrimSpace(matrix.Go.Type) == "" {
+		return newValidationError(KindIncompleteMatrix, ErrIncompleteMatrix, entry.ID, "api and Pi/Go names and types are required")
+	}
+	if !matrixSurfaceEnum[matrix.Surface] {
+		return newValidationError(KindIllegalMatrixValue, ErrIllegalMatrixValue, entry.ID, "surface="+matrix.Surface)
+	}
+	if !matrixCategoryEnum[matrix.Category] {
+		return newValidationError(KindIllegalMatrixValue, ErrIllegalMatrixValue, entry.ID, "category="+matrix.Category)
+	}
+	if !matrixDirectionEnum[matrix.Direction] {
+		return newValidationError(KindIllegalMatrixValue, ErrIllegalMatrixValue, entry.ID, "direction="+matrix.Direction)
+	}
+	if !matrixBehaviorEnum[matrix.PreTargetBehavior] {
+		return newValidationError(KindIllegalMatrixValue, ErrIllegalMatrixValue, entry.ID, "pre_target_behavior="+matrix.PreTargetBehavior)
+	}
+	if len(matrix.ValueSemantics.States) == 0 || strings.TrimSpace(matrix.ValueSemantics.Description) == "" {
+		return newValidationError(KindIncompleteMatrix, ErrIncompleteMatrix, entry.ID, "value_semantics states and description are required")
+	}
+	seenStates := make(map[string]bool, len(matrix.ValueSemantics.States))
+	for _, state := range matrix.ValueSemantics.States {
+		if !matrixValueStateEnum[state] || seenStates[state] {
+			return newValidationError(KindIllegalMatrixValue, ErrIllegalMatrixValue, entry.ID, "value_semantics state="+state)
+		}
+		seenStates[state] = true
+	}
+	if len(matrix.EvidenceRequirements) == 0 {
+		return newValidationError(KindIncompleteMatrix, ErrIncompleteMatrix, entry.ID, "evidence_requirements are required")
+	}
+	for _, requirement := range matrix.EvidenceRequirements {
+		if !matrixEvidenceKindEnum[requirement.Kind] {
+			return newValidationError(KindIllegalMatrixValue, ErrIllegalMatrixValue, entry.ID, "evidence kind="+requirement.Kind)
+		}
+		if strings.TrimSpace(requirement.Assertion) == "" {
+			return newValidationError(KindIncompleteMatrix, ErrIncompleteMatrix, entry.ID, "evidence assertion is required")
+		}
+	}
+	return nil
+}
+
+func validateEvidence(entry Entry, baselineCommit string) error {
+	complete := entry.Status == StatusVerified && entry.Matrix != nil
+	achievedKinds := make(map[string]bool, len(entry.Evidence))
+	seenCases := make(map[string]bool, len(entry.Evidence))
+	for _, evidence := range entry.Evidence {
+		if strings.TrimSpace(evidence.Kind) == "" || strings.TrimSpace(evidence.Ref) == "" || strings.TrimSpace(evidence.Baseline) == "" {
+			return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID, "evidence kind, ref and baseline are required")
+		}
+		if evidence.Baseline != baselineCommit {
+			return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID, "evidence baseline must equal manifest baseline_commit")
+		}
+		achievedKinds[evidence.Kind] = true
+		if !complete {
+			continue
+		}
+
+		if strings.TrimSpace(evidence.CaseID) == "" || strings.TrimSpace(evidence.InputHash) == "" ||
+			strings.TrimSpace(evidence.ExecutionMethod) == "" || strings.TrimSpace(evidence.Expected) == "" ||
+			strings.TrimSpace(evidence.Actual) == "" || strings.TrimSpace(evidence.Platform) == "" ||
+			strings.TrimSpace(evidence.CatalogID) == "" {
+			return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID,
+				"completed evidence requires case_id, input_hash, execution_method, expected, actual, platform and catalog_id")
+		}
+		if !validSHA256(evidence.InputHash) {
+			return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID, "input_hash must be sha256:<64 lowercase hex>")
+		}
+		if evidence.CatalogID != entry.ID {
+			return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID, "evidence catalog_id must equal its containing entry id")
+		}
+		caseKey := evidence.Kind + "\x00" + evidence.CaseID
+		if seenCases[caseKey] {
+			return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID, "duplicate evidence kind/case_id")
+		}
+		seenCases[caseKey] = true
+	}
+
+	if entry.Status != StatusVerified || entry.Matrix == nil {
+		return nil
+	}
+	requiredKinds := make(map[string]bool, len(entry.Matrix.EvidenceRequirements)+2)
+	for _, requirement := range entry.Matrix.EvidenceRequirements {
+		requiredKinds[requirement.Kind] = true
+	}
+	if entry.Matrix.PreTargetBehavior == MatrixBehaviorNoOp {
+		requiredKinds[MatrixEvidenceOracle] = true
+		requiredKinds[MatrixEvidenceGoTest] = true
+	}
+	for kind := range requiredKinds {
+		if !achievedKinds[kind] {
+			return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID, "verified matrix entry lacks required "+kind+" evidence")
+		}
+	}
+	return nil
+}
+
+func validSHA256(value string) bool {
+	const prefix = "sha256:"
+	if !strings.HasPrefix(value, prefix) || len(value) != len(prefix)+64 {
+		return false
+	}
+	digest := value[len(prefix):]
+	if digest != strings.ToLower(digest) {
+		return false
+	}
+	_, err := hex.DecodeString(digest)
+	return err == nil
 }
 
 // compareCounts checks that the manifest status_counts equal the actual counts,
@@ -396,9 +702,13 @@ func compareCounts(manifestCounts, actual map[string]int) error {
 func GenerateReport(entries []Entry) string {
 	counts := make(map[string]int, len(StatusOrder))
 	byModule := make(map[string][]Entry)
+	var matrixEntries []Entry
 	for _, entry := range entries {
 		counts[entry.Status]++
 		byModule[entry.Mapping.Module] = append(byModule[entry.Mapping.Module], entry)
+		if entry.Matrix != nil {
+			matrixEntries = append(matrixEntries, entry)
+		}
 	}
 
 	var b strings.Builder
@@ -433,7 +743,75 @@ func GenerateReport(entries []Entry) string {
 		}
 	}
 
+	if len(matrixEntries) > 0 {
+		sort.Slice(matrixEntries, func(i, j int) bool {
+			left, right := matrixEntries[i], matrixEntries[j]
+			if left.Matrix.API != right.Matrix.API {
+				return left.Matrix.API < right.Matrix.API
+			}
+			if left.Matrix.Surface != right.Matrix.Surface {
+				return left.Matrix.Surface < right.Matrix.Surface
+			}
+			if left.Matrix.Category != right.Matrix.Category {
+				return left.Matrix.Category < right.Matrix.Category
+			}
+			return left.ID < right.ID
+		})
+		b.WriteString("\n## OpenAI Chat Completions capability matrix\n\n")
+		b.WriteString("This table is generated from field, entrypoint, and behavior entries in `parity/catalog.jsonl`; the catalog remains authoritative.\n\n")
+		b.WriteString("| Surface | Category | Pi capability / type | Go mapping / type | Direction | Target | Status | Before target | Value semantics | Evidence required | Pi source |\n")
+		b.WriteString("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n")
+		for _, entry := range matrixEntries {
+			matrix := entry.Matrix
+			fmt.Fprintf(&b, "| %s | %s | %s<br>%s | %s<br>%s | %s | %s | %s | %s | %s | %s | %s |\n",
+				markdownCell(matrix.Surface), markdownCell(matrix.Category), markdownCode(matrix.Pi.Name), markdownCode(matrix.Pi.Type),
+				markdownCode(matrix.Go.Name), markdownCode(matrix.Go.Type), markdownCell(matrix.Direction), markdownCell(entry.Milestone),
+				markdownCell(entry.Status), markdownCell(matrix.PreTargetBehavior), markdownCell(formatValueSemantics(matrix.ValueSemantics)),
+				markdownCell(formatEvidenceRequirements(matrix.EvidenceRequirements)), markdownCode(entry.Upstream.Reference))
+		}
+	}
+
 	return b.String()
+}
+
+func markdownCell(value string) string {
+	value = strings.ReplaceAll(value, "|", "\\|")
+	value = strings.ReplaceAll(value, "\r\n", "<br>")
+	value = strings.ReplaceAll(value, "\n", "<br>")
+	return value
+}
+
+func markdownCode(value string) string {
+	value = markdownCell(value)
+	longestRun := 0
+	currentRun := 0
+	for _, r := range value {
+		if r == '`' {
+			currentRun++
+			if currentRun > longestRun {
+				longestRun = currentRun
+			}
+		} else {
+			currentRun = 0
+		}
+	}
+	if longestRun == 0 {
+		return "`" + value + "`"
+	}
+	fence := strings.Repeat("`", longestRun+1)
+	return fence + " " + value + " " + fence
+}
+
+func formatValueSemantics(semantics MatrixValueSemantics) string {
+	return strings.Join(semantics.States, ", ") + " — " + semantics.Description
+}
+
+func formatEvidenceRequirements(requirements []MatrixEvidenceRequirement) string {
+	formatted := make([]string, len(requirements))
+	for i, requirement := range requirements {
+		formatted[i] = requirement.Kind + ": " + requirement.Assertion
+	}
+	return strings.Join(formatted, "; ")
 }
 
 // EncodeEntries serialises entries as canonical catalog JSONL: one compact
@@ -452,121 +830,6 @@ func EncodeEntries(entries []Entry) ([]byte, error) {
 		}
 	}
 	return buf.Bytes(), nil
-}
-
-// GenerateError reports a problem while generating the catalog from extracted
-// facts and a hand-authored overlay.
-type GenerateError struct {
-	ID     string
-	Reason string
-}
-
-func (e *GenerateError) Error() string {
-	if e.ID == "" {
-		return "catalog: generate: " + e.Reason
-	}
-	return "catalog: generate: id=" + e.ID + ": " + e.Reason
-}
-
-// Generate merges extracted base facts with a hand-authored, id-keyed overlay
-// into the final catalog entries, sorted by id. The overlay is the single
-// human-input surface: it may add new entries (e.g. kind:contract decisions) and
-// override fields of a matching base entry (an overlay field wins only when it
-// is set, so extraction-owned provenance survives unless deliberately replaced).
-//
-// Generate fails, rather than silently defaulting, when an entry lacks a
-// required human decision: every entry must carry a milestone (no implicit M0),
-// and every overlay entry must carry an id. The merged result is not validated
-// here; callers pass it to Validate.
-func Generate(base, overlay []Entry) ([]Entry, error) {
-	merged := make(map[string]Entry, len(base)+len(overlay))
-	order := make([]string, 0, len(base)+len(overlay))
-	seen := map[string]bool{}
-	remember := func(id string) {
-		if !seen[id] {
-			seen[id] = true
-			order = append(order, id)
-		}
-	}
-
-	for _, b := range base {
-		if b.ID == "" {
-			return nil, &GenerateError{Reason: "base entry has empty id"}
-		}
-		merged[b.ID] = b
-		remember(b.ID)
-	}
-
-	for _, o := range overlay {
-		if o.ID == "" {
-			return nil, &GenerateError{Reason: "overlay entry has empty id"}
-		}
-		if existing, ok := merged[o.ID]; ok {
-			merged[o.ID] = mergeEntry(existing, o)
-		} else {
-			merged[o.ID] = o
-		}
-		remember(o.ID)
-	}
-
-	entries := make([]Entry, 0, len(merged))
-	for _, id := range order {
-		e := merged[id]
-		if e.Milestone == "" {
-			return nil, &GenerateError{ID: id, Reason: "missing milestone (no implicit M0 default)"}
-		}
-		entries = append(entries, e)
-	}
-	sort.Slice(entries, func(i, j int) bool { return entries[i].ID < entries[j].ID })
-	return entries, nil
-}
-
-// mergeEntry overlays set fields of o onto b. A string field wins when non-empty;
-// a pointer or slice field wins when non-nil. This lets the overlay refine an
-// extracted base entry (e.g. attach a milestone or deferral) without discarding
-// extraction-owned provenance it leaves unset.
-func mergeEntry(b, o Entry) Entry {
-	if o.SchemaVersion != "" {
-		b.SchemaVersion = o.SchemaVersion
-	}
-	if o.Upstream != (Upstream{}) {
-		b.Upstream = o.Upstream
-	}
-	if o.Mapping != (Mapping{}) {
-		b.Mapping = o.Mapping
-	}
-	if o.Status != "" {
-		b.Status = o.Status
-	}
-	if o.Milestone != "" {
-		b.Milestone = o.Milestone
-	}
-	if o.Classification != "" {
-		b.Classification = o.Classification
-	}
-	if o.Evidence != nil {
-		b.Evidence = o.Evidence
-	}
-	if o.Deviation != nil {
-		b.Deviation = o.Deviation
-	}
-	if o.Partial != nil {
-		b.Partial = o.Partial
-	}
-	if o.Deferred != nil {
-		b.Deferred = o.Deferred
-	}
-	if o.Notes != "" {
-		b.Notes = o.Notes
-	}
-	return b
-}
-
-// LoadOverlay parses a hand-authored overlay JSONL file (same line format as the
-// catalog). It reuses the catalog loader, so malformed lines are reported with
-// their line number.
-func LoadOverlay(path string) ([]Entry, error) {
-	return LoadCatalog(path)
 }
 
 // ManifestPaths carries the fixed relative paths the catalog manifest records.

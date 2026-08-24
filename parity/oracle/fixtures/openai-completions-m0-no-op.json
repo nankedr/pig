@@ -1,0 +1,477 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ai/openai-completions/m0-no-op",
+  "catalog_ids": [
+    "matrix:ai/openai-completions/option/open-aicompletions-options-metadata",
+    "matrix:ai/openai-completions/option/open-aicompletions-options-telemetry-context",
+    "matrix:ai/openai-completions/option/open-aicompletions-options-transport",
+    "matrix:ai/openai-completions/option/open-aicompletions-options-websocket-connect-timeout-ms",
+    "matrix:ai/openai-completions/option/simple-stream-options-deferred",
+    "matrix:ai/openai-completions/option/simple-stream-options-deferred-window"
+  ],
+  "baseline_id": "pi-936aff0-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "upstream": {
+    "module": "ai",
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/api/openai-completions.ts#stream,streamSimple"
+  },
+  "normalizations": [
+    "remove AssistantMessage.timestamp recursively",
+    "remove user-agent, content-length, and x-stainless-* request headers",
+    "sort object keys recursively before hashing"
+  ],
+  "cases": [
+    {
+      "id": "metadata",
+      "catalog_id": "matrix:ai/openai-completions/option/open-aicompletions-options-metadata",
+      "input": {
+        "entrypoint": "stream",
+        "variants": [
+          {
+            "id": "empty",
+            "option": {
+              "metadata": {}
+            }
+          },
+          {
+            "id": "value",
+            "option": {
+              "metadata": {
+                "trace": {
+                  "enabled": true
+                }
+              }
+            }
+          }
+        ]
+      },
+      "input_sha256": "623c6b4deddcca7775badac7d88958d1964bb8aee53a21528b97ed19a68650e4",
+      "expected": {
+        "comparison": "each variant equals the same entrypoint with the option absent",
+        "request_count": 1,
+        "request_equal": true,
+        "events_equal": true,
+        "outcome_equal": true,
+        "telemetry_start_count": 0
+      },
+      "actual": {
+        "control": {
+          "request_count": 1,
+          "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+          "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+          "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+          "telemetry_start_count": 0
+        },
+        "observations": [
+          {
+            "variant": "empty",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "value",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "telemetry-context",
+      "catalog_id": "matrix:ai/openai-completions/option/open-aicompletions-options-telemetry-context",
+      "input": {
+        "entrypoint": "stream",
+        "variants": [
+          {
+            "id": "recording-context",
+            "option": {
+              "telemetryContext": "recording-context"
+            }
+          }
+        ]
+      },
+      "input_sha256": "2f61a56718d0f31298beb98291a6b5db138f7f2e543a4f266ab632b9c09b54c0",
+      "expected": {
+        "comparison": "each variant equals the same entrypoint with the option absent",
+        "request_count": 1,
+        "request_equal": true,
+        "events_equal": true,
+        "outcome_equal": true,
+        "telemetry_start_count": 0
+      },
+      "actual": {
+        "control": {
+          "request_count": 1,
+          "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+          "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+          "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+          "telemetry_start_count": 0
+        },
+        "observations": [
+          {
+            "variant": "recording-context",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "transport",
+      "catalog_id": "matrix:ai/openai-completions/option/open-aicompletions-options-transport",
+      "input": {
+        "entrypoint": "stream",
+        "variants": [
+          {
+            "id": "sse",
+            "option": {
+              "transport": "sse"
+            }
+          },
+          {
+            "id": "websocket",
+            "option": {
+              "transport": "websocket"
+            }
+          },
+          {
+            "id": "websocket-cached",
+            "option": {
+              "transport": "websocket-cached"
+            }
+          },
+          {
+            "id": "auto",
+            "option": {
+              "transport": "auto"
+            }
+          }
+        ]
+      },
+      "input_sha256": "4f3599049c43e0c3a807ef8155af90f44f347cbf62e61150f306ca53f650e533",
+      "expected": {
+        "comparison": "each variant equals the same entrypoint with the option absent",
+        "request_count": 1,
+        "request_equal": true,
+        "events_equal": true,
+        "outcome_equal": true,
+        "telemetry_start_count": 0
+      },
+      "actual": {
+        "control": {
+          "request_count": 1,
+          "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+          "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+          "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+          "telemetry_start_count": 0
+        },
+        "observations": [
+          {
+            "variant": "sse",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "websocket",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "websocket-cached",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "auto",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "websocket-connect-timeout-ms",
+      "catalog_id": "matrix:ai/openai-completions/option/open-aicompletions-options-websocket-connect-timeout-ms",
+      "input": {
+        "entrypoint": "stream",
+        "variants": [
+          {
+            "id": "zero",
+            "option": {
+              "websocketConnectTimeoutMs": 0
+            }
+          },
+          {
+            "id": "value",
+            "option": {
+              "websocketConnectTimeoutMs": 17
+            }
+          }
+        ]
+      },
+      "input_sha256": "0b4f2940cedd52d2fad9d365d0041eaef860d149ad6d3b37aba9a736cf299b5d",
+      "expected": {
+        "comparison": "each variant equals the same entrypoint with the option absent",
+        "request_count": 1,
+        "request_equal": true,
+        "events_equal": true,
+        "outcome_equal": true,
+        "telemetry_start_count": 0
+      },
+      "actual": {
+        "control": {
+          "request_count": 1,
+          "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+          "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+          "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+          "telemetry_start_count": 0
+        },
+        "observations": [
+          {
+            "variant": "zero",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "value",
+            "request_count": 1,
+            "request_sha256": "7c04d4550ca08b7b9ac5ef7d62c2b41fd1d3665fd46eef9eec1d3e406fd0661b",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "deferred",
+      "catalog_id": "matrix:ai/openai-completions/option/simple-stream-options-deferred",
+      "input": {
+        "entrypoint": "streamSimple",
+        "variants": [
+          {
+            "id": "false",
+            "option": {
+              "deferred": false
+            }
+          },
+          {
+            "id": "true",
+            "option": {
+              "deferred": true
+            }
+          },
+          {
+            "id": "empty",
+            "option": {
+              "deferred": {}
+            }
+          }
+        ]
+      },
+      "input_sha256": "3e450a4d914d427ffb0fd6833b2a626eaba6902303bfe2cf453043c45077b638",
+      "expected": {
+        "comparison": "each variant equals the same entrypoint with the option absent",
+        "request_count": 1,
+        "request_equal": true,
+        "events_equal": true,
+        "outcome_equal": true,
+        "telemetry_start_count": 0
+      },
+      "actual": {
+        "control": {
+          "request_count": 1,
+          "request_sha256": "842d3b301ccbab353d44daa88bc6f21e2467195ba05576342da94712fb87c9d8",
+          "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+          "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+          "telemetry_start_count": 0
+        },
+        "observations": [
+          {
+            "variant": "false",
+            "request_count": 1,
+            "request_sha256": "842d3b301ccbab353d44daa88bc6f21e2467195ba05576342da94712fb87c9d8",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "true",
+            "request_count": 1,
+            "request_sha256": "842d3b301ccbab353d44daa88bc6f21e2467195ba05576342da94712fb87c9d8",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "empty",
+            "request_count": 1,
+            "request_sha256": "842d3b301ccbab353d44daa88bc6f21e2467195ba05576342da94712fb87c9d8",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "deferred-window",
+      "catalog_id": "matrix:ai/openai-completions/option/simple-stream-options-deferred-window",
+      "input": {
+        "entrypoint": "streamSimple",
+        "variants": [
+          {
+            "id": "15m",
+            "option": {
+              "deferred": {
+                "window": "15m"
+              }
+            }
+          },
+          {
+            "id": "1h",
+            "option": {
+              "deferred": {
+                "window": "1h"
+              }
+            }
+          },
+          {
+            "id": "24h",
+            "option": {
+              "deferred": {
+                "window": "24h"
+              }
+            }
+          }
+        ]
+      },
+      "input_sha256": "647745278f39d89abd95882e0f10b3e224021d9f6439aef532742e2e2753fe4f",
+      "expected": {
+        "comparison": "each variant equals the same entrypoint with the option absent",
+        "request_count": 1,
+        "request_equal": true,
+        "events_equal": true,
+        "outcome_equal": true,
+        "telemetry_start_count": 0
+      },
+      "actual": {
+        "control": {
+          "request_count": 1,
+          "request_sha256": "842d3b301ccbab353d44daa88bc6f21e2467195ba05576342da94712fb87c9d8",
+          "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+          "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+          "telemetry_start_count": 0
+        },
+        "observations": [
+          {
+            "variant": "15m",
+            "request_count": 1,
+            "request_sha256": "842d3b301ccbab353d44daa88bc6f21e2467195ba05576342da94712fb87c9d8",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "1h",
+            "request_count": 1,
+            "request_sha256": "842d3b301ccbab353d44daa88bc6f21e2467195ba05576342da94712fb87c9d8",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          },
+          {
+            "variant": "24h",
+            "request_count": 1,
+            "request_sha256": "842d3b301ccbab353d44daa88bc6f21e2467195ba05576342da94712fb87c9d8",
+            "events_sha256": "14baa2c6fc12ac0b6938a6d00c414ba053df4a31ff83a0ce501266b4bffac10f",
+            "outcome_sha256": "99f6524663a91ae323665dd9fbf6728d459cf398f7101900b99441887be4a61e",
+            "telemetry_start_count": 0,
+            "request_equal": true,
+            "events_equal": true,
+            "outcome_equal": true
+          }
+        ]
+      }
+    }
+  ],
+  "hash": {
+    "algorithm": "sha256",
+    "observations_sha256": "87486040732136b4af83d74919ea8aba275bc3925ca7e2647daa51b94ec45075"
+  },
+  "env": {
+    "node_version": "v24.14.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "exec_method": "node --experimental-strip-types parity/oracle/openai-completions-m0-no-op.mjs"
+}
