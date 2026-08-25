@@ -1,0 +1,1693 @@
+## symbol:tui/src/autocomplete.ts#AutocompleteItem
+reference: packages/tui/src/autocomplete.ts#AutocompleteItem
+target: github.com/nankedr/pig/tui.AutocompleteItem
+type AutocompleteItem struct {
+	Value       string
+	Label       string
+	Description *string
+}
+
+## symbol:tui/src/autocomplete.ts#AutocompleteProvider
+reference: packages/tui/src/autocomplete.ts#AutocompleteProvider
+target: github.com/nankedr/pig/tui.AutocompleteProvider
+type AutocompleteProvider interface {
+	TriggerCharacters() []string
+	GetSuggestions(context.Context, []string, int, int, AutocompleteOptions) (AutocompleteSuggestions, bool, error)
+	ApplyCompletion([]string, int, int, AutocompleteItem, string) (AutocompleteResult, error)
+	ShouldTriggerFileCompletion([]string, int, int) (bool, error)
+}
+
+## symbol:tui/src/autocomplete.ts#AutocompleteSuggestions
+reference: packages/tui/src/autocomplete.ts#AutocompleteSuggestions
+target: github.com/nankedr/pig/tui.AutocompleteSuggestions
+type AutocompleteSuggestions struct {
+	Items  []AutocompleteItem
+	Prefix string
+}
+
+## symbol:tui/src/autocomplete.ts#CombinedAutocompleteProvider
+reference: packages/tui/src/autocomplete.ts#CombinedAutocompleteProvider
+target: github.com/nankedr/pig/tui.CombinedAutocompleteProvider
+type CombinedAutocompleteProvider struct {
+	commands []AutocompleteEntry
+	basePath string
+	fdPath   *string
+}
+func (*CombinedAutocompleteProvider) ApplyCompletion([]string, int, int, AutocompleteItem, string) (AutocompleteResult, error)
+func (*CombinedAutocompleteProvider) GetSuggestions(context.Context, []string, int, int, AutocompleteOptions) (AutocompleteSuggestions, bool, error)
+func (*CombinedAutocompleteProvider) ShouldTriggerFileCompletion([]string, int, int) (bool, error)
+func (*CombinedAutocompleteProvider) TriggerCharacters() []string
+
+## symbol:tui/src/autocomplete.ts#SlashCommand
+reference: packages/tui/src/autocomplete.ts#SlashCommand
+target: github.com/nankedr/pig/tui.SlashCommand
+type SlashCommand struct {
+	Name                   string
+	Description            *string
+	ArgumentHint           *string
+	GetArgumentCompletions func(context.Context, string) ([]AutocompleteItem, bool, error)
+}
+
+## symbol:tui/src/components/alt-screen-flash.ts#AltScreenFlashContainer
+reference: packages/tui/src/components/alt-screen-flash.ts#AltScreenFlashContainer
+target: github.com/nankedr/pig/tui.AltScreenFlashContainer
+type AltScreenFlashContainer struct {
+	requestRender func()
+}
+func (*AltScreenFlashContainer) Dispose() error
+func (*AltScreenFlashContainer) Flash(string, ...int64) error
+func (*AltScreenFlashContainer) Invalidate() error
+func (*AltScreenFlashContainer) Render(int) ([]string, error)
+
+## symbol:tui/src/components/box.ts#Box
+reference: packages/tui/src/components/box.ts#Box
+target: github.com/nankedr/pig/tui.Box
+type Box struct {
+	Children []Component
+	paddingX int
+	paddingY int
+	bgFunc   TextStyleFunc
+}
+func (*Box) AddChild(Component) error
+func (*Box) Clear() error
+func (*Box) Invalidate() error
+func (*Box) RemoveChild(Component) error
+func (*Box) Render(int) ([]string, error)
+func (*Box) SetBGFunc(TextStyleFunc) error
+
+## symbol:tui/src/components/cancellable-loader.ts#CancellableLoader
+reference: packages/tui/src/components/cancellable-loader.ts#CancellableLoader
+target: github.com/nankedr/pig/tui.CancellableLoader
+type CancellableLoader struct {
+	Loader
+	OnAbort func()
+	Signal  context.Context
+	Aborted bool
+}
+func (*CancellableLoader) Dispose() error
+func (*CancellableLoader) HandleInput(string) error
+func (*CancellableLoader) Render(int) ([]string, error)
+func (*CancellableLoader) SetCustomBGFn(TextStyleFunc) error
+func (*CancellableLoader) SetIndicator(LoaderIndicatorOptions) error
+func (*CancellableLoader) SetMessage(string) error
+func (*CancellableLoader) SetText(string) error
+func (*CancellableLoader) Start() error
+func (*CancellableLoader) Stop() error
+
+## symbol:tui/src/components/editor.ts#Editor
+reference: packages/tui/src/components/editor.ts#Editor
+target: github.com/nankedr/pig/tui.Editor
+type Editor struct {
+	Focused       bool
+	BorderColor   TextStyleFunc
+	DisableSubmit bool
+	OnSubmit      func(string)
+	OnChange      func(string)
+
+	ui                     EditorRuntime
+	theme                  EditorTheme
+	text                   string
+	paddingX               int
+	autocompleteMaxVisible int
+}
+func (*Editor) AddToHistory(string) error
+func (*Editor) GetCursor() EditorCursor
+func (*Editor) HandleInput(string) error
+func (*Editor) InsertTextAtCursor(string) error
+func (*Editor) Invalidate() error
+func (*Editor) IsShowingAutocomplete() bool
+func (*Editor) Render(int) ([]string, error)
+func (*Editor) SetAutocompleteMaxVisible(int) error
+func (*Editor) SetAutocompleteProvider(AutocompleteProvider) error
+func (*Editor) SetPaddingX(int) error
+func (e *Editor) GetAutocompleteMaxVisible() int
+func (e *Editor) GetExpandedText() (string, error)
+func (e *Editor) GetLines() []string
+func (e *Editor) GetPaddingX() int
+func (e *Editor) GetText() string
+func (e *Editor) SetBorderColor(style TextStyleFunc)
+func (e *Editor) SetFocusState(focused bool)
+func (e *Editor) SetOnChange(callback func(string))
+func (e *Editor) SetOnSubmit(callback func(string))
+func (e *Editor) SetText(text string) error
+
+## symbol:tui/src/components/editor.ts#EditorOptions
+reference: packages/tui/src/components/editor.ts#EditorOptions
+target: github.com/nankedr/pig/tui.EditorOptions
+type EditorOptions struct {
+	PaddingX               *int
+	AutocompleteMaxVisible *int
+}
+
+## symbol:tui/src/components/editor.ts#EditorTheme
+reference: packages/tui/src/components/editor.ts#EditorTheme
+target: github.com/nankedr/pig/tui.EditorTheme
+type EditorTheme struct {
+	BorderColor TextStyleFunc
+	SelectList  SelectListTheme
+}
+
+## symbol:tui/src/components/editor.ts#TextChunk
+reference: packages/tui/src/components/editor.ts#TextChunk
+target: github.com/nankedr/pig/tui.TextChunk
+type TextChunk struct {
+	Text       string
+	StartIndex int
+	EndIndex   int
+}
+
+## symbol:tui/src/components/editor.ts#wordWrapLine
+reference: packages/tui/src/components/editor.ts#wordWrapLine
+target: github.com/nankedr/pig/tui.WordWrapLine
+func WordWrapLine(string, int, ...[]UnicodeSegment) ([]TextChunk, error)
+
+## symbol:tui/src/components/h-stack.ts#HStack
+reference: packages/tui/src/components/h-stack.ts#HStack
+target: github.com/nankedr/pig/tui.HStack
+type HStack struct{ Stack }
+func (*HStack) AddChild(Component, ...StackEntryOptions) error
+func (*HStack) Clear() error
+func (*HStack) RemoveChild(Component) error
+func (*HStack) Render(int) ([]string, error)
+
+## symbol:tui/src/components/image.ts#Image
+reference: packages/tui/src/components/image.ts#Image
+target: github.com/nankedr/pig/tui.Image
+type Image struct {
+	base64Data string
+	mimeType   string
+	theme      ImageTheme
+	options    ImageOptions
+	dimensions *ImageDimensions
+	imageID    *uint32
+}
+func (*Image) Invalidate() error
+func (*Image) Render(int) ([]string, error)
+func (i *Image) GetImageID() *uint32
+
+## symbol:tui/src/components/image.ts#ImageOptions
+reference: packages/tui/src/components/image.ts#ImageOptions
+target: github.com/nankedr/pig/tui.ImageOptions
+type ImageOptions struct {
+	MaxWidthCells  *int
+	MaxHeightCells *int
+	Filename       *string
+	ImageID        *uint32
+}
+
+## symbol:tui/src/components/image.ts#ImageTheme
+reference: packages/tui/src/components/image.ts#ImageTheme
+target: github.com/nankedr/pig/tui.ImageTheme
+type ImageTheme struct {
+	FallbackColor TextStyleFunc
+}
+
+## symbol:tui/src/components/input.ts#Input
+reference: packages/tui/src/components/input.ts#Input
+target: github.com/nankedr/pig/tui.Input
+type Input struct {
+	Focused  bool
+	OnSubmit func(string)
+	OnEscape func()
+	value    string
+}
+func (*Input) HandleInput(string) error
+func (*Input) Invalidate() error
+func (*Input) Render(int) ([]string, error)
+func (i *Input) GetValue() string
+func (i *Input) SetFocusState(focused bool)
+func (i *Input) SetValue(value string)
+
+## symbol:tui/src/components/loader.ts#Loader
+reference: packages/tui/src/components/loader.ts#Loader
+target: github.com/nankedr/pig/tui.Loader
+type Loader struct {
+	Text
+	ui             RenderRequester
+	spinnerColorFn TextStyleFunc
+	messageColorFn TextStyleFunc
+	message        string
+	indicator      *LoaderIndicatorOptions
+}
+func (*Loader) Invalidate() error
+func (*Loader) Render(int) ([]string, error)
+func (*Loader) SetCustomBGFn(TextStyleFunc) error
+func (*Loader) SetIndicator(LoaderIndicatorOptions) error
+func (*Loader) SetMessage(string) error
+func (*Loader) SetText(string) error
+func (*Loader) Start() error
+func (*Loader) Stop() error
+
+## symbol:tui/src/components/loader.ts#LoaderIndicatorOptions
+reference: packages/tui/src/components/loader.ts#LoaderIndicatorOptions
+target: github.com/nankedr/pig/tui.LoaderIndicatorOptions
+type LoaderIndicatorOptions struct {
+	Frames     []string
+	IntervalMS *int64
+}
+
+## symbol:tui/src/components/markdown.ts#DefaultTextStyle
+reference: packages/tui/src/components/markdown.ts#DefaultTextStyle
+target: github.com/nankedr/pig/tui.DefaultTextStyle
+type DefaultTextStyle struct {
+	Color         TextStyleFunc
+	BGColor       TextStyleFunc
+	Bold          *bool
+	Italic        *bool
+	Strikethrough *bool
+	Underline     *bool
+}
+
+## symbol:tui/src/components/markdown.ts#Markdown
+reference: packages/tui/src/components/markdown.ts#Markdown
+target: github.com/nankedr/pig/tui.Markdown
+type Markdown struct {
+	text             string
+	paddingX         int
+	paddingY         int
+	theme            MarkdownTheme
+	defaultTextStyle *DefaultTextStyle
+	options          MarkdownOptions
+}
+func (*Markdown) Invalidate() error
+func (*Markdown) Render(int) ([]string, error)
+func (m *Markdown) SetText(text string)
+
+## symbol:tui/src/components/markdown.ts#MarkdownOptions
+reference: packages/tui/src/components/markdown.ts#MarkdownOptions
+target: github.com/nankedr/pig/tui.MarkdownOptions
+type MarkdownOptions struct {
+	PreserveOrderedListMarkers *bool
+	PreserveBackslashEscapes   *bool
+	Transform                  func(markdown string, availableWidth int) string
+	RenderLatex                *bool
+}
+
+## symbol:tui/src/components/markdown.ts#MarkdownTheme
+reference: packages/tui/src/components/markdown.ts#MarkdownTheme
+target: github.com/nankedr/pig/tui.MarkdownTheme
+type MarkdownTheme struct {
+	Heading         TextStyleFunc
+	Link            TextStyleFunc
+	LinkURL         TextStyleFunc
+	Code            TextStyleFunc
+	CodeBlock       TextStyleFunc
+	CodeBlockBorder TextStyleFunc
+	Quote           TextStyleFunc
+	QuoteBorder     TextStyleFunc
+	HR              TextStyleFunc
+	ListBullet      TextStyleFunc
+	Bold            TextStyleFunc
+	Italic          TextStyleFunc
+	Strikethrough   TextStyleFunc
+	Underline       TextStyleFunc
+	HighlightCode   func(code string, language *string) []string
+	CodeBlockIndent *string
+}
+
+## symbol:tui/src/components/scroll-view.ts#ScrollView
+reference: packages/tui/src/components/scroll-view.ts#ScrollView
+target: github.com/nankedr/pig/tui.ScrollView
+type ScrollView struct {
+	Primary              bool
+	Overscroll           ScrollViewOverscroll
+	ScrollbarStyle       TextStyleFunc
+	child                Component
+	axis                 ScrollViewAxis
+	follow               ScrollViewFollow
+	followingEnd         bool
+	scrollbar            ScrollViewScrollbar
+	scrollTop            int
+	viewportHeight       int
+	contentHeight        int
+	scrollbarHideDelayMS int64
+}
+func (*ScrollView) AddChild(Component) error
+func (*ScrollView) Clear() error
+func (*ScrollView) GetContentWidth(int) (int, error)
+func (*ScrollView) Invalidate() error
+func (*ScrollView) RemoveChild(Component) error
+func (*ScrollView) Render(int) ([]string, error)
+func (*ScrollView) ScrollBy(int) (int, error)
+func (*ScrollView) ScrollTo(int) error
+func (*ScrollView) ScrollToEnd() error
+func (*ScrollView) ScrollToStart() error
+func (*ScrollView) SetScrollbar(ScrollViewScrollbar) error
+func (*ScrollView) SetScrollbarActive(bool) error
+func (*ScrollView) UpdateLayout(int, int, func()) error
+func (s *ScrollView) Children() []Component
+func (s *ScrollView) IsFollowingEnd() bool
+func (s *ScrollView) IsPrimary() bool
+func (s *ScrollView) IsScrollbarVisible() bool
+func (s *ScrollView) OverscrollBehavior() ScrollViewOverscroll
+func (s *ScrollView) ScrollTop() int
+func (s *ScrollView) Scrollbar() ScrollViewScrollbar
+func (s *ScrollView) ViewportHeight() int
+
+## symbol:tui/src/components/scroll-view.ts#ScrollViewOptions
+reference: packages/tui/src/components/scroll-view.ts#ScrollViewOptions
+target: github.com/nankedr/pig/tui.ScrollViewOptions
+type ScrollViewOptions struct {
+	Axis                 *ScrollViewAxis
+	Follow               *ScrollViewFollow
+	Primary              *bool
+	Overscroll           *ScrollViewOverscroll
+	Scrollbar            *ScrollViewScrollbar
+	ScrollbarStyle       TextStyleFunc
+	ScrollbarHideDelayMS *int64
+}
+
+## symbol:tui/src/components/scroll-view.ts#ScrollViewScrollbar
+reference: packages/tui/src/components/scroll-view.ts#ScrollViewScrollbar
+target: github.com/nankedr/pig/tui.ScrollViewScrollbar
+type ScrollViewScrollbar string
+
+## symbol:tui/src/components/select-list.ts#SelectItem
+reference: packages/tui/src/components/select-list.ts#SelectItem
+target: github.com/nankedr/pig/tui.SelectItem
+type SelectItem struct {
+	Value       string
+	Label       string
+	Description *string
+}
+
+## symbol:tui/src/components/select-list.ts#SelectList
+reference: packages/tui/src/components/select-list.ts#SelectList
+target: github.com/nankedr/pig/tui.SelectList
+type SelectList struct {
+	OnSelect          func(SelectItem)
+	OnCancel          func()
+	OnSelectionChange func(SelectItem)
+	items             []SelectItem
+	maxVisible        int
+	theme             SelectListTheme
+	layout            SelectListLayoutOptions
+}
+func (*SelectList) GetSelectedItem() (*SelectItem, error)
+func (*SelectList) HandleInput(string) error
+func (*SelectList) Invalidate() error
+func (*SelectList) Render(int) ([]string, error)
+func (*SelectList) SetFilter(string) error
+func (*SelectList) SetSelectedIndex(int) error
+
+## symbol:tui/src/components/select-list.ts#SelectListLayoutOptions
+reference: packages/tui/src/components/select-list.ts#SelectListLayoutOptions
+target: github.com/nankedr/pig/tui.SelectListLayoutOptions
+type SelectListLayoutOptions struct {
+	MinPrimaryColumnWidth *int
+	MaxPrimaryColumnWidth *int
+	TruncatePrimary       func(SelectListTruncatePrimaryContext) string
+}
+
+## symbol:tui/src/components/select-list.ts#SelectListTheme
+reference: packages/tui/src/components/select-list.ts#SelectListTheme
+target: github.com/nankedr/pig/tui.SelectListTheme
+type SelectListTheme struct {
+	SelectedPrefix TextStyleFunc
+	SelectedText   TextStyleFunc
+	Description    TextStyleFunc
+	ScrollInfo     TextStyleFunc
+	NoMatch        TextStyleFunc
+}
+
+## symbol:tui/src/components/select-list.ts#SelectListTruncatePrimaryContext
+reference: packages/tui/src/components/select-list.ts#SelectListTruncatePrimaryContext
+target: github.com/nankedr/pig/tui.SelectListTruncatePrimaryContext
+type SelectListTruncatePrimaryContext struct {
+	Text        string
+	MaxWidth    int
+	ColumnWidth int
+	Item        SelectItem
+	IsSelected  bool
+}
+
+## symbol:tui/src/components/settings-list.ts#SettingItem
+reference: packages/tui/src/components/settings-list.ts#SettingItem
+target: github.com/nankedr/pig/tui.SettingItem
+type SettingItem struct {
+	ID           string
+	Label        string
+	Description  *string
+	CurrentValue string
+	Values       []string
+	Submenu      func(currentValue string, done func(*string)) Component
+}
+
+## symbol:tui/src/components/settings-list.ts#SettingsList
+reference: packages/tui/src/components/settings-list.ts#SettingsList
+target: github.com/nankedr/pig/tui.SettingsList
+type SettingsList struct {
+	items      []SettingItem
+	maxVisible int
+	theme      SettingsListTheme
+	onChange   func(id, newValue string)
+	onCancel   func()
+	options    SettingsListOptions
+}
+func (*SettingsList) HandleInput(string) error
+func (*SettingsList) Invalidate() error
+func (*SettingsList) Render(int) ([]string, error)
+func (*SettingsList) UpdateValue(string, string) error
+
+## symbol:tui/src/components/settings-list.ts#SettingsListOptions
+reference: packages/tui/src/components/settings-list.ts#SettingsListOptions
+target: github.com/nankedr/pig/tui.SettingsListOptions
+type SettingsListOptions struct {
+	EnableSearch *bool
+}
+
+## symbol:tui/src/components/settings-list.ts#SettingsListTheme
+reference: packages/tui/src/components/settings-list.ts#SettingsListTheme
+target: github.com/nankedr/pig/tui.SettingsListTheme
+type SettingsListTheme struct {
+	Label       TextStyleStateFunc
+	Value       TextStyleStateFunc
+	Description TextStyleFunc
+	Cursor      string
+	Hint        TextStyleFunc
+}
+
+## symbol:tui/src/components/spacer.ts#Spacer
+reference: packages/tui/src/components/spacer.ts#Spacer
+target: github.com/nankedr/pig/tui.Spacer
+type Spacer struct{ lines int }
+func (*Spacer) Invalidate() error
+func (*Spacer) Render(int) ([]string, error)
+func (s *Spacer) SetLines(lines int)
+
+## symbol:tui/src/components/stack.ts#Stack
+reference: packages/tui/src/components/stack.ts#Stack
+target: github.com/nankedr/pig/tui.Stack
+type Stack struct {
+	entries []StackEntry
+	gap     int
+	align   StackAlign
+}
+func (*Stack) AddChild(Component, ...StackEntryOptions) error
+func (*Stack) Clear() error
+func (*Stack) Invalidate() error
+func (*Stack) RemoveChild(Component) error
+func (*Stack) Render(int) ([]string, error)
+func (s *Stack) Children() []Component
+
+## symbol:tui/src/components/stack.ts#StackChild
+reference: packages/tui/src/components/stack.ts#StackChild
+target: github.com/nankedr/pig/tui.StackChild
+type StackChild struct {
+	Component Component
+	Entry     *StackEntry
+}
+
+## symbol:tui/src/components/stack.ts#StackEntry
+reference: packages/tui/src/components/stack.ts#StackEntry
+target: github.com/nankedr/pig/tui.StackEntry
+type StackEntry struct {
+	Component Component
+	StackEntryOptions
+}
+
+## symbol:tui/src/components/stack.ts#StackEntryOptions
+reference: packages/tui/src/components/stack.ts#StackEntryOptions
+target: github.com/nankedr/pig/tui.StackEntryOptions
+type StackEntryOptions struct {
+	Basis   *StackBasis
+	Grow    *int
+	Shrink  *int
+	MinSize *int
+	MaxSize *int
+	Visible func(LayoutViewport) bool
+}
+
+## symbol:tui/src/components/stack.ts#StackOptions
+reference: packages/tui/src/components/stack.ts#StackOptions
+target: github.com/nankedr/pig/tui.StackOptions
+type StackOptions struct {
+	Gap   *int
+	Align *StackAlign
+}
+
+## symbol:tui/src/components/stack.ts#allocateStackSizes
+reference: packages/tui/src/components/stack.ts#allocateStackSizes
+target: github.com/nankedr/pig/tui.AllocateStackSizes
+func AllocateStackSizes([]StackEntry, []int, *int, int) ([]int, error)
+
+## symbol:tui/src/components/stack.ts#visibleStackEntries
+reference: packages/tui/src/components/stack.ts#visibleStackEntries
+target: github.com/nankedr/pig/tui.VisibleStackEntries
+func VisibleStackEntries([]StackEntry, LayoutViewport) ([]StackEntry, error)
+
+## symbol:tui/src/components/text.ts#Text
+reference: packages/tui/src/components/text.ts#Text
+target: github.com/nankedr/pig/tui.Text
+type Text struct {
+	text       string
+	paddingX   int
+	paddingY   int
+	customBGFn TextStyleFunc
+}
+func (*Text) Invalidate() error
+func (*Text) Render(int) ([]string, error)
+func (t *Text) SetCustomBGFn(fn TextStyleFunc)
+func (t *Text) SetText(text string)
+
+## symbol:tui/src/components/truncated-text.ts#TruncatedText
+reference: packages/tui/src/components/truncated-text.ts#TruncatedText
+target: github.com/nankedr/pig/tui.TruncatedText
+type TruncatedText struct {
+	text     string
+	paddingX int
+	paddingY int
+}
+func (*TruncatedText) Invalidate() error
+func (*TruncatedText) Render(int) ([]string, error)
+
+## symbol:tui/src/components/v-stack.ts#VStack
+reference: packages/tui/src/components/v-stack.ts#VStack
+target: github.com/nankedr/pig/tui.VStack
+type VStack struct{ Stack }
+func (*VStack) AddChild(Component, ...StackEntryOptions) error
+func (*VStack) Clear() error
+func (*VStack) RemoveChild(Component) error
+func (*VStack) Render(int) ([]string, error)
+
+## symbol:tui/src/editor-component.ts#EditorComponent
+reference: packages/tui/src/editor-component.ts#EditorComponent
+target: github.com/nankedr/pig/tui.EditorComponent
+type EditorComponent interface {
+	Component
+	GetText() string
+	SetText(string) error
+	HandleInput(string) error
+}
+
+## symbol:tui/src/fuzzy.ts#FuzzyMatch
+reference: packages/tui/src/fuzzy.ts#FuzzyMatch
+target: github.com/nankedr/pig/tui.FuzzyMatchResult
+type FuzzyMatchResult struct {
+	Matches bool
+	Score   float64
+}
+
+## symbol:tui/src/fuzzy.ts#fuzzyFilter
+reference: packages/tui/src/fuzzy.ts#fuzzyFilter
+target: github.com/nankedr/pig/tui.FuzzyFilter
+func FuzzyFilter[T any]([]T, string, func(T) string) ([]T, error)
+
+## symbol:tui/src/fuzzy.ts#fuzzyMatch
+reference: packages/tui/src/fuzzy.ts#fuzzyMatch
+target: github.com/nankedr/pig/tui.FuzzyMatch
+func FuzzyMatch(string, string) (FuzzyMatchResult, error)
+
+## symbol:tui/src/keybindings.ts#Keybinding
+reference: packages/tui/src/keybindings.ts#Keybinding
+target: github.com/nankedr/pig/tui.Keybinding
+type Keybinding string
+
+## symbol:tui/src/keybindings.ts#KeybindingConflict
+reference: packages/tui/src/keybindings.ts#KeybindingConflict
+target: github.com/nankedr/pig/tui.KeybindingConflict
+type KeybindingConflict struct {
+	Key         KeyID
+	Keybindings []string
+}
+
+## symbol:tui/src/keybindings.ts#KeybindingDefinition
+reference: packages/tui/src/keybindings.ts#KeybindingDefinition
+target: github.com/nankedr/pig/tui.KeybindingDefinition
+type KeybindingDefinition struct {
+	DefaultKeys []KeyID
+	Description *string
+}
+
+## symbol:tui/src/keybindings.ts#KeybindingDefinitions
+reference: packages/tui/src/keybindings.ts#KeybindingDefinitions
+target: github.com/nankedr/pig/tui.KeybindingDefinitions
+type KeybindingDefinitions map[Keybinding]KeybindingDefinition
+
+## symbol:tui/src/keybindings.ts#Keybindings
+reference: packages/tui/src/keybindings.ts#Keybindings
+target: github.com/nankedr/pig/tui.Keybindings
+type Keybindings struct {
+	TUIEditorCursorUp           bool
+	TUIEditorCursorDown         bool
+	TUIEditorHistoryPrevious    bool
+	TUIEditorHistoryNext        bool
+	TUIEditorCursorLeft         bool
+	TUIEditorCursorRight        bool
+	TUIEditorCursorWordLeft     bool
+	TUIEditorCursorWordRight    bool
+	TUIEditorCursorLineStart    bool
+	TUIEditorCursorLineEnd      bool
+	TUIEditorJumpForward        bool
+	TUIEditorJumpBackward       bool
+	TUIEditorPageUp             bool
+	TUIEditorPageDown           bool
+	TUIEditorDeleteCharBackward bool
+	TUIEditorDeleteCharForward  bool
+	TUIEditorDeleteWordBackward bool
+	TUIEditorDeleteWordForward  bool
+	TUIEditorDeleteToLineStart  bool
+	TUIEditorDeleteToLineEnd    bool
+	TUIEditorYank               bool
+	TUIEditorYankPop            bool
+	TUIEditorUndo               bool
+	TUIInputNewLine             bool
+	TUIInputSubmit              bool
+	TUIInputTab                 bool
+	TUIInputCopy                bool
+	TUISelectUp                 bool
+	TUISelectDown               bool
+	TUISelectPageUp             bool
+	TUISelectPageDown           bool
+	TUISelectConfirm            bool
+	TUISelectCancel             bool
+	TUIAltScreenPageUp          bool
+	TUIAltScreenPageDown        bool
+	TUIAltScreenHalfPageUp      bool
+	TUIAltScreenHalfPageDown    bool
+	TUIAltScreenPreviousPrompt  bool
+	TUIAltScreenNextPrompt      bool
+	TUIAltScreenTop             bool
+	TUIAltScreenBottom          bool
+}
+
+## symbol:tui/src/keybindings.ts#KeybindingsConfig
+reference: packages/tui/src/keybindings.ts#KeybindingsConfig
+target: github.com/nankedr/pig/tui.KeybindingsConfig
+type KeybindingsConfig map[Keybinding][]KeyID
+
+## symbol:tui/src/keybindings.ts#KeybindingsManager
+reference: packages/tui/src/keybindings.ts#KeybindingsManager
+target: github.com/nankedr/pig/tui.KeybindingsManager
+type KeybindingsManager struct {
+	definitions  KeybindingDefinitions
+	userBindings KeybindingsConfig
+}
+func (*KeybindingsManager) GetConflicts() ([]KeybindingConflict, error)
+func (*KeybindingsManager) GetDefinition(Keybinding) (KeybindingDefinition, bool, error)
+func (*KeybindingsManager) GetKeys(Keybinding) ([]KeyID, error)
+func (*KeybindingsManager) GetResolvedBindings() (KeybindingsConfig, error)
+func (*KeybindingsManager) GetUserBindings() (KeybindingsConfig, error)
+func (*KeybindingsManager) Matches(string, Keybinding) (bool, error)
+func (*KeybindingsManager) SetUserBindings(KeybindingsConfig) error
+
+## symbol:tui/src/keybindings.ts#TUI_KEYBINDINGS
+reference: packages/tui/src/keybindings.ts#TUI_KEYBINDINGS
+target: github.com/nankedr/pig/tui.TUIKeybindings
+var TUIKeybindings = NewTUIKeybindings()
+
+## symbol:tui/src/keybindings.ts#getKeybindings
+reference: packages/tui/src/keybindings.ts#getKeybindings
+target: github.com/nankedr/pig/tui.GetKeybindings
+func GetKeybindings() (*KeybindingsManager, error)
+
+## symbol:tui/src/keybindings.ts#setKeybindings
+reference: packages/tui/src/keybindings.ts#setKeybindings
+target: github.com/nankedr/pig/tui.SetKeybindings
+func SetKeybindings(*KeybindingsManager) error
+
+## symbol:tui/src/keys.ts#Key
+reference: packages/tui/src/keys.ts#Key
+target: github.com/nankedr/pig/tui.Key
+var Key = keyNames{
+	Escape: "escape", Esc: "esc", Enter: "enter", Return: "return",
+	Tab: "tab", Space: "space", Backspace: "backspace", Delete: "delete",
+	Insert: "insert", Clear: "clear", Home: "home", End: "end",
+	PageUp: "pageUp", PageDown: "pageDown", Up: "up", Down: "down",
+	Left: "left", Right: "right", F1: "f1", F2: "f2", F3: "f3",
+	F4: "f4", F5: "f5", F6: "f6", F7: "f7", F8: "f8", F9: "f9",
+	F10: "f10", F11: "f11", F12: "f12",
+
+	Backtick: "`", Hyphen: "-", Equals: "=", LeftBracket: "[", RightBracket: "]",
+	Backslash: "\\", Semicolon: ";", Quote: "'", Comma: ",", Period: ".",
+	Slash: "/", Exclamation: "!", At: "@", Hash: "#", Dollar: "$", Percent: "%",
+	Caret: "^", Ampersand: "&", Asterisk: "*", LeftParen: "(", RightParen: ")",
+	Underscore: "_", Plus: "+", Pipe: "|", Tilde: "~", LeftBrace: "{",
+	RightBrace: "}", Colon: ":", LessThan: "<", GreaterThan: ">", Question: "?",
+}
+
+## symbol:tui/src/keys.ts#KeyEventType
+reference: packages/tui/src/keys.ts#KeyEventType
+target: github.com/nankedr/pig/tui.KeyEventType
+type KeyEventType string
+
+## symbol:tui/src/keys.ts#KeyId
+reference: packages/tui/src/keys.ts#KeyId
+target: github.com/nankedr/pig/tui.KeyID
+type KeyID string
+
+## symbol:tui/src/keys.ts#decodeKittyPrintable
+reference: packages/tui/src/keys.ts#decodeKittyPrintable
+target: github.com/nankedr/pig/tui.DecodeKittyPrintable
+func DecodeKittyPrintable(string) (string, bool, error)
+
+## symbol:tui/src/keys.ts#decodePrintableKey
+reference: packages/tui/src/keys.ts#decodePrintableKey
+target: github.com/nankedr/pig/tui.DecodePrintableKey
+func DecodePrintableKey(string) (string, bool, error)
+
+## symbol:tui/src/keys.ts#isKeyRelease
+reference: packages/tui/src/keys.ts#isKeyRelease
+target: github.com/nankedr/pig/tui.IsKeyRelease
+func IsKeyRelease(string) (bool, error)
+
+## symbol:tui/src/keys.ts#isKeyRepeat
+reference: packages/tui/src/keys.ts#isKeyRepeat
+target: github.com/nankedr/pig/tui.IsKeyRepeat
+func IsKeyRepeat(string) (bool, error)
+
+## symbol:tui/src/keys.ts#isKittyProtocolActive
+reference: packages/tui/src/keys.ts#isKittyProtocolActive
+target: github.com/nankedr/pig/tui.IsKittyProtocolActive
+func IsKittyProtocolActive() (bool, error)
+
+## symbol:tui/src/keys.ts#matchesKey
+reference: packages/tui/src/keys.ts#matchesKey
+target: github.com/nankedr/pig/tui.MatchesKey
+func MatchesKey(string, KeyID) (bool, error)
+
+## symbol:tui/src/keys.ts#parseKey
+reference: packages/tui/src/keys.ts#parseKey
+target: github.com/nankedr/pig/tui.ParseKey
+func ParseKey(string) (KeyID, bool, error)
+
+## symbol:tui/src/keys.ts#setKittyProtocolActive
+reference: packages/tui/src/keys.ts#setKittyProtocolActive
+target: github.com/nankedr/pig/tui.SetKittyProtocolActive
+func SetKittyProtocolActive(bool) error
+
+## symbol:tui/src/kill-ring.ts#KillRing
+reference: packages/tui/src/kill-ring.ts#KillRing
+target: github.com/nankedr/pig/tui.KillRing
+type KillRing struct {
+	ring []string
+}
+func (r *KillRing) Length() int
+func (r *KillRing) Peek() (string, bool)
+func (r *KillRing) Push(text string, options KillRingPushOptions)
+func (r *KillRing) Rotate()
+
+## symbol:tui/src/latex.ts#RenderLatexOptions
+reference: packages/tui/src/latex.ts#RenderLatexOptions
+target: github.com/nankedr/pig/tui.RenderLaTeXOptions
+type RenderLaTeXOptions struct {
+	Display bool
+}
+
+## symbol:tui/src/latex.ts#renderLatex
+reference: packages/tui/src/latex.ts#renderLatex
+target: github.com/nankedr/pig/tui.RenderLaTeX
+func RenderLaTeX(string, ...RenderLaTeXOptions) (string, bool, error)
+
+## symbol:tui/src/layout-node.ts#LAYOUT_NODE
+reference: packages/tui/src/layout-node.ts#LAYOUT_NODE
+target: github.com/nankedr/pig/tui.LayoutNodeMarker
+const LayoutNodeMarker = "@earendil-works/pi-tui/layout-node"
+
+## symbol:tui/src/layout-node.ts#LayoutComponent
+reference: packages/tui/src/layout-node.ts#LayoutComponent
+target: github.com/nankedr/pig/tui.LayoutComponent
+type LayoutComponent interface {
+	Component
+	LayoutNode() LayoutNode
+}
+
+## symbol:tui/src/layout-node.ts#LayoutNode
+reference: packages/tui/src/layout-node.ts#LayoutNode
+target: github.com/nankedr/pig/tui.LayoutNode
+type LayoutNode interface {
+	NodeType() LayoutNodeType
+	isLayoutNode()
+}
+
+## symbol:tui/src/layout-node.ts#LayoutViewport
+reference: packages/tui/src/layout-node.ts#LayoutViewport
+target: github.com/nankedr/pig/tui.LayoutViewport
+type LayoutViewport struct {
+	Width  int
+	Height int
+}
+
+## symbol:tui/src/layout-node.ts#ScrollLayoutNode
+reference: packages/tui/src/layout-node.ts#ScrollLayoutNode
+target: github.com/nankedr/pig/tui.ScrollLayoutNode
+type ScrollLayoutNode struct {
+	Type      LayoutNodeType
+	Component Component
+	State     ScrollLayoutState
+}
+func (node ScrollLayoutNode) NodeType() LayoutNodeType
+
+## symbol:tui/src/layout-node.ts#ScrollLayoutState
+reference: packages/tui/src/layout-node.ts#ScrollLayoutState
+target: github.com/nankedr/pig/tui.ScrollLayoutState
+type ScrollLayoutState interface {
+	ScrollTop() int
+	IsPrimary() bool
+	OverscrollBehavior() ScrollViewOverscroll
+	ViewportHeight() int
+	GetContentWidth(width int) (int, error)
+	UpdateLayout(contentHeight, viewportHeight int, requestRender func()) error
+}
+
+## symbol:tui/src/layout-node.ts#StackLayoutEntry
+reference: packages/tui/src/layout-node.ts#StackLayoutEntry
+target: github.com/nankedr/pig/tui.StackLayoutEntry
+type StackLayoutEntry struct {
+	Component Component
+	StackEntryOptions
+}
+
+## symbol:tui/src/layout-node.ts#StackLayoutNode
+reference: packages/tui/src/layout-node.ts#StackLayoutNode
+target: github.com/nankedr/pig/tui.StackLayoutNode
+type StackLayoutNode struct {
+	Type    LayoutNodeType
+	Entries []StackLayoutEntry
+	Gap     int
+	Align   StackAlign
+}
+func (node StackLayoutNode) NodeType() LayoutNodeType
+
+## symbol:tui/src/layout-node.ts#getLayoutNode
+reference: packages/tui/src/layout-node.ts#getLayoutNode
+target: github.com/nankedr/pig/tui.GetLayoutNode
+func GetLayoutNode(component Component) (LayoutNode, bool)
+
+## symbol:tui/src/layout.ts#LayoutBox
+reference: packages/tui/src/layout.ts#LayoutBox
+target: github.com/nankedr/pig/tui.LayoutBox
+type LayoutBox struct {
+	Component          Component
+	Rect               LayoutRect
+	Clip               LayoutRect
+	Children           []*LayoutBox
+	Parent             *LayoutBox
+	Lines              []string
+	LineOffset         *int
+	ScrollView         *ScrollView
+	ScrollContentLines []string
+	Layer              int
+}
+
+## symbol:tui/src/layout.ts#LayoutFrame
+reference: packages/tui/src/layout.ts#LayoutFrame
+target: github.com/nankedr/pig/tui.LayoutFrame
+type LayoutFrame struct {
+	Root              *LayoutBox
+	Width             int
+	Height            int
+	Lines             []string
+	PrimaryScrollView *ScrollView
+}
+
+## symbol:tui/src/layout.ts#LayoutRect
+reference: packages/tui/src/layout.ts#LayoutRect
+target: github.com/nankedr/pig/tui.LayoutRect
+type LayoutRect struct {
+	X      int
+	Y      int
+	Width  int
+	Height int
+}
+
+## symbol:tui/src/layout.ts#ScrollbarGeometry
+reference: packages/tui/src/layout.ts#ScrollbarGeometry
+target: github.com/nankedr/pig/tui.ScrollbarGeometry
+type ScrollbarGeometry struct {
+	Column       int
+	TrackTop     int
+	TrackHeight  int
+	ThumbTop     int
+	ThumbHeight  int
+	MaxScrollTop int
+}
+
+## symbol:tui/src/layout.ts#getScrollViewBox
+reference: packages/tui/src/layout.ts#getScrollViewBox
+target: github.com/nankedr/pig/tui.GetScrollViewBox
+func GetScrollViewBox(LayoutFrame, *ScrollView) (*LayoutBox, bool, error)
+
+## symbol:tui/src/layout.ts#getScrollViewsAt
+reference: packages/tui/src/layout.ts#getScrollViewsAt
+target: github.com/nankedr/pig/tui.GetScrollViewsAt
+func GetScrollViewsAt(LayoutFrame, int, int) ([]*ScrollView, error)
+
+## symbol:tui/src/layout.ts#getScrollbarGeometry
+reference: packages/tui/src/layout.ts#getScrollbarGeometry
+target: github.com/nankedr/pig/tui.GetScrollbarGeometry
+func GetScrollbarGeometry(*LayoutBox) (ScrollbarGeometry, bool, error)
+
+## symbol:tui/src/layout.ts#renderLayoutFrame
+reference: packages/tui/src/layout.ts#renderLayoutFrame
+target: github.com/nankedr/pig/tui.RenderLayoutFrame
+func RenderLayoutFrame(Component, int, int, func()) (LayoutFrame, error)
+
+## symbol:tui/src/native-modifiers.ts#ModifierKey
+reference: packages/tui/src/native-modifiers.ts#ModifierKey
+target: github.com/nankedr/pig/tui.ModifierKey
+type ModifierKey string
+
+## symbol:tui/src/native-modifiers.ts#isNativeModifierPressed
+reference: packages/tui/src/native-modifiers.ts#isNativeModifierPressed
+target: github.com/nankedr/pig/tui.IsNativeModifierPressed
+func IsNativeModifierPressed(ModifierKey) (bool, error)
+
+## symbol:tui/src/stdin-buffer.ts#StdinBuffer
+reference: packages/tui/src/stdin-buffer.ts#StdinBuffer
+target: github.com/nankedr/pig/tui.StdinBuffer
+type StdinBuffer struct {
+	options StdinBufferOptions
+}
+func (*StdinBuffer) Clear() error
+func (*StdinBuffer) Destroy() error
+func (*StdinBuffer) Flush() ([]string, error)
+func (*StdinBuffer) GetBuffer() (string, error)
+func (*StdinBuffer) Process([]byte) error
+
+## symbol:tui/src/stdin-buffer.ts#StdinBufferEventMap
+reference: packages/tui/src/stdin-buffer.ts#StdinBufferEventMap
+target: github.com/nankedr/pig/tui.StdinBufferEventMap
+type StdinBufferEventMap struct {
+	Data  func(string)
+	Paste func(string)
+}
+
+## symbol:tui/src/stdin-buffer.ts#StdinBufferOptions
+reference: packages/tui/src/stdin-buffer.ts#StdinBufferOptions
+target: github.com/nankedr/pig/tui.StdinBufferOptions
+type StdinBufferOptions struct {
+	Timeout *int64
+}
+
+## symbol:tui/src/terminal-colors.ts#RgbColor
+reference: packages/tui/src/terminal-colors.ts#RgbColor
+target: github.com/nankedr/pig/tui.RGBColor
+type RGBColor struct {
+	R int
+	G int
+	B int
+}
+
+## symbol:tui/src/terminal-colors.ts#TerminalColorScheme
+reference: packages/tui/src/terminal-colors.ts#TerminalColorScheme
+target: github.com/nankedr/pig/tui.TerminalColorScheme
+type TerminalColorScheme string
+
+## symbol:tui/src/terminal-colors.ts#isOsc11BackgroundColorResponse
+reference: packages/tui/src/terminal-colors.ts#isOsc11BackgroundColorResponse
+target: github.com/nankedr/pig/tui.IsOSC11BackgroundColorResponse
+func IsOSC11BackgroundColorResponse(string) (bool, error)
+
+## symbol:tui/src/terminal-colors.ts#parseOsc11BackgroundColor
+reference: packages/tui/src/terminal-colors.ts#parseOsc11BackgroundColor
+target: github.com/nankedr/pig/tui.ParseOSC11BackgroundColor
+func ParseOSC11BackgroundColor(string) (RGBColor, bool, error)
+
+## symbol:tui/src/terminal-colors.ts#parseTerminalColorSchemeReport
+reference: packages/tui/src/terminal-colors.ts#parseTerminalColorSchemeReport
+target: github.com/nankedr/pig/tui.ParseTerminalColorSchemeReport
+func ParseTerminalColorSchemeReport(string) (TerminalColorScheme, bool, error)
+
+## symbol:tui/src/terminal-image.ts#CellDimensions
+reference: packages/tui/src/terminal-image.ts#CellDimensions
+target: github.com/nankedr/pig/tui.CellDimensions
+type CellDimensions struct {
+	WidthPX  int
+	HeightPX int
+}
+
+## symbol:tui/src/terminal-image.ts#ImageCellSize
+reference: packages/tui/src/terminal-image.ts#ImageCellSize
+target: github.com/nankedr/pig/tui.ImageCellSize
+type ImageCellSize struct {
+	Columns int
+	Rows    int
+}
+
+## symbol:tui/src/terminal-image.ts#ImageDimensions
+reference: packages/tui/src/terminal-image.ts#ImageDimensions
+target: github.com/nankedr/pig/tui.ImageDimensions
+type ImageDimensions struct {
+	WidthPX  int
+	HeightPX int
+}
+
+## symbol:tui/src/terminal-image.ts#ImageProtocol
+reference: packages/tui/src/terminal-image.ts#ImageProtocol
+target: github.com/nankedr/pig/tui.ImageProtocol
+type ImageProtocol string
+
+## symbol:tui/src/terminal-image.ts#ImageRenderOptions
+reference: packages/tui/src/terminal-image.ts#ImageRenderOptions
+target: github.com/nankedr/pig/tui.ImageRenderOptions
+type ImageRenderOptions struct {
+	MaxWidthCells       *int
+	MaxHeightCells      *int
+	PreserveAspectRatio *bool
+	ImageID             *uint32
+	MoveCursor          *bool
+}
+
+## symbol:tui/src/terminal-image.ts#KittyImageMetadata
+reference: packages/tui/src/terminal-image.ts#KittyImageMetadata
+target: github.com/nankedr/pig/tui.KittyImageMetadata
+type KittyImageMetadata struct {
+	Columns  int
+	Rows     int
+	ImageID  uint32
+	WidthPX  int
+	HeightPX int
+}
+
+## symbol:tui/src/terminal-image.ts#KittyImagePlacement
+reference: packages/tui/src/terminal-image.ts#KittyImagePlacement
+target: github.com/nankedr/pig/tui.KittyImagePlacement
+type KittyImagePlacement struct {
+	ImageID                uint32
+	TransmissionGeneration uint64
+	TransmissionBytes      int
+	EstimatedDecodedBytes  int64
+	Sequence               string
+	ReplacementLine        string
+}
+
+## symbol:tui/src/terminal-image.ts#TerminalCapabilities
+reference: packages/tui/src/terminal-image.ts#TerminalCapabilities
+target: github.com/nankedr/pig/tui.TerminalCapabilities
+type TerminalCapabilities struct {
+	Images     ImageProtocol
+	TrueColor  bool
+	Hyperlinks bool
+}
+
+## symbol:tui/src/terminal-image.ts#allocateImageId
+reference: packages/tui/src/terminal-image.ts#allocateImageId
+target: github.com/nankedr/pig/tui.AllocateImageID
+func AllocateImageID() (uint32, error)
+
+## symbol:tui/src/terminal-image.ts#calculateImageCellSize
+reference: packages/tui/src/terminal-image.ts#calculateImageCellSize
+target: github.com/nankedr/pig/tui.CalculateImageCellSize
+func CalculateImageCellSize(ImageDimensions, int, *int, ...CellDimensions) (ImageCellSize, error)
+
+## symbol:tui/src/terminal-image.ts#calculateImageRows
+reference: packages/tui/src/terminal-image.ts#calculateImageRows
+target: github.com/nankedr/pig/tui.CalculateImageRows
+func CalculateImageRows(ImageDimensions, int, ...CellDimensions) (int, error)
+
+## symbol:tui/src/terminal-image.ts#cropKittyImageLine
+reference: packages/tui/src/terminal-image.ts#cropKittyImageLine
+target: github.com/nankedr/pig/tui.CropKittyImageLine
+func CropKittyImageLine(string, int, int) (string, error)
+
+## symbol:tui/src/terminal-image.ts#deleteAllKittyImages
+reference: packages/tui/src/terminal-image.ts#deleteAllKittyImages
+target: github.com/nankedr/pig/tui.DeleteAllKittyImages
+func DeleteAllKittyImages() (string, error)
+
+## symbol:tui/src/terminal-image.ts#deleteAllKittyPlacements
+reference: packages/tui/src/terminal-image.ts#deleteAllKittyPlacements
+target: github.com/nankedr/pig/tui.DeleteAllKittyPlacements
+func DeleteAllKittyPlacements() (string, error)
+
+## symbol:tui/src/terminal-image.ts#deleteKittyImage
+reference: packages/tui/src/terminal-image.ts#deleteKittyImage
+target: github.com/nankedr/pig/tui.DeleteKittyImage
+func DeleteKittyImage(uint32) (string, error)
+
+## symbol:tui/src/terminal-image.ts#detectCapabilities
+reference: packages/tui/src/terminal-image.ts#detectCapabilities
+target: github.com/nankedr/pig/tui.DetectCapabilities
+func DetectCapabilities(...TmuxHyperlinkProbe) (TerminalCapabilities, error)
+
+## symbol:tui/src/terminal-image.ts#encodeITerm2
+reference: packages/tui/src/terminal-image.ts#encodeITerm2
+target: github.com/nankedr/pig/tui.EncodeITerm2
+func EncodeITerm2(string, ...ITerm2EncodeOptions) (string, error)
+
+## symbol:tui/src/terminal-image.ts#encodeKitty
+reference: packages/tui/src/terminal-image.ts#encodeKitty
+target: github.com/nankedr/pig/tui.EncodeKitty
+func EncodeKitty(string, ...KittyEncodeOptions) (string, error)
+
+## symbol:tui/src/terminal-image.ts#getCapabilities
+reference: packages/tui/src/terminal-image.ts#getCapabilities
+target: github.com/nankedr/pig/tui.GetCapabilities
+func GetCapabilities() (TerminalCapabilities, error)
+
+## symbol:tui/src/terminal-image.ts#getCellDimensions
+reference: packages/tui/src/terminal-image.ts#getCellDimensions
+target: github.com/nankedr/pig/tui.GetCellDimensions
+func GetCellDimensions() (CellDimensions, error)
+
+## symbol:tui/src/terminal-image.ts#getGifDimensions
+reference: packages/tui/src/terminal-image.ts#getGifDimensions
+target: github.com/nankedr/pig/tui.GetGIFDimensions
+func GetGIFDimensions(string) (ImageDimensions, bool, error)
+
+## symbol:tui/src/terminal-image.ts#getImageDimensions
+reference: packages/tui/src/terminal-image.ts#getImageDimensions
+target: github.com/nankedr/pig/tui.GetImageDimensions
+func GetImageDimensions(string, string) (ImageDimensions, bool, error)
+
+## symbol:tui/src/terminal-image.ts#getJpegDimensions
+reference: packages/tui/src/terminal-image.ts#getJpegDimensions
+target: github.com/nankedr/pig/tui.GetJPEGDimensions
+func GetJPEGDimensions(string) (ImageDimensions, bool, error)
+
+## symbol:tui/src/terminal-image.ts#getKittyImageMetadata
+reference: packages/tui/src/terminal-image.ts#getKittyImageMetadata
+target: github.com/nankedr/pig/tui.GetKittyImageMetadata
+func GetKittyImageMetadata(string) (KittyImageMetadata, bool, error)
+
+## symbol:tui/src/terminal-image.ts#getKittyImagePlacement
+reference: packages/tui/src/terminal-image.ts#getKittyImagePlacement
+target: github.com/nankedr/pig/tui.GetKittyImagePlacement
+func GetKittyImagePlacement(string) (KittyImagePlacement, bool, error)
+
+## symbol:tui/src/terminal-image.ts#getPngDimensions
+reference: packages/tui/src/terminal-image.ts#getPngDimensions
+target: github.com/nankedr/pig/tui.GetPNGDimensions
+func GetPNGDimensions(string) (ImageDimensions, bool, error)
+
+## symbol:tui/src/terminal-image.ts#getWebpDimensions
+reference: packages/tui/src/terminal-image.ts#getWebpDimensions
+target: github.com/nankedr/pig/tui.GetWebPDimensions
+func GetWebPDimensions(string) (ImageDimensions, bool, error)
+
+## symbol:tui/src/terminal-image.ts#hyperlink
+reference: packages/tui/src/terminal-image.ts#hyperlink
+target: github.com/nankedr/pig/tui.Hyperlink
+func Hyperlink(string, string) (string, error)
+
+## symbol:tui/src/terminal-image.ts#imageFallback
+reference: packages/tui/src/terminal-image.ts#imageFallback
+target: github.com/nankedr/pig/tui.ImageFallback
+func ImageFallback(string, *ImageDimensions, ...string) (string, error)
+
+## symbol:tui/src/terminal-image.ts#isImageLine
+reference: packages/tui/src/terminal-image.ts#isImageLine
+target: github.com/nankedr/pig/tui.IsImageLine
+func IsImageLine(string) (bool, error)
+
+## symbol:tui/src/terminal-image.ts#registerKittyImageMetadata
+reference: packages/tui/src/terminal-image.ts#registerKittyImageMetadata
+target: github.com/nankedr/pig/tui.RegisterKittyImageMetadata
+func RegisterKittyImageMetadata(KittyImageMetadata) error
+
+## symbol:tui/src/terminal-image.ts#renderImage
+reference: packages/tui/src/terminal-image.ts#renderImage
+target: github.com/nankedr/pig/tui.RenderImage
+func RenderImage(string, ImageDimensions, ...ImageRenderOptions) (RenderedImage, bool, error)
+
+## symbol:tui/src/terminal-image.ts#resetCapabilitiesCache
+reference: packages/tui/src/terminal-image.ts#resetCapabilitiesCache
+target: github.com/nankedr/pig/tui.ResetCapabilitiesCache
+func ResetCapabilitiesCache() error
+
+## symbol:tui/src/terminal-image.ts#setCapabilities
+reference: packages/tui/src/terminal-image.ts#setCapabilities
+target: github.com/nankedr/pig/tui.SetCapabilities
+func SetCapabilities(TerminalCapabilities) error
+
+## symbol:tui/src/terminal-image.ts#setCellDimensions
+reference: packages/tui/src/terminal-image.ts#setCellDimensions
+target: github.com/nankedr/pig/tui.SetCellDimensions
+func SetCellDimensions(CellDimensions) error
+
+## symbol:tui/src/terminal.ts#KeyboardProtocolNegotiationSequence
+reference: packages/tui/src/terminal.ts#KeyboardProtocolNegotiationSequence
+target: github.com/nankedr/pig/tui.KeyboardProtocolNegotiationSequence
+type KeyboardProtocolNegotiationSequence struct {
+	Type  string
+	Flags int
+}
+
+## symbol:tui/src/terminal.ts#ProcessTerminal
+reference: packages/tui/src/terminal.ts#ProcessTerminal
+target: github.com/nankedr/pig/tui.ProcessTerminal
+type ProcessTerminal struct {
+	input  io.Reader
+	output io.Writer
+}
+func (*ProcessTerminal) ClearFromCursor() error
+func (*ProcessTerminal) ClearLine() error
+func (*ProcessTerminal) ClearScreen() error
+func (*ProcessTerminal) Columns() (int, error)
+func (*ProcessTerminal) DrainInput(context.Context, time.Duration, time.Duration) error
+func (*ProcessTerminal) HideCursor() error
+func (*ProcessTerminal) KittyProtocolActive() (bool, error)
+func (*ProcessTerminal) ModifyOtherKeysActive() (bool, error)
+func (*ProcessTerminal) MoveBy(int) error
+func (*ProcessTerminal) Rows() (int, error)
+func (*ProcessTerminal) SetProgress(bool) error
+func (*ProcessTerminal) SetTitle(string) error
+func (*ProcessTerminal) ShowCursor() error
+func (*ProcessTerminal) Start(func(string), func()) error
+func (*ProcessTerminal) Stop() error
+func (*ProcessTerminal) Write(string) error
+
+## symbol:tui/src/terminal.ts#Terminal
+reference: packages/tui/src/terminal.ts#Terminal
+target: github.com/nankedr/pig/tui.Terminal
+type Terminal interface {
+	Start(onInput func(string), onResize func()) error
+	Stop() error
+	DrainInput(context.Context, time.Duration, time.Duration) error
+	Write(string) error
+	Columns() (int, error)
+	Rows() (int, error)
+	KittyProtocolActive() (bool, error)
+	MoveBy(int) error
+	HideCursor() error
+	ShowCursor() error
+	ClearLine() error
+	ClearFromCursor() error
+	ClearScreen() error
+	SetTitle(string) error
+	SetProgress(bool) error
+}
+
+## symbol:tui/src/terminal.ts#isAppleTerminalSession
+reference: packages/tui/src/terminal.ts#isAppleTerminalSession
+target: github.com/nankedr/pig/tui.IsAppleTerminalSession
+func IsAppleTerminalSession() (bool, error)
+
+## symbol:tui/src/terminal.ts#normalizeAppleTerminalInput
+reference: packages/tui/src/terminal.ts#normalizeAppleTerminalInput
+target: github.com/nankedr/pig/tui.NormalizeAppleTerminalInput
+func NormalizeAppleTerminalInput(string, bool, bool) (string, error)
+
+## symbol:tui/src/terminal.ts#normalizeNativeShiftEnterInput
+reference: packages/tui/src/terminal.ts#normalizeNativeShiftEnterInput
+target: github.com/nankedr/pig/tui.NormalizeNativeShiftEnterInput
+func NormalizeNativeShiftEnterInput(string, bool, bool) (string, error)
+
+## symbol:tui/src/terminal.ts#parseKeyboardProtocolNegotiationSequence
+reference: packages/tui/src/terminal.ts#parseKeyboardProtocolNegotiationSequence
+target: github.com/nankedr/pig/tui.ParseKeyboardProtocolNegotiationSequence
+func ParseKeyboardProtocolNegotiationSequence(string) (KeyboardProtocolNegotiationSequence, bool, error)
+
+## symbol:tui/src/tui-alt-screen.ts#TuiAltScreen
+reference: packages/tui/src/tui-alt-screen.ts#TuiAltScreen
+target: github.com/nankedr/pig/tui.TUIAltScreen
+type TUIAltScreen struct {
+	*TUIBase
+	wheelScrollLines  int
+	mouseEnabled      bool
+	layoutRoot        Component
+	viewportTop       int
+	followingOutput   bool
+	openURL           func(string)
+	onRightClickPaste func()
+}
+func (*TUIAltScreen) Flash(string, ...int64) error
+func (*TUIAltScreen) IsViewportTUI() bool
+func (*TUIAltScreen) Mode() TUIMode
+func (*TUIAltScreen) Render(int) ([]string, error)
+func (*TUIAltScreen) ScrollBy(int) error
+func (*TUIAltScreen) ScrollToBottom() error
+func (*TUIAltScreen) ScrollToTop() error
+func (*TUIAltScreen) SetLayoutRoot(Component) error
+func (t *TUIAltScreen) IsFollowingOutput() bool
+func (t *TUIAltScreen) ViewportTop() int
+
+## symbol:tui/src/tui-alt-screen.ts#TuiAltScreenOptions
+reference: packages/tui/src/tui-alt-screen.ts#TuiAltScreenOptions
+target: github.com/nankedr/pig/tui.TUIAltScreenOptions
+type TUIAltScreenOptions struct {
+	ShowHardwareCursor *bool
+	LogDirectory       string
+	WheelScrollLines   *int
+	Mouse              *bool
+	OpenURL            func(string)
+	OnRightClickPaste  func()
+}
+
+## symbol:tui/src/tui-main-screen.ts#TuiMainScreen
+reference: packages/tui/src/tui-main-screen.ts#TuiMainScreen
+target: github.com/nankedr/pig/tui.TUIMainScreen
+type TUIMainScreen struct {
+	*TUIBase
+	renderState TUIMainScreenRenderState
+}
+func (*TUIMainScreen) Mode() TUIMode
+func (*TUIMainScreen) Render(int) ([]string, error)
+func (*TUIMainScreen) RestoreRenderState(TUIMainScreenRenderState) error
+func (t *TUIMainScreen) CaptureRenderState() TUIMainScreenRenderState
+
+## symbol:tui/src/tui-main-screen.ts#TuiMainScreenRenderState
+reference: packages/tui/src/tui-main-screen.ts#TuiMainScreenRenderState
+target: github.com/nankedr/pig/tui.TUIMainScreenRenderState
+type TUIMainScreenRenderState struct {
+	PreviousLines       []string
+	PreviousWidth       int
+	PreviousHeight      int
+	CursorRow           int
+	HardwareCursorRow   int
+	MaxLinesRendered    int
+	PreviousViewportTop int
+}
+
+## symbol:tui/src/tui.ts#CURSOR_MARKER
+reference: packages/tui/src/tui.ts#CURSOR_MARKER
+target: github.com/nankedr/pig/tui.CursorMarker
+const CursorMarker = "\x1b_pi:c\x07"
+
+## symbol:tui/src/tui.ts#Component
+reference: packages/tui/src/tui.ts#Component
+target: github.com/nankedr/pig/tui.Component
+type Component interface {
+	Render(width int) ([]string, error)
+	Invalidate() error
+}
+
+## symbol:tui/src/tui.ts#Container
+reference: packages/tui/src/tui.ts#Container
+target: github.com/nankedr/pig/tui.Container
+type Container struct {
+	children []Component
+}
+func (c *Container) AddChild(component Component)
+func (c *Container) Children() []Component
+func (c *Container) Clear()
+func (c *Container) Invalidate() error
+func (c *Container) RemoveChild(component Component)
+func (c *Container) Render(width int) ([]string, error)
+
+## symbol:tui/src/tui.ts#Focusable
+reference: packages/tui/src/tui.ts#Focusable
+target: github.com/nankedr/pig/tui.Focusable
+type Focusable interface {
+	SetFocusState(bool)
+}
+
+## symbol:tui/src/tui.ts#OverlayAnchor
+reference: packages/tui/src/tui.ts#OverlayAnchor
+target: github.com/nankedr/pig/tui.OverlayAnchor
+type OverlayAnchor string
+
+## symbol:tui/src/tui.ts#OverlayHandle
+reference: packages/tui/src/tui.ts#OverlayHandle
+target: github.com/nankedr/pig/tui.OverlayHandle
+type OverlayHandle interface {
+	Hide() error
+	SetHidden(bool) error
+	IsHidden() bool
+	Focus() error
+	Unfocus(...OverlayUnfocusOptions) error
+	IsFocused() bool
+}
+
+## symbol:tui/src/tui.ts#OverlayMargin
+reference: packages/tui/src/tui.ts#OverlayMargin
+target: github.com/nankedr/pig/tui.OverlayMargin
+type OverlayMargin struct {
+	Top    *int
+	Right  *int
+	Bottom *int
+	Left   *int
+}
+
+## symbol:tui/src/tui.ts#OverlayOptions
+reference: packages/tui/src/tui.ts#OverlayOptions
+target: github.com/nankedr/pig/tui.OverlayOptions
+type OverlayOptions struct {
+	Width        *SizeValue
+	MinWidth     *int
+	MaxHeight    *SizeValue
+	Anchor       *OverlayAnchor
+	OffsetX      *int
+	OffsetY      *int
+	Row          *SizeValue
+	Col          *SizeValue
+	Margin       *OverlayMarginValue
+	Visible      func(termWidth, termHeight int) bool
+	NonCapturing *bool
+}
+
+## symbol:tui/src/tui.ts#OverlayUnfocusOptions
+reference: packages/tui/src/tui.ts#OverlayUnfocusOptions
+target: github.com/nankedr/pig/tui.OverlayUnfocusOptions
+type OverlayUnfocusOptions struct {
+	Target Component
+}
+
+## symbol:tui/src/tui.ts#SizeValue
+reference: packages/tui/src/tui.ts#SizeValue
+target: github.com/nankedr/pig/tui.SizeValue
+type SizeValue struct {
+	Absolute   *int
+	Percentage *float64
+}
+
+## symbol:tui/src/tui.ts#TUI
+reference: packages/tui/src/tui.ts#TUI
+target: github.com/nankedr/pig/tui.TUI
+type TUI interface {
+	Component
+	ComponentInputHandler
+	KeyReleaseRequester
+	Mode() TUIMode
+	Children() []Component
+	Terminal() Terminal
+	OnDebug() func()
+	SetOnDebug(func())
+	FullRedraws() int
+	AddChild(Component)
+	RemoveChild(Component)
+	Clear()
+	GetShowHardwareCursor() bool
+	SetShowHardwareCursor(bool) error
+	GetClearOnShrink() bool
+	SetClearOnShrink(bool) error
+	SetFocus(Component) error
+	ShowOverlay(Component, ...OverlayOptions) (OverlayHandle, error)
+	HideOverlay() error
+	HasOverlay() bool
+	Start() error
+	Stop(...TUIStopOptions) error
+	RenderNow(...bool) error
+	RequestRender(...bool) error
+	AddInputListener(TUIInputListener) (TUIUnsubscribe, error)
+	RemoveInputListener(TUIInputListener) error
+	OnTerminalColorSchemeChange(TerminalColorSchemeListener) (TUIUnsubscribe, error)
+	SetTerminalColorSchemeNotifications(bool) error
+	QueryTerminalBackgroundColor(context.Context, TerminalColorQueryOptions) (RGBColor, bool, error)
+	QueryTerminalColorScheme(context.Context, TerminalColorQueryOptions) (TerminalColorScheme, bool, error)
+}
+
+## symbol:tui/src/tui.ts#TuiBase
+reference: packages/tui/src/tui.ts#TuiBase
+target: github.com/nankedr/pig/tui.TUIBase
+type TUIBase struct {
+	Container
+	terminal           Terminal
+	onDebug            func()
+	showHardwareCursor bool
+	clearOnShrink      bool
+	logDirectory       string
+	fullRedraws        int
+	focusedComponent   Component
+	overlays           []Component
+}
+func (*TUIBase) AddInputListener(TUIInputListener) (TUIUnsubscribe, error)
+func (*TUIBase) HandleInput(string) error
+func (*TUIBase) HideOverlay() error
+func (*TUIBase) Mode() TUIMode
+func (*TUIBase) OnTerminalColorSchemeChange(TerminalColorSchemeListener) (TUIUnsubscribe, error)
+func (*TUIBase) QueryTerminalBackgroundColor(context.Context, TerminalColorQueryOptions) (RGBColor, bool, error)
+func (*TUIBase) QueryTerminalColorScheme(context.Context, TerminalColorQueryOptions) (TerminalColorScheme, bool, error)
+func (*TUIBase) RemoveInputListener(TUIInputListener) error
+func (*TUIBase) Render(int) ([]string, error)
+func (*TUIBase) RenderNow(...bool) error
+func (*TUIBase) RequestRender(...bool) error
+func (*TUIBase) SetClearOnShrink(bool) error
+func (*TUIBase) SetFocus(Component) error
+func (*TUIBase) SetShowHardwareCursor(bool) error
+func (*TUIBase) SetTerminalColorSchemeNotifications(bool) error
+func (*TUIBase) ShowOverlay(Component, ...OverlayOptions) (OverlayHandle, error)
+func (*TUIBase) Start() error
+func (*TUIBase) Stop(...TUIStopOptions) error
+func (*TUIBase) WantsKeyRelease() bool
+func (t *TUIBase) FullRedraws() int
+func (t *TUIBase) GetClearOnShrink() bool
+func (t *TUIBase) GetFocusedComponent() Component
+func (t *TUIBase) GetShowHardwareCursor() bool
+func (t *TUIBase) HasOverlay() bool
+func (t *TUIBase) HasOverlayEntries() bool
+func (t *TUIBase) OnDebug() func()
+func (t *TUIBase) SetOnDebug(callback func())
+func (t *TUIBase) Terminal() Terminal
+
+## symbol:tui/src/tui.ts#TuiInputListener
+reference: packages/tui/src/tui.ts#TuiInputListener
+target: github.com/nankedr/pig/tui.TUIInputListener
+type TUIInputListener func(string) TUIInputListenerResult
+
+## symbol:tui/src/tui.ts#TuiInputListenerResult
+reference: packages/tui/src/tui.ts#TuiInputListenerResult
+target: github.com/nankedr/pig/tui.TUIInputListenerResult
+type TUIInputListenerResult struct {
+	Consume *bool
+	Data    *string
+}
+
+## symbol:tui/src/tui.ts#TuiMode
+reference: packages/tui/src/tui.ts#TuiMode
+target: github.com/nankedr/pig/tui.TUIMode
+type TUIMode string
+
+## symbol:tui/src/tui.ts#TuiStopOptions
+reference: packages/tui/src/tui.ts#TuiStopOptions
+target: github.com/nankedr/pig/tui.TUIStopOptions
+type TUIStopOptions struct {
+	PreserveScreen *bool
+}
+
+## symbol:tui/src/tui.ts#VIEWPORT_TUI
+reference: packages/tui/src/tui.ts#VIEWPORT_TUI
+target: github.com/nankedr/pig/tui.ViewportTUIMarker
+const ViewportTUIMarker = "@earendil-works/pi-tui/viewport"
+
+## symbol:tui/src/tui.ts#ViewportTUI
+reference: packages/tui/src/tui.ts#ViewportTUI
+target: github.com/nankedr/pig/tui.ViewportTUI
+type ViewportTUI interface {
+	TUI
+	IsViewportTUI() bool
+	SetLayoutRoot(Component) error
+}
+
+## symbol:tui/src/tui.ts#compositeTuiLine
+reference: packages/tui/src/tui.ts#compositeTuiLine
+target: github.com/nankedr/pig/tui.CompositeTUILine
+func CompositeTUILine(string, string, int, int, int) (string, error)
+
+## symbol:tui/src/tui.ts#isFocusable
+reference: packages/tui/src/tui.ts#isFocusable
+target: github.com/nankedr/pig/tui.IsFocusable
+func IsFocusable(component Component) (Focusable, bool)
+
+## symbol:tui/src/tui.ts#isViewportTUI
+reference: packages/tui/src/tui.ts#isViewportTUI
+target: github.com/nankedr/pig/tui.IsViewportTUI
+func IsViewportTUI(ui TUI) (ViewportTUI, bool)
+
+## symbol:tui/src/undo-stack.ts#UndoStack
+reference: packages/tui/src/undo-stack.ts#UndoStack
+target: github.com/nankedr/pig/tui.UndoStack
+type UndoStack[S any] struct{}
+func (*UndoStack[S]) Clear() error
+func (*UndoStack[S]) Length() int
+func (*UndoStack[S]) Pop() (S, bool, error)
+func (*UndoStack[S]) Push(S) error
+
+## symbol:tui/src/utils.ts#PUNCTUATION_REGEX
+reference: packages/tui/src/utils.ts#PUNCTUATION_REGEX
+target: github.com/nankedr/pig/tui.PunctuationRegex
+const PunctuationRegex RegexPattern = "[(){}[\\]<>.,;:'\"!?+\\-=*/\\\\|&%^$#@~`]"
+
+## symbol:tui/src/utils.ts#applyBackgroundToLine
+reference: packages/tui/src/utils.ts#applyBackgroundToLine
+target: github.com/nankedr/pig/tui.ApplyBackgroundToLine
+func ApplyBackgroundToLine(string, int, BackgroundFunc) (string, error)
+
+## symbol:tui/src/utils.ts#cjkBreakRegex
+reference: packages/tui/src/utils.ts#cjkBreakRegex
+target: github.com/nankedr/pig/tui.CJKBreakRegex
+const CJKBreakRegex RegexPattern = `[\p{Script_Extensions=Han}\p{Script_Extensions=Hiragana}\p{Script_Extensions=Katakana}\p{Script_Extensions=Hangul}\p{Script_Extensions=Bopomofo}]`
+
+## symbol:tui/src/utils.ts#extractAnsiCode
+reference: packages/tui/src/utils.ts#extractAnsiCode
+target: github.com/nankedr/pig/tui.ExtractANSICode
+func ExtractANSICode(string, int) (ANSICode, bool, error)
+
+## symbol:tui/src/utils.ts#extractSegments
+reference: packages/tui/src/utils.ts#extractSegments
+target: github.com/nankedr/pig/tui.ExtractSegments
+func ExtractSegments(string, int, int, int, ...bool) (ExtractedSegments, error)
+
+## symbol:tui/src/utils.ts#getGraphemeCellRange
+reference: packages/tui/src/utils.ts#getGraphemeCellRange
+target: github.com/nankedr/pig/tui.GetGraphemeCellRange
+func GetGraphemeCellRange(string, int) (GraphemeCellRange, bool, error)
+
+## symbol:tui/src/utils.ts#getGraphemeSegmenter
+reference: packages/tui/src/utils.ts#getGraphemeSegmenter
+target: github.com/nankedr/pig/tui.GetGraphemeSegmenter
+func GetGraphemeSegmenter() (TextSegmenter, error)
+
+## symbol:tui/src/utils.ts#getOsc8LinkAtColumn
+reference: packages/tui/src/utils.ts#getOsc8LinkAtColumn
+target: github.com/nankedr/pig/tui.GetOSC8LinkAtColumn
+func GetOSC8LinkAtColumn(string, int) (string, bool, error)
+
+## symbol:tui/src/utils.ts#getWordSegmenter
+reference: packages/tui/src/utils.ts#getWordSegmenter
+target: github.com/nankedr/pig/tui.GetWordSegmenter
+func GetWordSegmenter() (TextSegmenter, error)
+
+## symbol:tui/src/utils.ts#isPunctuationChar
+reference: packages/tui/src/utils.ts#isPunctuationChar
+target: github.com/nankedr/pig/tui.IsPunctuationChar
+func IsPunctuationChar(string) (bool, error)
+
+## symbol:tui/src/utils.ts#isWhitespaceChar
+reference: packages/tui/src/utils.ts#isWhitespaceChar
+target: github.com/nankedr/pig/tui.IsWhitespaceChar
+func IsWhitespaceChar(string) (bool, error)
+
+## symbol:tui/src/utils.ts#normalizeTerminalOutput
+reference: packages/tui/src/utils.ts#normalizeTerminalOutput
+target: github.com/nankedr/pig/tui.NormalizeTerminalOutput
+func NormalizeTerminalOutput(string) (string, error)
+
+## symbol:tui/src/utils.ts#sliceByColumn
+reference: packages/tui/src/utils.ts#sliceByColumn
+target: github.com/nankedr/pig/tui.SliceByColumn
+func SliceByColumn(string, int, int, ...bool) (string, error)
+
+## symbol:tui/src/utils.ts#sliceWithWidth
+reference: packages/tui/src/utils.ts#sliceWithWidth
+target: github.com/nankedr/pig/tui.SliceWithWidth
+func SliceWithWidth(string, int, int, ...bool) (TextSlice, error)
+
+## symbol:tui/src/utils.ts#stripTerminalSequences
+reference: packages/tui/src/utils.ts#stripTerminalSequences
+target: github.com/nankedr/pig/tui.StripTerminalSequences
+func StripTerminalSequences(string) (string, error)
+
+## symbol:tui/src/utils.ts#truncateToWidth
+reference: packages/tui/src/utils.ts#truncateToWidth
+target: github.com/nankedr/pig/tui.TruncateToWidth
+func TruncateToWidth(string, int, ...TruncateOptions) (string, error)
+
+## symbol:tui/src/utils.ts#visibleWidth
+reference: packages/tui/src/utils.ts#visibleWidth
+target: github.com/nankedr/pig/tui.VisibleWidth
+func VisibleWidth(string) (int, error)
+
+## symbol:tui/src/utils.ts#wrapTextWithAnsi
+reference: packages/tui/src/utils.ts#wrapTextWithAnsi
+target: github.com/nankedr/pig/tui.WrapTextWithANSI
+func WrapTextWithANSI(string, int) ([]string, error)
+
+## symbol:tui/src/word-navigation.ts#WordNavigationOptions
+reference: packages/tui/src/word-navigation.ts#WordNavigationOptions
+target: github.com/nankedr/pig/tui.WordNavigationOptions
+type WordNavigationOptions struct {
+	Segment         func(string) []WordSegment
+	IsAtomicSegment func(string) bool
+}
+
+## symbol:tui/src/word-navigation.ts#findWordBackward
+reference: packages/tui/src/word-navigation.ts#findWordBackward
+target: github.com/nankedr/pig/tui.FindWordBackward
+func FindWordBackward(string, int, ...WordNavigationOptions) (int, error)
+
+## symbol:tui/src/word-navigation.ts#findWordForward
+reference: packages/tui/src/word-navigation.ts#findWordForward
+target: github.com/nankedr/pig/tui.FindWordForward
+func FindWordForward(string, int, ...WordNavigationOptions) (int, error)
