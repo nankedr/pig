@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 601
+- Total entries: 918
 
 | Status | Count |
 | --- | --- |
-| inventoried | 306 |
-| scaffolded | 270 |
-| partial | 17 |
+| inventoried | 453 |
+| scaffolded | 435 |
+| partial | 22 |
 | implemented | 0 |
 | verified | 6 |
 | deferred | 2 |
@@ -25,7 +25,324 @@
 | ID | Status | Milestone | Kind | Target | Upstream |
 | --- | --- | --- | --- | --- | --- |
 | contract:session/v4-harness | inventoried | M8 | contract | github.com/nankedr/pig/agent | agent |
+| member:agent/src/types.ts#QueueMode.anchor | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.at | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.big | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.blink | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.bold | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.charAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.charCodeAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.codePointAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.concat | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.endsWith | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.fixed | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.fontcolor | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.fontsize | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.includes | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.indexOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.italics | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.lastIndexOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.length | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.link | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.localeCompare | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.match | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.matchAll | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.normalize | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.padEnd | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.padStart | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.repeat | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.replace | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.replaceAll | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.search | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.slice | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.small | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.split | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.startsWith | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.strike | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.sub | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.substr | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.substring | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.sup | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.toLocaleLowerCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.toLocaleUpperCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.toLowerCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.toString | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.toUpperCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.trim | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.trimEnd | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.trimLeft | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.trimRight | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.trimStart | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#QueueMode.valueOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.QueueMode | agent |
+| member:agent/src/types.ts#ThinkingLevel.anchor | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.at | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.big | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.blink | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.bold | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.charAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.charCodeAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.codePointAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.concat | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.endsWith | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.fixed | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.fontcolor | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.fontsize | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.includes | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.indexOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.italics | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.lastIndexOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.length | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.link | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.localeCompare | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.match | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.matchAll | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.normalize | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.padEnd | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.padStart | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.repeat | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.replace | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.replaceAll | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.search | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.slice | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.small | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.split | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.startsWith | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.strike | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.sub | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.substr | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.substring | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.sup | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.toLocaleLowerCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.toLocaleUpperCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.toLowerCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.toString | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.toUpperCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.trim | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.trimEnd | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.trimLeft | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.trimRight | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.trimStart | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ThinkingLevel.valueOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| member:agent/src/types.ts#ToolExecutionMode.anchor | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.at | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.big | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.blink | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.bold | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.charAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.charCodeAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.codePointAt | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.concat | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.endsWith | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.fixed | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.fontcolor | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.fontsize | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.includes | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.indexOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.italics | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.lastIndexOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.length | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.link | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.localeCompare | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.match | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.matchAll | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.normalize | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.padEnd | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.padStart | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.repeat | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.replace | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.replaceAll | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.search | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.slice | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.small | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.split | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.startsWith | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.strike | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.sub | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.substr | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.substring | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.sup | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.toLocaleLowerCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.toLocaleUpperCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.toLowerCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.toString | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.toUpperCase | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.trim | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.trimEnd | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.trimLeft | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.trimRight | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.trimStart | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| member:agent/src/types.ts#ToolExecutionMode.valueOf | inventoried | M1 | contract | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| contract:agent/runtime | scaffolded | M1 | contract | github.com/nankedr/pig/agent | agent |
+| member:agent/src/agent.ts#Agent.abort | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Abort | agent |
+| member:agent/src/agent.ts#Agent.afterToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).AfterToolCall / github.com/nankedr/pig/agent.(*Agent).SetAfterToolCall | agent |
+| member:agent/src/agent.ts#Agent.beforeToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).BeforeToolCall / github.com/nankedr/pig/agent.(*Agent).SetBeforeToolCall | agent |
+| member:agent/src/agent.ts#Agent.clearAllQueues | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ClearAllQueues | agent |
+| member:agent/src/agent.ts#Agent.clearFollowUpQueue | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ClearFollowUpQueue | agent |
+| member:agent/src/agent.ts#Agent.clearSteeringQueue | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ClearSteeringQueue | agent |
+| member:agent/src/agent.ts#Agent.continue | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Continue | agent |
+| member:agent/src/agent.ts#Agent.convertToLlm | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ConvertToLLM / github.com/nankedr/pig/agent.(*Agent).SetConvertToLLM | agent |
+| member:agent/src/agent.ts#Agent.followUp | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).FollowUp | agent |
+| member:agent/src/agent.ts#Agent.followUpMode | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).FollowUpMode / github.com/nankedr/pig/agent.(*Agent).SetFollowUpMode | agent |
+| member:agent/src/agent.ts#Agent.getApiKey | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).GetAPIKey / github.com/nankedr/pig/agent.(*Agent).SetGetAPIKey | agent |
+| member:agent/src/agent.ts#Agent.hasQueuedMessages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).HasQueuedMessages | agent |
+| member:agent/src/agent.ts#Agent.maxRetryDelayMs | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).MaxRetryDelayMS / github.com/nankedr/pig/agent.(*Agent).SetMaxRetryDelayMS | agent |
+| member:agent/src/agent.ts#Agent.onPayload | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).OnPayload / github.com/nankedr/pig/agent.(*Agent).SetOnPayload | agent |
+| member:agent/src/agent.ts#Agent.onResponse | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).OnResponse / github.com/nankedr/pig/agent.(*Agent).SetOnResponse | agent |
+| member:agent/src/agent.ts#Agent.prepareNextTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).PrepareNextTurn / github.com/nankedr/pig/agent.(*Agent).SetPrepareNextTurn | agent |
+| member:agent/src/agent.ts#Agent.prepareNextTurnWithContext | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).PrepareNextTurnWithContext / github.com/nankedr/pig/agent.(*Agent).SetPrepareNextTurnWithContext | agent |
+| member:agent/src/agent.ts#Agent.prompt | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Prompt / github.com/nankedr/pig/agent.(*Agent).PromptText | agent |
+| member:agent/src/agent.ts#Agent.reset | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Reset | agent |
+| member:agent/src/agent.ts#Agent.sessionId | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).SessionID / github.com/nankedr/pig/agent.(*Agent).SetSessionID | agent |
+| member:agent/src/agent.ts#Agent.shouldStopAfterTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ShouldStopAfterTurn / github.com/nankedr/pig/agent.(*Agent).SetShouldStopAfterTurn | agent |
+| member:agent/src/agent.ts#Agent.signal | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ActiveContext | agent |
+| member:agent/src/agent.ts#Agent.state | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).State | agent |
+| member:agent/src/agent.ts#Agent.steer | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Steer | agent |
+| member:agent/src/agent.ts#Agent.steeringMode | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).SteeringMode / github.com/nankedr/pig/agent.(*Agent).SetSteeringMode | agent |
+| member:agent/src/agent.ts#Agent.streamFunction | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).StreamFunction / github.com/nankedr/pig/agent.(*Agent).SetStreamFunction | agent |
+| member:agent/src/agent.ts#Agent.subscribe | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Subscribe | agent |
+| member:agent/src/agent.ts#Agent.thinkingBudgets | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ThinkingBudgets / github.com/nankedr/pig/agent.(*Agent).SetThinkingBudgets | agent |
+| member:agent/src/agent.ts#Agent.toolExecution | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ToolExecution / github.com/nankedr/pig/agent.(*Agent).SetToolExecution | agent |
+| member:agent/src/agent.ts#Agent.transformContext | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).TransformContext / github.com/nankedr/pig/agent.(*Agent).SetTransformContext | agent |
+| member:agent/src/agent.ts#Agent.transport | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Transport / github.com/nankedr/pig/agent.(*Agent).SetTransport | agent |
+| member:agent/src/agent.ts#Agent.waitForIdle | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).WaitForIdle | agent |
+| member:agent/src/agent.ts#AgentOptions.afterToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.AfterToolCall | agent |
+| member:agent/src/agent.ts#AgentOptions.beforeToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.BeforeToolCall | agent |
+| member:agent/src/agent.ts#AgentOptions.convertToLlm | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.ConvertToLLM | agent |
+| member:agent/src/agent.ts#AgentOptions.followUpMode | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.FollowUpMode | agent |
+| member:agent/src/agent.ts#AgentOptions.getApiKey | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.GetAPIKey | agent |
+| member:agent/src/agent.ts#AgentOptions.initialState | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.InitialState | agent |
+| member:agent/src/agent.ts#AgentOptions.maxRetryDelayMs | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.MaxRetryDelayMS | agent |
+| member:agent/src/agent.ts#AgentOptions.onPayload | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.OnPayload | agent |
+| member:agent/src/agent.ts#AgentOptions.onResponse | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.OnResponse | agent |
+| member:agent/src/agent.ts#AgentOptions.prepareNextTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.PrepareNextTurn | agent |
+| member:agent/src/agent.ts#AgentOptions.prepareNextTurnWithContext | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.PrepareNextTurnWithContext | agent |
+| member:agent/src/agent.ts#AgentOptions.sessionId | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.SessionID | agent |
+| member:agent/src/agent.ts#AgentOptions.shouldStopAfterTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.ShouldStopAfterTurn | agent |
+| member:agent/src/agent.ts#AgentOptions.steeringMode | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.SteeringMode | agent |
+| member:agent/src/agent.ts#AgentOptions.streamFn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.StreamFunction | agent |
+| member:agent/src/agent.ts#AgentOptions.thinkingBudgets | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.ThinkingBudgets | agent |
+| member:agent/src/agent.ts#AgentOptions.toolExecution | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.ToolExecution | agent |
+| member:agent/src/agent.ts#AgentOptions.transformContext | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.TransformContext | agent |
+| member:agent/src/agent.ts#AgentOptions.transport | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.Transport | agent |
+| member:agent/src/proxy.ts#ProxyAssistantMessageEvent.type | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyAssistantMessageEvent.ProxyAssistantMessageEventType | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.authToken | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.AuthToken | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.cacheRetention | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.CacheRetention | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.headers | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Headers | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.maxRetryDelayMs | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.MaxRetryDelayMS | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.maxTokens | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.MaxTokens | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.metadata | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Metadata | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.proxyUrl | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.ProxyURL | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.reasoning | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Reasoning | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.samplingParams | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.SamplingParams | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.sessionId | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.SessionID | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.signal | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Signal | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.temperature | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Temperature | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.thinkingBudgets | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.ThinkingBudgets | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.transport | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Transport | agent |
+| member:agent/src/types.ts#AfterToolCallContext.args | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.Args | agent |
+| member:agent/src/types.ts#AfterToolCallContext.assistantMessage | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.AssistantMessage | agent |
+| member:agent/src/types.ts#AfterToolCallContext.context | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.Context | agent |
+| member:agent/src/types.ts#AfterToolCallContext.isError | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.IsError | agent |
+| member:agent/src/types.ts#AfterToolCallContext.result | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.Result | agent |
+| member:agent/src/types.ts#AfterToolCallContext.toolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.ToolCall | agent |
+| member:agent/src/types.ts#AfterToolCallResult.content | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallResult.Content | agent |
+| member:agent/src/types.ts#AfterToolCallResult.details | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallResult.Details | agent |
+| member:agent/src/types.ts#AfterToolCallResult.isError | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallResult.IsError | agent |
+| member:agent/src/types.ts#AfterToolCallResult.terminate | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallResult.Terminate | agent |
+| member:agent/src/types.ts#AfterToolCallResult.usage | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallResult.Usage | agent |
+| member:agent/src/types.ts#AgentContext.messages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentContext.Messages | agent |
+| member:agent/src/types.ts#AgentContext.systemPrompt | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentContext.SystemPrompt | agent |
+| member:agent/src/types.ts#AgentContext.tools | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentContext.Tools | agent |
+| member:agent/src/types.ts#AgentEvent.type | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentEvent.AgentEventType | agent |
+| member:agent/src/types.ts#AgentLoopConfig.afterToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.AfterToolCall | agent |
+| member:agent/src/types.ts#AgentLoopConfig.beforeToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.BeforeToolCall | agent |
+| member:agent/src/types.ts#AgentLoopConfig.convertToLlm | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.ConvertToLLM | agent |
+| member:agent/src/types.ts#AgentLoopConfig.getApiKey | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetAPIKey | agent |
+| member:agent/src/types.ts#AgentLoopConfig.getFollowUpMessages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetFollowUpMessages | agent |
+| member:agent/src/types.ts#AgentLoopConfig.getSteeringMessages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetSteeringMessages | agent |
+| member:agent/src/types.ts#AgentLoopConfig.model | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.Model | agent |
+| member:agent/src/types.ts#AgentLoopConfig.prepareNextTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.PrepareNextTurn | agent |
+| member:agent/src/types.ts#AgentLoopConfig.shouldStopAfterTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.ShouldStopAfterTurn | agent |
+| member:agent/src/types.ts#AgentLoopConfig.toolExecution | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.ToolExecution | agent |
+| member:agent/src/types.ts#AgentLoopConfig.transformContext | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.TransformContext | agent |
+| member:agent/src/types.ts#AgentLoopTurnUpdate.context | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopTurnUpdate.Context | agent |
+| member:agent/src/types.ts#AgentLoopTurnUpdate.model | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopTurnUpdate.Model | agent |
+| member:agent/src/types.ts#AgentLoopTurnUpdate.thinkingLevel | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopTurnUpdate.ThinkingLevel | agent |
+| member:agent/src/types.ts#AgentState.errorMessage | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.ErrorMessage | agent |
+| member:agent/src/types.ts#AgentState.isStreaming | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.IsStreaming | agent |
+| member:agent/src/types.ts#AgentState.messages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.Messages | agent |
+| member:agent/src/types.ts#AgentState.model | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.Model | agent |
+| member:agent/src/types.ts#AgentState.pendingToolCalls | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.PendingToolCalls | agent |
+| member:agent/src/types.ts#AgentState.streamingMessage | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.StreamingMessage | agent |
+| member:agent/src/types.ts#AgentState.systemPrompt | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.SystemPrompt | agent |
+| member:agent/src/types.ts#AgentState.thinkingLevel | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.ThinkingLevel | agent |
+| member:agent/src/types.ts#AgentState.tools | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentState.Tools | agent |
+| member:agent/src/types.ts#AgentTool.execute | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentTool.Execute | agent |
+| member:agent/src/types.ts#AgentTool.executionMode | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentTool.ExecutionMode | agent |
+| member:agent/src/types.ts#AgentTool.label | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentTool.Label | agent |
+| member:agent/src/types.ts#AgentTool.prepareArguments | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentTool.PrepareArguments | agent |
+| member:agent/src/types.ts#AgentToolResult.addedToolNames | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentToolResult.AddedToolNames | agent |
+| member:agent/src/types.ts#AgentToolResult.content | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentToolResult.Content | agent |
+| member:agent/src/types.ts#AgentToolResult.details | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentToolResult.Details | agent |
+| member:agent/src/types.ts#AgentToolResult.terminate | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentToolResult.Terminate | agent |
+| member:agent/src/types.ts#AgentToolResult.usage | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentToolResult.Usage | agent |
+| member:agent/src/types.ts#BeforeToolCallContext.args | scaffolded | M1 | contract | github.com/nankedr/pig/agent.BeforeToolCallContext.Args | agent |
+| member:agent/src/types.ts#BeforeToolCallContext.assistantMessage | scaffolded | M1 | contract | github.com/nankedr/pig/agent.BeforeToolCallContext.AssistantMessage | agent |
+| member:agent/src/types.ts#BeforeToolCallContext.context | scaffolded | M1 | contract | github.com/nankedr/pig/agent.BeforeToolCallContext.Context | agent |
+| member:agent/src/types.ts#BeforeToolCallContext.toolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.BeforeToolCallContext.ToolCall | agent |
+| member:agent/src/types.ts#BeforeToolCallResult.block | scaffolded | M1 | contract | github.com/nankedr/pig/agent.BeforeToolCallResult.Block | agent |
+| member:agent/src/types.ts#BeforeToolCallResult.reason | scaffolded | M1 | contract | github.com/nankedr/pig/agent.BeforeToolCallResult.Reason | agent |
+| member:agent/src/types.ts#BeforeToolCallResult.terminate | scaffolded | M1 | contract | github.com/nankedr/pig/agent.BeforeToolCallResult.Terminate | agent |
+| member:agent/src/types.ts#CustomAgentMessages.bashExecution | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentMessage | agent |
+| member:agent/src/types.ts#CustomAgentMessages.branchSummary | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentMessage | agent |
+| member:agent/src/types.ts#CustomAgentMessages.compactionSummary | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentMessage | agent |
+| member:agent/src/types.ts#CustomAgentMessages.custom | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentMessage | agent |
+| member:agent/src/types.ts#PrepareNextTurnContext.context | scaffolded | M1 | contract | github.com/nankedr/pig/agent.PrepareNextTurnContext.Context | agent |
+| member:agent/src/types.ts#PrepareNextTurnContext.message | scaffolded | M1 | contract | github.com/nankedr/pig/agent.PrepareNextTurnContext.Message | agent |
+| member:agent/src/types.ts#PrepareNextTurnContext.newMessages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.PrepareNextTurnContext.NewMessages | agent |
+| member:agent/src/types.ts#PrepareNextTurnContext.toolResults | scaffolded | M1 | contract | github.com/nankedr/pig/agent.PrepareNextTurnContext.ToolResults | agent |
+| member:agent/src/types.ts#ShouldStopAfterTurnContext.context | scaffolded | M1 | contract | github.com/nankedr/pig/agent.ShouldStopAfterTurnContext.Context | agent |
+| member:agent/src/types.ts#ShouldStopAfterTurnContext.message | scaffolded | M1 | contract | github.com/nankedr/pig/agent.ShouldStopAfterTurnContext.Message | agent |
+| member:agent/src/types.ts#ShouldStopAfterTurnContext.newMessages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.ShouldStopAfterTurnContext.NewMessages | agent |
+| member:agent/src/types.ts#ShouldStopAfterTurnContext.toolResults | scaffolded | M1 | contract | github.com/nankedr/pig/agent.ShouldStopAfterTurnContext.ToolResults | agent |
 | module-agent | scaffolded | M1 | package | github.com/nankedr/pig/agent | agent |
+| symbol:agent/src/agent-loop.ts#AgentEventSink | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentEventSink | agent |
+| symbol:agent/src/agent-loop.ts#agentLoop | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentLoop | agent |
+| symbol:agent/src/agent-loop.ts#agentLoopContinue | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentLoopContinue | agent |
+| symbol:agent/src/agent-loop.ts#runAgentLoop | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.RunAgentLoop | agent |
+| symbol:agent/src/agent-loop.ts#runAgentLoopContinue | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.RunAgentLoopContinue | agent |
+| symbol:agent/src/agent.ts#Agent | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.Agent | agent |
+| symbol:agent/src/agent.ts#AgentOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentOptions | agent |
+| symbol:agent/src/proxy.ts#ProxyAssistantMessageEvent | scaffolded | M2 | symbol | github.com/nankedr/pig/agent.ProxyAssistantMessageEvent | agent |
+| symbol:agent/src/proxy.ts#ProxyStreamOptions | scaffolded | M2 | symbol | github.com/nankedr/pig/agent.ProxyStreamOptions | agent |
+| symbol:agent/src/proxy.ts#streamProxy | scaffolded | M2 | symbol | github.com/nankedr/pig/agent.StreamProxy | agent |
+| symbol:agent/src/stream-fn.ts#setDefaultStreamFn | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.SetDefaultStreamFunction | agent |
+| symbol:agent/src/types.ts#AfterToolCallContext | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AfterToolCallContext | agent |
+| symbol:agent/src/types.ts#AfterToolCallResult | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AfterToolCallResult | agent |
+| symbol:agent/src/types.ts#AgentContext | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentContext | agent |
+| symbol:agent/src/types.ts#AgentEvent | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentEvent | agent |
+| symbol:agent/src/types.ts#AgentLoopConfig | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentLoopConfig | agent |
+| symbol:agent/src/types.ts#AgentLoopTurnUpdate | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentLoopTurnUpdate | agent |
+| symbol:agent/src/types.ts#AgentMessage | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentMessage | agent |
+| symbol:agent/src/types.ts#AgentState | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentState | agent |
+| symbol:agent/src/types.ts#AgentTool | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentTool | agent |
+| symbol:agent/src/types.ts#AgentToolCall | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentToolCall | agent |
+| symbol:agent/src/types.ts#AgentToolResult | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentToolResult | agent |
+| symbol:agent/src/types.ts#AgentToolUpdateCallback | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AgentToolUpdateCallback | agent |
+| symbol:agent/src/types.ts#BeforeToolCallContext | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.BeforeToolCallContext | agent |
+| symbol:agent/src/types.ts#BeforeToolCallResult | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.BeforeToolCallResult | agent |
+| symbol:agent/src/types.ts#CustomAgentMessages | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.CustomAgentMessages | agent |
+| symbol:agent/src/types.ts#PrepareNextTurnContext | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.PrepareNextTurnContext | agent |
+| symbol:agent/src/types.ts#QueueMode | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.QueueMode | agent |
+| symbol:agent/src/types.ts#ShouldStopAfterTurnContext | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.ShouldStopAfterTurnContext | agent |
+| symbol:agent/src/types.ts#StreamFn | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.StreamFunction | agent |
+| symbol:agent/src/types.ts#ThinkingLevel | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.ThinkingLevel | agent |
+| symbol:agent/src/types.ts#ToolExecutionMode | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
+| contract:agent/events | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
+| contract:agent/messages | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
+| contract:agent/proxy | partial | M2 | contract | github.com/nankedr/pig/agent | agent |
+| contract:agent/state-and-queues | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
+| contract:agent/tools | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 
 ### ai
 

@@ -1,0 +1,447 @@
+## symbol:agent/src/agent-loop.ts#AgentEventSink
+reference: packages/agent/src/agent-loop.ts#AgentEventSink
+target: github.com/nankedr/pig/agent.AgentEventSink
+type agent.AgentEventSink func(context.Context, agent.AgentEvent) error
+
+## symbol:agent/src/agent-loop.ts#agentLoop
+reference: packages/agent/src/agent-loop.ts#agentLoop
+target: github.com/nankedr/pig/agent.AgentLoop
+func agent.AgentLoop func(context.Context, []agent.AgentMessage, agent.AgentContext, agent.AgentLoopConfig, agent.StreamFunction) *agent.AgentEventStream
+
+## symbol:agent/src/agent-loop.ts#agentLoopContinue
+reference: packages/agent/src/agent-loop.ts#agentLoopContinue
+target: github.com/nankedr/pig/agent.AgentLoopContinue
+func agent.AgentLoopContinue func(context.Context, agent.AgentContext, agent.AgentLoopConfig, agent.StreamFunction) *agent.AgentEventStream
+
+## symbol:agent/src/agent-loop.ts#runAgentLoop
+reference: packages/agent/src/agent-loop.ts#runAgentLoop
+target: github.com/nankedr/pig/agent.RunAgentLoop
+func agent.RunAgentLoop func(context.Context, []agent.AgentMessage, agent.AgentContext, agent.AgentLoopConfig, agent.AgentEventSink, agent.StreamFunction) ([]agent.AgentMessage, error)
+
+## symbol:agent/src/agent-loop.ts#runAgentLoopContinue
+reference: packages/agent/src/agent-loop.ts#runAgentLoopContinue
+target: github.com/nankedr/pig/agent.RunAgentLoopContinue
+func agent.RunAgentLoopContinue func(context.Context, agent.AgentContext, agent.AgentLoopConfig, agent.AgentEventSink, agent.StreamFunction) ([]agent.AgentMessage, error)
+
+## symbol:agent/src/agent.ts#Agent
+reference: packages/agent/src/agent.ts#Agent
+target: github.com/nankedr/pig/agent.Agent
+type agent.Agent struct
+constructor func(agent.AgentOptions) (*agent.Agent, error)
+methods:
+- Abort func(*agent.Agent)
+- ActiveContext func(*agent.Agent) (context.Context, bool)
+- AfterToolCall func(*agent.Agent) func(context.Context, agent.AfterToolCallContext) (*agent.AfterToolCallResult, error)
+- AppendMessage func(*agent.Agent, agent.AgentMessage) error
+- BeforeToolCall func(*agent.Agent) func(context.Context, agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error)
+- Busy func(*agent.Agent) bool
+- ClearAllQueues func(*agent.Agent)
+- ClearFollowUpQueue func(*agent.Agent)
+- ClearSteeringQueue func(*agent.Agent)
+- Continue func(*agent.Agent, context.Context) error
+- ConvertToLLM func(*agent.Agent) agent.ConvertToLLMFunc
+- FollowUp func(*agent.Agent, agent.AgentMessage) error
+- FollowUpMode func(*agent.Agent) agent.QueueMode
+- GetAPIKey func(*agent.Agent) func(context.Context, ai.ProviderID) (string, bool, error)
+- HasQueuedMessages func(*agent.Agent) bool
+- MaxRetryDelayMS func(*agent.Agent) *int64
+- OnPayload func(*agent.Agent) ai.PayloadHook
+- OnResponse func(*agent.Agent) ai.ResponseHook
+- PrepareNextTurn func(*agent.Agent) func(context.Context) (*agent.AgentLoopTurnUpdate, error)
+- PrepareNextTurnWithContext func(*agent.Agent) func(context.Context, agent.ShouldStopAfterTurnContext) (*agent.AgentLoopTurnUpdate, error)
+- Prompt func(*agent.Agent, context.Context, ...agent.AgentMessage) error
+- PromptText func(*agent.Agent, context.Context, string, ...ai.ImageContent) error
+- ReplaceMessages func(*agent.Agent, []agent.AgentMessage) error
+- Reset func(*agent.Agent) error
+- SessionID func(*agent.Agent) string
+- SetAfterToolCall func(*agent.Agent, func(context.Context, agent.AfterToolCallContext) (*agent.AfterToolCallResult, error))
+- SetBeforeToolCall func(*agent.Agent, func(context.Context, agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error))
+- SetConvertToLLM func(*agent.Agent, agent.ConvertToLLMFunc)
+- SetFollowUpMode func(*agent.Agent, agent.QueueMode) error
+- SetGetAPIKey func(*agent.Agent, func(context.Context, ai.ProviderID) (string, bool, error))
+- SetMaxRetryDelayMS func(*agent.Agent, *int64) error
+- SetModel func(*agent.Agent, ai.Model)
+- SetOnPayload func(*agent.Agent, ai.PayloadHook)
+- SetOnResponse func(*agent.Agent, ai.ResponseHook)
+- SetPrepareNextTurn func(*agent.Agent, func(context.Context) (*agent.AgentLoopTurnUpdate, error))
+- SetPrepareNextTurnWithContext func(*agent.Agent, func(context.Context, agent.ShouldStopAfterTurnContext) (*agent.AgentLoopTurnUpdate, error))
+- SetSessionID func(*agent.Agent, string)
+- SetShouldStopAfterTurn func(*agent.Agent, func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error))
+- SetSteeringMode func(*agent.Agent, agent.QueueMode) error
+- SetStreamFunction func(*agent.Agent, agent.StreamFunction)
+- SetSystemPrompt func(*agent.Agent, string)
+- SetThinkingBudgets func(*agent.Agent, *ai.ThinkingBudgets)
+- SetThinkingLevel func(*agent.Agent, ai.ModelThinkingLevel) error
+- SetToolExecution func(*agent.Agent, agent.ToolExecutionMode) error
+- SetTools func(*agent.Agent, []agent.ErasedAgentTool) error
+- SetTransformContext func(*agent.Agent, agent.TransformContextFunc)
+- SetTransport func(*agent.Agent, ai.Transport) error
+- ShouldStopAfterTurn func(*agent.Agent) func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error)
+- State func(*agent.Agent) agent.AgentState
+- Steer func(*agent.Agent, agent.AgentMessage) error
+- SteeringMode func(*agent.Agent) agent.QueueMode
+- StreamFunction func(*agent.Agent) agent.StreamFunction
+- Subscribe func(*agent.Agent, agent.AgentEventSink) agent.Unsubscribe
+- ThinkingBudgets func(*agent.Agent) *ai.ThinkingBudgets
+- ToolExecution func(*agent.Agent) agent.ToolExecutionMode
+- TransformContext func(*agent.Agent) agent.TransformContextFunc
+- Transport func(*agent.Agent) ai.Transport
+- WaitForIdle func(*agent.Agent, context.Context) error
+
+## symbol:agent/src/agent.ts#AgentOptions
+reference: packages/agent/src/agent.ts#AgentOptions
+target: github.com/nankedr/pig/agent.AgentOptions
+type agent.AgentOptions struct
+fields:
+- InitialState *agent.AgentInitialState
+- ConvertToLLM agent.ConvertToLLMFunc
+- TransformContext agent.TransformContextFunc
+- StreamFunction agent.StreamFunction
+- GetAPIKey func(context.Context, ai.ProviderID) (string, bool, error)
+- OnPayload ai.PayloadHook
+- OnResponse ai.ResponseHook
+- BeforeToolCall func(context.Context, agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error)
+- AfterToolCall func(context.Context, agent.AfterToolCallContext) (*agent.AfterToolCallResult, error)
+- ShouldStopAfterTurn func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error)
+- PrepareNextTurn func(context.Context) (*agent.AgentLoopTurnUpdate, error)
+- PrepareNextTurnWithContext func(context.Context, agent.ShouldStopAfterTurnContext) (*agent.AgentLoopTurnUpdate, error)
+- SteeringMode agent.QueueMode
+- FollowUpMode agent.QueueMode
+- SessionID string
+- ThinkingBudgets *ai.ThinkingBudgets
+- Transport ai.Transport
+- MaxRetryDelayMS *int64
+- ToolExecution agent.ToolExecutionMode
+
+## symbol:agent/src/proxy.ts#ProxyAssistantMessageEvent
+reference: packages/agent/src/proxy.ts#ProxyAssistantMessageEvent
+target: github.com/nankedr/pig/agent.ProxyAssistantMessageEvent
+type agent.ProxyAssistantMessageEvent interface
+methods:
+- ProxyAssistantMessageEventType func() ai.AssistantMessageEventType
+- proxyAssistantMessageEvent func()
+variants:
+- agent.ProxyStartEvent discriminator="start"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+- agent.ProxyTextStartEvent discriminator="text_start"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+- agent.ProxyTextDeltaEvent discriminator="text_delta"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+  - Delta string tag="json:\"delta\""
+- agent.ProxyTextEndEvent discriminator="text_end"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+  - ContentSignature *string tag="json:\"contentSignature,omitempty\""
+- agent.ProxyThinkingStartEvent discriminator="thinking_start"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+- agent.ProxyThinkingDeltaEvent discriminator="thinking_delta"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+  - Delta string tag="json:\"delta\""
+- agent.ProxyThinkingEndEvent discriminator="thinking_end"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+  - ContentSignature *string tag="json:\"contentSignature,omitempty\""
+- agent.ProxyToolCallStartEvent discriminator="toolcall_start"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+  - ID string tag="json:\"id\""
+  - ToolName string tag="json:\"toolName\""
+- agent.ProxyToolCallDeltaEvent discriminator="toolcall_delta"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+  - Delta string tag="json:\"delta\""
+- agent.ProxyToolCallEndEvent discriminator="toolcall_end"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - ContentIndex int tag="json:\"contentIndex\""
+  - ToolCall ai.ToolCall tag="json:\"toolCall\""
+- agent.ProxyDoneEvent discriminator="done"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - Reason ai.StopReason tag="json:\"reason\""
+  - Usage ai.Usage tag="json:\"usage\""
+- agent.ProxyErrorEvent discriminator="error"
+  fields:
+  - Type ai.AssistantMessageEventType tag="json:\"type\""
+  - Reason ai.StopReason tag="json:\"reason\""
+  - ErrorMessage *string tag="json:\"errorMessage,omitempty\""
+  - Usage ai.Usage tag="json:\"usage\""
+codecs:
+func agent.MarshalProxyAssistantMessageEvent func(agent.ProxyAssistantMessageEvent) ([]byte, error)
+func agent.UnmarshalProxyAssistantMessageEvent func([]byte) (agent.ProxyAssistantMessageEvent, error)
+
+## symbol:agent/src/proxy.ts#ProxyStreamOptions
+reference: packages/agent/src/proxy.ts#ProxyStreamOptions
+target: github.com/nankedr/pig/agent.ProxyStreamOptions
+type agent.ProxyStreamOptions struct
+fields:
+- AuthToken string tag="json:\"-\""
+- CacheRetention *ai.CacheRetention tag="json:\"cacheRetention,omitempty\""
+- Headers ai.ProviderHeaders tag="json:\"headers,omitempty\""
+- MaxRetryDelayMS *int64 tag="json:\"maxRetryDelayMs,omitempty\""
+- MaxTokens *int64 tag="json:\"maxTokens,omitempty\""
+- Metadata map[string]json.RawMessage tag="json:\"metadata,omitempty\""
+- ProxyURL string tag="json:\"-\""
+- Reasoning *ai.ThinkingLevel tag="json:\"reasoning,omitempty\""
+- SamplingParams map[string]json.RawMessage tag="json:\"samplingParams,omitempty\""
+- SessionID *string tag="json:\"sessionId,omitempty\""
+- Signal context.Context tag="json:\"-\""
+- Temperature *float64 tag="json:\"temperature,omitempty\""
+- ThinkingBudgets *ai.ThinkingBudgets tag="json:\"thinkingBudgets,omitempty\""
+- Transport *ai.Transport tag="json:\"transport,omitempty\""
+
+## symbol:agent/src/proxy.ts#streamProxy
+reference: packages/agent/src/proxy.ts#streamProxy
+target: github.com/nankedr/pig/agent.StreamProxy
+func agent.StreamProxy func(context.Context, ai.Model, ai.Context, agent.ProxyStreamOptions) *agent.ProxyMessageEventStream
+
+## symbol:agent/src/stream-fn.ts#setDefaultStreamFn
+reference: packages/agent/src/stream-fn.ts#setDefaultStreamFn
+target: github.com/nankedr/pig/agent.SetDefaultStreamFunction
+func agent.SetDefaultStreamFunction func(agent.StreamFunction) error
+
+## symbol:agent/src/types.ts#AfterToolCallContext
+reference: packages/agent/src/types.ts#AfterToolCallContext
+target: github.com/nankedr/pig/agent.AfterToolCallContext
+type agent.AfterToolCallContext struct
+fields:
+- AssistantMessage ai.AssistantMessage
+- ToolCall ai.ToolCall
+- Args interface {}
+- Result agent.AgentToolResult[interface {}]
+- IsError bool
+- Context agent.AgentContext
+
+## symbol:agent/src/types.ts#AfterToolCallResult
+reference: packages/agent/src/types.ts#AfterToolCallResult
+target: github.com/nankedr/pig/agent.AfterToolCallResult
+type agent.AfterToolCallResult struct
+fields:
+- Content ai.Optional[[]github.com/nankedr/pig/ai.ToolResultContent]
+- Details ai.Optional[interface {}]
+- IsError ai.Optional[bool]
+- Usage ai.Optional[github.com/nankedr/pig/ai.Usage]
+- Terminate ai.Optional[bool]
+
+## symbol:agent/src/types.ts#AgentContext
+reference: packages/agent/src/types.ts#AgentContext
+target: github.com/nankedr/pig/agent.AgentContext
+type agent.AgentContext struct
+fields:
+- SystemPrompt string
+- Messages []agent.AgentMessage
+- Tools []agent.ErasedAgentTool
+
+## symbol:agent/src/types.ts#AgentEvent
+reference: packages/agent/src/types.ts#AgentEvent
+target: github.com/nankedr/pig/agent.AgentEvent
+type agent.AgentEvent interface
+methods:
+- AgentEventType func() agent.AgentEventType
+- agentEvent func()
+variants:
+- agent.AgentStartEvent discriminator="agent_start"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+- agent.AgentEndEvent discriminator="agent_end"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+  - Messages []agent.AgentMessage tag="json:\"-\""
+- agent.TurnStartEvent discriminator="turn_start"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+- agent.TurnEndEvent discriminator="turn_end"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+  - Message agent.AgentMessage tag="json:\"-\""
+  - ToolResults []ai.ToolResultMessage tag="json:\"-\""
+- agent.MessageStartEvent discriminator="message_start"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+  - Message agent.AgentMessage tag="json:\"-\""
+- agent.MessageUpdateEvent discriminator="message_update"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+  - Message agent.AgentMessage tag="json:\"-\""
+  - AssistantMessageEvent ai.AssistantMessageEvent tag="json:\"-\""
+- agent.MessageEndEvent discriminator="message_end"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+  - Message agent.AgentMessage tag="json:\"-\""
+- agent.ToolExecutionStartEvent discriminator="tool_execution_start"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+  - ToolCallID string tag="json:\"toolCallId\""
+  - ToolName string tag="json:\"toolName\""
+  - Arguments interface {} tag="json:\"args\""
+- agent.ToolExecutionUpdateEvent discriminator="tool_execution_update"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+  - ToolCallID string tag="json:\"toolCallId\""
+  - ToolName string tag="json:\"toolName\""
+  - Arguments interface {} tag="json:\"args\""
+  - PartialResult agent.AgentToolResult[interface {}] tag="json:\"-\""
+- agent.ToolExecutionEndEvent discriminator="tool_execution_end"
+  fields:
+  - Type agent.AgentEventType tag="json:\"type\""
+  - ToolCallID string tag="json:\"toolCallId\""
+  - ToolName string tag="json:\"toolName\""
+  - Result agent.AgentToolResult[interface {}] tag="json:\"-\""
+  - IsError bool tag="json:\"isError\""
+codecs:
+func agent.MarshalAgentEvent func(agent.AgentEvent) ([]byte, error)
+func agent.UnmarshalAgentEvent func([]byte) (agent.AgentEvent, error)
+
+## symbol:agent/src/types.ts#AgentLoopConfig
+reference: packages/agent/src/types.ts#AgentLoopConfig
+target: github.com/nankedr/pig/agent.AgentLoopConfig
+type agent.AgentLoopConfig struct
+fields:
+- SimpleStreamOptions ai.SimpleStreamOptions embedded
+- Model ai.Model
+- ConvertToLLM func(context.Context, []agent.AgentMessage) ([]ai.Message, error)
+- TransformContext func(context.Context, []agent.AgentMessage) ([]agent.AgentMessage, error)
+- GetAPIKey func(context.Context, ai.ProviderID) (string, bool, error)
+- ShouldStopAfterTurn func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error)
+- PrepareNextTurn func(context.Context, agent.ShouldStopAfterTurnContext) (*agent.AgentLoopTurnUpdate, error)
+- GetSteeringMessages func(context.Context) ([]agent.AgentMessage, error)
+- GetFollowUpMessages func(context.Context) ([]agent.AgentMessage, error)
+- ToolExecution agent.ToolExecutionMode
+- BeforeToolCall func(context.Context, agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error)
+- AfterToolCall func(context.Context, agent.AfterToolCallContext) (*agent.AfterToolCallResult, error)
+
+## symbol:agent/src/types.ts#AgentLoopTurnUpdate
+reference: packages/agent/src/types.ts#AgentLoopTurnUpdate
+target: github.com/nankedr/pig/agent.AgentLoopTurnUpdate
+type agent.AgentLoopTurnUpdate struct
+fields:
+- Context *agent.AgentContext
+- Model *ai.Model
+- ThinkingLevel *ai.ModelThinkingLevel
+
+## symbol:agent/src/types.ts#AgentMessage
+reference: packages/agent/src/types.ts#AgentMessage
+target: github.com/nankedr/pig/agent.AgentMessage
+type agent.AgentMessage interface
+methods:
+- MessageRole func() ai.MessageRole
+
+## symbol:agent/src/types.ts#AgentState
+reference: packages/agent/src/types.ts#AgentState
+target: github.com/nankedr/pig/agent.AgentState
+type agent.AgentState struct
+fields:
+- SystemPrompt string
+- Model ai.Model
+- ThinkingLevel ai.ModelThinkingLevel
+- Tools []agent.ErasedAgentTool
+- Messages []agent.AgentMessage
+- IsStreaming bool
+- StreamingMessage agent.AgentMessage
+- PendingToolCalls map[string]struct {}
+- ErrorMessage *string
+
+## symbol:agent/src/types.ts#AgentTool
+reference: packages/agent/src/types.ts#AgentTool
+target: github.com/nankedr/pig/agent.AgentTool
+type agent.AgentTool[map[string]any, map[string]any] struct
+fields:
+- Tool ai.Tool embedded
+- Label string
+- PrepareArguments agent.PrepareArgumentsFunc
+- DecodeValidated func(interface {}) map[string]interface {}
+- Execute func(context.Context, string, map[string]interface {}, agent.AgentToolUpdateCallback[map[string]interface {}]) (agent.AgentToolResult[map[string]interface {}], error)
+- ExecutionMode agent.ToolExecutionMode
+
+## symbol:agent/src/types.ts#AgentToolCall
+reference: packages/agent/src/types.ts#AgentToolCall
+target: github.com/nankedr/pig/agent.AgentToolCall
+type agent.AgentToolCall = ai.ToolCall
+
+## symbol:agent/src/types.ts#AgentToolResult
+reference: packages/agent/src/types.ts#AgentToolResult
+target: github.com/nankedr/pig/agent.AgentToolResult
+type agent.AgentToolResult[map[string]any] struct
+fields:
+- Content []ai.ToolResultContent
+- Details map[string]interface {}
+- Usage ai.Optional[github.com/nankedr/pig/ai.Usage]
+- AddedToolNames ai.Optional[[]string]
+- Terminate ai.Optional[bool]
+
+## symbol:agent/src/types.ts#AgentToolUpdateCallback
+reference: packages/agent/src/types.ts#AgentToolUpdateCallback
+target: github.com/nankedr/pig/agent.AgentToolUpdateCallback
+type agent.AgentToolUpdateCallback[map[string]any] func(agent.AgentToolResult[map[string]interface {}])
+
+## symbol:agent/src/types.ts#BeforeToolCallContext
+reference: packages/agent/src/types.ts#BeforeToolCallContext
+target: github.com/nankedr/pig/agent.BeforeToolCallContext
+type agent.BeforeToolCallContext struct
+fields:
+- AssistantMessage ai.AssistantMessage
+- ToolCall ai.ToolCall
+- Args interface {}
+- Context agent.AgentContext
+
+## symbol:agent/src/types.ts#BeforeToolCallResult
+reference: packages/agent/src/types.ts#BeforeToolCallResult
+target: github.com/nankedr/pig/agent.BeforeToolCallResult
+type agent.BeforeToolCallResult struct
+fields:
+- Block bool
+- Reason string
+- Terminate bool
+
+## symbol:agent/src/types.ts#CustomAgentMessages
+reference: packages/agent/src/types.ts#CustomAgentMessages
+target: github.com/nankedr/pig/agent.CustomAgentMessages
+type agent.CustomAgentMessages = agent.AgentMessage
+
+## symbol:agent/src/types.ts#PrepareNextTurnContext
+reference: packages/agent/src/types.ts#PrepareNextTurnContext
+target: github.com/nankedr/pig/agent.PrepareNextTurnContext
+type agent.PrepareNextTurnContext = agent.ShouldStopAfterTurnContext
+
+## symbol:agent/src/types.ts#QueueMode
+reference: packages/agent/src/types.ts#QueueMode
+target: github.com/nankedr/pig/agent.QueueMode
+type agent.QueueMode string
+
+## symbol:agent/src/types.ts#ShouldStopAfterTurnContext
+reference: packages/agent/src/types.ts#ShouldStopAfterTurnContext
+target: github.com/nankedr/pig/agent.ShouldStopAfterTurnContext
+type agent.ShouldStopAfterTurnContext struct
+fields:
+- Message ai.AssistantMessage
+- ToolResults []ai.ToolResultMessage
+- Context agent.AgentContext
+- NewMessages []agent.AgentMessage
+
+## symbol:agent/src/types.ts#StreamFn
+reference: packages/agent/src/types.ts#StreamFn
+target: github.com/nankedr/pig/agent.StreamFunction
+type agent.StreamFunction func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+## symbol:agent/src/types.ts#ThinkingLevel
+reference: packages/agent/src/types.ts#ThinkingLevel
+target: github.com/nankedr/pig/agent.ThinkingLevel
+type agent.ThinkingLevel = ai.ModelThinkingLevel
+
+## symbol:agent/src/types.ts#ToolExecutionMode
+reference: packages/agent/src/types.ts#ToolExecutionMode
+target: github.com/nankedr/pig/agent.ToolExecutionMode
+type agent.ToolExecutionMode string
