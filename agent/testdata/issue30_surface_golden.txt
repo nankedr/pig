@@ -1,0 +1,2383 @@
+## symbol:agent/src/harness/agent-harness.ts#AbortRejected
+reference: packages/agent/src/harness/agent-harness.ts#AbortRejected
+target: github.com/nankedr/pig/agent.AbortRejected
+type AbortRejected interface {
+	taggedHarnessError
+	abortRejected()
+}
+
+## symbol:agent/src/harness/agent-harness.ts#AbortResult
+reference: packages/agent/src/harness/agent-harness.ts#AbortResult
+target: github.com/nankedr/pig/agent.AbortResult
+type AbortResult struct{ Result[AbortOutcome] }
+
+## symbol:agent/src/harness/agent-harness.ts#ActionInfo
+reference: packages/agent/src/harness/agent-harness.ts#ActionInfo
+target: github.com/nankedr/pig/agent.ActionInfo
+type ActionInfo struct {
+	Kind       string
+	EntryType  EntryType
+	EntryID    string
+	RecordType string
+	To         string
+	ToSet      bool
+	Fact       string
+	Outcome    string
+	Queue      QueueName
+	Step       StepKind
+	Attempt    int
+	ToolCallID string
+	ToolName   string
+	Provider   string
+	ID         string
+	Hook       HookName
+	DelayMS    int64
+}
+
+## symbol:agent/src/harness/agent-harness.ts#AgentHarness
+reference: packages/agent/src/harness/agent-harness.ts#AgentHarness
+target: github.com/nankedr/pig/agent.AgentHarness
+type AgentHarness struct {
+	mu                 sync.RWMutex
+	session            *Session
+	model              ai.Model
+	thinkingLevel      ThinkingLevel
+	activeToolNames    []string
+	tools              []HarnessTool
+	resources          Resources
+	streamOptions      StreamOptions
+	retryPolicy        RetryPolicy
+	compactionSettings CompactionSettings
+	steeringMode       QueueMode
+	followUpMode       QueueMode
+	closed             bool
+}
+func (*AgentHarness) Name() string
+func (h *AgentHarness) Abort(context.Context) (AbortResult, error)
+func (h *AgentHarness) CancelQueued(context.Context, string) (CancelQueuedResult, error)
+func (h *AgentHarness) Close(context.Context) error
+func (h *AgentHarness) Compact(context.Context, ...CompactOptions) (CompactionResult, error)
+func (h *AgentHarness) CreateLane(context.Context, string, *string) (CreateLaneResult, error)
+func (h *AgentHarness) Events() Events
+func (h *AgentHarness) ExecuteAction(context.Context) (ActionInfo, bool, error)
+func (h *AgentHarness) FollowUp(context.Context, AgentMessage) (QueueResult, error)
+func (h *AgentHarness) FollowUpText(context.Context, string, ...ai.ImageContent) (QueueResult, error)
+func (h *AgentHarness) GetActiveTools(context.Context) ([]string, error)
+func (h *AgentHarness) GetCompactionSettings(context.Context) (CompactionSettings, error)
+func (h *AgentHarness) GetFollowUpMode(context.Context) (QueueMode, error)
+func (h *AgentHarness) GetLeafID(ctx context.Context) (string, bool, error)
+func (h *AgentHarness) GetModel(context.Context) (ai.Model, error)
+func (h *AgentHarness) GetResources(context.Context) (Resources, error)
+func (h *AgentHarness) GetRetryPolicy(context.Context) (RetryPolicy, error)
+func (h *AgentHarness) GetSteeringMode(context.Context) (QueueMode, error)
+func (h *AgentHarness) GetStreamOptions(context.Context) (StreamOptions, error)
+func (h *AgentHarness) GetThinkingLevel(context.Context) (ThinkingLevel, error)
+func (h *AgentHarness) GetTools(context.Context) ([]HarnessTool, error)
+func (h *AgentHarness) Hooks() Hooks
+func (h *AgentHarness) Lane(context.Context, string) (AgentLane, bool, error)
+func (h *AgentHarness) Lanes(context.Context) ([]LaneInfo, error)
+func (h *AgentHarness) NavigateTree(context.Context, *string, ...NavigateOptions) (NavigationResult, error)
+func (h *AgentHarness) NextRun(context.Context, AgentMessage) (QueueResult, error)
+func (h *AgentHarness) NextRunText(context.Context, string, ...ai.ImageContent) (QueueResult, error)
+func (h *AgentHarness) PeekAction(context.Context) (ActionInfo, bool, error)
+func (h *AgentHarness) Prompt(context.Context, ...AgentMessage) (RunResult, error)
+func (h *AgentHarness) PromptFromTemplate(context.Context, string, ...string) (RunResult, error)
+func (h *AgentHarness) PromptText(context.Context, string, ...ai.ImageContent) (RunResult, error)
+func (h *AgentHarness) RecordUsage(context.Context, ai.Usage, ...RecordUsageOptions) (RecordUsageResult, error)
+func (h *AgentHarness) Resume(context.Context) (ResumeResult, error)
+func (h *AgentHarness) RunToCompletion(context.Context) error
+func (h *AgentHarness) RunWhenIdle(context.Context, func(context.Context) error) error
+func (h *AgentHarness) Session() SessionTree
+func (h *AgentHarness) SetActiveTools(_ context.Context, names []string) error
+func (h *AgentHarness) SetCompactionSettings(_ context.Context, settings CompactionSettings) error
+func (h *AgentHarness) SetFollowUpMode(_ context.Context, mode QueueMode) error
+func (h *AgentHarness) SetModel(_ context.Context, model ai.Model) error
+func (h *AgentHarness) SetResources(_ context.Context, resources Resources) error
+func (h *AgentHarness) SetRetryPolicy(_ context.Context, policy RetryPolicy) error
+func (h *AgentHarness) SetSteeringMode(_ context.Context, mode QueueMode) error
+func (h *AgentHarness) SetStreamOptions(_ context.Context, options StreamOptions) error
+func (h *AgentHarness) SetThinkingLevel(_ context.Context, level ThinkingLevel) error
+func (h *AgentHarness) SetTools(_ context.Context, tools []HarnessTool, activeNames ...[]string) error
+func (h *AgentHarness) Skill(context.Context, string, ...string) (RunResult, error)
+func (h *AgentHarness) Steer(context.Context, AgentMessage) (QueueResult, error)
+func (h *AgentHarness) SteerText(context.Context, string, ...ai.ImageContent) (QueueResult, error)
+func (h *AgentHarness) WaitForIdle(context.Context) error
+func (h *AgentHarness) Watch(context.Context) (WatchHandle[LaneSnapshot], error)
+func (h *AgentHarness) WatchSession(context.Context) (WatchHandle[SessionSnapshot], error)
+
+## symbol:agent/src/harness/agent-harness.ts#AgentHarnessOptions
+reference: packages/agent/src/harness/agent-harness.ts#AgentHarnessOptions
+target: github.com/nankedr/pig/agent.AgentHarnessOptions
+type AgentHarnessOptions struct {
+	Session            *Session
+	Models             ai.Models
+	Model              ai.Model
+	ThinkingLevel      ThinkingLevel
+	ActiveToolNames    []string
+	Tools              []HarnessTool
+	ToolContext        any
+	SystemPrompt       any
+	Resources          Resources
+	StreamOptions      StreamOptions
+	Retry              RetryPolicy
+	Compaction         CompactionSettings
+	SteeringMode       QueueMode
+	FollowUpMode       QueueMode
+	ToolExecution      ToolExecutionMode
+	Drive              string
+	ToProviderMessages func(context.Context, []AgentMessage) ([]ai.Message, error)
+	EntryProjectors    map[string]EntryProjector
+	Context            telemetry.TelemetryContext
+}
+
+## symbol:agent/src/harness/agent-harness.ts#AgentLane
+reference: packages/agent/src/harness/agent-harness.ts#AgentLane
+target: github.com/nankedr/pig/agent.AgentLane
+type AgentLane interface {
+	Name() string
+	GetLeafID(context.Context) (string, bool, error)
+	Prompt(context.Context, ...AgentMessage) (RunResult, error)
+	PromptText(context.Context, string, ...ai.ImageContent) (RunResult, error)
+	Skill(context.Context, string, ...string) (RunResult, error)
+	PromptFromTemplate(context.Context, string, ...string) (RunResult, error)
+	Compact(context.Context, ...CompactOptions) (CompactionResult, error)
+	NavigateTree(context.Context, *string, ...NavigateOptions) (NavigationResult, error)
+	Resume(context.Context) (ResumeResult, error)
+	Abort(context.Context) (AbortResult, error)
+	Steer(context.Context, AgentMessage) (QueueResult, error)
+	SteerText(context.Context, string, ...ai.ImageContent) (QueueResult, error)
+	FollowUp(context.Context, AgentMessage) (QueueResult, error)
+	FollowUpText(context.Context, string, ...ai.ImageContent) (QueueResult, error)
+	NextRun(context.Context, AgentMessage) (QueueResult, error)
+	NextRunText(context.Context, string, ...ai.ImageContent) (QueueResult, error)
+	CancelQueued(context.Context, string) (CancelQueuedResult, error)
+	RecordUsage(context.Context, ai.Usage, ...RecordUsageOptions) (RecordUsageResult, error)
+	WaitForIdle(context.Context) error
+	RunWhenIdle(context.Context, func(context.Context) error) error
+	PeekAction(context.Context) (ActionInfo, bool, error)
+	ExecuteAction(context.Context) (ActionInfo, bool, error)
+	RunToCompletion(context.Context) error
+	GetModel(context.Context) (ai.Model, error)
+	SetModel(context.Context, ai.Model) error
+	GetThinkingLevel(context.Context) (ThinkingLevel, error)
+	SetThinkingLevel(context.Context, ThinkingLevel) error
+	GetActiveTools(context.Context) ([]string, error)
+	SetActiveTools(context.Context, []string) error
+	Session() SessionTree
+	Watch(context.Context) (WatchHandle[LaneSnapshot], error)
+}
+
+## symbol:agent/src/harness/agent-harness.ts#CancelQueuedRejected
+reference: packages/agent/src/harness/agent-harness.ts#CancelQueuedRejected
+target: github.com/nankedr/pig/agent.CancelQueuedRejected
+type CancelQueuedRejected interface {
+	taggedHarnessError
+	cancelQueuedRejected()
+}
+
+## symbol:agent/src/harness/agent-harness.ts#CancelQueuedResult
+reference: packages/agent/src/harness/agent-harness.ts#CancelQueuedResult
+target: github.com/nankedr/pig/agent.CancelQueuedResult
+type CancelQueuedResult struct{ Result[CancelQueuedOutcome] }
+
+## symbol:agent/src/harness/agent-harness.ts#Closed
+reference: packages/agent/src/harness/agent-harness.ts#Closed
+target: github.com/nankedr/pig/agent.Closed
+type Closed struct {
+	Message string
+}
+func (*Closed) Tag() string
+func (e *Closed) Error() string
+func (e *Closed) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#CompactionOutcome
+reference: packages/agent/src/harness/agent-harness.ts#CompactionOutcome
+target: github.com/nankedr/pig/agent.CompactionOutcome
+type CompactionOutcome struct {
+	Kind   string
+	LeafID string
+	Entry  *CompactionEntry
+	Error  *OperationError
+}
+
+## symbol:agent/src/harness/agent-harness.ts#CompactionRejected
+reference: packages/agent/src/harness/agent-harness.ts#CompactionRejected
+target: github.com/nankedr/pig/agent.CompactionRejected
+type CompactionRejected interface {
+	taggedHarnessError
+	compactionRejected()
+}
+
+## symbol:agent/src/harness/agent-harness.ts#CompactionResult
+reference: packages/agent/src/harness/agent-harness.ts#CompactionResult
+target: github.com/nankedr/pig/agent.CompactionResult
+type CompactionResult struct {
+	Result[CompactionOutcome]
+	RunID string
+}
+
+## symbol:agent/src/harness/agent-harness.ts#CreateLaneResult
+reference: packages/agent/src/harness/agent-harness.ts#CreateLaneResult
+target: github.com/nankedr/pig/agent.CreateLaneResult
+type CreateLaneResult struct{ Result[AgentLane] }
+
+## symbol:agent/src/harness/agent-harness.ts#EntryProjector
+reference: packages/agent/src/harness/agent-harness.ts#EntryProjector
+target: github.com/nankedr/pig/agent.EntryProjector
+type EntryProjector func(context.Context, Entry) ([]AgentMessage, error)
+
+## symbol:agent/src/harness/agent-harness.ts#Events
+reference: packages/agent/src/harness/agent-harness.ts#Events
+target: github.com/nankedr/pig/agent.Events
+type Events interface {
+	On(context.Context, string, EventListener) (Unsubscribe, error)
+}
+
+## symbol:agent/src/harness/agent-harness.ts#HarnessClosed
+reference: packages/agent/src/harness/agent-harness.ts#HarnessClosed
+target: github.com/nankedr/pig/agent.HarnessClosed
+type HarnessClosed struct{}
+func (*HarnessClosed) Error() string
+
+## symbol:agent/src/harness/agent-harness.ts#HarnessFault
+reference: packages/agent/src/harness/agent-harness.ts#HarnessFault
+target: github.com/nankedr/pig/agent.HarnessFault
+type HarnessFault struct {
+	Message string
+	Cause   any
+}
+func (e *HarnessFault) Error() string
+func (e *HarnessFault) Unwrap() error
+
+## symbol:agent/src/harness/agent-harness.ts#HarnessNotImplemented
+reference: packages/agent/src/harness/agent-harness.ts#HarnessNotImplemented
+target: github.com/nankedr/pig/agent.HarnessNotImplemented
+type HarnessNotImplemented struct {
+	Name      string
+	Message   string
+	Operation string
+	Cause     error
+}
+func (e *HarnessNotImplemented) Error() string
+func (e *HarnessNotImplemented) Unwrap() error
+
+## symbol:agent/src/harness/agent-harness.ts#HarnessTool
+reference: packages/agent/src/harness/agent-harness.ts#HarnessTool
+target: github.com/nankedr/pig/agent.HarnessTool
+type HarnessTool struct {
+	ai.Tool
+	Label            string
+	PrepareArguments PrepareArgumentsFunc
+	Execute          HarnessToolExecute
+	ExecutionMode    ToolExecutionMode
+	Replay           ToolReplay
+}
+
+## symbol:agent/src/harness/agent-harness.ts#HookName
+reference: packages/agent/src/harness/agent-harness.ts#HookName
+target: github.com/nankedr/pig/agent.HookName
+type HookName string
+
+## symbol:agent/src/harness/agent-harness.ts#Hooks
+reference: packages/agent/src/harness/agent-harness.ts#Hooks
+target: github.com/nankedr/pig/agent.Hooks
+type Hooks interface {
+	On(context.Context, HookName, HookHandler, ...HookOptions) (Unsubscribe, error)
+}
+
+## symbol:agent/src/harness/agent-harness.ts#InvalidLane
+reference: packages/agent/src/harness/agent-harness.ts#InvalidLane
+target: github.com/nankedr/pig/agent.InvalidLane
+type InvalidLane struct {
+	Lane    string
+	Reason  string
+	Message string
+}
+func (*InvalidLane) Tag() string
+func (e *InvalidLane) Error() string
+func (e *InvalidLane) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#InvalidMessage
+reference: packages/agent/src/harness/agent-harness.ts#InvalidMessage
+target: github.com/nankedr/pig/agent.InvalidMessage
+type InvalidMessage struct {
+	Lane    string
+	Reason  string
+	Message string
+}
+func (*InvalidMessage) Tag() string
+func (e *InvalidMessage) Error() string
+func (e *InvalidMessage) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#LaneBusy
+reference: packages/agent/src/harness/agent-harness.ts#LaneBusy
+target: github.com/nankedr/pig/agent.LaneBusy
+type LaneBusy struct {
+	Lane          string
+	OperationID   string
+	OperationKind OperationKind
+	Message       string
+}
+func (*LaneBusy) Tag() string
+func (e *LaneBusy) Error() string
+func (e *LaneBusy) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#LaneExists
+reference: packages/agent/src/harness/agent-harness.ts#LaneExists
+target: github.com/nankedr/pig/agent.LaneExists
+type LaneExists struct {
+	Lane    string
+	Message string
+}
+func (*LaneExists) Tag() string
+func (e *LaneExists) Error() string
+func (e *LaneExists) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#LaneInfo
+reference: packages/agent/src/harness/agent-harness.ts#LaneInfo
+target: github.com/nankedr/pig/agent.LaneInfo
+type LaneInfo struct {
+	Name      string
+	LeafID    string
+	LeafIDSet bool
+	Operation *LaneOperationInfo
+}
+
+## symbol:agent/src/harness/agent-harness.ts#LaneSnapshot
+reference: packages/agent/src/harness/agent-harness.ts#LaneSnapshot
+target: github.com/nankedr/pig/agent.LaneSnapshot
+type LaneSnapshot struct {
+	Lane          string
+	Transcript    []Entry
+	LeafID        string
+	LeafIDSet     bool
+	Operation     *LaneOperationInfo
+	Queues        LaneQueues
+	PendingWrites []PendingWrite
+	Faulted       bool
+}
+
+## symbol:agent/src/harness/agent-harness.ts#MissingIdentities
+reference: packages/agent/src/harness/agent-harness.ts#MissingIdentities
+target: github.com/nankedr/pig/agent.MissingIdentities
+type MissingIdentities struct {
+	Lane    string
+	Tools   []string
+	Models  []string
+	Message string
+}
+func (*MissingIdentities) Tag() string
+func (e *MissingIdentities) Error() string
+func (e *MissingIdentities) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#NavigateOptions
+reference: packages/agent/src/harness/agent-harness.ts#NavigateOptions
+target: github.com/nankedr/pig/agent.NavigateOptions
+type NavigateOptions struct {
+	Summarize          *bool
+	CustomInstructions *string
+	Label              *string
+}
+
+## symbol:agent/src/harness/agent-harness.ts#NavigationOutcome
+reference: packages/agent/src/harness/agent-harness.ts#NavigationOutcome
+target: github.com/nankedr/pig/agent.NavigationOutcome
+type NavigationOutcome struct {
+	Kind         string
+	NewLeafID    string
+	NewLeafIDSet bool
+	LeafID       string
+	LeafIDSet    bool
+	SummaryEntry *BranchSummaryEntry
+	Error        *OperationError
+}
+
+## symbol:agent/src/harness/agent-harness.ts#NavigationRejected
+reference: packages/agent/src/harness/agent-harness.ts#NavigationRejected
+target: github.com/nankedr/pig/agent.NavigationRejected
+type NavigationRejected interface {
+	taggedHarnessError
+	navigationRejected()
+}
+
+## symbol:agent/src/harness/agent-harness.ts#NavigationResult
+reference: packages/agent/src/harness/agent-harness.ts#NavigationResult
+target: github.com/nankedr/pig/agent.NavigationResult
+type NavigationResult struct {
+	Result[NavigationOutcome]
+	RunID string
+}
+
+## symbol:agent/src/harness/agent-harness.ts#NoActiveOperation
+reference: packages/agent/src/harness/agent-harness.ts#NoActiveOperation
+target: github.com/nankedr/pig/agent.NoActiveOperation
+type NoActiveOperation struct {
+	Lane    string
+	Message string
+}
+func (*NoActiveOperation) Tag() string
+func (e *NoActiveOperation) Error() string
+func (e *NoActiveOperation) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#NoActiveRun
+reference: packages/agent/src/harness/agent-harness.ts#NoActiveRun
+target: github.com/nankedr/pig/agent.NoActiveRun
+type NoActiveRun struct {
+	Lane    string
+	Message string
+}
+func (*NoActiveRun) Tag() string
+func (e *NoActiveRun) Error() string
+func (e *NoActiveRun) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#NothingToCompact
+reference: packages/agent/src/harness/agent-harness.ts#NothingToCompact
+target: github.com/nankedr/pig/agent.NothingToCompact
+type NothingToCompact struct {
+	Lane    string
+	Message string
+}
+func (*NothingToCompact) Tag() string
+func (e *NothingToCompact) Error() string
+func (e *NothingToCompact) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#NothingToResume
+reference: packages/agent/src/harness/agent-harness.ts#NothingToResume
+target: github.com/nankedr/pig/agent.NothingToResume
+type NothingToResume struct {
+	Lane    string
+	Message string
+}
+func (*NothingToResume) Tag() string
+func (e *NothingToResume) Error() string
+func (e *NothingToResume) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#OperationError
+reference: packages/agent/src/harness/agent-harness.ts#OperationError
+target: github.com/nankedr/pig/agent.OperationError
+type OperationError struct {
+	Code    string
+	Message string
+}
+
+## symbol:agent/src/harness/agent-harness.ts#QueueRejected
+reference: packages/agent/src/harness/agent-harness.ts#QueueRejected
+target: github.com/nankedr/pig/agent.QueueRejected
+type QueueRejected interface {
+	taggedHarnessError
+	queueRejected()
+}
+
+## symbol:agent/src/harness/agent-harness.ts#QueueResult
+reference: packages/agent/src/harness/agent-harness.ts#QueueResult
+target: github.com/nankedr/pig/agent.QueueResult
+type QueueResult struct{ Result[QueueOutcome] }
+
+## symbol:agent/src/harness/agent-harness.ts#QueuedItem
+reference: packages/agent/src/harness/agent-harness.ts#QueuedItem
+target: github.com/nankedr/pig/agent.QueuedItem
+type QueuedItem struct {
+	EntryID string
+	Message AgentMessage
+}
+
+## symbol:agent/src/harness/agent-harness.ts#RecordUsageResult
+reference: packages/agent/src/harness/agent-harness.ts#RecordUsageResult
+target: github.com/nankedr/pig/agent.RecordUsageResult
+type RecordUsageResult struct{ Result[struct{}] }
+
+## symbol:agent/src/harness/agent-harness.ts#Resources
+reference: packages/agent/src/harness/agent-harness.ts#Resources
+target: github.com/nankedr/pig/agent.Resources
+type Resources = AgentHarnessResources[Skill, PromptTemplate]
+
+## symbol:agent/src/harness/agent-harness.ts#ResumeOutcome
+reference: packages/agent/src/harness/agent-harness.ts#ResumeOutcome
+target: github.com/nankedr/pig/agent.ResumeOutcome
+type ResumeOutcome struct {
+	Kind       string
+	Operation  OperationKind
+	RunID      string
+	Run        *RunOutcome
+	Compaction *CompactionOutcome
+	Navigation *NavigationOutcome
+}
+
+## symbol:agent/src/harness/agent-harness.ts#ResumeRejected
+reference: packages/agent/src/harness/agent-harness.ts#ResumeRejected
+target: github.com/nankedr/pig/agent.ResumeRejected
+type ResumeRejected interface {
+	taggedHarnessError
+	resumeRejected()
+}
+
+## symbol:agent/src/harness/agent-harness.ts#ResumeResult
+reference: packages/agent/src/harness/agent-harness.ts#ResumeResult
+target: github.com/nankedr/pig/agent.ResumeResult
+type ResumeResult struct{ Result[ResumeOutcome] }
+
+## symbol:agent/src/harness/agent-harness.ts#RunOutcome
+reference: packages/agent/src/harness/agent-harness.ts#RunOutcome
+target: github.com/nankedr/pig/agent.RunOutcome
+type RunOutcome struct {
+	Kind            string
+	LeafID          string
+	FinalEntryID    string
+	FinalEntryIDSet bool
+	FinalMessage    ai.AssistantMessage
+	FinalMessageSet bool
+	Error           *OperationError
+	Deferred        *ai.DeferredHandle
+}
+
+## symbol:agent/src/harness/agent-harness.ts#RunRejected
+reference: packages/agent/src/harness/agent-harness.ts#RunRejected
+target: github.com/nankedr/pig/agent.RunRejected
+type RunRejected interface {
+	taggedHarnessError
+	runRejected()
+}
+
+## symbol:agent/src/harness/agent-harness.ts#RunResult
+reference: packages/agent/src/harness/agent-harness.ts#RunResult
+target: github.com/nankedr/pig/agent.RunResult
+type RunResult struct {
+	Result[RunOutcome]
+	RunID string
+}
+
+## symbol:agent/src/harness/agent-harness.ts#SessionSnapshot
+reference: packages/agent/src/harness/agent-harness.ts#SessionSnapshot
+target: github.com/nankedr/pig/agent.SessionSnapshot
+type SessionSnapshot struct {
+	Lanes   []SessionLaneSnapshot
+	Faulted bool
+}
+
+## symbol:agent/src/harness/agent-harness.ts#StreamOptions
+reference: packages/agent/src/harness/agent-harness.ts#StreamOptions
+target: github.com/nankedr/pig/agent.StreamOptions
+type StreamOptions = ai.SimpleStreamOptions
+
+## symbol:agent/src/harness/agent-harness.ts#StreamOptionsPatch
+reference: packages/agent/src/harness/agent-harness.ts#StreamOptionsPatch
+target: github.com/nankedr/pig/agent.StreamOptionsPatch
+type StreamOptionsPatch = ai.SimpleStreamOptions
+
+## symbol:agent/src/harness/agent-harness.ts#SuspendedOperation
+reference: packages/agent/src/harness/agent-harness.ts#SuspendedOperation
+target: github.com/nankedr/pig/agent.SuspendedOperation
+type SuspendedOperation struct {
+	Lane      string
+	Kind      OperationKind
+	ID        string
+	StartedAt int64
+	Reason    string
+	Prompt    []AgentMessage
+	Deferred  *ai.DeferredHandle
+	Aborting  *SuspendedAborting
+	Missing   SuspendedMissingIdentities
+}
+
+## symbol:agent/src/harness/agent-harness.ts#UnknownQueueItem
+reference: packages/agent/src/harness/agent-harness.ts#UnknownQueueItem
+target: github.com/nankedr/pig/agent.UnknownQueueItem
+type UnknownQueueItem struct {
+	Lane    string
+	EntryID string
+	Message string
+}
+func (*UnknownQueueItem) Tag() string
+func (e *UnknownQueueItem) Error() string
+func (e *UnknownQueueItem) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#UnknownSkill
+reference: packages/agent/src/harness/agent-harness.ts#UnknownSkill
+target: github.com/nankedr/pig/agent.UnknownSkill
+type UnknownSkill struct {
+	Name    string
+	Message string
+}
+func (*UnknownSkill) Tag() string
+func (e *UnknownSkill) Error() string
+func (e *UnknownSkill) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#UnknownTarget
+reference: packages/agent/src/harness/agent-harness.ts#UnknownTarget
+target: github.com/nankedr/pig/agent.UnknownTarget
+type UnknownTarget struct {
+	TargetID string
+	Message  string
+}
+func (*UnknownTarget) Tag() string
+func (e *UnknownTarget) Error() string
+func (e *UnknownTarget) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#UnknownTemplate
+reference: packages/agent/src/harness/agent-harness.ts#UnknownTemplate
+target: github.com/nankedr/pig/agent.UnknownTemplate
+type UnknownTemplate struct {
+	Name    string
+	Message string
+}
+func (*UnknownTemplate) Tag() string
+func (e *UnknownTemplate) Error() string
+func (e *UnknownTemplate) ToJSON() map[string]any
+
+## symbol:agent/src/harness/agent-harness.ts#WatchHandle
+reference: packages/agent/src/harness/agent-harness.ts#WatchHandle
+target: github.com/nankedr/pig/agent.WatchHandle
+type WatchHandle[TSnapshot any] interface {
+	Snapshot() TSnapshot
+	Start(func(any)) error
+	Unsubscribe()
+}
+
+## symbol:agent/src/harness/compaction/branch-summarization.ts#BranchPreparation
+reference: packages/agent/src/harness/compaction/branch-summarization.ts#BranchPreparation
+target: github.com/nankedr/pig/agent.BranchPreparation
+type BranchPreparation struct {
+	Messages    []AgentMessage
+	FileOps     FileOperations
+	TotalTokens int64
+}
+
+## symbol:agent/src/harness/compaction/branch-summarization.ts#BranchSummaryDetails
+reference: packages/agent/src/harness/compaction/branch-summarization.ts#BranchSummaryDetails
+target: github.com/nankedr/pig/agent.BranchSummaryDetails
+type BranchSummaryDetails struct {
+	ReadFiles     []string
+	ModifiedFiles []string
+}
+
+## symbol:agent/src/harness/compaction/branch-summarization.ts#BranchSummaryResult
+reference: packages/agent/src/harness/compaction/branch-summarization.ts#BranchSummaryResult
+target: github.com/nankedr/pig/agent.BranchSummaryResult
+type BranchSummaryResult struct {
+	Summary       string
+	Usage         *ai.Usage
+	ReadFiles     []string
+	ModifiedFiles []string
+}
+
+## symbol:agent/src/harness/compaction/branch-summarization.ts#CollectEntriesResult
+reference: packages/agent/src/harness/compaction/branch-summarization.ts#CollectEntriesResult
+target: github.com/nankedr/pig/agent.CollectEntriesResult
+type CollectEntriesResult struct {
+	Entries          []Entry
+	CommonAncestorID string
+}
+
+## symbol:agent/src/harness/compaction/branch-summarization.ts#GenerateBranchSummaryOptions
+reference: packages/agent/src/harness/compaction/branch-summarization.ts#GenerateBranchSummaryOptions
+target: github.com/nankedr/pig/agent.GenerateBranchSummaryOptions
+type GenerateBranchSummaryOptions struct {
+	Models              ai.Models
+	Model               ai.Model
+	CustomInstructions  string
+	ReplaceInstructions bool
+	ReserveTokens       int64
+	Retry               RetryPolicy
+	Callbacks           RetryCallbacks
+}
+
+## symbol:agent/src/harness/compaction/branch-summarization.ts#collectEntriesForBranchSummary
+reference: packages/agent/src/harness/compaction/branch-summarization.ts#collectEntriesForBranchSummary
+target: github.com/nankedr/pig/agent.CollectEntriesForBranchSummary
+func CollectEntriesForBranchSummary(context.Context, *Session, string, string) (CollectEntriesResult, error)
+
+## symbol:agent/src/harness/compaction/branch-summarization.ts#generateBranchSummary
+reference: packages/agent/src/harness/compaction/branch-summarization.ts#generateBranchSummary
+target: github.com/nankedr/pig/agent.GenerateBranchSummary
+func GenerateBranchSummary(context.Context, []Entry, GenerateBranchSummaryOptions) (Result[BranchSummaryResult], error)
+
+## symbol:agent/src/harness/compaction/branch-summarization.ts#prepareBranchEntries
+reference: packages/agent/src/harness/compaction/branch-summarization.ts#prepareBranchEntries
+target: github.com/nankedr/pig/agent.PrepareBranchEntries
+func PrepareBranchEntries(entries []Entry, tokenBudget int64) BranchPreparation
+
+## symbol:agent/src/harness/compaction/compaction.ts#CompactResult
+reference: packages/agent/src/harness/compaction/compaction.ts#CompactResult
+target: github.com/nankedr/pig/agent.CompactResult
+type CompactResult struct {
+	Summary      string
+	TokensBefore int64
+	Usage        *ai.Usage
+	RetainedTail []AgentMessage
+	Details      ai.JSONValue
+}
+
+## symbol:agent/src/harness/compaction/compaction.ts#CompactionPreparation
+reference: packages/agent/src/harness/compaction/compaction.ts#CompactionPreparation
+target: github.com/nankedr/pig/agent.CompactionPreparation
+type CompactionPreparation struct {
+	MessagesToSummarize []AgentMessage
+	TurnPrefixMessages  []AgentMessage
+	RetainedTail        []AgentMessage
+	IsSplitTurn         bool
+	TokensBefore        int64
+	PreviousSummary     string
+	FileOps             FileOperations
+	Settings            CompactionSettings
+}
+
+## symbol:agent/src/harness/compaction/compaction.ts#CompactionSettings
+reference: packages/agent/src/harness/compaction/compaction.ts#CompactionSettings
+target: github.com/nankedr/pig/agent.CompactionSettings
+type CompactionSettings struct {
+	Enabled          bool
+	ReserveTokens    int64
+	KeepRecentTokens int64
+}
+
+## symbol:agent/src/harness/compaction/compaction.ts#DEFAULT_COMPACTION_SETTINGS
+reference: packages/agent/src/harness/compaction/compaction.ts#DEFAULT_COMPACTION_SETTINGS
+target: github.com/nankedr/pig/agent.DefaultCompactionSettings
+var DefaultCompactionSettings = CompactionSettings{
+	Enabled:          true,
+	ReserveTokens:    16_384,
+	KeepRecentTokens: 20_000,
+}
+
+## symbol:agent/src/harness/compaction/compaction.ts#calculateContextTokens
+reference: packages/agent/src/harness/compaction/compaction.ts#calculateContextTokens
+target: github.com/nankedr/pig/agent.CalculateContextTokens
+func CalculateContextTokens(usage ai.Usage) int64
+
+## symbol:agent/src/harness/compaction/compaction.ts#compact
+reference: packages/agent/src/harness/compaction/compaction.ts#compact
+target: github.com/nankedr/pig/agent.Compact
+func Compact(context.Context, CompactionPreparation, ai.Models, ai.Model) (Result[CompactResult], error)
+
+## symbol:agent/src/harness/compaction/compaction.ts#estimateContextTokens
+reference: packages/agent/src/harness/compaction/compaction.ts#estimateContextTokens
+target: github.com/nankedr/pig/agent.EstimateContextTokens
+func EstimateContextTokens(messages []AgentMessage) ContextUsageEstimate
+
+## symbol:agent/src/harness/compaction/compaction.ts#estimateTokens
+reference: packages/agent/src/harness/compaction/compaction.ts#estimateTokens
+target: github.com/nankedr/pig/agent.EstimateTokens
+func EstimateTokens(message AgentMessage) int64
+
+## symbol:agent/src/harness/compaction/compaction.ts#findCutPoint
+reference: packages/agent/src/harness/compaction/compaction.ts#findCutPoint
+target: github.com/nankedr/pig/agent.FindCutPoint
+func FindCutPoint(entries []Entry, startIndex, endIndex int, keepRecentTokens int64) CutPointResult
+
+## symbol:agent/src/harness/compaction/compaction.ts#findTurnStartIndex
+reference: packages/agent/src/harness/compaction/compaction.ts#findTurnStartIndex
+target: github.com/nankedr/pig/agent.FindTurnStartIndex
+func FindTurnStartIndex(entries []Entry, entryIndex, startIndex int) int
+
+## symbol:agent/src/harness/compaction/compaction.ts#generateSummary
+reference: packages/agent/src/harness/compaction/compaction.ts#generateSummary
+target: github.com/nankedr/pig/agent.GenerateSummary
+func GenerateSummary(context.Context, []AgentMessage, ai.Models, ai.Model, int64) (Result[string], error)
+
+## symbol:agent/src/harness/compaction/compaction.ts#generateSummaryWithUsage
+reference: packages/agent/src/harness/compaction/compaction.ts#generateSummaryWithUsage
+target: github.com/nankedr/pig/agent.GenerateSummaryWithUsage
+func GenerateSummaryWithUsage(context.Context, []AgentMessage, ai.Models, ai.Model, int64) (Result[SummaryWithUsage], error)
+
+## symbol:agent/src/harness/compaction/compaction.ts#getLastAssistantUsage
+reference: packages/agent/src/harness/compaction/compaction.ts#getLastAssistantUsage
+target: github.com/nankedr/pig/agent.GetLastAssistantUsage
+func GetLastAssistantUsage(entries []Entry) (*ai.Usage, bool)
+
+## symbol:agent/src/harness/compaction/compaction.ts#prepareCompaction
+reference: packages/agent/src/harness/compaction/compaction.ts#prepareCompaction
+target: github.com/nankedr/pig/agent.PrepareCompaction
+func PrepareCompaction([]Entry, CompactionSettings) (Result[*CompactionPreparation], error)
+
+## symbol:agent/src/harness/compaction/compaction.ts#shouldCompact
+reference: packages/agent/src/harness/compaction/compaction.ts#shouldCompact
+target: github.com/nankedr/pig/agent.ShouldCompact
+func ShouldCompact(contextTokens, contextWindow int64, settings CompactionSettings) bool
+
+## symbol:agent/src/harness/compaction/utils.ts#FileOperations
+reference: packages/agent/src/harness/compaction/utils.ts#FileOperations
+target: github.com/nankedr/pig/agent.FileOperations
+type FileOperations struct {
+	Read    map[string]struct{}
+	Written map[string]struct{}
+	Edited  map[string]struct{}
+}
+
+## symbol:agent/src/harness/compaction/utils.ts#serializeConversation
+reference: packages/agent/src/harness/compaction/utils.ts#serializeConversation
+target: github.com/nankedr/pig/agent.SerializeConversation
+func SerializeConversation(messages []ai.Message) string
+
+## symbol:agent/src/harness/env/nodejs.ts#NodeExecutionEnv
+reference: packages/agent/src/harness/env/nodejs.ts#NodeExecutionEnv
+target: github.com/nankedr/pig/agent/node.NodeExecutionEnv
+type NodeExecutionEnv struct {
+	workingDirectory string
+}
+func (*NodeExecutionEnv) AbsolutePath(context.Context, string) agent.Result[string]
+func (*NodeExecutionEnv) AppendFile(context.Context, string, []byte) agent.Result[struct{}]
+func (*NodeExecutionEnv) CanonicalPath(context.Context, string) agent.Result[string]
+func (*NodeExecutionEnv) Cleanup(context.Context) error
+func (*NodeExecutionEnv) CreateDir(context.Context, string, agent.CreateDirOptions) agent.Result[struct{}]
+func (*NodeExecutionEnv) CreateTempDir(context.Context, string) agent.Result[string]
+func (*NodeExecutionEnv) CreateTempFile(context.Context, agent.CreateTempFileOptions) agent.Result[string]
+func (*NodeExecutionEnv) Exec(context.Context, string, agent.ShellExecOptions) agent.Result[agent.ShellExecResult]
+func (*NodeExecutionEnv) Exists(context.Context, string) agent.Result[bool]
+func (*NodeExecutionEnv) FileInfo(context.Context, string) agent.Result[agent.FileInfo]
+func (*NodeExecutionEnv) JoinPath(context.Context, []string) agent.Result[string]
+func (*NodeExecutionEnv) ListDir(context.Context, string) agent.Result[[]agent.FileInfo]
+func (*NodeExecutionEnv) ReadBinaryFile(context.Context, string) agent.Result[[]byte]
+func (*NodeExecutionEnv) ReadTextFile(context.Context, string) agent.Result[string]
+func (*NodeExecutionEnv) ReadTextLines(context.Context, string, agent.ReadTextLinesOptions) agent.Result[[]string]
+func (*NodeExecutionEnv) Remove(context.Context, string, agent.RemoveOptions) agent.Result[struct{}]
+func (*NodeExecutionEnv) RenameFile(context.Context, string, string) agent.Result[struct{}]
+func (*NodeExecutionEnv) WriteFile(context.Context, string, []byte) agent.Result[struct{}]
+func (e *NodeExecutionEnv) CWD() string
+
+## symbol:agent/src/harness/messages.ts#BRANCH_SUMMARY_PREFIX
+reference: packages/agent/src/harness/messages.ts#BRANCH_SUMMARY_PREFIX
+target: github.com/nankedr/pig/agent.BranchSummaryPrefix
+const BranchSummaryPrefix = "The following is a summary of a branch that this conversation came back from:\n\n<summary>\n"
+
+## symbol:agent/src/harness/messages.ts#BRANCH_SUMMARY_SUFFIX
+reference: packages/agent/src/harness/messages.ts#BRANCH_SUMMARY_SUFFIX
+target: github.com/nankedr/pig/agent.BranchSummarySuffix
+const BranchSummarySuffix = "</summary>"
+
+## symbol:agent/src/harness/messages.ts#BashExecutionMessage
+reference: packages/agent/src/harness/messages.ts#BashExecutionMessage
+target: github.com/nankedr/pig/agent.BashExecutionMessage
+type BashExecutionMessage struct {
+	Role               ai.MessageRole
+	Command            string
+	Output             string
+	ExitCode           int
+	ExitCodeSet        bool
+	Cancelled          bool
+	Truncated          bool
+	FullOutputPath     string
+	Timestamp          int64
+	ExcludeFromContext bool
+}
+func (m BashExecutionMessage) MessageRole() ai.MessageRole
+
+## symbol:agent/src/harness/messages.ts#BranchSummaryMessage
+reference: packages/agent/src/harness/messages.ts#BranchSummaryMessage
+target: github.com/nankedr/pig/agent.BranchSummaryMessage
+type BranchSummaryMessage struct {
+	Role      ai.MessageRole
+	Summary   string
+	FromID    string
+	Timestamp int64
+}
+func (m BranchSummaryMessage) MessageRole() ai.MessageRole
+
+## symbol:agent/src/harness/messages.ts#COMPACTION_SUMMARY_PREFIX
+reference: packages/agent/src/harness/messages.ts#COMPACTION_SUMMARY_PREFIX
+target: github.com/nankedr/pig/agent.CompactionSummaryPrefix
+const CompactionSummaryPrefix = "The conversation history before this point was compacted into the following summary:\n\n<summary>\n"
+
+## symbol:agent/src/harness/messages.ts#COMPACTION_SUMMARY_SUFFIX
+reference: packages/agent/src/harness/messages.ts#COMPACTION_SUMMARY_SUFFIX
+target: github.com/nankedr/pig/agent.CompactionSummarySuffix
+const CompactionSummarySuffix = "\n</summary>"
+
+## symbol:agent/src/harness/messages.ts#CompactionSummaryMessage
+reference: packages/agent/src/harness/messages.ts#CompactionSummaryMessage
+target: github.com/nankedr/pig/agent.CompactionSummaryMessage
+type CompactionSummaryMessage struct {
+	Role         ai.MessageRole
+	Summary      string
+	TokensBefore int64
+	Timestamp    int64
+}
+func (m CompactionSummaryMessage) MessageRole() ai.MessageRole
+
+## symbol:agent/src/harness/messages.ts#CustomMessage
+reference: packages/agent/src/harness/messages.ts#CustomMessage
+target: github.com/nankedr/pig/agent.CustomMessage
+type CustomMessage struct {
+	Role       ai.MessageRole
+	CustomType string
+	Content    ai.UserMessageContent
+	Display    bool
+	Details    ai.Optional[ai.JSONValue]
+	Timestamp  int64
+}
+func (m CustomMessage) MessageRole() ai.MessageRole
+
+## symbol:agent/src/harness/messages.ts#bashExecutionToText
+reference: packages/agent/src/harness/messages.ts#bashExecutionToText
+target: github.com/nankedr/pig/agent.BashExecutionToText
+func BashExecutionToText(message BashExecutionMessage) string
+
+## symbol:agent/src/harness/messages.ts#convertToLlm
+reference: packages/agent/src/harness/messages.ts#convertToLlm
+target: github.com/nankedr/pig/agent.ConvertToLLM
+func ConvertToLLM(messages []AgentMessage) []ai.Message
+
+## symbol:agent/src/harness/messages.ts#createBranchSummaryMessage
+reference: packages/agent/src/harness/messages.ts#createBranchSummaryMessage
+target: github.com/nankedr/pig/agent.CreateBranchSummaryMessage
+func CreateBranchSummaryMessage(summary, fromID string, timestamp int64) AgentMessage
+
+## symbol:agent/src/harness/messages.ts#createCompactionSummaryMessage
+reference: packages/agent/src/harness/messages.ts#createCompactionSummaryMessage
+target: github.com/nankedr/pig/agent.CreateCompactionSummaryMessage
+func CreateCompactionSummaryMessage(summary string, tokensBefore, timestamp int64) AgentMessage
+
+## symbol:agent/src/harness/messages.ts#createCustomMessage
+reference: packages/agent/src/harness/messages.ts#createCustomMessage
+target: github.com/nankedr/pig/agent.CreateCustomMessage
+func CreateCustomMessage(customType string, content ai.UserMessageContent, display bool, details ai.Optional[ai.JSONValue], timestamp int64) AgentMessage
+
+## symbol:agent/src/harness/prompt-templates.ts#PromptTemplateDiagnostic
+reference: packages/agent/src/harness/prompt-templates.ts#PromptTemplateDiagnostic
+target: github.com/nankedr/pig/agent.PromptTemplateDiagnostic
+type PromptTemplateDiagnostic struct {
+	Type    string
+	Code    PromptTemplateDiagnosticCode
+	Message string
+	Path    string
+}
+
+## symbol:agent/src/harness/prompt-templates.ts#PromptTemplateDiagnosticCode
+reference: packages/agent/src/harness/prompt-templates.ts#PromptTemplateDiagnosticCode
+target: github.com/nankedr/pig/agent.PromptTemplateDiagnosticCode
+type PromptTemplateDiagnosticCode string
+
+## symbol:agent/src/harness/prompt-templates.ts#formatPromptTemplateInvocation
+reference: packages/agent/src/harness/prompt-templates.ts#formatPromptTemplateInvocation
+target: github.com/nankedr/pig/agent.FormatPromptTemplateInvocation
+func FormatPromptTemplateInvocation(template PromptTemplate, args []string) string
+
+## symbol:agent/src/harness/prompt-templates.ts#loadPromptTemplates
+reference: packages/agent/src/harness/prompt-templates.ts#loadPromptTemplates
+target: github.com/nankedr/pig/agent.LoadPromptTemplates
+func LoadPromptTemplates(context.Context, ExecutionEnv, []string) (PromptTemplateLoadResult, error)
+
+## symbol:agent/src/harness/prompt-templates.ts#loadSourcedPromptTemplates
+reference: packages/agent/src/harness/prompt-templates.ts#loadSourcedPromptTemplates
+target: github.com/nankedr/pig/agent.LoadSourcedPromptTemplates
+func LoadSourcedPromptTemplates(context.Context, ExecutionEnv, []string) (SourcedPromptTemplateLoadResult, error)
+
+## symbol:agent/src/harness/prompt-templates.ts#parseCommandArgs
+reference: packages/agent/src/harness/prompt-templates.ts#parseCommandArgs
+target: github.com/nankedr/pig/agent.ParseCommandArgs
+func ParseCommandArgs(value string) []string
+
+## symbol:agent/src/harness/prompt-templates.ts#substituteArgs
+reference: packages/agent/src/harness/prompt-templates.ts#substituteArgs
+target: github.com/nankedr/pig/agent.SubstituteArgs
+func SubstituteArgs(content string, args []string) string
+
+## symbol:agent/src/harness/result.ts#ErrorMatchers
+reference: packages/agent/src/harness/result.ts#ErrorMatchers
+target: github.com/nankedr/pig/agent.ErrorMatchers
+type ErrorMatchers[T any] map[string]func(*TaggedErrorValue) T
+
+## symbol:agent/src/harness/result.ts#Result
+reference: packages/agent/src/harness/result.ts#Result
+target: github.com/nankedr/pig/agent.Result
+type Result[T any] struct {
+	OK    bool
+	Value T
+	Error error
+}
+
+## symbol:agent/src/harness/result.ts#TaggedError
+reference: packages/agent/src/harness/result.ts#TaggedError
+target: github.com/nankedr/pig/agent.TaggedError
+func TaggedError(tag string) TaggedErrorFactory
+
+## symbol:agent/src/harness/result.ts#TaggedErrorFactory
+reference: packages/agent/src/harness/result.ts#TaggedErrorFactory
+target: github.com/nankedr/pig/agent.TaggedErrorFactory
+type TaggedErrorFactory struct {
+	tag   string
+	token *struct{}
+}
+func (f TaggedErrorFactory) Is(value any) bool
+func (f TaggedErrorFactory) New(message string, properties map[string]any) *TaggedErrorValue
+
+## symbol:agent/src/harness/result.ts#TaggedErrorValue
+reference: packages/agent/src/harness/result.ts#TaggedErrorValue
+target: github.com/nankedr/pig/agent.TaggedErrorValue
+type TaggedErrorValue struct {
+	Tag        string
+	Message    string
+	Name       string
+	Stack      string
+	Cause      error
+	Properties map[string]any
+	factory    *struct{}
+}
+func (e *TaggedErrorValue) Error() string
+func (e *TaggedErrorValue) ToJSON() map[string]any
+func (e *TaggedErrorValue) Unwrap() error
+
+## symbol:agent/src/harness/result.ts#matchError
+reference: packages/agent/src/harness/result.ts#matchError
+target: github.com/nankedr/pig/agent.MatchError
+func MatchError[T any](err *TaggedErrorValue, matchers ErrorMatchers[T]) (T, bool)
+
+## symbol:agent/src/harness/session/context.ts#ContextEntryTransform
+reference: packages/agent/src/harness/session/context.ts#ContextEntryTransform
+target: github.com/nankedr/pig/agent.ContextEntryTransform
+type ContextEntryTransform func([]Entry) []Entry
+
+## symbol:agent/src/harness/session/context.ts#CustomEntryContextMessageProjector
+reference: packages/agent/src/harness/session/context.ts#CustomEntryContextMessageProjector
+target: github.com/nankedr/pig/agent.CustomEntryContextMessageProjector
+type CustomEntryContextMessageProjector func(CustomEntry, int, []Entry) []AgentMessage
+
+## symbol:agent/src/harness/session/context.ts#SessionContext
+reference: packages/agent/src/harness/session/context.ts#SessionContext
+target: github.com/nankedr/pig/agent.SessionContext
+type SessionContext struct {
+	Messages        []AgentMessage
+	ThinkingLevel   string
+	Model           *SessionContextModel
+	ActiveToolNames []string
+}
+
+## symbol:agent/src/harness/session/context.ts#SessionContextBuildOptions
+reference: packages/agent/src/harness/session/context.ts#SessionContextBuildOptions
+target: github.com/nankedr/pig/agent.SessionContextBuildOptions
+type SessionContextBuildOptions struct {
+	EntryTransforms []ContextEntryTransform
+	EntryProjectors map[string]CustomEntryContextMessageProjector
+}
+
+## symbol:agent/src/harness/session/context.ts#buildContextEntries
+reference: packages/agent/src/harness/session/context.ts#buildContextEntries
+target: github.com/nankedr/pig/agent.BuildContextEntries
+func BuildContextEntries(pathEntries []Entry, options ...SessionContextBuildOptions) []Entry
+
+## symbol:agent/src/harness/session/context.ts#buildSessionContext
+reference: packages/agent/src/harness/session/context.ts#buildSessionContext
+target: github.com/nankedr/pig/agent.BuildSessionContext
+func BuildSessionContext(pathEntries []Entry, options ...SessionContextBuildOptions) SessionContext
+
+## symbol:agent/src/harness/session/context.ts#defaultContextEntryTransform
+reference: packages/agent/src/harness/session/context.ts#defaultContextEntryTransform
+target: github.com/nankedr/pig/agent.DefaultContextEntryTransform
+func DefaultContextEntryTransform(pathEntries []Entry) []Entry
+
+## symbol:agent/src/harness/session/context.ts#sessionEntryToContextMessages
+reference: packages/agent/src/harness/session/context.ts#sessionEntryToContextMessages
+target: github.com/nankedr/pig/agent.SessionEntryToContextMessages
+func SessionEntryToContextMessages(entry Entry, index int, entries []Entry, options ...SessionContextBuildOptions) []AgentMessage
+
+## symbol:agent/src/harness/session/jsonl/repo.ts#JsonlSessionRepo
+reference: packages/agent/src/harness/session/jsonl/repo.ts#JsonlSessionRepo
+target: github.com/nankedr/pig/agent.JSONLSessionRepo
+type JSONLSessionRepo struct {
+	options JSONLSessionRepoOptions
+}
+func (r *JSONLSessionRepo) Create(context.Context, JSONLSessionCreateOptions) (*Session, error)
+func (r *JSONLSessionRepo) Delete(context.Context, JSONLSessionMetadata) error
+func (r *JSONLSessionRepo) Fork(context.Context, JSONLSessionMetadata, ForkOptions, JSONLSessionCreateOptions) (*Session, error)
+func (r *JSONLSessionRepo) List(context.Context, JSONLSessionListOptions) ([]JSONLSessionMetadata, error)
+func (r *JSONLSessionRepo) Open(context.Context, JSONLSessionMetadata) (*Session, error)
+
+## symbol:agent/src/harness/session/jsonl/types.ts#JsonlSessionCreateOptions
+reference: packages/agent/src/harness/session/jsonl/types.ts#JsonlSessionCreateOptions
+target: github.com/nankedr/pig/agent.JSONLSessionCreateOptions
+type JSONLSessionCreateOptions struct {
+	SessionCreateOptions
+	CWD      string
+	Metadata map[string]JSONValue
+}
+
+## symbol:agent/src/harness/session/jsonl/types.ts#JsonlSessionListOptions
+reference: packages/agent/src/harness/session/jsonl/types.ts#JsonlSessionListOptions
+target: github.com/nankedr/pig/agent.JSONLSessionListOptions
+type JSONLSessionListOptions struct {
+	CWD string
+}
+
+## symbol:agent/src/harness/session/jsonl/types.ts#JsonlSessionMetadata
+reference: packages/agent/src/harness/session/jsonl/types.ts#JsonlSessionMetadata
+target: github.com/nankedr/pig/agent.JSONLSessionMetadata
+type JSONLSessionMetadata struct {
+	SessionMetadata
+	CWD                     string
+	Path                    string
+	ModifiedAt              int64
+	SourceFormat            int
+	LegacyParentSessionPath string
+	LegacyParentPathSet     bool
+	Metadata                map[string]JSONValue
+}
+
+## symbol:agent/src/harness/session/jsonl/types.ts#JsonlSessionRepoFileSystem
+reference: packages/agent/src/harness/session/jsonl/types.ts#JsonlSessionRepoFileSystem
+target: github.com/nankedr/pig/agent.JSONLSessionRepoFileSystem
+type JSONLSessionRepoFileSystem interface {
+	AbsolutePath(context.Context, string) Result[string]
+	JoinPath(context.Context, []string) Result[string]
+	ReadTextFile(context.Context, string) Result[string]
+	ReadTextLines(context.Context, string, ReadTextLinesOptions) Result[[]string]
+	WriteFile(context.Context, string, []byte) Result[struct{}]
+	AppendFile(context.Context, string, []byte) Result[struct{}]
+	RenameFile(context.Context, string, string) Result[struct{}]
+	FileInfo(context.Context, string) Result[FileInfo]
+	ListDir(context.Context, string) Result[[]FileInfo]
+	Exists(context.Context, string) Result[bool]
+	CreateDir(context.Context, string, CreateDirOptions) Result[struct{}]
+	Remove(context.Context, string, RemoveOptions) Result[struct{}]
+}
+
+## symbol:agent/src/harness/session/jsonl/types.ts#JsonlSessionRepoOptions
+reference: packages/agent/src/harness/session/jsonl/types.ts#JsonlSessionRepoOptions
+target: github.com/nankedr/pig/agent.JSONLSessionRepoOptions
+type JSONLSessionRepoOptions struct {
+	FS           JSONLSessionRepoFileSystem
+	SessionsRoot string
+}
+
+## symbol:agent/src/harness/session/jsonl/types.ts#JsonlV4Header
+reference: packages/agent/src/harness/session/jsonl/types.ts#JsonlV4Header
+target: github.com/nankedr/pig/agent.JSONLV4Header
+type JSONLV4Header struct {
+	Kind                    string
+	Version                 int
+	ID                      string
+	CreatedAt               int64
+	CWD                     string
+	ParentSessionID         string
+	ParentSessionIDSet      bool
+	LegacyParentSessionPath string
+	LegacyParentPathSet     bool
+	Metadata                map[string]JSONValue
+}
+
+## symbol:agent/src/harness/session/memory.ts#InMemorySessionRepo
+reference: packages/agent/src/harness/session/memory.ts#InMemorySessionRepo
+target: github.com/nankedr/pig/agent.InMemorySessionRepo
+type InMemorySessionRepo struct {
+	mu       sync.RWMutex
+	sessions map[string]*InMemorySessionStorage
+}
+func (r *InMemorySessionRepo) Create(ctx context.Context, options SessionCreateOptions) (*Session, error)
+func (r *InMemorySessionRepo) Delete(ctx context.Context, metadata SessionMetadata) error
+func (r *InMemorySessionRepo) Fork(ctx context.Context, source SessionMetadata, options ForkOptions, create SessionCreateOptions) (*Session, error)
+func (r *InMemorySessionRepo) List(ctx context.Context) ([]SessionMetadata, error)
+func (r *InMemorySessionRepo) Open(ctx context.Context, metadata SessionMetadata) (*Session, error)
+
+## symbol:agent/src/harness/session/memory.ts#InMemorySessionStorage
+reference: packages/agent/src/harness/session/memory.ts#InMemorySessionStorage
+target: github.com/nankedr/pig/agent.InMemorySessionStorage
+type InMemorySessionStorage struct {
+	mu             sync.RWMutex
+	metadata       SessionMetadata
+	sequence       int64
+	usedIDs        map[string]struct{}
+	entries        []Entry
+	entriesByID    map[string]Entry
+	records        []LaneRecord
+	openOperations map[string]map[string]OperationStartedRecord
+	lanes          map[string]laneLeaf
+	laneOrder      []string
+	log            []LogItem
+	stats          SessionStats
+	name           string
+	nameSet        bool
+	labels         map[string]string
+}
+func (s *InMemorySessionStorage) AppendEntry(ctx context.Context, provisioned ProvisionedEntry, lane string) (Entry, error)
+func (s *InMemorySessionStorage) AppendRecord(ctx context.Context, provisioned NewRecord) (LaneRecord, error)
+func (s *InMemorySessionStorage) CreateLane(ctx context.Context, lane, at string, atSet bool) error
+func (s *InMemorySessionStorage) FindEntries(ctx context.Context, query EntryQuery) ([]Entry, error)
+func (s *InMemorySessionStorage) FindEntriesOnBranch(ctx context.Context, query EntryQuery, bounds BranchBounds) ([]Entry, error)
+func (s *InMemorySessionStorage) FindOpenOperations(ctx context.Context, lane string, limit int) ([]OperationStartedRecord, error)
+func (s *InMemorySessionStorage) FindRecords(ctx context.Context, query RecordQuery) ([]LaneRecord, error)
+func (s *InMemorySessionStorage) Fork(ctx context.Context, metadata SessionMetadata, options ForkOptions) (*InMemorySessionStorage, error)
+func (s *InMemorySessionStorage) GetEntry(ctx context.Context, id string) (Entry, bool, error)
+func (s *InMemorySessionStorage) GetLabel(ctx context.Context, id string) (string, bool, error)
+func (s *InMemorySessionStorage) GetLanes(ctx context.Context) ([]LanePointer, error)
+func (s *InMemorySessionStorage) GetLog(ctx context.Context, options LogOptions) ([]LogItem, error)
+func (s *InMemorySessionStorage) GetMetadata(ctx context.Context) (SessionMetadata, error)
+func (s *InMemorySessionStorage) GetName(ctx context.Context) (string, bool, error)
+func (s *InMemorySessionStorage) GetStats(ctx context.Context) (SessionStats, error)
+func (s *InMemorySessionStorage) MoveLane(ctx context.Context, lane, to string, toSet bool) error
+func (s *InMemorySessionStorage) SetLabel(ctx context.Context, id, label string, set bool) error
+func (s *InMemorySessionStorage) SetName(ctx context.Context, name string, set bool) error
+
+## symbol:agent/src/harness/session/search.ts#SessionSearch
+reference: packages/agent/src/harness/session/search.ts#SessionSearch
+target: github.com/nankedr/pig/agent.SessionSearch
+type SessionSearch interface {
+	Search(context.Context, SessionSearchOptions) ([]SessionSearchHit, error)
+}
+
+## symbol:agent/src/harness/session/search.ts#SessionSearchHit
+reference: packages/agent/src/harness/session/search.ts#SessionSearchHit
+target: github.com/nankedr/pig/agent.SessionSearchHit
+type SessionSearchHit struct {
+	Metadata   SessionMetadata
+	EntryID    string
+	Timestamp  string
+	Snippet    string
+	SnippetSet bool
+	Score      float64
+	ScoreSet   bool
+}
+
+## symbol:agent/src/harness/session/search.ts#SessionSearchOptions
+reference: packages/agent/src/harness/session/search.ts#SessionSearchOptions
+target: github.com/nankedr/pig/agent.SessionSearchOptions
+type SessionSearchOptions struct {
+	Text   string
+	CWD    string
+	CWDSet bool
+}
+
+## symbol:agent/src/harness/session/search.ts#createScanningSessionSearch
+reference: packages/agent/src/harness/session/search.ts#createScanningSessionSearch
+target: github.com/nankedr/pig/agent.CreateScanningSessionSearch
+func CreateScanningSessionSearch(source SessionRepo) SessionSearch
+
+## symbol:agent/src/harness/session/search.ts#getFileSystemResultOrThrow
+reference: packages/agent/src/harness/session/search.ts#getFileSystemResultOrThrow
+target: github.com/nankedr/pig/agent.GetFileSystemResultOrThrow
+func GetFileSystemResultOrThrow[T any](result Result[T], message string) (T, error)
+
+## symbol:agent/src/harness/session/session.ts#Session
+reference: packages/agent/src/harness/session/session.ts#Session
+target: github.com/nankedr/pig/agent.Session
+type Session struct {
+	storage     SessionStorage
+	IDGenerator IDGenerator
+	lane        string
+}
+func (s *Session) AppendCustomEntry(ctx context.Context, customType string, data ...JSONValue) (string, error)
+func (s *Session) AppendEntry(ctx context.Context, entry ProvisionedEntry, lane string) (Entry, error)
+func (s *Session) AppendMessage(ctx context.Context, message AgentMessage) (string, error)
+func (s *Session) AppendRecord(ctx context.Context, record NewRecord) (LaneRecord, error)
+func (s *Session) CreateLane(ctx context.Context, lane, at string, atSet bool) error
+func (s *Session) FindEntries(ctx context.Context, query EntryQuery) ([]Entry, error)
+func (s *Session) FindEntriesOnBranch(ctx context.Context, query EntryQuery, bounds BranchBounds) ([]Entry, error)
+func (s *Session) FindEntry(ctx context.Context, query EntryQuery) (Entry, bool, error)
+func (s *Session) FindEntryOnBranch(ctx context.Context, query EntryQuery, bounds BranchBounds) (Entry, bool, error)
+func (s *Session) FindOpenOperations(ctx context.Context, lane string, limit int) ([]OperationStartedRecord, error)
+func (s *Session) FindRecords(ctx context.Context, query RecordQuery) ([]LaneRecord, error)
+func (s *Session) GetEntry(ctx context.Context, id string) (Entry, bool, error)
+func (s *Session) GetLabel(ctx context.Context, targetID string) (string, bool, error)
+func (s *Session) GetLanes(ctx context.Context) ([]LanePointer, error)
+func (s *Session) GetLeafID(ctx context.Context) (string, bool, error)
+func (s *Session) GetLog(ctx context.Context, options LogOptions) ([]LogItem, error)
+func (s *Session) GetMetadata(ctx context.Context) (SessionMetadata, error)
+func (s *Session) GetName(ctx context.Context) (string, bool, error)
+func (s *Session) GetStats(ctx context.Context) (SessionStats, error)
+func (s *Session) MoveLane(ctx context.Context, lane, to string, toSet bool) error
+func (s *Session) SetLabel(ctx context.Context, targetID, label string, set bool) error
+func (s *Session) SetName(ctx context.Context, name string, set bool) error
+func (s *Session) View(lane string) SessionTree
+
+## symbol:agent/src/harness/session/session.ts#assertJsonSerializable
+reference: packages/agent/src/harness/session/session.ts#assertJsonSerializable
+target: github.com/nankedr/pig/agent.AssertJSONSerializable
+func AssertJSONSerializable(value any) error
+
+## symbol:agent/src/harness/session/testing/conformance.ts#createSessionBackendConformance
+reference: packages/agent/src/harness/session/testing/conformance.ts#createSessionBackendConformance
+target: github.com/nankedr/pig/agent/session/testing.CreateSessionBackendConformance
+func CreateSessionBackendConformance(factory SessionBackendFixtureFactory) []SessionBackendConformanceCase
+
+## symbol:agent/src/harness/session/testing/types.ts#SessionBackendConformanceCase
+reference: packages/agent/src/harness/session/testing/types.ts#SessionBackendConformanceCase
+target: github.com/nankedr/pig/agent/session/testing.SessionBackendConformanceCase
+type SessionBackendConformanceCase interface {
+	Group() string
+	Name() string
+	Run(context.Context) error
+}
+
+## symbol:agent/src/harness/session/testing/types.ts#SessionBackendFixture
+reference: packages/agent/src/harness/session/testing/types.ts#SessionBackendFixture
+target: github.com/nankedr/pig/agent/session/testing.SessionBackendFixture
+type SessionBackendFixture interface {
+	Repository() agent.SessionRepo
+	Close(context.Context) error
+}
+
+## symbol:agent/src/harness/session/testing/types.ts#SessionBackendFixtureFactory
+reference: packages/agent/src/harness/session/testing/types.ts#SessionBackendFixtureFactory
+target: github.com/nankedr/pig/agent/session/testing.SessionBackendFixtureFactory
+type SessionBackendFixtureFactory func(context.Context) (SessionBackendFixture, error)
+
+## symbol:agent/src/harness/session/types.ts#AbortRequestedRecord
+reference: packages/agent/src/harness/session/types.ts#AbortRequestedRecord
+target: github.com/nankedr/pig/agent.AbortRequestedRecord
+type AbortRequestedRecord struct {
+	RecordBase
+	RunID string
+}
+func (r AbortRequestedRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/session/types.ts#ActiveToolsEntry
+reference: packages/agent/src/harness/session/types.ts#ActiveToolsEntry
+target: github.com/nankedr/pig/agent.ActiveToolsEntry
+type ActiveToolsEntry struct {
+	EntryBase
+	ActiveToolNames []string
+}
+func (e ActiveToolsEntry) EntryType() EntryType
+
+## symbol:agent/src/harness/session/types.ts#BranchBounds
+reference: packages/agent/src/harness/session/types.ts#BranchBounds
+target: github.com/nankedr/pig/agent.BranchBounds
+type BranchBounds struct {
+	Start      string
+	StartSet   bool
+	StopAtType EntryType
+	StopAtID   string
+}
+
+## symbol:agent/src/harness/session/types.ts#BranchSummaryEntry
+reference: packages/agent/src/harness/session/types.ts#BranchSummaryEntry
+target: github.com/nankedr/pig/agent.BranchSummaryEntry
+type BranchSummaryEntry struct {
+	EntryBase
+	FromID  string
+	Summary string
+	Details JSONValue
+	Usage   *ai.Usage
+}
+func (e BranchSummaryEntry) EntryType() EntryType
+
+## symbol:agent/src/harness/session/types.ts#CompactionEntry
+reference: packages/agent/src/harness/session/types.ts#CompactionEntry
+target: github.com/nankedr/pig/agent.CompactionEntry
+type CompactionEntry struct {
+	EntryBase
+	Summary      string
+	RetainedTail []AgentMessage
+	TokensBefore int64
+	Details      JSONValue
+	Usage        *ai.Usage
+}
+func (e CompactionEntry) EntryType() EntryType
+
+## symbol:agent/src/harness/session/types.ts#CompactionReason
+reference: packages/agent/src/harness/session/types.ts#CompactionReason
+target: github.com/nankedr/pig/agent.CompactionReason
+type CompactionReason string
+
+## symbol:agent/src/harness/session/types.ts#CustomEntry
+reference: packages/agent/src/harness/session/types.ts#CustomEntry
+target: github.com/nankedr/pig/agent.CustomEntry
+type CustomEntry struct {
+	EntryBase
+	CustomType string
+	Data       JSONValue
+	DataSet    bool
+}
+func (e CustomEntry) EntryType() EntryType
+
+## symbol:agent/src/harness/session/types.ts#Entry
+reference: packages/agent/src/harness/session/types.ts#Entry
+target: github.com/nankedr/pig/agent.Entry
+type Entry interface {
+	EntryType() EntryType
+	entryBase() EntryBase
+}
+
+## symbol:agent/src/harness/session/types.ts#EntryBase
+reference: packages/agent/src/harness/session/types.ts#EntryBase
+target: github.com/nankedr/pig/agent.EntryBase
+type EntryBase struct {
+	ID          string
+	Seq         int64
+	ParentID    string
+	ParentIDSet bool
+	Timestamp   int64
+}
+
+## symbol:agent/src/harness/session/types.ts#EntryCursor
+reference: packages/agent/src/harness/session/types.ts#EntryCursor
+target: github.com/nankedr/pig/agent.EntryCursor
+type EntryCursor struct {
+	AfterSeq int64
+}
+
+## symbol:agent/src/harness/session/types.ts#EntryOrder
+reference: packages/agent/src/harness/session/types.ts#EntryOrder
+target: github.com/nankedr/pig/agent.EntryOrder
+type EntryOrder string
+
+## symbol:agent/src/harness/session/types.ts#EntryQuery
+reference: packages/agent/src/harness/session/types.ts#EntryQuery
+target: github.com/nankedr/pig/agent.EntryQuery
+type EntryQuery struct {
+	Type       EntryType
+	CustomType string
+	Order      EntryOrder
+	Limit      int
+	Cursor     *EntryCursor
+}
+
+## symbol:agent/src/harness/session/types.ts#ForkOptions
+reference: packages/agent/src/harness/session/types.ts#ForkOptions
+target: github.com/nankedr/pig/agent.ForkOptions
+type ForkOptions struct {
+	Scope      ForkScope
+	EntryID    string
+	EntryIDSet bool
+	Position   ForkPosition
+}
+
+## symbol:agent/src/harness/session/types.ts#IdGenerator
+reference: packages/agent/src/harness/session/types.ts#IdGenerator
+target: github.com/nankedr/pig/agent.IDGenerator
+type IDGenerator interface {
+	Next() string
+}
+
+## symbol:agent/src/harness/session/types.ts#JsonValue
+reference: packages/agent/src/harness/session/types.ts#JsonValue
+target: github.com/nankedr/pig/agent.JSONValue
+type JSONValue = any
+
+## symbol:agent/src/harness/session/types.ts#LanePointer
+reference: packages/agent/src/harness/session/types.ts#LanePointer
+target: github.com/nankedr/pig/agent.LanePointer
+type LanePointer struct {
+	Lane      string
+	LeafID    string
+	LeafIDSet bool
+}
+
+## symbol:agent/src/harness/session/types.ts#LaneRecord
+reference: packages/agent/src/harness/session/types.ts#LaneRecord
+target: github.com/nankedr/pig/agent.LaneRecord
+type LaneRecord interface {
+	RecordType() LaneRecordType
+	recordBase() RecordBase
+}
+
+## symbol:agent/src/harness/session/types.ts#LogItem
+reference: packages/agent/src/harness/session/types.ts#LogItem
+target: github.com/nankedr/pig/agent.LogItem
+type LogItem interface {
+	LogItemKind() LogItemKind
+	LogSequence() int64
+}
+
+## symbol:agent/src/harness/session/types.ts#LogOptions
+reference: packages/agent/src/harness/session/types.ts#LogOptions
+target: github.com/nankedr/pig/agent.LogOptions
+type LogOptions struct {
+	AfterSeq    int64
+	AfterSeqSet bool
+	Limit       int
+}
+
+## symbol:agent/src/harness/session/types.ts#MessageEntry
+reference: packages/agent/src/harness/session/types.ts#MessageEntry
+target: github.com/nankedr/pig/agent.MessageEntry
+type MessageEntry struct {
+	EntryBase
+	Message   AgentMessage
+	Terminate bool
+}
+func (e MessageEntry) EntryType() EntryType
+
+## symbol:agent/src/harness/session/types.ts#ModelChangeEntry
+reference: packages/agent/src/harness/session/types.ts#ModelChangeEntry
+target: github.com/nankedr/pig/agent.ModelChangeEntry
+type ModelChangeEntry struct {
+	EntryBase
+	Provider string
+	ModelID  string
+}
+func (e ModelChangeEntry) EntryType() EntryType
+
+## symbol:agent/src/harness/session/types.ts#NewRecord
+reference: packages/agent/src/harness/session/types.ts#NewRecord
+target: github.com/nankedr/pig/agent.NewRecord
+type NewRecord = LaneRecord
+
+## symbol:agent/src/harness/session/types.ts#OperationFinishedRecord
+reference: packages/agent/src/harness/session/types.ts#OperationFinishedRecord
+target: github.com/nankedr/pig/agent.OperationFinishedRecord
+type OperationFinishedRecord struct {
+	RecordBase
+	RunID   string
+	Outcome OperationOutcome
+	Error   *OperationRecordError
+}
+func (r OperationFinishedRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/session/types.ts#OperationStartedRecord
+reference: packages/agent/src/harness/session/types.ts#OperationStartedRecord
+target: github.com/nankedr/pig/agent.OperationStartedRecord
+type OperationStartedRecord struct {
+	RecordBase
+	SourceLeafID    string
+	SourceLeafIDSet bool
+	Intent          OperationIntent
+}
+func (r OperationStartedRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/session/types.ts#ProvisionedEntry
+reference: packages/agent/src/harness/session/types.ts#ProvisionedEntry
+target: github.com/nankedr/pig/agent.ProvisionedEntry
+type ProvisionedEntry = Entry
+
+## symbol:agent/src/harness/session/types.ts#QueueCancelledRecord
+reference: packages/agent/src/harness/session/types.ts#QueueCancelledRecord
+target: github.com/nankedr/pig/agent.QueueCancelledRecord
+type QueueCancelledRecord struct {
+	RecordBase
+	RunID    string
+	RunIDSet bool
+	EntryID  string
+}
+func (r QueueCancelledRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/session/types.ts#QueueEnqueuedRecord
+reference: packages/agent/src/harness/session/types.ts#QueueEnqueuedRecord
+target: github.com/nankedr/pig/agent.QueueEnqueuedRecord
+type QueueEnqueuedRecord struct {
+	RecordBase
+	Queue    QueueName
+	RunID    string
+	RunIDSet bool
+	Target   ProvisionedEntry
+}
+func (r QueueEnqueuedRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/session/types.ts#RecordBase
+reference: packages/agent/src/harness/session/types.ts#RecordBase
+target: github.com/nankedr/pig/agent.RecordBase
+type RecordBase struct {
+	ID        string
+	Seq       int64
+	Lane      string
+	Timestamp int64
+}
+
+## symbol:agent/src/harness/session/types.ts#RecordQuery
+reference: packages/agent/src/harness/session/types.ts#RecordQuery
+target: github.com/nankedr/pig/agent.RecordQuery
+type RecordQuery struct {
+	Lane          string
+	Type          LaneRecordType
+	RunID         string
+	OperationKind OperationKind
+	AfterSeq      int64
+	AfterSeqSet   bool
+	Order         EntryOrder
+	Limit         int
+}
+
+## symbol:agent/src/harness/session/types.ts#SessionCreateOptions
+reference: packages/agent/src/harness/session/types.ts#SessionCreateOptions
+target: github.com/nankedr/pig/agent.SessionCreateOptions
+type SessionCreateOptions struct {
+	ID                 string
+	ParentSessionID    string
+	ParentSessionIDSet bool
+}
+
+## symbol:agent/src/harness/session/types.ts#SessionError
+reference: packages/agent/src/harness/session/types.ts#SessionError
+target: github.com/nankedr/pig/agent.SessionError
+type SessionError struct {
+	Code    SessionErrorCode
+	Message string
+	Cause   error
+}
+func (e *SessionError) Error() string
+func (e *SessionError) Unwrap() error
+
+## symbol:agent/src/harness/session/types.ts#SessionErrorCode
+reference: packages/agent/src/harness/session/types.ts#SessionErrorCode
+target: github.com/nankedr/pig/agent.SessionErrorCode
+type SessionErrorCode string
+
+## symbol:agent/src/harness/session/types.ts#SessionMetadata
+reference: packages/agent/src/harness/session/types.ts#SessionMetadata
+target: github.com/nankedr/pig/agent.SessionMetadata
+type SessionMetadata struct {
+	ID                 string
+	CreatedAt          int64
+	ParentSessionID    string
+	ParentSessionIDSet bool
+}
+
+## symbol:agent/src/harness/session/types.ts#SessionRepo
+reference: packages/agent/src/harness/session/types.ts#SessionRepo
+target: github.com/nankedr/pig/agent.SessionRepo
+type SessionRepo interface {
+	Create(context.Context, SessionCreateOptions) (*Session, error)
+	Open(context.Context, SessionMetadata) (*Session, error)
+	List(context.Context) ([]SessionMetadata, error)
+	Delete(context.Context, SessionMetadata) error
+	Fork(context.Context, SessionMetadata, ForkOptions, SessionCreateOptions) (*Session, error)
+}
+
+## symbol:agent/src/harness/session/types.ts#SessionStats
+reference: packages/agent/src/harness/session/types.ts#SessionStats
+target: github.com/nankedr/pig/agent.SessionStats
+type SessionStats struct {
+	MessageCount   int64
+	CachedTokens   int64
+	UncachedTokens int64
+	TotalTokens    int64
+	CostTotal      float64
+}
+
+## symbol:agent/src/harness/session/types.ts#SessionStopReason
+reference: packages/agent/src/harness/session/types.ts#SessionStopReason
+target: github.com/nankedr/pig/agent.SessionStopReason
+type SessionStopReason string
+
+## symbol:agent/src/harness/session/types.ts#SessionStorage
+reference: packages/agent/src/harness/session/types.ts#SessionStorage
+target: github.com/nankedr/pig/agent.SessionStorage
+type SessionStorage interface {
+	GetMetadata(context.Context) (SessionMetadata, error)
+	GetLanes(context.Context) ([]LanePointer, error)
+	CreateLane(context.Context, string, string, bool) error
+	MoveLane(context.Context, string, string, bool) error
+	AppendEntry(context.Context, ProvisionedEntry, string) (Entry, error)
+	AppendRecord(context.Context, NewRecord) (LaneRecord, error)
+	GetEntry(context.Context, string) (Entry, bool, error)
+	FindEntries(context.Context, EntryQuery) ([]Entry, error)
+	FindEntriesOnBranch(context.Context, EntryQuery, BranchBounds) ([]Entry, error)
+	FindRecords(context.Context, RecordQuery) ([]LaneRecord, error)
+	FindOpenOperations(context.Context, string, int) ([]OperationStartedRecord, error)
+	GetLog(context.Context, LogOptions) ([]LogItem, error)
+	GetName(context.Context) (string, bool, error)
+	SetName(context.Context, string, bool) error
+	GetLabel(context.Context, string) (string, bool, error)
+	SetLabel(context.Context, string, string, bool) error
+	GetStats(context.Context) (SessionStats, error)
+}
+
+## symbol:agent/src/harness/session/types.ts#SessionTree
+reference: packages/agent/src/harness/session/types.ts#SessionTree
+target: github.com/nankedr/pig/agent.SessionTree
+type SessionTree interface {
+	GetLeafID(context.Context) (string, bool, error)
+	GetEntry(context.Context, string) (Entry, bool, error)
+	GetStats(context.Context) (SessionStats, error)
+	GetName(context.Context) (string, bool, error)
+	SetName(context.Context, string, bool) error
+	GetLabel(context.Context, string) (string, bool, error)
+	SetLabel(context.Context, string, string, bool) error
+	FindEntries(context.Context, EntryQuery) ([]Entry, error)
+	FindEntry(context.Context, EntryQuery) (Entry, bool, error)
+	FindEntriesOnBranch(context.Context, EntryQuery, BranchBounds) ([]Entry, error)
+	FindEntryOnBranch(context.Context, EntryQuery, BranchBounds) (Entry, bool, error)
+	AppendMessage(context.Context, AgentMessage) (string, error)
+	AppendCustomEntry(context.Context, string, ...JSONValue) (string, error)
+}
+
+## symbol:agent/src/harness/session/types.ts#StepAttemptRecord
+reference: packages/agent/src/harness/session/types.ts#StepAttemptRecord
+target: github.com/nankedr/pig/agent.StepAttemptRecord
+type StepAttemptRecord struct {
+	RecordBase
+	RunID            string
+	Step             StepKind
+	Attempt          int
+	ResultEntryID    string
+	CompactionReason *CompactionReason
+}
+func (r StepAttemptRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/session/types.ts#ThinkingLevelEntry
+reference: packages/agent/src/harness/session/types.ts#ThinkingLevelEntry
+target: github.com/nankedr/pig/agent.ThinkingLevelEntry
+type ThinkingLevelEntry struct {
+	EntryBase
+	ThinkingLevel string
+}
+func (e ThinkingLevelEntry) EntryType() EntryType
+
+## symbol:agent/src/harness/session/types.ts#ToolStartedRecord
+reference: packages/agent/src/harness/session/types.ts#ToolStartedRecord
+target: github.com/nankedr/pig/agent.ToolStartedRecord
+type ToolStartedRecord struct {
+	RecordBase
+	RunID            string
+	AssistantEntryID string
+	ToolIndex        int
+	ToolCallID       string
+	ToolName         string
+	EffectiveArgs    map[string]any
+	ResultEntryID    string
+	Replay           ToolReplay
+}
+func (r ToolStartedRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/session/types.ts#UsageRecord
+reference: packages/agent/src/harness/session/types.ts#UsageRecord
+target: github.com/nankedr/pig/agent.UsageRecord
+type UsageRecord struct {
+	RecordBase
+	Usage      ai.Usage
+	Cause      UsageCause
+	RunID      string
+	RunIDSet   bool
+	EntryID    string
+	EntryIDSet bool
+	Attempt    int
+	AttemptSet bool
+	StopReason SessionStopReason
+	ToolCallID string
+	Details    JSONValue
+	DetailsSet bool
+}
+func (r UsageRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/session/types.ts#WriteDeferredRecord
+reference: packages/agent/src/harness/session/types.ts#WriteDeferredRecord
+target: github.com/nankedr/pig/agent.WriteDeferredRecord
+type WriteDeferredRecord struct {
+	RecordBase
+	RunID  string
+	Target ProvisionedEntry
+}
+func (r WriteDeferredRecord) RecordType() LaneRecordType
+
+## symbol:agent/src/harness/skills.ts#SkillDiagnostic
+reference: packages/agent/src/harness/skills.ts#SkillDiagnostic
+target: github.com/nankedr/pig/agent.SkillDiagnostic
+type SkillDiagnostic struct {
+	Type    string
+	Code    SkillDiagnosticCode
+	Message string
+	Path    string
+}
+
+## symbol:agent/src/harness/skills.ts#SkillDiagnosticCode
+reference: packages/agent/src/harness/skills.ts#SkillDiagnosticCode
+target: github.com/nankedr/pig/agent.SkillDiagnosticCode
+type SkillDiagnosticCode string
+
+## symbol:agent/src/harness/skills.ts#formatSkillInvocation
+reference: packages/agent/src/harness/skills.ts#formatSkillInvocation
+target: github.com/nankedr/pig/agent.FormatSkillInvocation
+func FormatSkillInvocation(skill Skill, additionalInstructions string) string
+
+## symbol:agent/src/harness/skills.ts#loadSkills
+reference: packages/agent/src/harness/skills.ts#loadSkills
+target: github.com/nankedr/pig/agent.LoadSkills
+func LoadSkills(context.Context, ExecutionEnv, []string) (SkillLoadResult, error)
+
+## symbol:agent/src/harness/skills.ts#loadSourcedSkills
+reference: packages/agent/src/harness/skills.ts#loadSourcedSkills
+target: github.com/nankedr/pig/agent.LoadSourcedSkills
+func LoadSourcedSkills(context.Context, ExecutionEnv, []string) (SourcedSkillLoadResult, error)
+
+## symbol:agent/src/harness/system-prompt.ts#formatSkillsForSystemPrompt
+reference: packages/agent/src/harness/system-prompt.ts#formatSkillsForSystemPrompt
+target: github.com/nankedr/pig/agent.FormatSkillsForSystemPrompt
+func FormatSkillsForSystemPrompt(skills []Skill) string
+
+## symbol:agent/src/harness/telemetry.ts#AGENT_TELEMETRY_SCHEMAS
+reference: packages/agent/src/harness/telemetry.ts#AGENT_TELEMETRY_SCHEMAS
+target: github.com/nankedr/pig/agent.AgentTelemetrySchemas
+var AgentTelemetrySchemas = []telemetry.TelemetrySchemaDefinition{AITelemetrySchema, HarnessTelemetrySchema}
+
+## symbol:agent/src/harness/telemetry.ts#AI_TELEMETRY_SCHEMA
+reference: packages/agent/src/harness/telemetry.ts#AI_TELEMETRY_SCHEMA
+target: github.com/nankedr/pig/agent.AITelemetrySchema
+var AITelemetrySchema = telemetry.TelemetrySchemaDefinition{
+	Version: 1,
+	Spans: map[string]telemetry.TelemetrySpanDefinition{
+		"pi.ai.request": {
+			Description: "One logical request to an AI provider",
+			Parents:     telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindAny},
+			Status:      telemetry.TelemetrySpanStatusRule{Default: telemetry.SpanStatusOK, ErrorWhen: "The operation throws or returns an error result"},
+		},
+	},
+}
+
+## symbol:agent/src/harness/telemetry.ts#AiSpan
+reference: packages/agent/src/harness/telemetry.ts#AiSpan
+target: github.com/nankedr/pig/agent.AISpan
+type AISpan = telemetry.TelemetrySchemaSpanUnion
+
+## symbol:agent/src/harness/telemetry.ts#AiSpanAttributes
+reference: packages/agent/src/harness/telemetry.ts#AiSpanAttributes
+target: github.com/nankedr/pig/agent.AISpanAttributes
+type AISpanAttributes = telemetry.SpanAttributes
+
+## symbol:agent/src/harness/telemetry.ts#AiSpanEndAttributes
+reference: packages/agent/src/harness/telemetry.ts#AiSpanEndAttributes
+target: github.com/nankedr/pig/agent.AISpanEndAttributes
+type AISpanEndAttributes = telemetry.TelemetrySchemaSpanEndAttributes
+
+## symbol:agent/src/harness/telemetry.ts#AiSpanEventAttributes
+reference: packages/agent/src/harness/telemetry.ts#AiSpanEventAttributes
+target: github.com/nankedr/pig/agent.AISpanEventAttributes
+type AISpanEventAttributes = telemetry.TelemetrySchemaSpanEventAttributes
+
+## symbol:agent/src/harness/telemetry.ts#AiSpanEventName
+reference: packages/agent/src/harness/telemetry.ts#AiSpanEventName
+target: github.com/nankedr/pig/agent.AISpanEventName
+type AISpanEventName = telemetry.TelemetrySchemaSpanEventName
+
+## symbol:agent/src/harness/telemetry.ts#AiSpanName
+reference: packages/agent/src/harness/telemetry.ts#AiSpanName
+target: github.com/nankedr/pig/agent.AISpanName
+type AISpanName = telemetry.TelemetrySchemaSpanName
+
+## symbol:agent/src/harness/telemetry.ts#AiSpanStartAttributes
+reference: packages/agent/src/harness/telemetry.ts#AiSpanStartAttributes
+target: github.com/nankedr/pig/agent.AISpanStartAttributes
+type AISpanStartAttributes = telemetry.TelemetrySchemaSpanStartAttributes
+
+## symbol:agent/src/harness/telemetry.ts#AiTelemetrySpan
+reference: packages/agent/src/harness/telemetry.ts#AiTelemetrySpan
+target: github.com/nankedr/pig/agent.AITelemetrySpan
+type AITelemetrySpan = telemetry.SchemaTelemetrySpan
+
+## symbol:agent/src/harness/telemetry.ts#HARNESS_TELEMETRY_SCHEMA
+reference: packages/agent/src/harness/telemetry.ts#HARNESS_TELEMETRY_SCHEMA
+target: github.com/nankedr/pig/agent.HarnessTelemetrySchema
+var HarnessTelemetrySchema = telemetry.TelemetrySchemaDefinition{
+	Version: 1,
+	Spans: map[string]telemetry.TelemetrySpanDefinition{
+		"pi.harness.run":           {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindRootOrExternal}},
+		"pi.harness.compaction":    {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindRootOrExternal}},
+		"pi.harness.navigation":    {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindRootOrExternal}},
+		"pi.harness.checkpoint":    {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindSpans, Spans: []string{"pi.harness.run"}}},
+		"pi.harness.turn":          {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindSpans, Spans: []string{"pi.harness.run"}}},
+		"pi.harness.step":          {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindSpans, Spans: []string{"pi.harness.run"}}},
+		"pi.harness.tool":          {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindSpans, Spans: []string{"pi.harness.run"}}},
+		"pi.harness.hook":          {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindAny}},
+		"pi.harness.sleep":         {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindAny}},
+		"pi.harness.event_handler": {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindAny}},
+		"pi.session.write":         {Parents: telemetry.TelemetryParentDefinition{Kind: telemetry.ParentKindAny}},
+	},
+}
+
+## symbol:agent/src/harness/telemetry.ts#HarnessSpan
+reference: packages/agent/src/harness/telemetry.ts#HarnessSpan
+target: github.com/nankedr/pig/agent.HarnessSpan
+type HarnessSpan = telemetry.TelemetrySchemaSpanUnion
+
+## symbol:agent/src/harness/telemetry.ts#HarnessSpanAttributes
+reference: packages/agent/src/harness/telemetry.ts#HarnessSpanAttributes
+target: github.com/nankedr/pig/agent.HarnessSpanAttributes
+type HarnessSpanAttributes = telemetry.SpanAttributes
+
+## symbol:agent/src/harness/telemetry.ts#HarnessSpanEndAttributes
+reference: packages/agent/src/harness/telemetry.ts#HarnessSpanEndAttributes
+target: github.com/nankedr/pig/agent.HarnessSpanEndAttributes
+type HarnessSpanEndAttributes = telemetry.TelemetrySchemaSpanEndAttributes
+
+## symbol:agent/src/harness/telemetry.ts#HarnessSpanEventAttributes
+reference: packages/agent/src/harness/telemetry.ts#HarnessSpanEventAttributes
+target: github.com/nankedr/pig/agent.HarnessSpanEventAttributes
+type HarnessSpanEventAttributes = telemetry.TelemetrySchemaSpanEventAttributes
+
+## symbol:agent/src/harness/telemetry.ts#HarnessSpanEventName
+reference: packages/agent/src/harness/telemetry.ts#HarnessSpanEventName
+target: github.com/nankedr/pig/agent.HarnessSpanEventName
+type HarnessSpanEventName = telemetry.TelemetrySchemaSpanEventName
+
+## symbol:agent/src/harness/telemetry.ts#HarnessSpanName
+reference: packages/agent/src/harness/telemetry.ts#HarnessSpanName
+target: github.com/nankedr/pig/agent.HarnessSpanName
+type HarnessSpanName = telemetry.TelemetrySchemaSpanName
+
+## symbol:agent/src/harness/telemetry.ts#HarnessSpanStartAttributes
+reference: packages/agent/src/harness/telemetry.ts#HarnessSpanStartAttributes
+target: github.com/nankedr/pig/agent.HarnessSpanStartAttributes
+type HarnessSpanStartAttributes = telemetry.TelemetrySchemaSpanStartAttributes
+
+## symbol:agent/src/harness/telemetry.ts#HarnessTelemetrySpan
+reference: packages/agent/src/harness/telemetry.ts#HarnessTelemetrySpan
+target: github.com/nankedr/pig/agent.HarnessTelemetrySpan
+type HarnessTelemetrySpan = telemetry.SchemaTelemetrySpan
+
+## symbol:agent/src/harness/telemetry.ts#startAiSpan
+reference: packages/agent/src/harness/telemetry.ts#startAiSpan
+target: github.com/nankedr/pig/agent.StartAISpan
+func StartAISpan[T any](
+	ctx context.Context,
+	telemetryContext telemetry.TelemetryContext,
+	name AISpanName,
+	attributes AISpanStartAttributes,
+	callback func(context.Context, AITelemetrySpan) (T, error),
+) (T, error)
+
+## symbol:agent/src/harness/telemetry.ts#startHarnessSpan
+reference: packages/agent/src/harness/telemetry.ts#startHarnessSpan
+target: github.com/nankedr/pig/agent.StartHarnessSpan
+func StartHarnessSpan[T any](
+	ctx context.Context,
+	telemetryContext telemetry.TelemetryContext,
+	name HarnessSpanName,
+	attributes HarnessSpanStartAttributes,
+	callback func(context.Context, HarnessTelemetrySpan) (T, error),
+) (T, error)
+
+## symbol:agent/src/harness/tools/bash.ts#BashExecution
+reference: packages/agent/src/harness/tools/bash.ts#BashExecution
+target: github.com/nankedr/pig/agent.BashExecution
+type BashExecution struct {
+	Command    string
+	CWD        string
+	Env        map[string]string
+	InheritEnv bool
+}
+
+## symbol:agent/src/harness/tools/bash.ts#BashPrepare
+reference: packages/agent/src/harness/tools/bash.ts#BashPrepare
+target: github.com/nankedr/pig/agent.BashPrepare
+type BashPrepare func(context.Context, *BashExecution, ExecutionToolContext) error
+
+## symbol:agent/src/harness/tools/bash.ts#BashToolDetails
+reference: packages/agent/src/harness/tools/bash.ts#BashToolDetails
+target: github.com/nankedr/pig/agent.BashToolDetails
+type BashToolDetails struct {
+	Truncation     *TruncationResult
+	FullOutputPath string
+}
+
+## symbol:agent/src/harness/tools/bash.ts#BashToolInput
+reference: packages/agent/src/harness/tools/bash.ts#BashToolInput
+target: github.com/nankedr/pig/agent.BashToolInput
+type BashToolInput struct {
+	Command string
+	Timeout *float64
+}
+
+## symbol:agent/src/harness/tools/bash.ts#BashToolOptions
+reference: packages/agent/src/harness/tools/bash.ts#BashToolOptions
+target: github.com/nankedr/pig/agent.BashToolOptions
+type BashToolOptions struct {
+	CommandPrefix string
+	Prepare       BashPrepare
+}
+
+## symbol:agent/src/harness/tools/bash.ts#createBashTool
+reference: packages/agent/src/harness/tools/bash.ts#createBashTool
+target: github.com/nankedr/pig/agent.CreateBashTool
+func CreateBashTool(options BashToolOptions) HarnessTool
+
+## symbol:agent/src/harness/tools/edit.ts#EditToolDetails
+reference: packages/agent/src/harness/tools/edit.ts#EditToolDetails
+target: github.com/nankedr/pig/agent.EditToolDetails
+type EditToolDetails struct {
+	Diff             string
+	Patch            string
+	FirstChangedLine int
+}
+
+## symbol:agent/src/harness/tools/edit.ts#EditToolInput
+reference: packages/agent/src/harness/tools/edit.ts#EditToolInput
+target: github.com/nankedr/pig/agent.EditToolInput
+type EditToolInput struct {
+	Path  string
+	Edits []Edit
+}
+
+## symbol:agent/src/harness/tools/edit.ts#createEditTool
+reference: packages/agent/src/harness/tools/edit.ts#createEditTool
+target: github.com/nankedr/pig/agent.CreateEditTool
+func CreateEditTool() HarnessTool
+
+## symbol:agent/src/harness/tools/read.ts#ReadImageProcessor
+reference: packages/agent/src/harness/tools/read.ts#ReadImageProcessor
+target: github.com/nankedr/pig/agent.ReadImageProcessor
+type ReadImageProcessor func(context.Context, []byte, string, bool) (ReadImageProcessorResult, error)
+
+## symbol:agent/src/harness/tools/read.ts#ReadImageProcessorResult
+reference: packages/agent/src/harness/tools/read.ts#ReadImageProcessorResult
+target: github.com/nankedr/pig/agent.ReadImageProcessorResult
+type ReadImageProcessorResult struct {
+	OK       bool
+	Data     string
+	MIMEType string
+	Hints    []string
+	Message  string
+}
+
+## symbol:agent/src/harness/tools/read.ts#ReadToolDetails
+reference: packages/agent/src/harness/tools/read.ts#ReadToolDetails
+target: github.com/nankedr/pig/agent.ReadToolDetails
+type ReadToolDetails struct {
+	Truncation *TruncationResult
+}
+
+## symbol:agent/src/harness/tools/read.ts#ReadToolInput
+reference: packages/agent/src/harness/tools/read.ts#ReadToolInput
+target: github.com/nankedr/pig/agent.ReadToolInput
+type ReadToolInput struct {
+	Path   string
+	Offset *int
+	Limit  *int
+}
+
+## symbol:agent/src/harness/tools/read.ts#ReadToolOptions
+reference: packages/agent/src/harness/tools/read.ts#ReadToolOptions
+target: github.com/nankedr/pig/agent.ReadToolOptions
+type ReadToolOptions struct {
+	AutoResizeImages *bool
+	ImageProcessor   ReadImageProcessor
+}
+
+## symbol:agent/src/harness/tools/read.ts#createReadTool
+reference: packages/agent/src/harness/tools/read.ts#createReadTool
+target: github.com/nankedr/pig/agent.CreateReadTool
+func CreateReadTool(options ReadToolOptions) HarnessTool
+
+## symbol:agent/src/harness/tools/tool-context.ts#ExecutionToolContext
+reference: packages/agent/src/harness/tools/tool-context.ts#ExecutionToolContext
+target: github.com/nankedr/pig/agent.ExecutionToolContext
+type ExecutionToolContext struct {
+	Env ExecutionEnv
+}
+
+## symbol:agent/src/harness/tools/write.ts#WriteToolInput
+reference: packages/agent/src/harness/tools/write.ts#WriteToolInput
+target: github.com/nankedr/pig/agent.WriteToolInput
+type WriteToolInput struct {
+	Path    string
+	Content string
+}
+
+## symbol:agent/src/harness/tools/write.ts#createWriteTool
+reference: packages/agent/src/harness/tools/write.ts#createWriteTool
+target: github.com/nankedr/pig/agent.CreateWriteTool
+func CreateWriteTool() HarnessTool
+
+## symbol:agent/src/harness/types.ts#AgentHarnessResources
+reference: packages/agent/src/harness/types.ts#AgentHarnessResources
+target: github.com/nankedr/pig/agent.AgentHarnessResources
+type AgentHarnessResources[TSkill, TPromptTemplate any] struct {
+	PromptTemplates []TPromptTemplate
+	Skills          []TSkill
+}
+
+## symbol:agent/src/harness/types.ts#AgentHarnessStreamOptions
+reference: packages/agent/src/harness/types.ts#AgentHarnessStreamOptions
+target: github.com/nankedr/pig/agent.AgentHarnessStreamOptions
+type AgentHarnessStreamOptions struct {
+	Transport       *ai.Transport
+	TimeoutMS       *int64
+	MaxRetries      *int
+	MaxRetryDelayMS *int64
+	Headers         map[string]string
+	Metadata        map[string]json.RawMessage
+	CacheRetention  *ai.CacheRetention
+}
+
+## symbol:agent/src/harness/types.ts#AgentHarnessStreamOptionsPatch
+reference: packages/agent/src/harness/types.ts#AgentHarnessStreamOptionsPatch
+target: github.com/nankedr/pig/agent.AgentHarnessStreamOptionsPatch
+type AgentHarnessStreamOptionsPatch struct {
+	Transport       *ai.Transport
+	TimeoutMS       *int64
+	MaxRetries      *int
+	MaxRetryDelayMS *int64
+	Headers         map[string]*string
+	Metadata        map[string]ai.Optional[json.RawMessage]
+	CacheRetention  *ai.CacheRetention
+}
+
+## symbol:agent/src/harness/types.ts#AgentHarnessTool
+reference: packages/agent/src/harness/types.ts#AgentHarnessTool
+target: github.com/nankedr/pig/agent.AgentHarnessTool
+type AgentHarnessTool[TContext, TParameters, TDetails any] struct {
+	ai.Tool
+	Label            string
+	PrepareArguments PrepareArgumentsFunc
+	Execute          func(context.Context, string, TParameters, AgentToolUpdateCallback[TDetails], TContext) (AgentToolResult[TDetails], error)
+	ExecutionMode    ToolExecutionMode
+}
+
+## symbol:agent/src/harness/types.ts#AgentHarnessToolContextSource
+reference: packages/agent/src/harness/types.ts#AgentHarnessToolContextSource
+target: github.com/nankedr/pig/agent.AgentHarnessToolContextSource
+type AgentHarnessToolContextSource func(context.Context) (any, error)
+
+## symbol:agent/src/harness/types.ts#BranchSummaryError
+reference: packages/agent/src/harness/types.ts#BranchSummaryError
+target: github.com/nankedr/pig/agent.BranchSummaryError
+type BranchSummaryError struct {
+	Code    BranchSummaryErrorCode
+	Message string
+	Cause   error
+}
+func (e *BranchSummaryError) Error() string
+func (e *BranchSummaryError) Unwrap() error
+
+## symbol:agent/src/harness/types.ts#BranchSummaryErrorCode
+reference: packages/agent/src/harness/types.ts#BranchSummaryErrorCode
+target: github.com/nankedr/pig/agent.BranchSummaryErrorCode
+type BranchSummaryErrorCode string
+
+## symbol:agent/src/harness/types.ts#CompactionError
+reference: packages/agent/src/harness/types.ts#CompactionError
+target: github.com/nankedr/pig/agent.CompactionError
+type CompactionError struct {
+	Code    CompactionErrorCode
+	Message string
+	Cause   error
+}
+func (e *CompactionError) Error() string
+func (e *CompactionError) Unwrap() error
+
+## symbol:agent/src/harness/types.ts#CompactionErrorCode
+reference: packages/agent/src/harness/types.ts#CompactionErrorCode
+target: github.com/nankedr/pig/agent.CompactionErrorCode
+type CompactionErrorCode string
+
+## symbol:agent/src/harness/types.ts#ExecutionEnv
+reference: packages/agent/src/harness/types.ts#ExecutionEnv
+target: github.com/nankedr/pig/agent.ExecutionEnv
+type ExecutionEnv interface {
+	FileSystem
+	Shell
+}
+
+## symbol:agent/src/harness/types.ts#ExecutionError
+reference: packages/agent/src/harness/types.ts#ExecutionError
+target: github.com/nankedr/pig/agent.ExecutionError
+type ExecutionError struct {
+	Code    ExecutionErrorCode
+	Message string
+	Cause   error
+}
+func (e *ExecutionError) Error() string
+func (e *ExecutionError) Unwrap() error
+
+## symbol:agent/src/harness/types.ts#ExecutionErrorCode
+reference: packages/agent/src/harness/types.ts#ExecutionErrorCode
+target: github.com/nankedr/pig/agent.ExecutionErrorCode
+type ExecutionErrorCode string
+
+## symbol:agent/src/harness/types.ts#FileError
+reference: packages/agent/src/harness/types.ts#FileError
+target: github.com/nankedr/pig/agent.FileError
+type FileError struct {
+	Code    FileErrorCode
+	Message string
+	Path    string
+	Cause   error
+}
+func (e *FileError) Error() string
+func (e *FileError) Unwrap() error
+
+## symbol:agent/src/harness/types.ts#FileErrorCode
+reference: packages/agent/src/harness/types.ts#FileErrorCode
+target: github.com/nankedr/pig/agent.FileErrorCode
+type FileErrorCode string
+
+## symbol:agent/src/harness/types.ts#FileInfo
+reference: packages/agent/src/harness/types.ts#FileInfo
+target: github.com/nankedr/pig/agent.FileInfo
+type FileInfo struct {
+	Name    string
+	Path    string
+	Kind    FileKind
+	Size    int64
+	MtimeMS int64
+}
+
+## symbol:agent/src/harness/types.ts#FileKind
+reference: packages/agent/src/harness/types.ts#FileKind
+target: github.com/nankedr/pig/agent.FileKind
+type FileKind string
+
+## symbol:agent/src/harness/types.ts#FileSystem
+reference: packages/agent/src/harness/types.ts#FileSystem
+target: github.com/nankedr/pig/agent.FileSystem
+type FileSystem interface {
+	CWD() string
+	AbsolutePath(context.Context, string) Result[string]
+	JoinPath(context.Context, []string) Result[string]
+	ReadTextFile(context.Context, string) Result[string]
+	ReadTextLines(context.Context, string, ReadTextLinesOptions) Result[[]string]
+	ReadBinaryFile(context.Context, string) Result[[]byte]
+	WriteFile(context.Context, string, []byte) Result[struct{}]
+	AppendFile(context.Context, string, []byte) Result[struct{}]
+	RenameFile(context.Context, string, string) Result[struct{}]
+	FileInfo(context.Context, string) Result[FileInfo]
+	ListDir(context.Context, string) Result[[]FileInfo]
+	CanonicalPath(context.Context, string) Result[string]
+	Exists(context.Context, string) Result[bool]
+	CreateDir(context.Context, string, CreateDirOptions) Result[struct{}]
+	Remove(context.Context, string, RemoveOptions) Result[struct{}]
+	CreateTempDir(context.Context, string) Result[string]
+	CreateTempFile(context.Context, CreateTempFileOptions) Result[string]
+	Cleanup(context.Context) error
+}
+
+## symbol:agent/src/harness/types.ts#PromptTemplate
+reference: packages/agent/src/harness/types.ts#PromptTemplate
+target: github.com/nankedr/pig/agent.PromptTemplate
+type PromptTemplate struct {
+	Name        string
+	Description string
+	Content     string
+}
+
+## symbol:agent/src/harness/types.ts#Shell
+reference: packages/agent/src/harness/types.ts#Shell
+target: github.com/nankedr/pig/agent.Shell
+type Shell interface {
+	Exec(context.Context, string, ShellExecOptions) Result[ShellExecResult]
+	Cleanup(context.Context) error
+}
+
+## symbol:agent/src/harness/types.ts#ShellExecOptions
+reference: packages/agent/src/harness/types.ts#ShellExecOptions
+target: github.com/nankedr/pig/agent.ShellExecOptions
+type ShellExecOptions struct {
+	CWD        string
+	Env        map[string]string
+	InheritEnv *bool
+	Timeout    int64
+	OnStdout   func(string)
+	OnStderr   func(string)
+}
+
+## symbol:agent/src/harness/types.ts#Skill
+reference: packages/agent/src/harness/types.ts#Skill
+target: github.com/nankedr/pig/agent.Skill
+type Skill struct {
+	Name                   string
+	Description            string
+	Content                string
+	FilePath               string
+	DisableModelInvocation bool
+}
+
+## symbol:agent/src/harness/types.ts#err
+reference: packages/agent/src/harness/types.ts#err
+target: github.com/nankedr/pig/agent.Err
+func Err[T any](err error) Result[T]
+
+## symbol:agent/src/harness/types.ts#getOrThrow
+reference: packages/agent/src/harness/types.ts#getOrThrow
+target: github.com/nankedr/pig/agent.GetOrThrow
+func GetOrThrow[T any](result Result[T]) (T, error)
+
+## symbol:agent/src/harness/types.ts#getOrUndefined
+reference: packages/agent/src/harness/types.ts#getOrUndefined
+target: github.com/nankedr/pig/agent.GetOrUndefined
+func GetOrUndefined[T any](result Result[T]) (T, bool)
+
+## symbol:agent/src/harness/types.ts#ok
+reference: packages/agent/src/harness/types.ts#ok
+target: github.com/nankedr/pig/agent.OK
+func OK[T any](value T) Result[T]
+
+## symbol:agent/src/harness/types.ts#toError
+reference: packages/agent/src/harness/types.ts#toError
+target: github.com/nankedr/pig/agent.ToError
+func ToError(value any) error
+
+## symbol:agent/src/harness/utils/shell-output.ts#ShellCaptureOptions
+reference: packages/agent/src/harness/utils/shell-output.ts#ShellCaptureOptions
+target: github.com/nankedr/pig/agent.ShellCaptureOptions
+type ShellCaptureOptions struct {
+	ShellExecOptions
+	OnChunk               func(string, func() ShellCaptureProgress)
+	ReturnExecutionErrors bool
+}
+
+## symbol:agent/src/harness/utils/shell-output.ts#ShellCaptureProgress
+reference: packages/agent/src/harness/utils/shell-output.ts#ShellCaptureProgress
+target: github.com/nankedr/pig/agent.ShellCaptureProgress
+type ShellCaptureProgress struct {
+	Output         string
+	Truncation     TruncationResult
+	FullOutputPath string
+	LastLineBytes  int
+}
+
+## symbol:agent/src/harness/utils/shell-output.ts#ShellCaptureResult
+reference: packages/agent/src/harness/utils/shell-output.ts#ShellCaptureResult
+target: github.com/nankedr/pig/agent.ShellCaptureResult
+type ShellCaptureResult struct {
+	ShellCaptureProgress
+	ExitCode       int
+	ExitCodeSet    bool
+	Cancelled      bool
+	Truncated      bool
+	ExecutionError *ExecutionError
+}
+
+## symbol:agent/src/harness/utils/shell-output.ts#executeShellWithCapture
+reference: packages/agent/src/harness/utils/shell-output.ts#executeShellWithCapture
+target: github.com/nankedr/pig/agent.ExecuteShellWithCapture
+func ExecuteShellWithCapture(context.Context, ExecutionEnv, string, ShellCaptureOptions) (Result[ShellCaptureResult], error)
+
+## symbol:agent/src/harness/utils/shell-output.ts#sanitizeBinaryOutput
+reference: packages/agent/src/harness/utils/shell-output.ts#sanitizeBinaryOutput
+target: github.com/nankedr/pig/agent.SanitizeBinaryOutput
+func SanitizeBinaryOutput(value string) string
+
+## symbol:agent/src/harness/utils/truncate.ts#DEFAULT_MAX_BYTES
+reference: packages/agent/src/harness/utils/truncate.ts#DEFAULT_MAX_BYTES
+target: github.com/nankedr/pig/agent.DefaultMaxBytes
+const DefaultMaxBytes = 50 * 1024
+
+## symbol:agent/src/harness/utils/truncate.ts#DEFAULT_MAX_LINES
+reference: packages/agent/src/harness/utils/truncate.ts#DEFAULT_MAX_LINES
+target: github.com/nankedr/pig/agent.DefaultMaxLines
+const DefaultMaxLines = 2000
+
+## symbol:agent/src/harness/utils/truncate.ts#GREP_MAX_LINE_LENGTH
+reference: packages/agent/src/harness/utils/truncate.ts#GREP_MAX_LINE_LENGTH
+target: github.com/nankedr/pig/agent.GrepMaxLineLength
+const GrepMaxLineLength = 500
+
+## symbol:agent/src/harness/utils/truncate.ts#TruncationOptions
+reference: packages/agent/src/harness/utils/truncate.ts#TruncationOptions
+target: github.com/nankedr/pig/agent.TruncationOptions
+type TruncationOptions struct {
+	MaxLines int
+	MaxBytes int
+}
+
+## symbol:agent/src/harness/utils/truncate.ts#TruncationResult
+reference: packages/agent/src/harness/utils/truncate.ts#TruncationResult
+target: github.com/nankedr/pig/agent.TruncationResult
+type TruncationResult struct {
+	Content               string
+	Truncated             bool
+	TruncatedBy           TruncationLimit
+	TotalLines            int
+	TotalBytes            int
+	OutputLines           int
+	OutputBytes           int
+	LastLinePartial       bool
+	FirstLineExceedsLimit bool
+	MaxLines              int
+	MaxBytes              int
+}
+
+## symbol:agent/src/harness/utils/truncate.ts#formatSize
+reference: packages/agent/src/harness/utils/truncate.ts#formatSize
+target: github.com/nankedr/pig/agent.FormatSize
+func FormatSize(bytes int64) string
+
+## symbol:agent/src/harness/utils/truncate.ts#truncateHead
+reference: packages/agent/src/harness/utils/truncate.ts#truncateHead
+target: github.com/nankedr/pig/agent.TruncateHead
+func TruncateHead(content string, options TruncationOptions) TruncationResult
+
+## symbol:agent/src/harness/utils/truncate.ts#truncateLine
+reference: packages/agent/src/harness/utils/truncate.ts#truncateLine
+target: github.com/nankedr/pig/agent.TruncateLine
+func TruncateLine(line string, maxCharacters int) LineTruncation
+
+## symbol:agent/src/harness/utils/truncate.ts#truncateTail
+reference: packages/agent/src/harness/utils/truncate.ts#truncateTail
+target: github.com/nankedr/pig/agent.TruncateTail
+func TruncateTail(content string, options TruncationOptions) TruncationResult
