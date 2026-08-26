@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 6523
+- Total entries: 6524
 
 | Status | Count |
 | --- | --- |
-| inventoried | 2254 |
-| scaffolded | 4233 |
-| partial | 26 |
+| inventoried | 2251 |
+| scaffolded | 4231 |
+| partial | 32 |
 | implemented | 2 |
 | verified | 6 |
 | deferred | 2 |
@@ -2082,7 +2082,6 @@
 | --- | --- | --- | --- | --- | --- |
 | constructor:ai/src/api/pi-messages.ts#PiMessagesResponseError | inventoried | M11 | contract | github.com/nankedr/pig/ai.PiMessagesResponseError | ai |
 | constructor:ai/src/auth/resolve.ts#ModelsError | inventoried | M1 | contract | github.com/nankedr/pig/ai.ModelsError | ai |
-| contract:auth/pig-ai/login-cli | inventoried | M11 | contract | github.com/nankedr/pig/cmd/pig-ai | ai |
 | matrix:ai/openai-completions/compat/chat-template-kwarg-value-omit-when-off | inventoried | M10 | field | github.com/nankedr/pig/ai.ChatTemplateKwargValue | ai |
 | matrix:ai/openai-completions/compat/chat-template-kwarg-value-var | inventoried | M10 | field | github.com/nankedr/pig/ai.ChatTemplateKwargValue | ai |
 | matrix:ai/openai-completions/compat/open-router-routing-max-price-audio | inventoried | M10 | field | github.com/nankedr/pig/ai.OpenRouterRouting.MaxPrice | ai |
@@ -2377,7 +2376,6 @@
 | matrix:ai/openai-completions/usage/usage-source-choice | inventoried | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.UsageMapper.ChoiceSource | ai |
 | matrix:ai/openai-completions/usage/usage-source-chunk | inventoried | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.UsageMapper.ChunkSource | ai |
 | matrix:ai/openai-completions/usage/usage-total-formula | inventoried | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.UsageMapper.Total | ai |
-| cmd-pig-ai | scaffolded | M11 | command | github.com/nankedr/pig/cmd/pig-ai | ai |
 | constructor:ai/src/auth/credential-store.ts#InMemoryCredentialStore | scaffolded | M1 | contract | github.com/nankedr/pig/ai.NewInMemoryCredentialStore | ai |
 | constructor:ai/src/models-store.ts#InMemoryModelsStore | scaffolded | M1 | contract | github.com/nankedr/pig/ai.NewInMemoryModelsStore | ai |
 | constructor:ai/src/utils/event-stream.ts#AssistantMessageEventStream | scaffolded | M1 | contract | github.com/nankedr/pig/ai.NewAssistantMessageEventStream | ai |
@@ -2639,6 +2637,7 @@
 | matrix:ai/openai-completions/usage/usage-output | scaffolded | M1 | field | github.com/nankedr/pig/ai.Usage.Output | ai |
 | matrix:ai/openai-completions/usage/usage-reasoning | scaffolded | M2 | field | github.com/nankedr/pig/ai.Usage.Reasoning | ai |
 | matrix:ai/openai-completions/usage/usage-total-tokens | scaffolded | M1 | field | github.com/nankedr/pig/ai.Usage.TotalTokens | ai |
+| cmd-pig-ai | partial | M11 | command | github.com/nankedr/pig/cmd/pig-ai | ai |
 | contract:ai/api-entrypoints | partial | M11 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/auth | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/auth-entrypoints | partial | M11 | contract | github.com/nankedr/pig/ai | ai |
@@ -2655,6 +2654,7 @@
 | contract:ai/provider-factories | partial | M11 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/providers-all | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/tool | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:auth/pig-ai/login-cli | partial | M11 | contract | github.com/nankedr/pig/internal/pigaicli | ai |
 | module-ai | partial | M1 | package | github.com/nankedr/pig/ai | ai |
 | matrix:ai/openai-completions/option/open-aicompletions-options-metadata | verified | M0 | field | github.com/nankedr/pig/ai.OpenAICompletionsOptions.Metadata | ai |
 | matrix:ai/openai-completions/option/open-aicompletions-options-telemetry-context | verified | M0 | field | github.com/nankedr/pig/ai.OpenAICompletionsOptions.TelemetryContext | ai |
@@ -2711,8 +2711,6 @@
 | constructor:codingagent/src/modes/interactive/components/user-message-selector.ts#UserMessageSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/theme/theme.ts#Theme | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.Theme | coding-agent |
-| contract:cli/pig/args | inventoried | M3 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
-| contract:cli/pig/exit-codes | inventoried | M3 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | contract:config/auth-json | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:config/models-json | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:config/settings | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
@@ -3433,7 +3431,6 @@
 | member:codingagent/src/modes/interactive/theme/theme.ts#ThemeColor.trimRight | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ThemeColor | coding-agent |
 | member:codingagent/src/modes/interactive/theme/theme.ts#ThemeColor.trimStart | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ThemeColor | coding-agent |
 | member:codingagent/src/modes/interactive/theme/theme.ts#ThemeColor.valueOf | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ThemeColor | coding-agent |
-| cmd-pig | scaffolded | M1 | command | github.com/nankedr/pig/cmd/pig | coding-agent |
 | constructor:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.NewAgentSessionRuntime | coding-agent |
 | constructor:codingagent/src/core/agent-session.ts#AgentSession | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.NewAgentSession | coding-agent |
 | constructor:codingagent/src/core/model-registry.ts#ModelRegistry | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.NewModelRegistry | coding-agent |
@@ -5290,6 +5287,10 @@
 | symbol:codingagent/src/utils/image-resize.ts#formatDimensionNote | scaffolded | M12 | symbol | github.com/nankedr/pig/codingagent.FormatDimensionNote | coding-agent |
 | symbol:codingagent/src/utils/image-resize.ts#resizeImage | scaffolded | M12 | symbol | github.com/nankedr/pig/codingagent.ResizeImage | coding-agent |
 | symbol:codingagent/src/utils/shell.ts#getShellConfig | scaffolded | M13 | symbol | github.com/nankedr/pig/codingagent.GetShellConfig | coding-agent |
+| cmd-pig | partial | M1 | command | github.com/nankedr/pig/cmd/pig | coding-agent |
+| contract:cli/pig/args | partial | M3 | contract | github.com/nankedr/pig/codingagent.RunCLI | coding-agent |
+| contract:cli/pig/exit-codes | partial | M3 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
+| contract:cli/pig/experimental | partial | M0 | contract | github.com/nankedr/pig/codingagent.runExperimentalCLI | coding-agent |
 | contract:codingagent/compaction | partial | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |

@@ -1,0 +1,115 @@
+pig root
+  args: []
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.pig: not implemented\n"
+pig listener
+  args: ["--listen" "unix:///tmp/pig.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.pig: not implemented\n"
+pig auth token
+  args: ["--auth-token" "token"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.pig: not implemented\n"
+pig auth token file
+  args: ["--auth-token-file" "/tmp/pig.token"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.pig: not implemented\n"
+server root
+  args: ["server"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.server: not implemented\n"
+server
+  args: ["server" "--listen" "unix:///tmp/pig.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.server: not implemented\n"
+server auth
+  args: ["server" "--auth-token" "token"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.server: not implemented\n"
+client root
+  args: ["client"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.client: not implemented\n"
+client
+  args: ["client" "--connect" "unix:///tmp/pig.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.client: not implemented\n"
+client auth
+  args: ["client" "--auth-token-file" "/tmp/pig.token"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.client: not implemented\n"
+legacy remainder
+  args: ["--model" "openai/gpt" "--listen=unix:///tmp/ignored.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.pig: not implemented\n"
+root help is legacy input
+  args: ["--help"]
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.experimental.pig: not implemented\n"
+missing listener
+  args: ["--listen"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --listen requires a value\n"
+duplicate listener
+  args: ["--listen" "unix:///tmp/pig.sock" "--listen=unix:///tmp/other.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --listen may only be specified once\n"
+duplicate connector
+  args: ["client" "--connect" "unix:///tmp/pig.sock" "--connect=unix:///tmp/other.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --connect may only be specified once\n"
+duplicate auth token
+  args: ["--auth-token" "one" "--auth-token" "two"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --auth-token may only be specified once\n"
+mutually exclusive auth
+  args: ["--auth-token" "token" "--auth-token-file" "/tmp/pig.token"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --auth-token and --auth-token-file are mutually exclusive\n"
+root connector is client only
+  args: ["--connect="]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --connect is only valid for client mode\n"
+invalid transport
+  args: ["server" "--listen" "ws://localhost:8080"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unsupported --listen transport \"ws:\"\n"
+invalid address
+  args: ["--listen" "relative.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: Invalid --listen address \"relative.sock\"\n"
+authority forbidden
+  args: ["--listen" "unix://relative.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unix transport address must not include an authority\n"
+client rejects legacy option
+  args: ["client" "--listen" "unix:///tmp/pig.sock"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: The experimental client command does not support existing CLI options yet\n"
+server rejects legacy option
+  args: ["server" "--model" "openai/gpt"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: The experimental server command does not support existing CLI options yet\n"

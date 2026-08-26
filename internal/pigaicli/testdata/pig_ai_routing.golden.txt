@@ -1,0 +1,135 @@
+list
+  args: ["list"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.List: not implemented\n"
+list trailing argument
+  args: ["list" "ignored"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.List: not implemented\n"
+list trailing option
+  args: ["list" "--unknown"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.List: not implemented\n"
+login chooser
+  args: ["login"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login anthropic
+  args: ["login" "anthropic"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login github copilot
+  args: ["login" "github-copilot"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login kimi coding
+  args: ["login" "kimi-coding"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login openai codex
+  args: ["login" "openai-codex"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login openrouter
+  args: ["login" "openrouter"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login radius
+  args: ["login" "radius"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login xai
+  args: ["login" "xai"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login trailing argument
+  args: ["login" "anthropic" "ignored"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+login trailing option
+  args: ["login" "anthropic" "--unknown"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+auth path before list
+  args: ["--auth-path" "/tmp/auth.json" "list"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.List: not implemented\n"
+auth path after list
+  args: ["list" "--auth-path" "/tmp/auth.json"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.List: not implemented\n"
+auth path before login
+  args: ["--auth-path" "/tmp/auth.json" "login" "anthropic"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+auth path after login
+  args: ["login" "--auth-path" "/tmp/auth.json" "anthropic"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+auth path after provider
+  args: ["login" "anthropic" "--auth-path" "/tmp/auth.json"]
+  exit: 1
+  stdout: ""
+  stderr: "ai.CLI.Login: not implemented\n"
+missing auth path only
+  args: ["--auth-path"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --auth-path requires a value\n"
+missing auth path after list
+  args: ["list" "--auth-path"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --auth-path requires a value\n"
+missing auth path after provider
+  args: ["login" "anthropic" "--auth-path"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --auth-path requires a value\n"
+option cannot be auth path
+  args: ["list" "--auth-path" "--unknown"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --auth-path requires a value\n"
+duplicate auth path
+  args: ["--auth-path" "one.json" "list" "--auth-path" "two.json"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: --auth-path may only be specified once\n"
+unknown provider
+  args: ["login" "unknown"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown provider: unknown\n"
+version absent
+  args: ["--version"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown command: --version\n"
+logout absent
+  args: ["logout"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown command: logout\n"
+unknown command
+  args: ["unknown"]
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown command: unknown\n"

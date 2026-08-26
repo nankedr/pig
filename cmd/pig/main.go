@@ -1,13 +1,19 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
+	"os/signal"
 
 	"github.com/nankedr/pig/codingagent"
 )
 
 func main() {
-	fmt.Fprintln(os.Stderr, &codingagent.NotImplementedError{Module: "codingagent", Operation: "command"})
-	os.Exit(1)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+	if err := codingagent.Main(ctx, os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }

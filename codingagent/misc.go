@@ -2,7 +2,9 @@ package codingagent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -223,7 +225,7 @@ func ParseArgs(arguments []string) Args {
 					result.Thinking = level
 				} else {
 					result.Diagnostics = append(result.Diagnostics, ArgDiagnostic{
-						Type:    "error",
+						Type:    "warning",
 						Message: `Invalid thinking level "` + raw + `". Valid values: off, minimal, low, medium, high, xhigh, max`,
 					})
 				}
@@ -342,10 +344,23 @@ type MainOptions struct {
 // executable ABI remains deliberately unfrozen until the extension milestone.
 type InlineExtension ExtensionFactory
 
-// Main is the package-level product entry point. Product assembly remains an
-// explicit Capability Stub and therefore does not inspect args or host state.
-func Main(context.Context, []string, ...MainOptions) error {
-	return notImplemented("Main")
+// Main is the package-level product entry point. MainOptions remain inert until
+// the extension runtime milestone.
+func Main(ctx context.Context, arguments []string, _ ...MainOptions) error {
+	result, err := RunCLI(ctx, CLIInvocation{
+		Arguments:        arguments,
+		StdinIsTerminal:  isTerminalFile(os.Stdin),
+		StdoutIsTerminal: isTerminalFile(os.Stdout),
+	})
+	if result.Stderr != "" {
+		_, _ = fmt.Fprint(os.Stderr, result.Stderr)
+	}
+	if result.Stdout != "" {
+		if _, writeErr := fmt.Fprint(os.Stdout, result.Stdout); writeErr != nil {
+			return errors.New("Error: Failed to write stdout.")
+		}
+	}
+	return err
 }
 
 // Package and user configuration paths are ambient filesystem capabilities.

@@ -247,7 +247,7 @@ func TestParseArgsMatchesPinnedValueEdgeCases(t *testing.T) {
 		}
 	})
 
-	t.Run("invalid enum values are errors", func(t *testing.T) {
+	t.Run("invalid mode values are errors", func(t *testing.T) {
 		tests := []struct {
 			name        string
 			flag        string
@@ -256,8 +256,6 @@ func TestParseArgsMatchesPinnedValueEdgeCases(t *testing.T) {
 		}{
 			{name: "mode", flag: "--mode", value: "bogus", wantMessage: `Invalid mode "bogus". Valid values: text, json, rpc`},
 			{name: "mode consumes option-shaped value", flag: "--mode", value: "--help", wantMessage: `Invalid mode "--help". Valid values: text, json, rpc`},
-			{name: "thinking", flag: "--thinking", value: "bogus", wantMessage: `Invalid thinking level "bogus". Valid values: off, minimal, low, medium, high, xhigh, max`},
-			{name: "thinking consumes option-shaped value", flag: "--thinking", value: "--help", wantMessage: `Invalid thinking level "--help". Valid values: off, minimal, low, medium, high, xhigh, max`},
 		}
 
 		for _, test := range tests {
@@ -266,6 +264,30 @@ func TestParseArgsMatchesPinnedValueEdgeCases(t *testing.T) {
 				wantDiagnostic := ArgDiagnostic{Type: "error", Message: test.wantMessage}
 				if got.Help {
 					t.Fatal("Help = true, want enum option to consume its value")
+				}
+				if len(got.Diagnostics) != 1 || got.Diagnostics[0] != wantDiagnostic {
+					t.Fatalf("Diagnostics = %#v, want %#v", got.Diagnostics, []ArgDiagnostic{wantDiagnostic})
+				}
+			})
+		}
+	})
+
+	t.Run("invalid thinking values are warnings", func(t *testing.T) {
+		tests := []struct {
+			name        string
+			value       string
+			wantMessage string
+		}{
+			{name: "ordinary value", value: "bogus", wantMessage: `Invalid thinking level "bogus". Valid values: off, minimal, low, medium, high, xhigh, max`},
+			{name: "option-shaped value", value: "--help", wantMessage: `Invalid thinking level "--help". Valid values: off, minimal, low, medium, high, xhigh, max`},
+		}
+
+		for _, test := range tests {
+			t.Run(test.name, func(t *testing.T) {
+				got := ParseArgs([]string{"--thinking", test.value})
+				wantDiagnostic := ArgDiagnostic{Type: "warning", Message: test.wantMessage}
+				if got.Help {
+					t.Fatal("Help = true, want thinking option to consume its value")
 				}
 				if len(got.Diagnostics) != 1 || got.Diagnostics[0] != wantDiagnostic {
 					t.Fatalf("Diagnostics = %#v, want %#v", got.Diagnostics, []ArgDiagnostic{wantDiagnostic})

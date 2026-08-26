@@ -1,0 +1,14 @@
+Usage:
+  pig remove <source> [-l] [--approve|--no-approve]
+
+Remove a package and its source from settings.
+Alias: pig uninstall <source> [-l]
+
+Options:
+  -l, --local       Remove from project settings (.pig/settings.json)
+  -a, --approve     Trust project-local files for this command
+  -na, --no-approve Ignore project-local files for this command
+
+Examples:
+  pig remove npm:@foo/bar
+  pig uninstall npm:@foo/bar

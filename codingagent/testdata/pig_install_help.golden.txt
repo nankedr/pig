@@ -1,0 +1,17 @@
+Usage:
+  pig install <source> [-l] [--approve|--no-approve]
+
+Install a package and add it to settings.
+
+Options:
+  -l, --local       Install project-locally (.pig/settings.json)
+  -a, --approve     Trust project-local files for this command
+  -na, --no-approve Ignore project-local files for this command
+
+Examples:
+  pig install npm:@foo/bar
+  pig install git:github.com/user/repo
+  pig install git:git@github.com:user/repo
+  pig install https://github.com/user/repo
+  pig install ssh://git@github.com/user/repo
+  pig install ./local/path

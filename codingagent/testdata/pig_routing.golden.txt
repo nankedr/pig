@@ -1,0 +1,966 @@
+version long
+  args: ["--version"]
+  terminals: stdin=false stdout=false
+  exit: 0
+  stdout: "0.0.0\n"
+  stderr: ""
+version short
+  args: ["-v"]
+  terminals: stdin=false stdout=false
+  exit: 0
+  stdout: "0.0.0\n"
+  stderr: ""
+version bypasses root constraints
+  args: ["--session-id" "-bad" "--version"]
+  terminals: stdin=false stdout=false
+  exit: 0
+  stdout: "0.0.0\n"
+  stderr: ""
+bare help is a message
+  args: ["help"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+bare version is a message
+  args: ["version"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+interactive
+  args: []
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+explicit text
+  args: ["--mode" "text"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+print long
+  args: ["--print"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.print.text: not implemented\n"
+print short
+  args: ["-p"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.print.text: not implemented\n"
+piped stdin
+  args: []
+  terminals: stdin=false stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.print.text: not implemented\n"
+redirected stdout
+  args: []
+  terminals: stdin=true stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.print.text: not implemented\n"
+json
+  args: ["--mode" "json"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.json: not implemented\n"
+rpc
+  args: ["--mode" "rpc"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.rpc: not implemented\n"
+provider
+  args: ["--provider" "openai"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+model
+  args: ["--model" "openai/gpt"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+api key
+  args: ["--api-key" "test-key"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+system prompt
+  args: ["--system-prompt" "prompt"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+append system prompt
+  args: ["--append-system-prompt" "appendix"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+continue long
+  args: ["--continue"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+continue short
+  args: ["-c"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+resume long
+  args: ["--resume"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+resume short
+  args: ["-r"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+session
+  args: ["--session" "session.jsonl"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+session id
+  args: ["--session-id" "session-1"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+session id with interior punctuation
+  args: ["--session-id" "abc-123_def.456"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+fork
+  args: ["--fork" "old.jsonl"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+session dir
+  args: ["--session-dir" "sessions"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no session
+  args: ["--no-session"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+name long
+  args: ["--name" "review"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+name short
+  args: ["-n" "review"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+models
+  args: ["--models" "openai/*,anthropic/*"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no tools long
+  args: ["--no-tools"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no tools short
+  args: ["-nt"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no builtin tools long
+  args: ["--no-builtin-tools"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no builtin tools short
+  args: ["-nbt"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+tools long
+  args: ["--tools" "read,bash"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+tools short
+  args: ["-t" "read,bash"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+exclude tools long
+  args: ["--exclude-tools" "bash"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+exclude tools short
+  args: ["-xt" "bash"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+thinking
+  args: ["--thinking" "high"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no extensions long
+  args: ["--no-extensions"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no extensions short
+  args: ["-ne"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+skill
+  args: ["--skill" "skill.md"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no skills long
+  args: ["--no-skills"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no skills short
+  args: ["-ns"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+prompt template
+  args: ["--prompt-template" "prompt.md"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no prompt templates long
+  args: ["--no-prompt-templates"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no prompt templates short
+  args: ["-np"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+theme
+  args: ["--theme" "theme.json"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no themes
+  args: ["--no-themes"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no context files long
+  args: ["--no-context-files"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no context files short
+  args: ["-nc"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+verbose
+  args: ["--verbose"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+tui regular
+  args: ["--tui-mode" "regular"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+tui fullscreen
+  args: ["--tui-mode" "fullscreen"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+approve long
+  args: ["--approve"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+approve short
+  args: ["-a"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no approve long
+  args: ["--no-approve"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+no approve short
+  args: ["-na"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+offline
+  args: ["--offline"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+file argument
+  args: ["@prompt.md"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+message argument
+  args: ["explain this"]
+  terminals: stdin=true stdout=true
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.mode.interactive: not implemented\n"
+install
+  args: ["install" "npm:@example/pkg"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.install: not implemented\n"
+install short options
+  args: ["install" "npm:@example/pkg" "-l" "-a"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.install: not implemented\n"
+install long options
+  args: ["install" "npm:@example/pkg" "--local" "--approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.install: not implemented\n"
+install no approve short
+  args: ["install" "npm:@example/pkg" "-na"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.install: not implemented\n"
+install no approve long
+  args: ["install" "npm:@example/pkg" "--no-approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.install: not implemented\n"
+remove
+  args: ["remove" "npm:@example/pkg"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.remove: not implemented\n"
+remove short options
+  args: ["remove" "npm:@example/pkg" "-l" "-a"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.remove: not implemented\n"
+remove long options
+  args: ["remove" "npm:@example/pkg" "--local" "--no-approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.remove: not implemented\n"
+uninstall
+  args: ["uninstall" "npm:@example/pkg"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.remove: not implemented\n"
+uninstall options
+  args: ["uninstall" "npm:@example/pkg" "-l" "-na"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.remove: not implemented\n"
+update
+  args: ["update"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update source
+  args: ["update" "npm:@example/pkg"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update self target
+  args: ["update" "self"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update pig target
+  args: ["update" "pig"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update self flag
+  args: ["update" "--self"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update extensions
+  args: ["update" "--extensions"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update models
+  args: ["update" "--models"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update all
+  args: ["update" "--all"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update extension
+  args: ["update" "--extension" "npm:@example/pkg"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update force
+  args: ["update" "--force"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update approve short
+  args: ["update" "-a"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update approve long
+  args: ["update" "--approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update no approve short
+  args: ["update" "-na"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+update no approve long
+  args: ["update" "--no-approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.update: not implemented\n"
+list
+  args: ["list"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.list: not implemented\n"
+list approve short
+  args: ["list" "-a"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.list: not implemented\n"
+list approve long
+  args: ["list" "--approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.list: not implemented\n"
+list no approve short
+  args: ["list" "-na"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.list: not implemented\n"
+list no approve long
+  args: ["list" "--no-approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.list: not implemented\n"
+config
+  args: ["config"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.config: not implemented\n"
+config short options
+  args: ["config" "-l" "-a"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.config: not implemented\n"
+config long options
+  args: ["config" "--local" "--approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.config: not implemented\n"
+config no approve short
+  args: ["config" "-na"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.config: not implemented\n"
+config no approve long
+  args: ["config" "--no-approve"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.config: not implemented\n"
+auth check
+  args: ["auth" "check" "--provider" "openai"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.check: not implemented\n"
+auth check model
+  args: ["auth" "check" "--model" "openai/gpt"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.check: not implemented\n"
+auth check json
+  args: ["auth" "check" "--provider" "openai" "--json"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.check: not implemented\n"
+auth check credentials
+  args: ["auth" "check" "--provider" "openai" "--credentials"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.check: not implemented\n"
+auth check no refresh
+  args: ["auth" "check" "--provider" "openai" "--no-refresh"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.check: not implemented\n"
+auth api key
+  args: ["auth" "print-api-key" "--provider" "openai"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.print-api-key: not implemented\n"
+auth api key model
+  args: ["auth" "print-api-key" "--model" "openai/gpt"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.print-api-key: not implemented\n"
+auth bearer token
+  args: ["auth" "print-bearer-token" "--provider" "openai"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.print-bearer-token: not implemented\n"
+auth bearer token model
+  args: ["auth" "print-bearer-token" "--model" "openai/gpt"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.print-bearer-token: not implemented\n"
+auth bearer token expiry
+  args: ["auth" "print-bearer-token" "--provider" "openai" "--min-expiry" "30m"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.command.auth.print-bearer-token: not implemented\n"
+extension discovery long
+  args: ["--extension" "extension.ts"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.extension.discovery: not implemented\n"
+extension discovery short
+  args: ["-e" "extension.ts"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.extension.discovery: not implemented\n"
+extension flag bare
+  args: ["--plan"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.extension.flag.plan: not implemented\n"
+extension flag separate value
+  args: ["--review" "deep"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.extension.flag.review: not implemented\n"
+extension flag equals value
+  args: ["--review=deep"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.extension.flag.review: not implemented\n"
+first extension flag wins
+  args: ["--zeta" "--alpha"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.extension.flag.zeta: not implemented\n"
+session export
+  args: ["--export" "session.jsonl"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.session.export: not implemented\n"
+session export bypasses root constraints
+  args: ["--name" " " "--export" "session.jsonl"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.session.export: not implemented\n"
+model list all
+  args: ["--list-models"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.models.list: not implemented\n"
+model list search
+  args: ["--list-models" "openai"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "codingagent.models.list: not implemented\n"
+invalid mode
+  args: ["--mode" "invalid"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Invalid mode \"invalid\". Valid values: text, json, rpc\n"
+missing mode
+  args: ["--mode"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --mode requires a value\n"
+invalid mode precedes help
+  args: ["--mode" "invalid" "--help"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Invalid mode \"invalid\". Valid values: text, json, rpc\n"
+missing tui mode
+  args: ["--tui-mode"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --tui-mode requires regular or fullscreen\n"
+invalid tui mode
+  args: ["--tui-mode" "invalid"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Invalid TUI mode \"invalid\". Valid values: regular, fullscreen\n"
+missing thinking
+  args: ["--thinking"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --thinking requires a value\n"
+invalid thinking
+  args: ["--thinking" "invalid"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Warning: Invalid thinking level \"invalid\". Valid values: off, minimal, low, medium, high, xhigh, max\ncodingagent.mode.print.text: not implemented\n"
+unknown short option
+  args: ["-z"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown option: -z\n"
+rpc rejects file
+  args: ["--mode" "rpc" "@prompt.md"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: @file arguments are not supported in RPC mode\n"
+fork session conflict
+  args: ["--fork" "old.jsonl" "--session" "new.jsonl"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --fork cannot be combined with --session\n"
+fork all conflicts
+  args: ["--fork" "old.jsonl" "--continue" "--resume" "--no-session"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --fork cannot be combined with --continue, --resume, --no-session\n"
+session id conflict
+  args: ["--session-id" "session-1" "--resume"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --session-id cannot be combined with --resume\n"
+invalid session id
+  args: ["--session-id" "-bad"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Session id must be non-empty, contain only alphanumeric characters, '-', '_', and '.', and start and end with an alphanumeric character\n"
+empty name
+  args: ["--name" ""]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --name requires a non-empty value\n"
+whitespace name
+  args: ["--name" " \t "]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --name requires a non-empty value\n"
+session id validation precedes help
+  args: ["--session-id" "-bad" "--help"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Session id must be non-empty, contain only alphanumeric characters, '-', '_', and '.', and start and end with an alphanumeric character\n"
+name validation precedes model list
+  args: ["--name" " " "--list-models"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --name requires a non-empty value\n"
+fork validation precedes extension discovery
+  args: ["--fork" "old.jsonl" "--resume" "--extension" "extension.ts"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --fork cannot be combined with --resume\n"
+RPC validation precedes extension flag
+  args: ["--mode" "rpc" "@prompt.md" "--plan"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: @file arguments are not supported in RPC mode\n"
+missing install source
+  args: ["install"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Missing install source.\n"
+missing remove source
+  args: ["remove"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Missing remove source.\n"
+missing uninstall source
+  args: ["uninstall"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Missing remove source.\n"
+install extra argument
+  args: ["install" "one" "two"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unexpected argument two.\n"
+remove unknown option
+  args: ["remove" "pkg" "--force"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown option --force for \"remove\".\n"
+list unknown option
+  args: ["list" "--wat"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown option --wat for \"list\".\n"
+config unknown option
+  args: ["config" "--force"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown option --force for \"config\".\n"
+config extra argument
+  args: ["config" "extra"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unexpected argument extra.\n"
+update missing extension
+  args: ["update" "--extension"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Missing value for --extension.\n"
+update duplicate extension
+  args: ["update" "--extension" "one" "--extension" "two"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --extension can only be provided once\n"
+update all conflict
+  args: ["update" "--all" "--models"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --all cannot be combined with --self, --extensions, --models, or --extension\n"
+update all source conflict
+  args: ["update" "source" "--all"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --all cannot be combined with a positional source\n"
+update models conflict
+  args: ["update" "--models" "--self"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --models cannot be combined with --self, --extensions, --all, or --extension\n"
+update models source conflict
+  args: ["update" "source" "--models"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --models cannot be combined with a positional source\n"
+update extension flag conflict
+  args: ["update" "--extension" "one" "--self"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --extension cannot be combined with --self, --extensions, or --all\n"
+update extension source conflict
+  args: ["update" "source" "--extension" "one"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --extension cannot be combined with a positional source\n"
+update positional conflict
+  args: ["update" "source" "--self"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: positional update targets cannot be combined with --self, --extensions, or --all\n"
+unknown auth command
+  args: ["auth" "login"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown auth command \"login\". Use \"pig auth print-api-key\", \"pig auth print-bearer-token\", or \"pig auth check\".\n"
+missing auth selector
+  args: ["auth" "check"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Auth checks require --provider <provider> or --model <model>\n"
+missing auth print selector
+  args: ["auth" "print-api-key"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Credential printing requires --provider <provider> or --model <model>\n"
+auth unknown option
+  args: ["auth" "check" "--wat"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Unknown option --wat for \"auth check\".\n"
+auth missing provider
+  args: ["auth" "check" "--provider"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --provider requires a value\n"
+auth api key rejects json
+  args: ["auth" "print-api-key" "--provider" "openai" "--json"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --json is only supported by auth check\n"
+auth check rejects expiry
+  args: ["auth" "check" "--provider" "openai" "--min-expiry" "30m"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --min-expiry is only supported by print-bearer-token\n"
+auth invalid expiry
+  args: ["auth" "print-bearer-token" "--provider" "openai" "--min-expiry" "30"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: --min-expiry must use a duration such as 30m or 1h\n"
+auth rejects message
+  args: ["auth" "check" "--provider" "openai" "message"]
+  terminals: stdin=false stdout=false
+  exit: 1
+  stdout: ""
+  stderr: "Error: Auth commands only accept --provider and --model\n"

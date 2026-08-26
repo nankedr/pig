@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nankedr/pig/ai"
+	"github.com/nankedr/pig/internal/pigaicli"
 )
 
 func main() {
-	fmt.Fprintln(os.Stderr, &ai.NotImplementedError{Module: "ai", Operation: "command"})
-	os.Exit(1)
+	if err := pigaicli.Run(os.Args[1:], os.Stdout, os.Stderr); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
