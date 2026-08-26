@@ -7,6 +7,23 @@ import (
 	"github.com/nankedr/pig/internal/capability"
 )
 
+// PiMessagesResponseError preserves the public error data exposed by the
+// Pi Messages adapter. It is a value carrier only: constructing it performs
+// no request, credential lookup, or other provider work.
+type PiMessagesResponseError struct {
+	Message           string
+	Code              *string
+	DiagnosticDetails map[string]any
+}
+
+// Error returns the provider response message.
+func (e *PiMessagesResponseError) Error() string {
+	if e == nil {
+		return ""
+	}
+	return e.Message
+}
+
 var ErrNotImplemented = capability.ErrNotImplemented
 
 type NotImplementedError = capability.NotImplementedError

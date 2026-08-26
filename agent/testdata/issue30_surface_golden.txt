@@ -52,6 +52,10 @@ type AgentHarness struct {
 	followUpMode       QueueMode
 	closed             bool
 }
+func NewAgentHarness(
+	ctx context.Context,
+	options AgentHarnessOptions,
+) (*AgentHarness, []SuspendedOperation, error)
 func (*AgentHarness) Name() string
 func (h *AgentHarness) Abort(context.Context) (AbortResult, error)
 func (h *AgentHarness) CancelQueued(context.Context, string) (CancelQueuedResult, error)
@@ -186,6 +190,7 @@ target: github.com/nankedr/pig/agent.Closed
 type Closed struct {
 	Message string
 }
+func IsClosed(err error) bool
 func (*Closed) Tag() string
 func (e *Closed) Error() string
 func (e *Closed) ToJSON() map[string]any
@@ -293,6 +298,7 @@ type InvalidLane struct {
 	Reason  string
 	Message string
 }
+func IsInvalidLane(err error) bool
 func (*InvalidLane) Tag() string
 func (e *InvalidLane) Error() string
 func (e *InvalidLane) ToJSON() map[string]any
@@ -305,6 +311,7 @@ type InvalidMessage struct {
 	Reason  string
 	Message string
 }
+func IsInvalidMessage(err error) bool
 func (*InvalidMessage) Tag() string
 func (e *InvalidMessage) Error() string
 func (e *InvalidMessage) ToJSON() map[string]any
@@ -318,6 +325,7 @@ type LaneBusy struct {
 	OperationKind OperationKind
 	Message       string
 }
+func IsLaneBusy(err error) bool
 func (*LaneBusy) Tag() string
 func (e *LaneBusy) Error() string
 func (e *LaneBusy) ToJSON() map[string]any
@@ -329,6 +337,7 @@ type LaneExists struct {
 	Lane    string
 	Message string
 }
+func IsLaneExists(err error) bool
 func (*LaneExists) Tag() string
 func (e *LaneExists) Error() string
 func (e *LaneExists) ToJSON() map[string]any
@@ -366,6 +375,7 @@ type MissingIdentities struct {
 	Models  []string
 	Message string
 }
+func IsMissingIdentities(err error) bool
 func (*MissingIdentities) Tag() string
 func (e *MissingIdentities) Error() string
 func (e *MissingIdentities) ToJSON() map[string]any
@@ -415,6 +425,7 @@ type NoActiveOperation struct {
 	Lane    string
 	Message string
 }
+func IsNoActiveOperation(err error) bool
 func (*NoActiveOperation) Tag() string
 func (e *NoActiveOperation) Error() string
 func (e *NoActiveOperation) ToJSON() map[string]any
@@ -426,6 +437,7 @@ type NoActiveRun struct {
 	Lane    string
 	Message string
 }
+func IsNoActiveRun(err error) bool
 func (*NoActiveRun) Tag() string
 func (e *NoActiveRun) Error() string
 func (e *NoActiveRun) ToJSON() map[string]any
@@ -437,6 +449,7 @@ type NothingToCompact struct {
 	Lane    string
 	Message string
 }
+func IsNothingToCompact(err error) bool
 func (*NothingToCompact) Tag() string
 func (e *NothingToCompact) Error() string
 func (e *NothingToCompact) ToJSON() map[string]any
@@ -448,6 +461,7 @@ type NothingToResume struct {
 	Lane    string
 	Message string
 }
+func IsNothingToResume(err error) bool
 func (*NothingToResume) Tag() string
 func (e *NothingToResume) Error() string
 func (e *NothingToResume) ToJSON() map[string]any
@@ -587,6 +601,7 @@ type UnknownQueueItem struct {
 	EntryID string
 	Message string
 }
+func IsUnknownQueueItem(err error) bool
 func (*UnknownQueueItem) Tag() string
 func (e *UnknownQueueItem) Error() string
 func (e *UnknownQueueItem) ToJSON() map[string]any
@@ -598,6 +613,7 @@ type UnknownSkill struct {
 	Name    string
 	Message string
 }
+func IsUnknownSkill(err error) bool
 func (*UnknownSkill) Tag() string
 func (e *UnknownSkill) Error() string
 func (e *UnknownSkill) ToJSON() map[string]any
@@ -609,6 +625,7 @@ type UnknownTarget struct {
 	TargetID string
 	Message  string
 }
+func IsUnknownTarget(err error) bool
 func (*UnknownTarget) Tag() string
 func (e *UnknownTarget) Error() string
 func (e *UnknownTarget) ToJSON() map[string]any
@@ -620,6 +637,7 @@ type UnknownTemplate struct {
 	Name    string
 	Message string
 }
+func IsUnknownTemplate(err error) bool
 func (*UnknownTemplate) Tag() string
 func (e *UnknownTemplate) Error() string
 func (e *UnknownTemplate) ToJSON() map[string]any

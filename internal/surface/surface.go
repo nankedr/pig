@@ -25,7 +25,7 @@ import (
 
 // SchemaVersion is the surface snapshot schema version. It matches the value
 // emitted by parity/extract/surface.mjs.
-const SchemaVersion = "1.0.0"
+const SchemaVersion = "1.1.0"
 
 // Repository is the fixed upstream repository every symbol is extracted from.
 const Repository = "https://github.com/badlogic/pi-mono"
@@ -102,22 +102,26 @@ type Symbol struct {
 	Module         string   `json:"module"`
 	Name           string   `json:"name"`
 	Kind           string   `json:"kind"`
+	Constructible  bool     `json:"constructible"`
 	Upstream       Upstream `json:"upstream"`
 	ExportSubpaths []string `json:"export_subpaths"`
 	Members        []string `json:"members"`
+	StaticMembers  []string `json:"static_members"`
 }
 
 // Manifest is the versioned surface manifest (parity/surface/manifest.json). It
 // anchors the baseline commit and carries coverage counts, mirroring the
 // inventory manifest.
 type Manifest struct {
-	SchemaVersion  string         `json:"schema_version"`
-	BaselineCommit string         `json:"baseline_commit"`
-	Symbols        string         `json:"symbols"`
-	SymbolCount    int            `json:"symbol_count"`
-	MemberCount    int            `json:"member_count"`
-	ModuleCounts   map[string]int `json:"module_counts"`
-	KindCounts     map[string]int `json:"kind_counts"`
+	SchemaVersion     string         `json:"schema_version"`
+	BaselineCommit    string         `json:"baseline_commit"`
+	Symbols           string         `json:"symbols"`
+	SymbolCount       int            `json:"symbol_count"`
+	MemberCount       int            `json:"member_count"`
+	StaticMemberCount int            `json:"static_member_count"`
+	ConstructorCount  int            `json:"constructor_count"`
+	ModuleCounts      map[string]int `json:"module_counts"`
+	KindCounts        map[string]int `json:"kind_counts"`
 }
 
 // Kind identifies a consistency failure category.
@@ -136,6 +140,7 @@ const (
 	KindModuleUncovered  Kind = "module_uncovered"
 	KindNotSorted        Kind = "not_sorted"
 	KindManifestMismatch Kind = "manifest_mismatch"
+	KindSchemaVersion    Kind = "schema_version"
 )
 
 // Sentinel errors, matchable with errors.Is.
@@ -149,8 +154,9 @@ var (
 	ErrCommitMismatch   = errors.New("surface: upstream commit does not match manifest baseline")
 	ErrUnmapped         = errors.New("surface: module has no resolvable owning catalog entry")
 	ErrModuleUncovered  = errors.New("surface: in-scope module has no extracted symbols")
-	ErrNotSorted        = errors.New("surface: members or export_subpaths not sorted and unique")
+	ErrNotSorted        = errors.New("surface: members, static_members, or export_subpaths not sorted and unique")
 	ErrManifestMismatch = errors.New("surface: manifest counts do not match symbols")
+	ErrSchemaVersion    = errors.New("surface: schema version missing or inconsistent")
 	ErrMalformedLine    = errors.New("surface: malformed symbols.jsonl line")
 )
 
@@ -178,6 +184,8 @@ func sentinelFor(k Kind) error {
 		return ErrNotSorted
 	case KindManifestMismatch:
 		return ErrManifestMismatch
+	case KindSchemaVersion:
+		return ErrSchemaVersion
 	default:
 		return nil
 	}
@@ -223,7 +231,8 @@ func (e *ParseError) Error() string {
 func (e *ParseError) Unwrap() error { return ErrMalformedLine }
 
 // LoadSymbols parses a symbols.jsonl surface view line by line. A malformed line
-// is an error identifying the line number.
+// or a record missing the required constructible field is an error identifying
+// the line number.
 func LoadSymbols(path string) ([]Symbol, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -238,6 +247,15 @@ func LoadSymbols(path string) ([]Symbol, error) {
 		raw := scanner.Bytes()
 		if len(bytes.TrimSpace(raw)) == 0 {
 			return nil, &ParseError{Line: line, err: errors.New("blank line not allowed")}
+		}
+		var required struct {
+			Constructible *bool `json:"constructible"`
+		}
+		if err := json.Unmarshal(raw, &required); err != nil {
+			return nil, &ParseError{Line: line, err: err}
+		}
+		if required.Constructible == nil {
+			return nil, &ParseError{Line: line, err: errors.New("required field constructible is missing or null")}
 		}
 		dec := json.NewDecoder(bytes.NewReader(raw))
 		dec.DisallowUnknownFields()
@@ -294,19 +312,27 @@ func BuildManifest(symbols []Symbol, baselineCommit string) Manifest {
 	moduleCounts := map[string]int{}
 	kindCounts := map[string]int{}
 	members := 0
+	staticMembers := 0
+	constructors := 0
 	for _, s := range symbols {
 		moduleCounts[s.Module]++
 		kindCounts[s.Kind]++
 		members += len(s.Members)
+		staticMembers += len(s.StaticMembers)
+		if s.Constructible {
+			constructors++
+		}
 	}
 	return Manifest{
-		SchemaVersion:  SchemaVersion,
-		BaselineCommit: baselineCommit,
-		Symbols:        "symbols.jsonl",
-		SymbolCount:    len(symbols),
-		MemberCount:    members,
-		ModuleCounts:   moduleCounts,
-		KindCounts:     kindCounts,
+		SchemaVersion:     SchemaVersion,
+		BaselineCommit:    baselineCommit,
+		Symbols:           "symbols.jsonl",
+		SymbolCount:       len(symbols),
+		MemberCount:       members,
+		StaticMemberCount: staticMembers,
+		ConstructorCount:  constructors,
+		ModuleCounts:      moduleCounts,
+		KindCounts:        kindCounts,
 	}
 }
 
@@ -337,16 +363,20 @@ func isSortedUnique(values []string) bool {
 // requires the set of known Parity Catalog entry ids so it can reject symbols
 // whose owning module-level catalog entry does not resolve (unmapped surface).
 //
-// It rejects: symbols missing a required field; duplicate ids; illegal kind;
-// unknown module; ids that disagree with module/name; upstream provenance that
-// does not match the module (repository, module name, reference prefix); upstream
-// commit that differs from the manifest baseline; a module whose module-level
-// catalog entry is absent from the catalog; in-scope modules with no symbols;
-// members or export_subpaths that are not sorted-and-unique; and manifests whose
-// counts disagree with the symbols.
+// It rejects: symbols missing a required field; duplicate ids; illegal kind or a
+// non-class marked constructible; unknown module; ids that disagree with
+// module/name; upstream provenance that does not match the module (repository,
+// module name, reference prefix); upstream commit that differs from the manifest
+// baseline; a module whose module-level catalog entry is absent from the catalog;
+// in-scope modules with no symbols; members, static_members, or export_subpaths
+// that are not sorted-and-unique; and manifests whose symbol, member,
+// static-member, or constructor counts disagree with the symbols.
 func Validate(symbols []Symbol, manifest Manifest, catalogIDs map[string]bool) error {
 	if manifest.SchemaVersion == "" {
 		return newError(KindMissingField, "", "manifest schema_version is empty")
+	}
+	if manifest.SchemaVersion != SchemaVersion {
+		return newError(KindSchemaVersion, "", "manifest schema_version=%q want=%q", manifest.SchemaVersion, SchemaVersion)
 	}
 	if manifest.BaselineCommit == "" {
 		return newError(KindMissingField, "", "manifest baseline_commit is empty")
@@ -356,11 +386,15 @@ func Validate(symbols []Symbol, manifest Manifest, catalogIDs map[string]bool) e
 	moduleCounts := map[string]int{}
 	kindCounts := map[string]int{}
 	members := 0
+	staticMembers := 0
+	constructors := 0
 
 	for _, s := range symbols {
 		switch {
 		case s.SchemaVersion == "":
 			return newError(KindMissingField, s.ID, "schema_version is empty")
+		case s.SchemaVersion != SchemaVersion:
+			return newError(KindSchemaVersion, s.ID, "schema_version=%q want=%q", s.SchemaVersion, SchemaVersion)
 		case s.ID == "":
 			return newError(KindMissingField, s.ID, "id is empty")
 		case s.Module == "":
@@ -386,6 +420,9 @@ func Validate(symbols []Symbol, manifest Manifest, catalogIDs map[string]bool) e
 
 		if !kindEnum[s.Kind] {
 			return newError(KindIllegalKind, s.ID, "%s", s.Kind)
+		}
+		if s.Constructible && s.Kind != "class" {
+			return newError(KindIllegalKind, s.ID, "constructible=true requires kind=class, got %q", s.Kind)
 		}
 
 		mod, ok := moduleByPig[s.Module]
@@ -428,8 +465,10 @@ func Validate(symbols []Symbol, manifest Manifest, catalogIDs map[string]bool) e
 			return newError(KindUnmapped, s.ID, "owning catalog entry %s is not present", mod.CatalogID)
 		}
 
-		// The generated authority must be deterministic: members and export
-		// subpaths sorted and unique, no empty member names.
+		// The generated authority must be deterministic: instance/type members,
+		// static members, and export subpaths are sorted and unique, with no
+		// empty names. static_members must be present even when empty so the
+		// schema distinguishes an extracted empty set from an omitted field.
 		for _, name := range s.Members {
 			if name == "" {
 				return newError(KindMissingField, s.ID, "member name is empty")
@@ -437,6 +476,17 @@ func Validate(symbols []Symbol, manifest Manifest, catalogIDs map[string]bool) e
 		}
 		if !isSortedUnique(s.Members) {
 			return newError(KindNotSorted, s.ID, "members not sorted and unique")
+		}
+		if s.StaticMembers == nil {
+			return newError(KindMissingField, s.ID, "static_members is missing")
+		}
+		for _, name := range s.StaticMembers {
+			if name == "" {
+				return newError(KindMissingField, s.ID, "static member name is empty")
+			}
+		}
+		if !isSortedUnique(s.StaticMembers) {
+			return newError(KindNotSorted, s.ID, "static_members not sorted and unique")
 		}
 		if len(s.ExportSubpaths) == 0 {
 			return newError(KindMissingField, s.ID, "export_subpaths is empty")
@@ -453,6 +503,10 @@ func Validate(symbols []Symbol, manifest Manifest, catalogIDs map[string]bool) e
 		moduleCounts[s.Module]++
 		kindCounts[s.Kind]++
 		members += len(s.Members)
+		staticMembers += len(s.StaticMembers)
+		if s.Constructible {
+			constructors++
+		}
 	}
 
 	for _, m := range Modules {
@@ -466,6 +520,12 @@ func Validate(symbols []Symbol, manifest Manifest, catalogIDs map[string]bool) e
 	}
 	if manifest.MemberCount != members {
 		return newError(KindManifestMismatch, "", "member_count=%d actual=%d", manifest.MemberCount, members)
+	}
+	if manifest.StaticMemberCount != staticMembers {
+		return newError(KindManifestMismatch, "", "static_member_count=%d actual=%d", manifest.StaticMemberCount, staticMembers)
+	}
+	if manifest.ConstructorCount != constructors {
+		return newError(KindManifestMismatch, "", "constructor_count=%d actual=%d", manifest.ConstructorCount, constructors)
 	}
 	if err := compareCounts("module_counts", manifest.ModuleCounts, moduleCounts); err != nil {
 		return err

@@ -17,6 +17,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/internal/catalog"
 	"github.com/nankedr/pig/internal/surface"
 )
@@ -25,10 +26,12 @@ var updateIssue30Catalog = flag.Bool("update-issue30-catalog", false, "regenerat
 var updateIssue30Surface = flag.Bool("update-issue30-surface", false, "regenerate the issue #30 Go API snapshot")
 
 const (
-	issue30BaselineCommit = "936aff00918de1187f085f123c2812d8f2d67745"
-	issue30SurfaceHash    = "sha256:353816fada23e5469f2357d8a5e1b034481b0ada916e8ea129773f934a42c689"
-	issue30MemberTestRef  = "agent/issue30_surface_test.go#TestIssue30ScaffoldedMemberTargetsResolve"
-	issue30MemberTestRun  = "go test ./agent -run '^(TestIssue30MemberMappingsMatchLockedHarnessSurface|TestIssue30ScaffoldedMemberTargetsResolve)$' -count=1"
+	issue30BaselineCommit      = "936aff00918de1187f085f123c2812d8f2d67745"
+	issue30SurfaceHash         = "sha256:878278ceb284bc0b2489a5dee57b63622c75827e1c3d1b833af32d980192852f"
+	issue30MemberTestRef       = "agent/issue30_surface_test.go#TestIssue30ScaffoldedMemberTargetsResolve"
+	issue30MemberTestRun       = "go test ./agent -run '^(TestIssue30MemberMappingsMatchLockedHarnessSurface|TestIssue30ScaffoldedMemberTargetsResolve)$' -count=1"
+	issue30StaticMemberTestRef = "agent/issue30_surface_test.go#TestIssue30ScaffoldedStaticMemberTargetsResolve"
+	issue30StaticMemberTestRun = "go test ./agent -run '^(TestIssue30MemberMappingsMatchLockedHarnessSurface|TestIssue30ScaffoldedStaticMemberTargetsResolve|TestIssue30HarnessStaticPredicates)$' -count=1"
 )
 
 func TestIssue30MappingsMatchLockedHarnessSurface(t *testing.T) {
@@ -152,9 +155,12 @@ func TestIssue30MemberMappingsMatchLockedHarnessSurface(t *testing.T) {
 	if err != nil {
 		t.Fatalf("LoadSymbols: %v", err)
 	}
-	expected := issue30ExpectedCatalogEntries(symbols)
-	if len(expected) != 1667 {
-		t.Fatalf("issue #30 expected catalog rows = %d, want 1667", len(expected))
+	expected, err := issue30ExpectedCatalogEntries(symbols)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(expected) != 1704 {
+		t.Fatalf("issue #30 expected catalog rows = %d, want 1704", len(expected))
 	}
 	if *updateIssue30Catalog {
 		issue30WriteCatalog(t, root, expected)
@@ -212,9 +218,26 @@ func TestIssue30ScaffoldedMemberTargetsResolve(t *testing.T) {
 		}
 		indexes[rel] = index
 	}
-	for _, entry := range issue30ExpectedCatalogEntries(symbols) {
+	entries, err := issue30ExpectedCatalogEntries(symbols)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wantTaggedTargets := issue30TaggedErrorMemberTargets()
+	for _, entry := range entries {
 		if entry.Mapping.Kind != "contract" || entry.Status != catalog.StatusScaffolded {
 			continue
+		}
+		if strings.HasPrefix(entry.ID, "static-member:") {
+			continue
+		}
+		if strings.HasSuffix(entry.ID, "._tag") {
+			wantTarget, ok := wantTaggedTargets[entry.ID]
+			if !ok {
+				t.Errorf("unexpected Harness _tag row %q", entry.ID)
+			} else if entry.Mapping.Target != wantTarget {
+				t.Errorf("%s target = %q, want discriminator carrier %q", entry.ID, entry.Mapping.Target, wantTarget)
+			}
+			delete(wantTaggedTargets, entry.ID)
 		}
 		dir, typeName, member, err := issue30MemberTargetParts(entry.Mapping.Target)
 		if err != nil {
@@ -230,13 +253,125 @@ func TestIssue30ScaffoldedMemberTargetsResolve(t *testing.T) {
 			t.Errorf("%s maps to missing Go member %s.%s", entry.ID, typeName, member)
 		}
 	}
+	for id := range wantTaggedTargets {
+		t.Errorf("missing Harness _tag row %s", id)
+	}
+}
+
+func TestIssue30ScaffoldedStaticMemberTargetsResolve(t *testing.T) {
+	wantTargets := map[string]string{
+		"static-member:agent/src/harness/agent-harness.ts#AgentHarness.create": "github.com/nankedr/pig/agent.NewAgentHarness",
+	}
+	for name, target := range issue30HarnessStaticPredicates {
+		id := "static-member:agent/src/harness/agent-harness.ts#" + name + ".is"
+		wantTargets[id] = "github.com/nankedr/pig/agent." + target
+	}
+	root := issue30RepoRoot(t)
+	symbols, err := surface.LoadSymbols(filepath.Join(root, "parity", "surface", "symbols.jsonl"))
+	if err != nil {
+		t.Fatalf("LoadSymbols: %v", err)
+	}
+	indexes := make(map[string]map[string]*issue30GoDecl)
+	for _, rel := range []string{"agent", "agent/node", "agent/session/testing"} {
+		index, err := issue30LoadDecls(filepath.Join(root, filepath.FromSlash(rel)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		indexes[rel] = index
+	}
+	entries, err := issue30ExpectedCatalogEntries(symbols)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resolved := 0
+	for _, entry := range entries {
+		if !strings.HasPrefix(entry.ID, "static-member:") {
+			continue
+		}
+		resolved++
+		wantTarget, ok := wantTargets[entry.ID]
+		if !ok {
+			t.Errorf("unexpected Harness static-member row %q", entry.ID)
+			continue
+		}
+		delete(wantTargets, entry.ID)
+		if entry.Mapping.Target != wantTarget {
+			t.Errorf("%s target = %q, want %q", entry.ID, entry.Mapping.Target, wantTarget)
+		}
+		if entry.Mapping.Module != "agent" || entry.Mapping.Kind != "contract" {
+			t.Errorf("%s has incomplete mapping: %+v", entry.ID, entry.Mapping)
+		}
+		if entry.Status != catalog.StatusScaffolded {
+			t.Errorf("%s status = %q, want scaffolded", entry.ID, entry.Status)
+		}
+		dir, name, err := issue30TargetParts(entry.Mapping.Target)
+		if err != nil {
+			t.Errorf("%s: %v", entry.ID, err)
+			continue
+		}
+		decl := indexes[dir][name]
+		if decl == nil {
+			t.Errorf("%s maps to missing Go declaration %s", entry.ID, name)
+			continue
+		}
+		if !decl.packageFunction {
+			t.Errorf("%s maps to %s, want an exported package function", entry.ID, entry.Mapping.Target)
+		}
+	}
+	if resolved != 15 {
+		t.Fatalf("resolved Harness static-member rows = %d, want 15", resolved)
+	}
+	for id := range wantTargets {
+		t.Errorf("missing Harness static-member row %s", id)
+	}
+}
+
+func TestIssue30HarnessStaticPredicates(t *testing.T) {
+	tests := []struct {
+		name      string
+		predicate func(error) bool
+		value     error
+	}{
+		{"Closed", agent.IsClosed, &agent.Closed{}},
+		{"InvalidLane", agent.IsInvalidLane, &agent.InvalidLane{}},
+		{"InvalidMessage", agent.IsInvalidMessage, &agent.InvalidMessage{}},
+		{"LaneBusy", agent.IsLaneBusy, &agent.LaneBusy{}},
+		{"LaneExists", agent.IsLaneExists, &agent.LaneExists{}},
+		{"MissingIdentities", agent.IsMissingIdentities, &agent.MissingIdentities{}},
+		{"NoActiveOperation", agent.IsNoActiveOperation, &agent.NoActiveOperation{}},
+		{"NoActiveRun", agent.IsNoActiveRun, &agent.NoActiveRun{}},
+		{"NothingToCompact", agent.IsNothingToCompact, &agent.NothingToCompact{}},
+		{"NothingToResume", agent.IsNothingToResume, &agent.NothingToResume{}},
+		{"UnknownQueueItem", agent.IsUnknownQueueItem, &agent.UnknownQueueItem{}},
+		{"UnknownSkill", agent.IsUnknownSkill, &agent.UnknownSkill{}},
+		{"UnknownTarget", agent.IsUnknownTarget, &agent.UnknownTarget{}},
+		{"UnknownTemplate", agent.IsUnknownTemplate, &agent.UnknownTemplate{}},
+	}
+	for i, test := range tests {
+		wrong := tests[(i+1)%len(tests)].value
+		t.Run(test.name, func(t *testing.T) {
+			if !test.predicate(test.value) {
+				t.Error("predicate does not recognize its concrete error")
+			}
+			if !test.predicate(fmt.Errorf("wrapped: %w", test.value)) {
+				t.Error("predicate does not recognize a wrapped concrete error")
+			}
+			if test.predicate(nil) {
+				t.Error("predicate matches nil")
+			}
+			if test.predicate(wrong) {
+				t.Errorf("predicate matches %T", wrong)
+			}
+		})
+	}
 }
 
 type issue30GoDecl struct {
-	declaration string
-	methods     []string
-	members     map[string]struct{}
-	embeds      []string
+	declaration     string
+	methods         []string
+	members         map[string]struct{}
+	embeds          []string
+	packageFunction bool
 }
 
 func issue30APISnapshot(root string, symbols []surface.Symbol) (string, error) {
@@ -272,6 +407,23 @@ func issue30APISnapshot(root string, symbols []surface.Symbol) (string, error) {
 			b.WriteByte('\n')
 		}
 		fmt.Fprintf(&b, "## %s\nreference: %s\ntarget: %s\n%s\n", symbol.ID, symbol.Upstream.Reference, target, decl.declaration)
+		for _, member := range symbol.StaticMembers {
+			staticTarget, err := issue30StaticMemberTarget(symbol, member)
+			if err != nil {
+				return "", err
+			}
+			staticDir, staticName, err := issue30TargetParts(staticTarget)
+			if err != nil {
+				return "", fmt.Errorf("%s.%s: %w", symbol.ID, member, err)
+			}
+			staticDecl := indexes[staticDir][staticName]
+			if staticDecl == nil || !staticDecl.packageFunction {
+				missing = append(missing, fmt.Sprintf("static-member:%s.%s -> %s", strings.TrimPrefix(symbol.ID, "symbol:"), member, staticTarget))
+				continue
+			}
+			b.WriteString(staticDecl.declaration)
+			b.WriteByte('\n')
+		}
 		for _, method := range decl.methods {
 			b.WriteString(method)
 			b.WriteByte('\n')
@@ -338,6 +490,7 @@ func issue30LoadDecls(dir string) (map[string]*issue30GoDecl, error) {
 								index[decl.Name.Name] = entry
 							}
 							entry.declaration = text
+							entry.packageFunction = true
 						}
 						continue
 					}
@@ -486,7 +639,7 @@ func issue30MemberTargetParts(target string) (dir, typeName, member string, err 
 	return dir, typeName, member, nil
 }
 
-func issue30ExpectedCatalogEntries(symbols []surface.Symbol) []catalog.Entry {
+func issue30ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, error) {
 	var entries []catalog.Entry
 	for _, symbol := range symbols {
 		if !issue30HarnessReference(symbol.Upstream.Reference) {
@@ -535,9 +688,38 @@ func issue30ExpectedCatalogEntries(symbols []surface.Symbol) []catalog.Entry {
 			}
 			entries = append(entries, entry)
 		}
+		for _, member := range symbol.StaticMembers {
+			id := "static-member:" + strings.TrimPrefix(symbol.ID, "symbol:") + "." + member
+			staticTarget, err := issue30StaticMemberTarget(symbol, member)
+			if err != nil {
+				return nil, err
+			}
+			entries = append(entries, catalog.Entry{
+				SchemaVersion:  catalog.SchemaVersion,
+				ID:             id,
+				Upstream:       catalog.Upstream{Module: "agent", Repository: symbol.Upstream.Repository, Commit: symbol.Upstream.Commit, Reference: "packages/" + strings.TrimPrefix(id, "static-member:")},
+				Mapping:        catalog.Mapping{Module: "agent", Target: staticTarget, Kind: "contract"},
+				Status:         catalog.StatusScaffolded,
+				Milestone:      "M8",
+				Classification: "public-api",
+				Evidence: []catalog.Evidence{{
+					Kind:            "go-test",
+					Ref:             issue30StaticMemberTestRef,
+					Baseline:        issue30BaselineCommit,
+					CaseID:          id,
+					InputHash:       issue30SurfaceHash,
+					ExecutionMethod: issue30StaticMemberTestRun,
+					Expected:        fmt.Sprintf("the pinned Pi %s.%s static member maps to a declared and behaviorally exercised Go package function", symbol.Name, member),
+					Actual:          fmt.Sprintf("PASS; %s resolved to and exercised %s", id, staticTarget),
+					Platform:        "any",
+					CatalogID:       id,
+				}},
+				Notes: fmt.Sprintf("Issue #30 concrete %s static-member mapping authority. Behavioral status remains on contract:session/v4-harness.", symbol.Name),
+			})
+		}
 	}
 	sort.Slice(entries, func(i, j int) bool { return entries[i].ID < entries[j].ID })
-	return entries
+	return entries, nil
 }
 
 func issue30SymbolTarget(symbol surface.Symbol) string {
@@ -550,7 +732,39 @@ func issue30SymbolTarget(symbol surface.Symbol) string {
 	return pkg + "." + issue30GoName(symbol.Name)
 }
 
+func issue30StaticMemberTarget(symbol surface.Symbol, member string) (string, error) {
+	if symbol.ID == "symbol:agent/src/harness/agent-harness.ts#AgentHarness" && member == "create" {
+		return "github.com/nankedr/pig/agent.NewAgentHarness", nil
+	}
+	if member == "is" && symbol.ID == "symbol:agent/src/harness/agent-harness.ts#"+symbol.Name {
+		if predicate, ok := issue30HarnessStaticPredicates[symbol.Name]; ok {
+			return "github.com/nankedr/pig/agent." + predicate, nil
+		}
+	}
+	return "", fmt.Errorf("unsupported Harness static member %s.%s", symbol.ID, member)
+}
+
+var issue30HarnessStaticPredicates = map[string]string{
+	"Closed":            "IsClosed",
+	"InvalidLane":       "IsInvalidLane",
+	"InvalidMessage":    "IsInvalidMessage",
+	"LaneBusy":          "IsLaneBusy",
+	"LaneExists":        "IsLaneExists",
+	"MissingIdentities": "IsMissingIdentities",
+	"NoActiveOperation": "IsNoActiveOperation",
+	"NoActiveRun":       "IsNoActiveRun",
+	"NothingToCompact":  "IsNothingToCompact",
+	"NothingToResume":   "IsNothingToResume",
+	"UnknownQueueItem":  "IsUnknownQueueItem",
+	"UnknownSkill":      "IsUnknownSkill",
+	"UnknownTarget":     "IsUnknownTarget",
+	"UnknownTemplate":   "IsUnknownTemplate",
+}
+
 func issue30MemberTarget(symbol surface.Symbol, parentTarget, member string) (string, string) {
+	if member == "_tag" && issue30TaggedErrorSymbols[symbol.Name] {
+		return parentTarget + ".Tag", ""
+	}
 	if reflect.DeepEqual(symbol.Members, issue30StringInheritedMembers) || issue30ErrorInheritedMember(symbol, member) {
 		return parentTarget, "a TypeScript runtime-inherited member represented by Go's built-in value or error contract"
 	}
@@ -599,6 +813,43 @@ func issue30MemberTarget(symbol surface.Symbol, parentTarget, member string) (st
 		}
 	}
 	return parentTarget + "." + issue30GoName(member), ""
+}
+
+var issue30TaggedErrorSymbols = map[string]bool{
+	"AbortRejected":        true,
+	"CancelQueuedRejected": true,
+	"Closed":               true,
+	"CompactionRejected":   true,
+	"InvalidLane":          true,
+	"InvalidMessage":       true,
+	"LaneBusy":             true,
+	"LaneExists":           true,
+	"MissingIdentities":    true,
+	"NavigationRejected":   true,
+	"NoActiveOperation":    true,
+	"NoActiveRun":          true,
+	"NothingToCompact":     true,
+	"NothingToResume":      true,
+	"QueueRejected":        true,
+	"ResumeRejected":       true,
+	"RunRejected":          true,
+	"TaggedErrorValue":     true,
+	"UnknownQueueItem":     true,
+	"UnknownSkill":         true,
+	"UnknownTarget":        true,
+	"UnknownTemplate":      true,
+}
+
+func issue30TaggedErrorMemberTargets() map[string]string {
+	targets := make(map[string]string, len(issue30TaggedErrorSymbols))
+	for name := range issue30TaggedErrorSymbols {
+		path := "agent-harness.ts"
+		if name == "TaggedErrorValue" {
+			path = "result.ts"
+		}
+		targets["member:agent/src/harness/"+path+"#"+name+"._tag"] = "github.com/nankedr/pig/agent." + name + ".Tag"
+	}
+	return targets
 }
 
 func issue30BaseMemberTarget(base, member string) (string, bool) {
@@ -687,7 +938,7 @@ func issue30CatalogEntries(t *testing.T, root string) []catalog.Entry {
 }
 
 func issue30CatalogID(id string) bool {
-	for _, prefix := range []string{"symbol:agent/src/harness/", "member:agent/src/harness/"} {
+	for _, prefix := range []string{"symbol:agent/src/harness/", "member:agent/src/harness/", "static-member:agent/src/harness/"} {
 		if strings.HasPrefix(id, prefix) {
 			return true
 		}

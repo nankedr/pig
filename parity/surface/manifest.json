@@ -1,9 +1,11 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
   "symbols": "symbols.jsonl",
   "symbol_count": 1457,
-  "member_count": 7254,
+  "member_count": 7429,
+  "static_member_count": 30,
+  "constructor_count": 110,
   "module_counts": {
     "agent": 297,
     "ai": 424,

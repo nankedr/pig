@@ -26,7 +26,7 @@ var updateIssue31Surface = flag.Bool("update-issue31-surface", false, "regenerat
 
 const (
 	issue31BaselineCommit = "936aff00918de1187f085f123c2812d8f2d67745"
-	issue31SurfaceHash    = "sha256:353816fada23e5469f2357d8a5e1b034481b0ada916e8ea129773f934a42c689"
+	issue31SurfaceHash    = "sha256:878278ceb284bc0b2489a5dee57b63622c75827e1c3d1b833af32d980192852f"
 	issue31GoPackage      = "github.com/nankedr/pig/tui"
 	issue31MemberTestRef  = "tui/issue31_surface_test.go#TestIssue31ScaffoldedMemberTargetsResolve"
 	issue31MemberTestRun  = "go test ./tui -run '^(TestIssue31MemberMappingsMatchLockedTUISurface|TestIssue31ScaffoldedMemberTargetsResolve)$' -count=1"

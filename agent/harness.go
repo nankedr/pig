@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -208,6 +209,53 @@ func (e *Closed) Error() string { return e.Message }
 func (*Closed) Tag() string     { return "Closed" }
 func (e *Closed) ToJSON() map[string]any {
 	return harnessTaggedJSON(e.Tag(), e.Message, nil)
+}
+
+// IsLaneBusy reports whether err is or wraps a LaneBusy rejection.
+func IsLaneBusy(err error) bool { return isHarnessError[*LaneBusy](err) }
+
+// IsMissingIdentities reports whether err is or wraps a MissingIdentities rejection.
+func IsMissingIdentities(err error) bool { return isHarnessError[*MissingIdentities](err) }
+
+// IsNoActiveRun reports whether err is or wraps a NoActiveRun rejection.
+func IsNoActiveRun(err error) bool { return isHarnessError[*NoActiveRun](err) }
+
+// IsNoActiveOperation reports whether err is or wraps a NoActiveOperation rejection.
+func IsNoActiveOperation(err error) bool { return isHarnessError[*NoActiveOperation](err) }
+
+// IsNothingToResume reports whether err is or wraps a NothingToResume rejection.
+func IsNothingToResume(err error) bool { return isHarnessError[*NothingToResume](err) }
+
+// IsInvalidMessage reports whether err is or wraps an InvalidMessage rejection.
+func IsInvalidMessage(err error) bool { return isHarnessError[*InvalidMessage](err) }
+
+// IsUnknownSkill reports whether err is or wraps an UnknownSkill rejection.
+func IsUnknownSkill(err error) bool { return isHarnessError[*UnknownSkill](err) }
+
+// IsUnknownTemplate reports whether err is or wraps an UnknownTemplate rejection.
+func IsUnknownTemplate(err error) bool { return isHarnessError[*UnknownTemplate](err) }
+
+// IsUnknownTarget reports whether err is or wraps an UnknownTarget rejection.
+func IsUnknownTarget(err error) bool { return isHarnessError[*UnknownTarget](err) }
+
+// IsUnknownQueueItem reports whether err is or wraps an UnknownQueueItem rejection.
+func IsUnknownQueueItem(err error) bool { return isHarnessError[*UnknownQueueItem](err) }
+
+// IsLaneExists reports whether err is or wraps a LaneExists rejection.
+func IsLaneExists(err error) bool { return isHarnessError[*LaneExists](err) }
+
+// IsInvalidLane reports whether err is or wraps an InvalidLane rejection.
+func IsInvalidLane(err error) bool { return isHarnessError[*InvalidLane](err) }
+
+// IsNothingToCompact reports whether err is or wraps a NothingToCompact rejection.
+func IsNothingToCompact(err error) bool { return isHarnessError[*NothingToCompact](err) }
+
+// IsClosed reports whether err is or wraps a Closed rejection.
+func IsClosed(err error) bool { return isHarnessError[*Closed](err) }
+
+func isHarnessError[T error](err error) bool {
+	var target T
+	return errors.As(err, &target)
 }
 
 func harnessTaggedJSON(tag, message string, properties map[string]any) map[string]any {

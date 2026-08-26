@@ -94,41 +94,93 @@ func EstimateContextTokens(messages []AgentMessage) ContextUsageEstimate {
 }
 
 func EstimateTokens(message AgentMessage) int64 {
-	characters := 0
+	utf16Units := 0
 	switch message := message.(type) {
 	case ai.UserMessage:
-		if text, ok := message.Content.Text(); ok {
-			characters = len([]rune(text))
-		} else if blocks, ok := message.Content.Blocks(); ok {
-			for _, block := range blocks {
-				switch block := block.(type) {
-				case ai.TextContent:
-					characters += len([]rune(block.Text))
-				case ai.ImageContent:
-					characters += 4800
-				}
-			}
+		utf16Units = userContentUTF16Units(message.Content)
+	case *ai.UserMessage:
+		if message != nil {
+			utf16Units = userContentUTF16Units(message.Content)
 		}
 	case ai.AssistantMessage:
-		for _, block := range message.Content {
-			switch block := block.(type) {
-			case ai.TextContent:
-				characters += len([]rune(block.Text))
-			case ai.ThinkingContent:
-				characters += len([]rune(block.Thinking))
-			case ai.ToolCall:
-				encoded, _ := json.Marshal(block.Arguments)
-				characters += len([]rune(block.Name)) + len([]rune(string(encoded)))
-			}
+		utf16Units = assistantContentUTF16Units(message.Content)
+	case *ai.AssistantMessage:
+		if message != nil {
+			utf16Units = assistantContentUTF16Units(message.Content)
+		}
+	case ai.ToolResultMessage:
+		utf16Units = toolResultContentUTF16Units(message.Content)
+	case *ai.ToolResultMessage:
+		if message != nil {
+			utf16Units = toolResultContentUTF16Units(message.Content)
 		}
 	case BashExecutionMessage:
-		characters = len([]rune(message.Command)) + len([]rune(message.Output))
+		utf16Units = utf16CodeUnits(message.Command) + utf16CodeUnits(message.Output)
+	case CustomMessage:
+		utf16Units = userContentUTF16Units(message.Content)
 	case BranchSummaryMessage:
-		characters = len([]rune(message.Summary))
+		utf16Units = utf16CodeUnits(message.Summary)
 	case CompactionSummaryMessage:
-		characters = len([]rune(message.Summary))
+		utf16Units = utf16CodeUnits(message.Summary)
 	}
-	return int64((characters + 3) / 4)
+	return int64((utf16Units + 3) / 4)
+}
+
+func utf16CodeUnits(text string) int {
+	units := 0
+	for _, character := range text {
+		units++
+		if character > 0xffff {
+			units++
+		}
+	}
+	return units
+}
+
+func userContentUTF16Units(content ai.UserMessageContent) int {
+	if text, ok := content.Text(); ok {
+		return utf16CodeUnits(text)
+	}
+	blocks, _ := content.Blocks()
+	utf16Units := 0
+	for _, block := range blocks {
+		switch block := block.(type) {
+		case ai.TextContent:
+			utf16Units += utf16CodeUnits(block.Text)
+		case ai.ImageContent:
+			utf16Units += 4800
+		}
+	}
+	return utf16Units
+}
+
+func assistantContentUTF16Units(content []ai.AssistantContent) int {
+	utf16Units := 0
+	for _, block := range content {
+		switch block := block.(type) {
+		case ai.TextContent:
+			utf16Units += utf16CodeUnits(block.Text)
+		case ai.ThinkingContent:
+			utf16Units += utf16CodeUnits(block.Thinking)
+		case ai.ToolCall:
+			encoded, _ := json.Marshal(block.Arguments)
+			utf16Units += utf16CodeUnits(block.Name) + utf16CodeUnits(string(encoded))
+		}
+	}
+	return utf16Units
+}
+
+func toolResultContentUTF16Units(content []ai.ToolResultContent) int {
+	utf16Units := 0
+	for _, block := range content {
+		switch block := block.(type) {
+		case ai.TextContent:
+			utf16Units += utf16CodeUnits(block.Text)
+		case ai.ImageContent:
+			utf16Units += 4800
+		}
+	}
+	return utf16Units
 }
 
 func GetLastAssistantUsage(entries []Entry) (*ai.Usage, bool) {

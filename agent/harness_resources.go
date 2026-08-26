@@ -267,6 +267,12 @@ func normalizeTruncationOptions(options TruncationOptions) TruncationOptions {
 	if options.MaxBytes == 0 {
 		options.MaxBytes = DefaultMaxBytes
 	}
+	if options.MaxLines < 0 {
+		options.MaxLines = 0
+	}
+	if options.MaxBytes < 0 {
+		options.MaxBytes = 0
+	}
 	return options
 }
 
@@ -370,6 +376,9 @@ type LineTruncation struct {
 func TruncateLine(line string, maxCharacters int) LineTruncation {
 	if maxCharacters == 0 {
 		maxCharacters = GrepMaxLineLength
+	}
+	if maxCharacters < 0 {
+		maxCharacters = 0
 	}
 	runes := []rune(line)
 	if len(runes) <= maxCharacters {

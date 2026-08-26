@@ -18,10 +18,10 @@
 
 import ts from "typescript";
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join, relative, dirname } from "node:path";
+import { join, relative, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const SCHEMA_VERSION = "1.0.0";
+const SCHEMA_VERSION = "1.1.0";
 const BASELINE_COMMIT = "936aff00918de1187f085f123c2812d8f2d67745";
 const REPOSITORY = "https://github.com/badlogic/pi-mono";
 
@@ -30,14 +30,53 @@ const here = dirname(fileURLToPath(import.meta.url));
 // The seven in-scope modules, in deterministic order. dir is relative to the Pi
 // checkout root; pig is the Pig module bucket the symbols map into.
 const MODULES = [
-	{ dir: "packages/agent", pig: "agent" },
-	{ dir: "packages/ai", pig: "ai" },
-	{ dir: "packages/client", pig: "client" },
-	{ dir: "packages/coding-agent", pig: "codingagent" },
-	{ dir: "packages/protocol", pig: "protocol" },
-	{ dir: "packages/telemetry", pig: "telemetry" },
-	{ dir: "packages/tui", pig: "tui" },
+	{ dir: "packages/agent", packageName: "@earendil-works/pi-agent-core", pig: "agent" },
+	{ dir: "packages/ai", packageName: "@earendil-works/pi-ai", pig: "ai" },
+	{ dir: "packages/client", packageName: "@earendil-works/pi-client", pig: "client" },
+	{
+		dir: "packages/coding-agent",
+		packageName: "@earendil-works/pi-coding-agent",
+		pig: "codingagent",
+	},
+	{ dir: "packages/protocol", packageName: "@earendil-works/pi-protocol", pig: "protocol" },
+	{
+		dir: "packages/telemetry",
+		packageName: "@earendil-works/pi-telemetry",
+		pig: "telemetry",
+	},
+	{ dir: "packages/tui", packageName: "@earendil-works/pi-tui", pig: "tui" },
 ];
+const PI_PACKAGE_NAMES = new Set(MODULES.map((module) => module.packageName));
+
+// Leading underscores are an internal-name convention throughout the pinned
+// Pi surface, except for these exact TypeScript-public members. Keep the full
+// surface identity here so an unrelated symbol cannot become public merely by
+// reusing one of the allowed member names.
+const ALLOWED_LEADING_UNDERSCORE_MEMBERS = new Set([
+	"symbol:agent/src/harness/agent-harness.ts#AbortRejected._tag",
+	"symbol:agent/src/harness/agent-harness.ts#CancelQueuedRejected._tag",
+	"symbol:agent/src/harness/agent-harness.ts#Closed._tag",
+	"symbol:agent/src/harness/agent-harness.ts#CompactionRejected._tag",
+	"symbol:agent/src/harness/agent-harness.ts#InvalidLane._tag",
+	"symbol:agent/src/harness/agent-harness.ts#InvalidMessage._tag",
+	"symbol:agent/src/harness/agent-harness.ts#LaneBusy._tag",
+	"symbol:agent/src/harness/agent-harness.ts#LaneExists._tag",
+	"symbol:agent/src/harness/agent-harness.ts#MissingIdentities._tag",
+	"symbol:agent/src/harness/agent-harness.ts#NavigationRejected._tag",
+	"symbol:agent/src/harness/agent-harness.ts#NoActiveOperation._tag",
+	"symbol:agent/src/harness/agent-harness.ts#NoActiveRun._tag",
+	"symbol:agent/src/harness/agent-harness.ts#NothingToCompact._tag",
+	"symbol:agent/src/harness/agent-harness.ts#NothingToResume._tag",
+	"symbol:agent/src/harness/agent-harness.ts#QueueRejected._tag",
+	"symbol:agent/src/harness/agent-harness.ts#ResumeRejected._tag",
+	"symbol:agent/src/harness/agent-harness.ts#RunRejected._tag",
+	"symbol:agent/src/harness/agent-harness.ts#UnknownQueueItem._tag",
+	"symbol:agent/src/harness/agent-harness.ts#UnknownSkill._tag",
+	"symbol:agent/src/harness/agent-harness.ts#UnknownTarget._tag",
+	"symbol:agent/src/harness/agent-harness.ts#UnknownTemplate._tag",
+	"symbol:agent/src/harness/result.ts#TaggedErrorValue._tag",
+	"symbol:codingagent/src/core/session-manager.ts#SessionManager._persist",
+]);
 
 function parseArgs(argv) {
 	const args = { piRoot: null, out: join(here, "..", "surface", "symbols.jsonl") };
@@ -47,6 +86,44 @@ function parseArgs(argv) {
 		else if (!args.piRoot) args.piRoot = rest[i];
 	}
 	return args;
+}
+
+function compilerOptions() {
+	return {
+		target: ts.ScriptTarget.ES2022,
+		module: ts.ModuleKind.NodeNext,
+		moduleResolution: ts.ModuleResolutionKind.NodeNext,
+		allowImportingTsExtensions: true,
+		resolveJsonModule: true,
+		skipLibCheck: true,
+		noEmit: true,
+		strict: true,
+	};
+}
+
+// loadWorkspaceCompilerOptions adds the frozen checkout's workspace paths to
+// the extractor's stable compiler policy. A separate Program uses these options
+// only for class member inheritance, so unrelated export/type extraction keeps
+// its established semantics.
+function loadWorkspaceCompilerOptions(piRoot) {
+	const configPath = join(piRoot, "tsconfig.json");
+	const read = ts.readConfigFile(configPath, ts.sys.readFile);
+	if (read.error) {
+		throw new Error(formatDiagnostic(read.error));
+	}
+	const parsed = ts.parseJsonConfigFileContent(read.config, ts.sys, piRoot, { noEmit: true }, configPath);
+	if (parsed.errors.length > 0) {
+		throw new Error(parsed.errors.map(formatDiagnostic).join("\n"));
+	}
+	return {
+		...compilerOptions(),
+		baseUrl: piRoot,
+		paths: parsed.options.paths,
+	};
+}
+
+function formatDiagnostic(diagnostic) {
+	return ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
 }
 
 // distTargetToSrc maps a built dist target (e.g. "./dist/providers/openai.js")
@@ -228,22 +305,304 @@ function declarationRef(sym, piRoot) {
 // memberNames returns the sorted public member names of a symbol's declared
 // type (properties and methods). It skips members that are not part of the
 // public surface: ECMAScript #private fields (name begins with "#"), the
-// TypeScript "private" modifier, and the leading-"_" internal convention.
-function memberNames(sym, checker) {
+// TypeScript "private" or "protected" modifiers, leading-underscore names
+// outside the exact pinned exceptions above, compiler-internal computed names, and
+// inherited class members supplied by an external dependency. Pi workspace
+// packages remain owners of their declarations whether TypeScript resolves an
+// import to checkout source or to that package beneath a node_modules tree.
+function memberNames(sym, checker, program, piRoot, symbolID) {
 	let target = sym;
 	try {
 		const t = checker.getDeclaredTypeOfSymbol(target);
 		if (!t || !t.getProperties) return [];
 		const names = [];
+		const isClass = Boolean(sym.getFlags() & ts.SymbolFlags.Class);
 		for (const p of t.getProperties()) {
 			const name = p.getName();
-			if (name.startsWith("_") || name.startsWith("#")) continue;
+			if (name.startsWith("#") || name.startsWith("__@")) continue;
+			if (name.startsWith("_") && !ALLOWED_LEADING_UNDERSCORE_MEMBERS.has(`${symbolID}.${name}`)) {
+				continue;
+			}
 			if (isPrivateMember(p)) continue;
+			if (isClass && isExternalDependencyMember(p, program, piRoot)) continue;
 			names.push(name);
 		}
 		return [...new Set(names)].sort();
 	} catch {
 		return [];
+	}
+}
+
+// isExternalDependencyMember reports whether every declaration comes from a
+// source outside the in-scope Pi packages. Checking exact package ownership,
+// rather than treating node_modules as synonymous with external, retains Pi
+// inheritance under both workspace-source and installed-package resolution.
+// TypeScript's standard library remains part of the declared member surface
+// even though the compiler itself may be installed beneath node_modules.
+function isExternalDependencyMember(prop, program, piRoot) {
+	const decls = prop.getDeclarations && prop.getDeclarations();
+	return Boolean(
+		decls &&
+			decls.length > 0 &&
+			decls.every((d) => {
+				const sourceFile = d.getSourceFile();
+				if (program.isSourceFileDefaultLibrary(sourceFile)) return false;
+				const file = normalizePath(sourceFile.fileName);
+				return !isPiOwnedDeclaration(file, piRoot);
+			}),
+	);
+}
+
+function isPiOwnedDeclaration(file, piRoot, installedPackage = nodeModulesPackageName(file)) {
+	if (installedPackage !== null) return PI_PACKAGE_NAMES.has(installedPackage);
+	const normalizedRoot = normalizePath(piRoot);
+	return MODULES.some((module) => {
+		const sourceRoot = `${normalizedRoot}/${module.dir}`;
+		return file === sourceRoot || file.startsWith(`${sourceRoot}/`);
+	});
+}
+
+function nodeModulesPackageName(file) {
+	const parts = file.split("/");
+	const index = parts.lastIndexOf("node_modules");
+	if (index < 0 || index + 1 >= parts.length) return null;
+	const first = parts[index + 1];
+	if (!first.startsWith("@")) return first;
+	if (index + 2 >= parts.length) return null;
+	return `${first}/${parts[index + 2]}`;
+}
+
+function normalizePath(path) {
+	return resolve(path).split("\\").join("/").replace(/\/$/, "");
+}
+
+function assertOwnershipClassifier(piRoot) {
+	const cases = [
+		[join(piRoot, "packages", "tui", "src", "keybindings.ts"), true],
+		[join(piRoot, "node_modules", "@earendil-works", "pi-tui", "dist", "index.d.ts"), true],
+		[
+			join(
+				piRoot,
+				"node_modules",
+				".pnpm",
+				"@earendil-works+pi-tui@0.84.1",
+				"node_modules",
+				"@earendil-works",
+				"pi-tui",
+				"dist",
+				"index.d.ts",
+			),
+			true,
+		],
+		[join(piRoot, "packages", "ai", "node_modules", "@types", "node", "events.d.ts"), false],
+		[join(dirname(piRoot), "node_modules", "@types", "node", "events.d.ts"), false],
+	];
+	for (const [file, want] of cases) {
+		const got = isPiOwnedDeclaration(normalizePath(file), piRoot);
+		if (got !== want) throw new Error(`Pi ownership for ${file} = ${got}, want ${want}`);
+	}
+}
+
+// staticMemberNames returns the sorted names of public constructor-side class
+// properties declared by Pi. The constructor type includes inherited statics;
+// requiring a Pi-owned declaration excludes Function/Error/Node statics while
+// retaining statics inherited through another Pi class or factory. A set
+// collapses method overload declarations and getter/setter pairs by name.
+function staticMemberNames(sym, checker, piRoot) {
+	if (!(sym.getFlags() & ts.SymbolFlags.Class)) return [];
+	const decls = sym.getDeclarations && sym.getDeclarations();
+	const location = sym.valueDeclaration || (decls && decls[0]);
+	if (!location) return [];
+	try {
+		const type = checker.getTypeOfSymbolAtLocation(sym, location);
+		if (!type || !type.getProperties) return [];
+		const names = new Set();
+		for (const property of type.getProperties()) {
+			const name = property.getName();
+			if (
+				!name ||
+				name.startsWith("#") ||
+				name.startsWith("__@") ||
+				name.startsWith("_") ||
+				name === "prototype" ||
+				Object.values(ts.InternalSymbolName).includes(name)
+			) {
+				continue;
+			}
+			if (isPrivateMember(property)) continue;
+			const propertyDecls = property.getDeclarations && property.getDeclarations();
+			if (
+				!propertyDecls ||
+				!propertyDecls.some((decl) =>
+					isPiOwnedDeclaration(normalizePath(decl.getSourceFile().fileName), piRoot),
+				)
+			) {
+				continue;
+			}
+			names.add(name);
+		}
+		return [...names].sort();
+	} catch {
+		return [];
+	}
+}
+
+// isConstructibleClass reports whether an exported class can be instantiated
+// directly by a consumer. Classes with no constructor declaration have an
+// implicit public constructor. Explicit constructor overloads are considered as
+// a group: a private or protected declaration makes the constructor surface
+// inaccessible. Abstract classes are never directly constructible.
+function isConstructibleClass(sym) {
+	if (!(sym.getFlags() & ts.SymbolFlags.Class)) return false;
+	const decls = sym.getDeclarations && sym.getDeclarations();
+	if (!decls) return false;
+
+	const classDecls = decls.filter((decl) =>
+		ts.isClassDeclaration(decl) || ts.isClassExpression(decl),
+	);
+	if (classDecls.length === 0) return false;
+
+	return classDecls.some((decl) => {
+		if (ts.getCombinedModifierFlags(decl) & ts.ModifierFlags.Abstract) return false;
+		const constructors = decl.members.filter(ts.isConstructorDeclaration);
+		if (constructors.length === 0) return true;
+		return constructors.every((constructor) => {
+			const mods = ts.getCombinedModifierFlags(constructor);
+			return !(mods & (ts.ModifierFlags.Private | ts.ModifierFlags.Protected));
+		});
+	});
+}
+
+function assertConstructorClassifier() {
+	const source = ts.createSourceFile(
+		"constructor-sentinels.ts",
+		[
+			"class Implicit {}",
+			"class PublicExplicit { constructor() {} }",
+			"class PublicOverloads { constructor(value: string); constructor(value: number); constructor(value: string | number) {} }",
+			"class Private { private constructor() {} }",
+			"class Protected { protected constructor() {} }",
+			"abstract class Abstract {}",
+		].join("\n"),
+		ts.ScriptTarget.ES2022,
+		true,
+		ts.ScriptKind.TS,
+	);
+	const classes = new Map(
+		source.statements
+			.filter(ts.isClassDeclaration)
+			.map((decl) => [decl.name.text, decl]),
+	);
+	for (const [name, want] of [
+		["Implicit", true],
+		["PublicExplicit", true],
+		["PublicOverloads", true],
+		["Private", false],
+		["Protected", false],
+		["Abstract", false],
+	]) {
+		const decl = classes.get(name);
+		const got = isConstructibleClass({
+			getFlags: () => ts.SymbolFlags.Class,
+			getDeclarations: () => [decl],
+		});
+		if (got !== want) throw new Error(`constructor classification for ${name} = ${got}, want ${want}`);
+	}
+}
+
+// assertRequiredMembers keeps the two ownership sentinels close to extraction:
+// one must retain Pi-owned inheritance, while the other must reject inheritance
+// from Node's EventEmitter. Failing here prevents an install-layout-dependent
+// surface from being written as if it were authoritative.
+function assertRequiredMembers(records, id, want) {
+	const record = records.find((candidate) => candidate.id === id);
+	if (!record) throw new Error(`required surface symbol missing: ${id}`);
+	if (record.members.length !== want.length || record.members.some((name, i) => name !== want[i])) {
+		throw new Error(`${id} members ${JSON.stringify(record.members)} != ${JSON.stringify(want)}`);
+	}
+}
+
+function assertRequiredMember(records, id, want) {
+	const record = records.find((candidate) => candidate.id === id);
+	if (!record) throw new Error(`required surface symbol missing: ${id}`);
+	if (!record.members.includes(want)) {
+		throw new Error(`${id} members ${JSON.stringify(record.members)} do not include ${want}`);
+	}
+}
+
+function assertAllowedLeadingUnderscoreMembers(records) {
+	const got = records
+		.flatMap((record) =>
+			record.members
+				.filter((name) => name.startsWith("_"))
+				.map((name) => `${record.id}.${name}`),
+		)
+		.sort();
+	const want = [...ALLOWED_LEADING_UNDERSCORE_MEMBERS].sort();
+	if (got.length !== want.length || got.some((name, i) => name !== want[i])) {
+		throw new Error(
+			`leading-underscore surface members ${JSON.stringify(got)} != ${JSON.stringify(want)}`,
+		);
+	}
+}
+
+function assertRequiredStaticMembers(records, id, want) {
+	const record = records.find((candidate) => candidate.id === id);
+	if (!record) throw new Error(`required surface symbol missing: ${id}`);
+	if (
+		record.static_members.length !== want.length ||
+		record.static_members.some((name, i) => name !== want[i])
+	) {
+		throw new Error(`${id} static members ${JSON.stringify(record.static_members)} != ${JSON.stringify(want)}`);
+	}
+}
+
+function assertConstructorSurface(records) {
+	const nonConstructibleClasses = records
+		.filter((record) => record.kind === "class" && !record.constructible)
+		.map((record) => record.id)
+		.sort();
+	const wantNonConstructibleClasses = [
+		"symbol:agent/src/harness/agent-harness.ts#AgentHarness",
+		"symbol:codingagent/src/client/remote-session.ts#RemoteSession",
+		"symbol:codingagent/src/core/model-runtime.ts#ModelRuntime",
+		"symbol:codingagent/src/core/session-manager.ts#SessionManager",
+		"symbol:codingagent/src/core/settings-manager.ts#SettingsManager",
+		"symbol:tui/src/components/stack.ts#Stack",
+		"symbol:tui/src/tui.ts#TuiBase",
+	].sort();
+	if (
+		nonConstructibleClasses.length !== wantNonConstructibleClasses.length ||
+		nonConstructibleClasses.some((id, i) => id !== wantNonConstructibleClasses[i])
+	) {
+		throw new Error(
+			`non-constructible classes ${JSON.stringify(nonConstructibleClasses)} != ${JSON.stringify(wantNonConstructibleClasses)}`,
+		);
+	}
+
+	const constructorTotal = records.filter((record) => record.constructible).length;
+	if (constructorTotal !== 110) {
+		throw new Error(`constructible symbol count ${constructorTotal} != 110`);
+	}
+	const codingAgentConstructorTotal = records.filter(
+		(record) => record.module === "codingagent" && record.constructible,
+	).length;
+	if (codingAgentConstructorTotal !== 38) {
+		throw new Error(`codingagent constructible symbol count ${codingAgentConstructorTotal} != 38`);
+	}
+}
+
+function assertMemberAbsent(records, id, forbidden) {
+	const record = records.find((candidate) => candidate.id === id);
+	if (!record) throw new Error(`required surface symbol missing: ${id}`);
+	if (record.members.includes(forbidden)) {
+		throw new Error(`${id} unexpectedly contains workspace-augmented member ${forbidden}`);
+	}
+}
+
+function assertRecordAbsent(records, id) {
+	if (records.some((candidate) => candidate.id === id)) {
+		throw new Error(`${id} leaked through a cross-package re-export`);
 	}
 }
 
@@ -260,14 +619,19 @@ function isPrivateMember(prop) {
 }
 
 function main() {
-	const { piRoot, out } = parseArgs(process.argv);
-	if (!piRoot) {
+	const args = parseArgs(process.argv);
+	if (!args.piRoot) {
 		console.error("usage: node surface.mjs <pi-checkout-root> [--out <path>]");
 		process.exit(2);
 	}
+	const piRoot = resolve(args.piRoot);
+	const out = args.out;
+	assertOwnershipClassifier(piRoot);
+	assertConstructorClassifier();
 
-	// One program over every module entry: shared type checker, cross-module
-	// re-exports resolve to their true declaration site.
+	// Both programs cover every module entry. The primary checker preserves the
+	// established export/type surface; the workspace checker deterministically
+	// resolves Pi-owned class inheritance from checkout source.
 	const entryMeta = new Map(); // absolute src -> {pig, subpath, isBin}
 	for (const module of MODULES) {
 		const moduleAbs = join(piRoot, module.dir);
@@ -278,17 +642,10 @@ function main() {
 	}
 	const rootFiles = [...entryMeta.keys()];
 
-	const program = ts.createProgram(rootFiles, {
-		target: ts.ScriptTarget.ES2022,
-		module: ts.ModuleKind.NodeNext,
-		moduleResolution: ts.ModuleResolutionKind.NodeNext,
-		allowImportingTsExtensions: true,
-		resolveJsonModule: true,
-		skipLibCheck: true,
-		noEmit: true,
-		strict: true,
-	});
+	const program = ts.createProgram(rootFiles, compilerOptions());
 	const checker = program.getTypeChecker();
+	const workspaceProgram = ts.createProgram(rootFiles, loadWorkspaceCompilerOptions(piRoot));
+	const workspaceChecker = workspaceProgram.getTypeChecker();
 
 	// Deduplicate by declaration-file#name so a symbol re-exported from many
 	// entry points is recorded once, against the module that owns its
@@ -317,12 +674,29 @@ function main() {
 			const key = ref.file + "#" + name;
 			let record = bySymbol.get(key);
 			if (!record) {
+				const symbolID = `symbol:${owner.pig}/${ref.file.slice(owner.dir.length + 1)}#${name}`;
+				let memberSymbol = resolved;
+				let memberChecker = checker;
+				let memberProgram = program;
+				if (resolved.getFlags() & ts.SymbolFlags.Class) {
+					const workspaceSource = workspaceProgram.getSourceFile(entryAbs);
+					const workspaceModule = workspaceSource && workspaceChecker.getSymbolAtLocation(workspaceSource);
+					const workspaceExport =
+						workspaceModule &&
+						workspaceChecker.getExportsOfModule(workspaceModule).find((candidate) => candidate.getName() === name);
+					if (workspaceExport) {
+						memberSymbol = unaliased(workspaceExport, workspaceChecker);
+						memberChecker = workspaceChecker;
+						memberProgram = workspaceProgram;
+					}
+				}
 				record = {
 					schema_version: SCHEMA_VERSION,
-					id: `symbol:${owner.pig}/${ref.file.slice(owner.dir.length + 1)}#${name}`,
+					id: symbolID,
 					module: owner.pig,
 					name,
 					kind: symbolKind(resolved, checker),
+					constructible: isConstructibleClass(memberSymbol),
 					upstream: {
 						module: owner.dir.replace("packages/", ""),
 						repository: REPOSITORY,
@@ -330,7 +704,8 @@ function main() {
 						reference: `${ref.file}#${name}`,
 					},
 					export_subpaths: new Set(),
-					members: memberNames(resolved, checker),
+					members: memberNames(memberSymbol, memberChecker, memberProgram, piRoot, symbolID),
+					static_members: staticMemberNames(memberSymbol, memberChecker, piRoot),
 				};
 				bySymbol.set(key, record);
 			}
@@ -345,11 +720,49 @@ function main() {
 			module: r.module,
 			name: r.name,
 			kind: r.kind,
+			constructible: r.constructible,
 			upstream: r.upstream,
 			export_subpaths: [...r.export_subpaths].sort(),
 			members: r.members,
+			static_members: r.static_members,
 		}))
 		.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+
+	assertRequiredMembers(records, "symbol:codingagent/src/core/keybindings.ts#KeybindingsManager", [
+		"getConflicts",
+		"getDefinition",
+		"getEffectiveConfig",
+		"getKeys",
+		"getResolvedBindings",
+		"getUserBindings",
+		"matches",
+		"reload",
+		"setUserBindings",
+	]);
+	assertRequiredMembers(records, "symbol:tui/src/stdin-buffer.ts#StdinBuffer", [
+		"clear",
+		"destroy",
+		"flush",
+		"getBuffer",
+		"process",
+	]);
+	assertRequiredMembers(records, "symbol:agent/src/harness/agent-harness.ts#HarnessFault", [
+		"cause",
+		"message",
+		"name",
+		"stack",
+	]);
+	assertRequiredMember(records, "symbol:agent/src/harness/result.ts#TaggedErrorValue", "_tag");
+	assertRequiredMember(records, "symbol:codingagent/src/core/session-manager.ts#SessionManager", "_persist");
+	assertAllowedLeadingUnderscoreMembers(records);
+	assertRequiredStaticMembers(records, "symbol:agent/src/harness/agent-harness.ts#AgentHarness", [
+		"create",
+	]);
+	assertRequiredStaticMembers(records, "symbol:agent/src/harness/agent-harness.ts#LaneBusy", ["is"]);
+	assertRequiredStaticMembers(records, "symbol:agent/src/harness/agent-harness.ts#HarnessFault", []);
+	assertConstructorSurface(records);
+	assertMemberAbsent(records, "symbol:tui/src/keybindings.ts#Keybindings", "app.clear");
+	assertRecordAbsent(records, "symbol:telemetry/src/index.ts#TelemetrySpanAttributes");
 
 	// Canonical JSONL: one compact object per line, sorted by id.
 	const lines = records.map((r) => JSON.stringify(r)).join("\n") + "\n";
@@ -357,8 +770,10 @@ function main() {
 	writeFileSync(out, lines);
 
 	const memberTotal = records.reduce((n, r) => n + r.members.length, 0);
+	const staticMemberTotal = records.reduce((n, r) => n + r.static_members.length, 0);
+	const constructorTotal = records.filter((r) => r.constructible).length;
 	console.error(
-		`surface: ${records.length} symbols across ${MODULES.length} modules, ${memberTotal} members -> ${out}`,
+		`surface: ${records.length} symbols across ${MODULES.length} modules, ${memberTotal} members, ${staticMemberTotal} static members, ${constructorTotal} constructors -> ${out}`,
 	);
 }
 

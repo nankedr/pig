@@ -220,7 +220,7 @@ type issue29MemberMappings struct {
 
 const (
 	issue29BaselineCommit = "936aff00918de1187f085f123c2812d8f2d67745"
-	issue29SurfaceHash    = "sha256:353816fada23e5469f2357d8a5e1b034481b0ada916e8ea129773f934a42c689"
+	issue29SurfaceHash    = "sha256:878278ceb284bc0b2489a5dee57b63622c75827e1c3d1b833af32d980192852f"
 	issue29MemberTestRef  = "agent/issue29_surface_test.go#TestIssue29MemberMappingsMatchLockedLegacyAgentSurface"
 	issue29MemberTestRun  = "go test ./agent -run '^TestIssue29MemberMappingsMatchLockedLegacyAgentSurface$' -count=1"
 )
