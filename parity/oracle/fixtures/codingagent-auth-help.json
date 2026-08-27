@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/cli/auth-command.ts#printAuthCommandHelp"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/pig/auth-help",
+    "catalog_id": "contract:cli/pig/auth-help",
+    "surface": "cli",
+    "input": {
+      "arguments": [
+        "auth",
+        "--help"
+      ]
+    },
+    "observe": [
+      "stdout",
+      "stderr",
+      "exit_status"
+    ],
+    "normalizations": [
+      {
+        "target": "/stdout",
+        "kind": "brand-token",
+        "oracle": "pi",
+        "pig": "pig",
+        "exact_matches": 3
+      }
+    ]
+  },
+  "observation": {
+    "stdout": "Usage:\n  pi auth print-api-key [--provider <provider>] [--model <model>]\n  pi auth print-bearer-token [--provider <provider>] [--model <model>] [--min-expiry <duration>]\n  pi auth check [--provider <provider>] [--model <model>] [--json] [--credentials] [--no-refresh]\n\nAuth commands require at least one of --provider or --model. Checks refresh expired OAuth credentials by default; --no-refresh prevents this. --credentials emits the credential, or includes it in JSON output.\n",
+    "stderr": "",
+    "exit_status": {
+      "code": 0
+    }
+  },
+  "input_hash": "sha256:db35e55df2a5360b564f3b2bbb45d2d4775bcb811d31c7def2b7c25c3b64dd89",
+  "observation_hash": "sha256:64960b7d1c9a1ea50450705dd1074c994bf4c432963ae5cfeec3199d676971c4",
+  "execution_method": "packages/coding-agent/dist/cli.js auth --help; byte-checked against clean locked src/cli.ts",
+  "platform": "darwin-arm64",
+  "environment": {
+    "node": "v24.14.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "public_bin_sha256": "sha256:840d1e8e689ed9e4937bcb00b9a810e02a8567d9afb10a47097f11ca93ea1521",
+    "source_entry_sha256": "sha256:184e297bf71200d7947b0d28ba62f4c09b1f3071ea8c85c2255d1ab8617bca08",
+    "auth_command_sha256": "sha256:7d6e92760d5939fe6ed8049be3ae2be20dc74823184f8f98040c0717f31e2ec9"
+  }
+}

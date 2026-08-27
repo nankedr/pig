@@ -90,7 +90,7 @@ type CapabilityMatrix struct {
 }
 
 // Evidence binds a catalog entry to repeatable verification material. Verified
-// matrix rows carry the full replay record required by parity-verification.md;
+// entries carry the full replay record required by parity-verification.md;
 // older scaffold evidence may retain the compact provenance-only form.
 type Evidence struct {
 	Kind            string `json:"kind"`
@@ -611,7 +611,7 @@ func validateCapabilityMatrix(entry Entry) error {
 }
 
 func validateEvidence(entry Entry, baselineCommit string) error {
-	complete := entry.Status == StatusVerified && entry.Matrix != nil
+	complete := entry.Status == StatusVerified
 	achievedKinds := make(map[string]bool, len(entry.Evidence))
 	seenCases := make(map[string]bool, len(entry.Evidence))
 	for _, evidence := range entry.Evidence {

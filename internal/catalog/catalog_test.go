@@ -230,6 +230,15 @@ func TestValidateVerifiedMatrixEvidence(t *testing.T) {
 	}
 }
 
+func TestValidateVerifiedEntryRequiresCompleteEvidence(t *testing.T) {
+	entries, _ := base()
+	entries[4].Evidence[0].CaseID = ""
+	err := catalog.Validate(entries, catalog.BuildManifest(entries, baselineCommit, catalog.DefaultManifestPaths))
+	if !errors.Is(err, catalog.ErrMissingEvidence) {
+		t.Fatalf("Validate() = %v, want ErrMissingEvidence", err)
+	}
+}
+
 func TestValidateRejectsMatrixMappingKindMismatch(t *testing.T) {
 	for _, kind := range []string{"field", "behavior"} {
 		t.Run(kind+" without matrix", func(t *testing.T) {

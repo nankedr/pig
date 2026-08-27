@@ -49,16 +49,13 @@
     },
     {
       "if": {
-        "properties": {
-          "status": { "const": "verified" },
-          "matrix": { "type": "object" }
-        },
-        "required": ["status", "matrix"]
+        "properties": { "status": { "const": "verified" } },
+        "required": ["status"]
       },
       "then": {
         "properties": {
           "evidence": {
-            "items": { "$ref": "#/$defs/verifiedMatrixEvidence" }
+            "items": { "$ref": "#/$defs/verifiedEvidence" }
           }
         }
       }
@@ -324,7 +321,7 @@
         "description": { "type": "string", "pattern": "\\S" }
       }
     },
-    "verifiedMatrixEvidence": {
+    "verifiedEvidence": {
       "type": "object",
       "additionalProperties": false,
       "required": [

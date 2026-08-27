@@ -7,7 +7,7 @@
 
 ## Summary
 
-- Total entries: 6524
+- Total entries: 6525
 
 | Status | Count |
 | --- | --- |
@@ -15,7 +15,7 @@
 | scaffolded | 4231 |
 | partial | 32 |
 | implemented | 2 |
-| verified | 6 |
+| verified | 7 |
 | deferred | 2 |
 
 ## Entries by module
@@ -5296,6 +5296,7 @@
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:session/migration | implemented | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| contract:cli/pig/auth-help | verified | M0 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | deferred-extension-runtime | deferred | M7 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | deferred-pig-server | deferred | M0 | contract | github.com/nankedr/pig/codingagent | server |
 
