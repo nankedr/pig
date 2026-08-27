@@ -1,25 +1,90 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.2.0",
   "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
-  "status": "pending-capture",
+  "status": "captured",
   "generation": {
-    "generated_at": null,
-    "generator_commit": "936aff00918de1187f085f123c2812d8f2d67745",
-    "tool_versions": {},
-    "input_sources": []
+    "generated_at": "2026-08-07T05:51:06.002Z",
+    "captured_at": "2026-08-27T06:24:35Z",
+    "generator_commit": "53fa77ccd8a279eb87e92294ef3687b03ff80112",
+    "method": "extract-official-release-and-derive-losslessly",
+    "tool_versions": {
+      "catalog_generator_node": "v22.23.2",
+      "catalog_generator_npm": "10.9.8",
+      "catalog_schema": "3",
+      "snapshot_derivation_node": "v24.14.0",
+      "snapshot_verifier_go": "go1.24.0"
+    },
+    "input_sources": [
+      "https://github.com/earendil-works/pi/releases/download/v0.84.1/pi-0.84.1-source.tar.gz",
+      "https://github.com/earendil-works/pi/actions/runs/31151936017/job/92783208245",
+      "https://github.com/badlogic/pi-mono/blob/936aff00918de1187f085f123c2812d8f2d67745/packages/ai/src/image-models.generated.ts",
+      "https://github.com/badlogic/pi-mono/blob/936aff00918de1187f085f123c2812d8f2d67745/packages/ai/scripts/generate-image-models.ts"
+    ]
   },
   "capture": {
-    "reason": "Pi commit 936aff00918de1187f085f123c2812d8f2d67745 does not commit the full chat-model data; the release process generates model shards over the network. Reproducing the provider, model IDs, APIs, pricing, context windows, max tokens, and compatibility metadata requires a controlled network+Node capture using that commit's generator. That controlled capture has not yet been performed, so no artifacts, hashes, or generation timestamps exist. Fabricating them is forbidden; this manifest stays in pending-capture until a real capture runs.",
-    "required_step": "docs/specs/model-catalog.md",
-    "tracked_by": "M0 catalog-capture (future task)"
+    "reason": "The exact 936aff0 chat catalog artifact is unavailable. This approved dual-source baseline uses the official v0.84.1 source release at 53fa77c, 40 commits before the code baseline; derivation only flattens API groups and applies no semantic overlay.",
+    "required_step": "Upgrade only through the explicit baseline-upgrade process in docs/specs/model-catalog.md.",
+    "tracked_by": "https://github.com/nankedr/pig/issues/35"
   },
-  "artifacts": [],
-  "providers": 0,
-  "models": 0,
+  "catalog_source": {
+    "type": "github-release-source-tar",
+    "release": "v0.84.1",
+    "commit": "53fa77ccd8a279eb87e92294ef3687b03ff80112",
+    "url": "https://github.com/earendil-works/pi/releases/download/v0.84.1/pi-0.84.1-source.tar.gz",
+    "sha256": "294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7",
+    "commits_behind_code_baseline": 40,
+    "manifest": "catalog/chat/source/manifest.json",
+    "manifest_sha256": "ed1960291fe50bf7ba300bfea19ca9cefcc4b53001b367469a5827523b286ba5",
+    "structure_sha256": "24c74ac10bb8ed4df2c96bdadcfd94a417f3c823d5038875f59a261e3c84424b"
+  },
+  "derivation": {
+    "method": "derived-from-v0.84.1-lossless-flatten",
+    "source_commit": "53fa77ccd8a279eb87e92294ef3687b03ff80112",
+    "rules": "catalog/chat/derivation.json",
+    "rule_count": 1,
+    "semantic_overlays": 0,
+    "result": "catalog/chat/models.json",
+    "result_sha256": "1268addeb40f0eb1b1b4a4229c1df59206b5e8bf5a55fdb627af58bc422a5583"
+  },
+  "image": {
+    "source_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "source_path": "packages/ai/src/image-models.generated.ts",
+    "source_sha256": "76ffa23d2fbd3fa7505a979af972c8be38ee1be16cdcd3b9512411efb476f3a2",
+    "generator_path": "packages/ai/scripts/generate-image-models.ts",
+    "generator_sha256": "735c4a5901932eb7e2e0d434ca99cbca9a6437c93ffed06d486e60a3b6b7aaef",
+    "method": "node-import-and-json-stringify",
+    "artifact": "catalog/image/models.json",
+    "providers": 1,
+    "models": 42
+  },
+  "artifacts": [
+    {
+      "path": "catalog/chat/source/manifest.json",
+      "sha256": "ed1960291fe50bf7ba300bfea19ca9cefcc4b53001b367469a5827523b286ba5",
+      "role": "source-manifest"
+    },
+    {
+      "path": "catalog/chat/derivation.json",
+      "sha256": "9e8f47fec2704aae0635ba1e10340b8956e6bb0fcedcecd0e6831ed910f0be53",
+      "role": "derivation-rules"
+    },
+    {
+      "path": "catalog/chat/models.json",
+      "sha256": "1268addeb40f0eb1b1b4a4229c1df59206b5e8bf5a55fdb627af58bc422a5583",
+      "role": "derived-chat-catalog"
+    },
+    {
+      "path": "catalog/image/models.json",
+      "sha256": "fba8b88a29f861c0e0ab23960af7370e095198ca0bdd88c2721495cb36b50142",
+      "role": "image-catalog"
+    }
+  ],
+  "providers": 39,
+  "models": 1220,
   "attribution": {
     "license": "MIT",
     "holder": "Mario Zechner",
-    "source": "https://github.com/badlogic/pi-mono"
+    "source": "https://github.com/earendil-works/pi/releases/download/v0.84.1/pi-0.84.1-source.tar.gz"
   },
   "excludes_secrets": true
 }

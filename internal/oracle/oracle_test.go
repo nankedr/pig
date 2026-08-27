@@ -8,10 +8,14 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/nankedr/pig/internal/baseline"
 	"github.com/nankedr/pig/internal/oracle"
 )
 
-const baselineCommit = "936aff00918de1187f085f123c2812d8f2d67745"
+const (
+	baselineID     = "pi-936aff0-catalog-v0.84.1-v1"
+	baselineCommit = "936aff00918de1187f085f123c2812d8f2d67745"
+)
 
 // repoRoot locates the repository root relative to this test file, mirroring the
 // runtime.Caller approach used by internal/inventory, internal/surface and
@@ -33,7 +37,7 @@ func baseFixture() oracle.Fixture {
 		SchemaVersion:  oracle.SchemaVersion,
 		ID:             "protocol/frame",
 		CatalogID:      "contract:protocol/frame",
-		BaselineID:     "pi-936aff0-v1",
+		BaselineID:     baselineID,
 		BaselineCommit: baselineCommit,
 		Deterministic:  true,
 		Upstream: oracle.Upstream{
@@ -70,7 +74,7 @@ func baseFixture() oracle.Fixture {
 }
 
 func TestReplayAcceptsKnownGoodVector(t *testing.T) {
-	if err := oracle.Replay(baseFixture(), baselineCommit); err != nil {
+	if err := oracle.Replay(baseFixture(), baselineID, baselineCommit); err != nil {
 		t.Fatalf("Replay(valid fixture) = %v", err)
 	}
 }
@@ -117,6 +121,12 @@ func TestReplayRejections(t *testing.T) {
 			mutate:   func(f *oracle.Fixture) { f.Hash.Algorithm = "md5" },
 			sentinel: oracle.ErrUnsupportedHash,
 			kind:     oracle.KindUnsupportedHash,
+		},
+		{
+			name:     "baseline id mismatch",
+			mutate:   func(f *oracle.Fixture) { f.BaselineID = "pi-other-v1" },
+			sentinel: oracle.ErrProvenance,
+			kind:     oracle.KindProvenance,
 		},
 		{
 			name:     "baseline commit mismatch",
@@ -196,7 +206,7 @@ func TestReplayRejections(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			f := baseFixture()
 			tt.mutate(&f)
-			err := oracle.Replay(f, baselineCommit)
+			err := oracle.Replay(f, baselineID, baselineCommit)
 			if err == nil {
 				t.Fatalf("Replay(%s) = nil, want error", tt.name)
 			}
@@ -260,7 +270,11 @@ func TestReplayRealFixture(t *testing.T) {
 	if !fixture.Deterministic {
 		t.Fatal("committed fixture is not marked deterministic")
 	}
-	if err := oracle.Replay(fixture, baselineCommit); err != nil {
+	lock, _, err := baseline.Load(filepath.Join(root, "parity", "baseline"))
+	if err != nil {
+		t.Fatalf("baseline.Load: %v", err)
+	}
+	if err := oracle.Replay(fixture, lock.BaselineID, lock.Upstream.Commit); err != nil {
 		t.Fatalf("Replay(real fixture) = %v", err)
 	}
 }

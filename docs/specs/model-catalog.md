@@ -1,25 +1,23 @@
 # 模型目录规范
 
-## 两种 Catalog 不可混淆
+## 基线与 Catalog 不可混淆
 
 - **Parity Catalog**：所有源码能力、映射、状态和证据的唯一权威。
-- **Catalog Snapshot**：固定基线使用的不可变模型目录数据制品。
+- **Code Baseline**：运行时语义与 API 的 Pi 源码基线。
+- **Catalog Baseline**：模型目录内容的上游不可变发布制品。
+- **Catalog Snapshot**：从 Catalog Baseline 锁定到 Pig 的目录数据与完整性 manifest。
 
-Catalog Snapshot 是 Parity Catalog 中受追踪的一组 artifact，但它本身不记录 Pig 的实现完成度。
+Chat 与 image Snapshot 分别由 Parity Catalog 的 `contract:baseline/catalog-snapshot`、`contract:baseline/image-catalog-snapshot` 条目追踪；前者以 `baseline_role: catalog` 绑定 Catalog Baseline，后者绑定 Code Baseline，二者都指向可重复 evidence。Snapshot 本身不记录 Pig 的运行时实现完成度。
 
 ## 为什么源码 commit 不够
 
-Pi commit `936aff00918de1187f085f123c2812d8f2d67745` 没有提交完整的 chat model 真实数据；发布过程会通过网络生成模型 shard。只锁定源码无法重现当时使用的 Provider、model ID、API、价格、context window、max tokens 和 compatibility metadata，因此 Parity Baseline 必须同时锁定 Catalog Snapshot。
+Code Baseline `936aff00918de1187f085f123c2812d8f2d67745` 没有提交完整的 chat model 真实数据；发布过程会通过网络生成模型 shard。只锁定源码无法重现 Provider、model ID、API、价格、context window、max tokens 和 compatibility metadata，因此 Parity Baseline 必须另有 Catalog Baseline。
 
-不能拿调查当天的实时目录冒充 commit 当天数据，也不能在普通 build 中联网后把结果当成固定基线。
+V1 的 Catalog Baseline 是 Pi v0.84.1 官方 source tar：来源 commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model，artifact SHA-256 `294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7`。它采用 Pi 根目录 MIT License，保留 `Copyright (c) 2025 Mario Zechner`。
 
-## Snapshot 获取顺序
+`53fa77c` 比 Code Baseline 早 40 个 commit。Code Baseline 当次生成目录的 artifact 已过期，发布通道也没有保留可恢复副本；日志与 hash 只能证明旧 artifact 存在，不能重建内容。V1 因此选择最近的较早官方不可变发布物，不拿调查当天的实时目录冒充历史结果。
 
-1. 优先寻找由该 commit 生成、不可变且可校验的历史发布 artifact。
-2. 若不存在，使用该 commit 的生成器进行一次受控抓取。
-3. 受控抓取必须记录真实抓取时间，并明确它晚于源码 commit。
-4. 对数据、manifest、原始响应和工具链计算 hash，人工审查来源与许可。
-5. 锁定结果后，任何变化都必须通过显式 baseline upgrade；运行时 refresh 不得修改 Snapshot。
+这是双来源 baseline compatibility，不是 fixed-run parity。API、生成算法和运行时行为以 Code Baseline 为准；内嵌目录值以 Catalog Baseline 为准；任何报告都不得声称 `936aff0` 的生成器曾产出 v0.84.1 数据。
 
 ## Snapshot 内容
 
@@ -27,14 +25,15 @@ Snapshot 至少包含：
 
 - 按 Provider/API 划分的规范化 chat model 数据；
 - image model 基线或其独立 manifest；
-- 生成时间、生成器 commit、工具版本和输入来源；
+- 发布时间、来源 commit、工具版本和输入来源；
 - 每个 artifact 的 SHA-256；
 - Provider、model 数量及完整性 manifest；
 - 手工修正、过滤、派生字段和兼容标记的来源；
 - 许可证、转载条件和第三方归属；
-- 原始网络响应，或在许可/体积不允许提交时对应的不可变内容地址与 hash。
+- 官方 release artifact 或其不可变地址与 hash。
 
 Snapshot 不包含真实 API key、OAuth token、cookie、账号标识或请求日志中的敏感 header。
+Pi 的 MIT notice 覆盖所选官方 release artifact；它不自动授权 Pig 独立抓取并再分发第三方目录服务的原始响应。没有端点级再分发许可时，只提交 URL、时间、状态、字节数、hash、记录数和生成器版本等不可逆 provenance。
 
 ## 普通构建与测试
 
@@ -86,4 +85,4 @@ Offline Mode 开启时，模型目录、版本、包更新和工具下载使用�
 
 ## Baseline 升级
 
-升级 Pi baseline 时必须显式修改 upstream lock 和 Catalog Snapshot，重新运行提取、生成、hash、diff、Oracle case 与许可审查。禁止只更新源码 commit 或只抓取新模型数据。旧 release 必须仍能定位其对应的两件基线制品。
+升级 Code Baseline 或 Catalog Baseline 时必须显式记录新的二元组合，更新对应 lock/manifest，并重新运行提取、hash、diff、Oracle case 与许可审查。两者可以独立选择，但不能把不同 revision 写成同一次生成；旧 release 必须仍能定位其对应的两件基线制品。

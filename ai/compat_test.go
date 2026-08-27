@@ -171,10 +171,10 @@ func TestCompatCatalogAliasesAndDeferredEntriesAreExplicit(t *testing.T) {
 		t.Fatalf("GetProviders count = %d, want 39 static providers", len(providers))
 	}
 	if models := ai.GetModels(ai.ProviderIDOpenAI); len(models) != 0 {
-		t.Fatalf("GetModels = %#v, want pending-capture empty snapshot", models)
+		t.Fatalf("GetModels = %#v, want M0-unloaded catalog", models)
 	}
 	if _, ok := ai.GetModel(ai.ProviderIDOpenAI, "missing"); ok {
-		t.Fatal("GetModel found pending-capture model")
+		t.Fatal("GetModel found a model before runtime catalog loading")
 	}
 	if _, err := ai.RegisterFauxProvider(); !errors.Is(err, ai.ErrNotImplemented) {
 		t.Fatalf("RegisterFauxProvider error = %v, want ErrNotImplemented", err)

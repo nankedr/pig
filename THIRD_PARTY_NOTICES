@@ -2,10 +2,14 @@
 
 ## Pi
 
-Pig uses Pi as its parity baseline:
+Pig uses two Pi artifacts as its parity baseline:
 
-- Source: https://github.com/badlogic/pi-mono
-- Commit: 936aff00918de1187f085f123c2812d8f2d67745
+- Code baseline source: https://github.com/badlogic/pi-mono
+- Code baseline commit: 936aff00918de1187f085f123c2812d8f2d67745
+- Catalog baseline source: https://github.com/earendil-works/pi/releases/download/v0.84.1/pi-0.84.1-source.tar.gz
+- Catalog baseline source commit: 53fa77ccd8a279eb87e92294ef3687b03ff80112
+- Catalog baseline SHA-256: 294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7
+- Catalog baseline contents: 39 providers, 1220 chat models
 - License: MIT
 
 MIT License
@@ -29,3 +33,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## models.dev
+
+- Source: https://github.com/anomalyco/models.dev
+- License: MIT
+
+Copyright (c) 2025 models.dev
+
+The retained license text is in `THIRD_PARTY_LICENSES/models.dev-MIT.txt`.
+Independently fetched catalog-service responses are not covered by the Pi or
+Pig MIT licenses. Without an endpoint-specific redistribution license, Pig
+records only irreversible provenance and grants no rights in third-party
+service data or trademarks.

@@ -2,6 +2,8 @@
 
 Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学习与证据”组织。阅读代码或设计任务前，先确认固定 Parity Baseline 和当前 Milestone Frontier。
 
+当前 Milestone Frontier：**M1**。M0 冻结门禁与边界说明见 [M0 兼容骨架](learning/m0-compatibility-skeleton.md)。
+
 ## 首次阅读
 
 1. [领域术语与范围](../CONTEXT.md)：统一 Pi、Pig、Parity、Compatibility Surface、Parity Catalog、Capability Stub 等术语。
@@ -15,7 +17,7 @@ Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学
 - [运行时契约](specs/runtime-contracts.md)：消息、EventStream、Agent turn、Tool、Session、Client 和 Telemetry 的可观察语义。
 - [CLI、存储与平台契约](specs/cli-storage-and-platform.md)：命令模式、RPC/Remote 区分、路径、Session、Shell 和平台边界。
 - [安全与网络契约](specs/security-and-network.md)：Project Trust、无 sandbox 的宿主模型、凭证、Offline 和外联边界。
-- [模型目录规范](specs/model-catalog.md)：Catalog Snapshot 缺口、获取与校验、运行时 overlay 和生成管线。
+- [模型目录规范](specs/model-catalog.md)：双来源 Catalog Baseline、Snapshot 校验、运行时 overlay 和生成管线。
 - [扩展系统规范](specs/extensions.md)：Extension Surface、早期 Stub、M5 package 边界和 M7 ABI 决策门禁。
 
 ## 决策记录
@@ -24,7 +26,7 @@ Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学
 
 常用主题：
 
-- 基线与证据：ADR-0001。
+- 基线与证据：ADR-0001、0014。
 - 语义兼容、Go API 与运行时：ADR-0002、0006、0007。
 - 模块范围、Go module 与冻结门禁：ADR-0003、0004、0005。
 - Pig 身份、状态、服务和宿主安全：ADR-0008、0010。
@@ -53,6 +55,8 @@ Markdown 报告、Issue 勾选、测试数量或文档中的阶段描述都不�
 
 - `docs/learning/`：Agent 原理、执行链、状态机、失败场景和实验；
 - `docs/mappings/typescript-to-go/`：Pi 文件、symbol、测试到 Pig 实现的导航。
+
+M0 入口：[兼容骨架](learning/m0-compatibility-skeleton.md)与 [TypeScript 到 Go 导航](mappings/typescript-to-go/m0.md)。
 
 学习材料解释“为什么”和“如何运行”，mapping 帮助对照源码；二者都不记录权威完成度。每个 Runnable Milestone 必须同步代码、Go SDK、示例、Parity Catalog、学习材料和 mapping。
 

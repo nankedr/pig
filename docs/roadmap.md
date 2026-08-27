@@ -1,6 +1,8 @@
 # Pig V1 路线图
 
-Pig V1 以 Pi `936aff00918de1187f085f123c2812d8f2d67745` 及配套 Catalog Snapshot 为对等基线。主学习路线一次只推进一个里程碑前沿；并行支线必须重新集成到持续可运行的 `pig`。
+Pig V1 使用双来源对等基线：Code Baseline 是 Pi `936aff00918de1187f085f123c2812d8f2d67745`，Catalog Baseline 是 Pi v0.84.1 官方 source tar（commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model）。两者相差 40 个 commit，因此这不是 fixed-run parity；详见 ADR-0014。主学习路线一次只推进一个里程碑前沿；并行支线必须重新集成到持续可运行的 `pig`。
+
+当前 Milestone Frontier：**M1**。
 
 | 阶段 | 可验收产物 |
 | --- | --- |
@@ -19,6 +21,8 @@ Pig V1 以 Pi `936aff00918de1187f085f123c2812d8f2d67745` 及配套 Catalog Snaps
 | M12 / v0.12.0 | 图片体系：image model/generation、消息图片、工具结果图片、处理与终端显示 |
 | M13 / v0.13.0 | 平台与发布闭环：六目标构建、原生行为、剪贴板、外部命令、资产、安装包、更新与第三方声明 |
 | M14 / v1.0.0 | 只关闭对等缺口：全量 Parity Catalog、测试、示例、文档、许可和发布门禁，不新增功能 |
+
+M0 的普通集成入口是纯离线的 `make m0-gate`，只重放已提交 fixture，不读取 Pi checkout。完整冻结使用 `make m0-freeze PIG_PI_ORACLE_CHECKOUT=/path/to/prepared/pi PIG_PI_SOURCE_CHECKOUT=/path/to/pristine/pi`；前者预装依赖并构建 `dist`，后者必须没有 tracked、untracked 或 ignored 状态，不能互相复用。准备命令见 [M0 兼容骨架](learning/m0-compatibility-skeleton.md#冻结门禁)。
 
 ## M1 冻结门禁
 

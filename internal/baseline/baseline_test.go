@@ -13,7 +13,10 @@ import (
 	"github.com/nankedr/pig/internal/baseline"
 )
 
-const fixedCommit = "936aff00918de1187f085f123c2812d8f2d67745"
+const (
+	fixedCommit   = "936aff00918de1187f085f123c2812d8f2d67745"
+	catalogCommit = "53fa77ccd8a279eb87e92294ef3687b03ff80112"
+)
 
 // repoBaselineDir locates the real committed parity/baseline directory relative
 // to this test file, mirroring the runtime.Caller approach used by the existing
@@ -32,7 +35,7 @@ func strptr(s string) *string { return &s }
 
 func validLock() baseline.Lock {
 	return baseline.Lock{
-		SchemaVersion: "0.1.0",
+		SchemaVersion: "0.2.0",
 		BaselineID:    "pi-test",
 		Upstream: baseline.Upstream{
 			Name:          "Pi",
@@ -49,7 +52,11 @@ func validLock() baseline.Lock {
 			NotASubmodule:         true,
 			NotARuntimeDependency: true,
 		},
-		CatalogSnapshot: baseline.CatalogSnapshot{Manifest: "snapshot.manifest.json"},
+		CatalogSnapshot: baseline.CatalogSnapshot{
+			Manifest: "snapshot.manifest.json", SourceCommit: catalogCommit,
+			SourceRelease: "v0.84.1", SourceReleaseSHA256: sha256Hex([]byte("release")),
+			SourceCommitsBehind: 40,
+		},
 	}
 }
 
@@ -75,6 +82,96 @@ func validPendingManifest() baseline.Manifest {
 		Attribution:     baseline.Attribution{License: "MIT", Holder: "Mario Zechner", Source: "https://github.com/badlogic/pi-mono"},
 		ExcludesSecrets: true,
 	}
+}
+
+func buildCapturedBaseline(t *testing.T) (string, baseline.Manifest) {
+	t.Helper()
+	dir := t.TempDir()
+	writeJSON(t, filepath.Join(dir, "upstream.lock.json"), validLock())
+
+	sourceDir := filepath.Join(dir, "catalog", "chat", "source")
+	providersDir := filepath.Join(sourceDir, "providers")
+	if err := os.MkdirAll(providersDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	sourceModel := map[string]any{
+		"id": "model", "name": "Model", "api": "openai-responses", "provider": "provider",
+		"baseUrl": "https://example.invalid", "reasoning": false, "input": []string{"text"},
+		"cost":          map[string]any{"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+		"contextWindow": 1, "maxTokens": 1,
+	}
+	shardPath := filepath.Join(providersDir, "provider.json")
+	writeJSON(t, shardPath, map[string]any{"openai-responses": map[string]any{"model": sourceModel}})
+	structure := map[string]map[string]string{"provider": {"model": "openai-responses"}}
+	sourceManifestPath := filepath.Join(sourceDir, "manifest.json")
+	writeJSON(t, sourceManifestPath, map[string]any{
+		"schemaVersion": 3,
+		"generatedAt":   "2026-08-07T05:51:06.002Z",
+		"structureHash": jsonHash(t, structure),
+		"files":         map[string]string{"provider.json": fileHash(t, shardPath)},
+	})
+
+	rulesPath := filepath.Join(dir, "catalog", "chat", "derivation.json")
+	writeJSON(t, rulesPath, map[string]any{
+		"schema_version":    "0.1.0",
+		"source_commit":     catalogCommit,
+		"semantic_overlays": []any{},
+		"rules": []any{map[string]any{
+			"operation": "flatten-api-groups", "preserves_fields_and_values": true,
+			"ordering": []string{"provider", "model_id"},
+		}},
+	})
+
+	derivedModel := cloneMap(t, sourceModel)
+	modelsPath := filepath.Join(dir, "catalog", "chat", "models.json")
+	writeJSON(t, modelsPath, map[string]any{"provider": map[string]any{"model": derivedModel}})
+	if err := os.MkdirAll(filepath.Join(dir, "catalog", "image"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	imagePath := filepath.Join(dir, "catalog", "image", "models.json")
+	writeJSON(t, imagePath, map[string]any{"image-provider": map[string]any{"image-model": map[string]any{
+		"id": "image-model", "name": "Image Model", "api": "openrouter-images", "provider": "image-provider",
+		"baseUrl": "https://example.invalid", "input": []string{"text"}, "output": []string{"image"},
+		"cost": map[string]any{"input": -1000000, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+	}}})
+
+	m := validPendingManifest()
+	m.SchemaVersion = "0.2.0"
+	m.Status = baseline.StatusCaptured
+	m.Generation.GeneratedAt = strptr("2026-08-07T05:51:06.002Z")
+	m.Generation.CapturedAt = strptr("2026-08-27T04:30:00Z")
+	m.Generation.GeneratorCommit = catalogCommit
+	m.Generation.Method = "extract-official-release-and-losslessly-flatten"
+	m.Generation.ToolVersions = map[string]string{"node": "v22.23.2", "npm": "10.9.8"}
+	m.Generation.InputSources = []string{"https://example.invalid/pi-0.84.1-source.tar.gz"}
+	m.CatalogSource = baseline.CatalogSource{
+		Type: "github-release-source-tar", Release: "v0.84.1", Commit: catalogCommit,
+		URL: "https://example.invalid/pi-0.84.1-source.tar.gz", SHA256: sha256Hex([]byte("release")),
+		CommitsBehindCodeBaseline: 40, Manifest: "catalog/chat/source/manifest.json",
+		ManifestSHA256: fileHash(t, sourceManifestPath), StructureSHA256: jsonHash(t, structure),
+	}
+	m.Attribution.Source = m.CatalogSource.URL
+	m.Derivation = baseline.Derivation{
+		Method: "lossless-flatten-provider-api-shards", SourceCommit: catalogCommit,
+		Rules: "catalog/chat/derivation.json", RuleCount: 1, SemanticOverlays: 0,
+		Result: "catalog/chat/models.json", ResultSHA256: fileHash(t, modelsPath),
+	}
+	m.Image = baseline.ImageSnapshot{
+		SourceCommit: fixedCommit, SourcePath: "packages/ai/src/image-models.generated.ts",
+		SourceSHA256:  sha256Hex([]byte("image source")),
+		GeneratorPath: "packages/ai/scripts/generate-image-models.ts", GeneratorSHA256: sha256Hex([]byte("image generator")),
+		Method: "node-import-json-stringify", Artifact: "catalog/image/models.json",
+		Providers: 1, Models: 1,
+	}
+	m.Providers = 1
+	m.Models = 1
+	m.Artifacts = []baseline.Artifact{
+		{Path: "catalog/chat/source/manifest.json", SHA256: fileHash(t, sourceManifestPath), Role: "source-manifest"},
+		{Path: "catalog/chat/derivation.json", SHA256: fileHash(t, rulesPath), Role: "derivation-rules"},
+		{Path: "catalog/chat/models.json", SHA256: fileHash(t, modelsPath), Role: "derived-chat-catalog"},
+		{Path: "catalog/image/models.json", SHA256: fileHash(t, imagePath), Role: "image-catalog"},
+	}
+	return dir, m
 }
 
 // writeBaseline marshals lock+manifest into a fresh temp dir and returns it.
@@ -104,6 +201,48 @@ func writeJSON(t *testing.T, path string, v any) {
 func sha256Hex(data []byte) string {
 	sum := sha256.Sum256(data)
 	return hex.EncodeToString(sum[:])
+}
+
+func fileHash(t *testing.T, path string) string {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return sha256Hex(data)
+}
+
+func jsonHash(t *testing.T, value any) string {
+	t.Helper()
+	data, err := json.Marshal(value)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return sha256Hex(data)
+}
+
+func cloneMap(t *testing.T, value map[string]any) map[string]any {
+	t.Helper()
+	data, err := json.Marshal(value)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cloned map[string]any
+	if err := json.Unmarshal(data, &cloned); err != nil {
+		t.Fatal(err)
+	}
+	return cloned
+}
+
+func setArtifactHash(t *testing.T, manifest *baseline.Manifest, path, hash string) {
+	t.Helper()
+	for i := range manifest.Artifacts {
+		if manifest.Artifacts[i].Path == path {
+			manifest.Artifacts[i].SHA256 = hash
+			return
+		}
+	}
+	t.Fatalf("artifact %q not found", path)
 }
 
 // assertKind checks the error matches both the sentinel (errors.Is) and the
@@ -142,17 +281,29 @@ func TestLoadRealBaseline(t *testing.T) {
 	if lock.Upstream.Commit != fixedCommit {
 		t.Errorf("lock.Upstream.Commit = %q, want %q", lock.Upstream.Commit, fixedCommit)
 	}
+	if lock.SchemaVersion != "0.2.0" || manifest.SchemaVersion != "0.2.0" {
+		t.Errorf("schemas = %q/%q, want 0.2.0/0.2.0", lock.SchemaVersion, manifest.SchemaVersion)
+	}
+	if lock.BaselineID != "pi-936aff0-catalog-v0.84.1-v1" {
+		t.Errorf("baseline ID = %q, want dual-source ID", lock.BaselineID)
+	}
 	if manifest.BaselineCommit != fixedCommit {
 		t.Errorf("manifest.BaselineCommit = %q, want %q", manifest.BaselineCommit, fixedCommit)
 	}
-	if manifest.Status != baseline.StatusPendingCapture {
-		t.Errorf("manifest.Status = %q, want %q", manifest.Status, baseline.StatusPendingCapture)
+	if manifest.Status != baseline.StatusCaptured {
+		t.Errorf("manifest.Status = %q, want %q", manifest.Status, baseline.StatusCaptured)
 	}
-	if manifest.Generation.GeneratedAt != nil {
-		t.Errorf("real pending manifest generated_at = %v, want nil", *manifest.Generation.GeneratedAt)
+	if manifest.Generation.GeneratorCommit != catalogCommit {
+		t.Errorf("generator commit = %q, want catalog source %q", manifest.Generation.GeneratorCommit, catalogCommit)
 	}
-	if len(manifest.Artifacts) != 0 {
-		t.Errorf("real pending manifest artifacts = %v, want empty", manifest.Artifacts)
+	if manifest.CatalogSource.Commit != catalogCommit || manifest.CatalogSource.CommitsBehindCodeBaseline != 40 {
+		t.Errorf("catalog source = %q/%d, want %q/40", manifest.CatalogSource.Commit, manifest.CatalogSource.CommitsBehindCodeBaseline, catalogCommit)
+	}
+	if manifest.Providers != 39 || manifest.Models != 1220 {
+		t.Errorf("chat counts = %d/%d, want 39/1220", manifest.Providers, manifest.Models)
+	}
+	if manifest.Image.Providers != 1 || manifest.Image.Models != 42 {
+		t.Errorf("image counts = %d/%d, want 1/42", manifest.Image.Providers, manifest.Image.Models)
 	}
 }
 
@@ -212,26 +363,8 @@ func TestVerifyCheckout(t *testing.T) {
 }
 
 func TestVerifyCapturedManifest(t *testing.T) {
-	data := []byte(`{"providers":[{"id":"deepseek"}]}`)
-
-	build := func(t *testing.T) (string, baseline.Manifest) {
-		dir := t.TempDir()
-		writeJSON(t, filepath.Join(dir, "upstream.lock.json"), validLock())
-		if err := os.WriteFile(filepath.Join(dir, "chat-models.json"), data, 0o600); err != nil {
-			t.Fatal(err)
-		}
-		m := validPendingManifest()
-		m.Status = baseline.StatusCaptured
-		m.Generation.GeneratedAt = strptr("2026-08-14T00:00:00Z")
-		m.Generation.InputSources = []string{"https://github.com/badlogic/pi-mono"}
-		m.Providers = 1
-		m.Models = 1
-		m.Artifacts = []baseline.Artifact{{Path: "chat-models.json", SHA256: sha256Hex(data)}}
-		return dir, m
-	}
-
 	t.Run("valid hash", func(t *testing.T) {
-		dir, m := build(t)
+		dir, m := buildCapturedBaseline(t)
 		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
 		if err := baseline.Verify(dir); err != nil {
 			t.Fatalf("Verify captured (valid hash) = %v, want nil", err)
@@ -239,31 +372,129 @@ func TestVerifyCapturedManifest(t *testing.T) {
 	})
 
 	t.Run("wrong hash", func(t *testing.T) {
-		dir, m := build(t)
+		dir, m := buildCapturedBaseline(t)
 		m.Artifacts[0].SHA256 = sha256Hex([]byte("different"))
 		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
 		assertKind(t, baseline.Verify(dir), baseline.ErrHashMismatch, baseline.KindHashMismatch)
 	})
 
 	t.Run("missing hash", func(t *testing.T) {
-		dir, m := build(t)
+		dir, m := buildCapturedBaseline(t)
 		m.Artifacts[0].SHA256 = ""
 		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
 		assertKind(t, baseline.Verify(dir), baseline.ErrMissingHash, baseline.KindMissingHash)
 	})
 
 	t.Run("missing generated_at", func(t *testing.T) {
-		dir, m := build(t)
+		dir, m := buildCapturedBaseline(t)
 		m.Generation.GeneratedAt = nil
 		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
 		assertKind(t, baseline.Verify(dir), baseline.ErrMissingField, baseline.KindMissingField)
 	})
 
 	t.Run("empty input sources", func(t *testing.T) {
-		dir, m := build(t)
+		dir, m := buildCapturedBaseline(t)
 		m.Generation.InputSources = []string{}
 		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
 		assertKind(t, baseline.Verify(dir), baseline.ErrMissingField, baseline.KindMissingField)
+	})
+
+	t.Run("tampered source shard", func(t *testing.T) {
+		dir, m := buildCapturedBaseline(t)
+		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
+		if err := os.WriteFile(filepath.Join(dir, "catalog", "chat", "source", "providers", "provider.json"), []byte("{}"), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		assertKind(t, baseline.Verify(dir), baseline.ErrHashMismatch, baseline.KindHashMismatch)
+	})
+
+	t.Run("derived catalog must match lossless flatten", func(t *testing.T) {
+		dir, m := buildCapturedBaseline(t)
+		modelsPath := filepath.Join(dir, "catalog", "chat", "models.json")
+		writeJSON(t, modelsPath, map[string]any{"provider": map[string]any{"model": map[string]any{
+			"id": "model", "provider": "provider", "api": "openai-responses",
+		}}})
+		m.Derivation.ResultSHA256 = fileHash(t, modelsPath)
+		for i := range m.Artifacts {
+			if m.Artifacts[i].Path == m.Derivation.Result {
+				m.Artifacts[i].SHA256 = m.Derivation.ResultSHA256
+			}
+		}
+		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
+		assertKind(t, baseline.Verify(dir), baseline.ErrCatalogMismatch, baseline.KindCatalogMismatch)
+	})
+
+	t.Run("manifest count", func(t *testing.T) {
+		dir, m := buildCapturedBaseline(t)
+		m.Models++
+		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
+		assertKind(t, baseline.Verify(dir), baseline.ErrCatalogMismatch, baseline.KindCatalogMismatch)
+	})
+
+	t.Run("duplicate model across APIs", func(t *testing.T) {
+		dir, m := buildCapturedBaseline(t)
+		shardPath := filepath.Join(dir, "catalog", "chat", "source", "providers", "provider.json")
+		var shard map[string]map[string]map[string]any
+		data, err := os.ReadFile(shardPath)
+		if err != nil {
+			t.Fatalf("read shard: %v", err)
+		}
+		if err := json.Unmarshal(data, &shard); err != nil {
+			t.Fatalf("decode shard: %v", err)
+		}
+		duplicate := cloneMap(t, shard["openai-responses"]["model"])
+		duplicate["api"] = "other-api"
+		shard["other-api"] = map[string]map[string]any{"model": duplicate}
+		writeJSON(t, shardPath, shard)
+
+		sourceManifestPath := filepath.Join(dir, m.CatalogSource.Manifest)
+		var sourceManifest map[string]any
+		data, err = os.ReadFile(sourceManifestPath)
+		if err != nil {
+			t.Fatalf("read source manifest: %v", err)
+		}
+		if err := json.Unmarshal(data, &sourceManifest); err != nil {
+			t.Fatalf("decode source manifest: %v", err)
+		}
+		sourceManifest["files"].(map[string]any)["provider.json"] = fileHash(t, shardPath)
+		writeJSON(t, sourceManifestPath, sourceManifest)
+		m.CatalogSource.ManifestSHA256 = fileHash(t, sourceManifestPath)
+		setArtifactHash(t, &m, m.CatalogSource.Manifest, m.CatalogSource.ManifestSHA256)
+		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
+		assertKind(t, baseline.Verify(dir), baseline.ErrCatalogMismatch, baseline.KindCatalogMismatch)
+	})
+
+	t.Run("unknown provider reference", func(t *testing.T) {
+		dir, m := buildCapturedBaseline(t)
+		modelsPath := filepath.Join(dir, m.Derivation.Result)
+		var models map[string]map[string]map[string]any
+		data, err := os.ReadFile(modelsPath)
+		if err != nil {
+			t.Fatalf("read models: %v", err)
+		}
+		if err := json.Unmarshal(data, &models); err != nil {
+			t.Fatalf("decode models: %v", err)
+		}
+		models["provider"]["model"]["provider"] = "unknown"
+		writeJSON(t, modelsPath, models)
+		m.Derivation.ResultSHA256 = fileHash(t, modelsPath)
+		setArtifactHash(t, &m, m.Derivation.Result, m.Derivation.ResultSHA256)
+		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
+		assertKind(t, baseline.Verify(dir), baseline.ErrCatalogMismatch, baseline.KindCatalogMismatch)
+	})
+
+	t.Run("release provenance hash", func(t *testing.T) {
+		dir, m := buildCapturedBaseline(t)
+		m.CatalogSource.SHA256 = sha256Hex([]byte("other release"))
+		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
+		assertKind(t, baseline.Verify(dir), baseline.ErrHashMismatch, baseline.KindHashMismatch)
+	})
+
+	t.Run("generator provenance cannot claim code baseline", func(t *testing.T) {
+		dir, m := buildCapturedBaseline(t)
+		m.Generation.GeneratorCommit = fixedCommit
+		writeJSON(t, filepath.Join(dir, "snapshot.manifest.json"), m)
+		assertKind(t, baseline.Verify(dir), baseline.ErrCommitMismatch, baseline.KindCommitMismatch)
 	})
 }
 
@@ -350,4 +581,19 @@ func TestVerifyMissingFiles(t *testing.T) {
 			t.Fatal("Verify with missing manifest = nil, want error")
 		}
 	})
+}
+
+func TestVerifyRejectsManifestOutsideBaseline(t *testing.T) {
+	root := t.TempDir()
+	dir := filepath.Join(root, "baseline")
+	if err := os.Mkdir(dir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	writeJSON(t, filepath.Join(root, "outside.json"), validPendingManifest())
+	lock := validLock()
+	lock.CatalogSnapshot.Manifest = "../outside.json"
+	writeJSON(t, filepath.Join(dir, "upstream.lock.json"), lock)
+	if err := baseline.Verify(dir); err == nil {
+		t.Fatal("Verify accepted a manifest outside the baseline directory")
+	}
 }

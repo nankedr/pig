@@ -1,6 +1,6 @@
 {
-  "schema_version": "0.1.0",
-  "baseline_id": "pi-936aff0-v1",
+  "schema_version": "0.2.0",
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
   "upstream": {
     "name": "Pi",
     "repository": "https://github.com/badlogic/pi-mono",
@@ -17,6 +17,10 @@
     "not_a_runtime_dependency": true
   },
   "catalog_snapshot": {
-    "manifest": "snapshot.manifest.json"
+    "manifest": "snapshot.manifest.json",
+    "source_commit": "53fa77ccd8a279eb87e92294ef3687b03ff80112",
+    "source_release": "v0.84.1",
+    "source_release_sha256": "294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7",
+    "source_commits_behind_code_baseline": 40
   }
 }

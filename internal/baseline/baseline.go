@@ -26,8 +26,8 @@ import (
 
 // Status values for the Catalog Snapshot manifest.
 const (
-	// StatusCaptured means a real controlled capture ran and produced locked
-	// artifacts with hashes, a generation timestamp and input sources.
+	// StatusCaptured means immutable source data was materialized into locked
+	// artifacts with hashes, timestamps and provenance.
 	StatusCaptured = "captured"
 	// StatusPendingCapture is the honest placeholder state used before any
 	// controlled network+Node capture has been performed. It must carry no
@@ -39,6 +39,7 @@ const (
 const (
 	defaultLockFile     = "upstream.lock.json"
 	defaultManifestFile = "snapshot.manifest.json"
+	capturedSchema      = "0.2.0"
 )
 
 // Lock is the upstream lock (parity/baseline/upstream.lock.json). It records the
@@ -72,25 +73,31 @@ type SourceVerification struct {
 	NotARuntimeDependency bool   `json:"not_a_runtime_dependency"`
 }
 
-// CatalogSnapshot points at the snapshot manifest file (relative to the baseline
-// directory).
+// CatalogSnapshot locks the catalog source and points at its manifest.
 type CatalogSnapshot struct {
-	Manifest string `json:"manifest"`
+	Manifest            string `json:"manifest"`
+	SourceCommit        string `json:"source_commit,omitempty"`
+	SourceRelease       string `json:"source_release,omitempty"`
+	SourceReleaseSHA256 string `json:"source_release_sha256,omitempty"`
+	SourceCommitsBehind int    `json:"source_commits_behind_code_baseline,omitempty"`
 }
 
 // Manifest is the Catalog Snapshot manifest
 // (parity/baseline/snapshot.manifest.json).
 type Manifest struct {
-	SchemaVersion   string      `json:"schema_version"`
-	BaselineCommit  string      `json:"baseline_commit"`
-	Status          string      `json:"status"`
-	Generation      Generation  `json:"generation"`
-	Capture         Capture     `json:"capture"`
-	Artifacts       []Artifact  `json:"artifacts"`
-	Providers       int         `json:"providers"`
-	Models          int         `json:"models"`
-	Attribution     Attribution `json:"attribution"`
-	ExcludesSecrets bool        `json:"excludes_secrets"`
+	SchemaVersion   string        `json:"schema_version"`
+	BaselineCommit  string        `json:"baseline_commit"`
+	Status          string        `json:"status"`
+	Generation      Generation    `json:"generation"`
+	Capture         Capture       `json:"capture"`
+	CatalogSource   CatalogSource `json:"catalog_source"`
+	Derivation      Derivation    `json:"derivation"`
+	Image           ImageSnapshot `json:"image"`
+	Artifacts       []Artifact    `json:"artifacts"`
+	Providers       int           `json:"providers"`
+	Models          int           `json:"models"`
+	Attribution     Attribution   `json:"attribution"`
+	ExcludesSecrets bool          `json:"excludes_secrets"`
 }
 
 // Generation records how the snapshot data was produced. GeneratedAt is a
@@ -98,22 +105,64 @@ type Manifest struct {
 // empty string.
 type Generation struct {
 	GeneratedAt     *string           `json:"generated_at"`
+	CapturedAt      *string           `json:"captured_at,omitempty"`
 	GeneratorCommit string            `json:"generator_commit"`
+	Method          string            `json:"method,omitempty"`
 	ToolVersions    map[string]string `json:"tool_versions"`
 	InputSources    []string          `json:"input_sources"`
 }
 
-// Capture explains why the snapshot is pending and how to complete it.
+// Capture records why this snapshot state was selected and how it is tracked.
 type Capture struct {
 	Reason       string `json:"reason"`
 	RequiredStep string `json:"required_step"`
 	TrackedBy    string `json:"tracked_by"`
 }
 
+// CatalogSource identifies the immutable released catalog used independently
+// from the locked code baseline.
+type CatalogSource struct {
+	Type                      string `json:"type"`
+	Release                   string `json:"release"`
+	Commit                    string `json:"commit"`
+	URL                       string `json:"url"`
+	SHA256                    string `json:"sha256"`
+	CommitsBehindCodeBaseline int    `json:"commits_behind_code_baseline"`
+	Manifest                  string `json:"manifest"`
+	ManifestSHA256            string `json:"manifest_sha256"`
+	StructureSHA256           string `json:"structure_sha256"`
+}
+
+// Derivation records the lossless transformation from the released catalog to
+// its materialized snapshot. SemanticOverlays must remain zero.
+type Derivation struct {
+	Method           string `json:"method"`
+	SourceCommit     string `json:"source_commit"`
+	Rules            string `json:"rules"`
+	RuleCount        int    `json:"rule_count"`
+	SemanticOverlays int    `json:"semantic_overlays"`
+	Result           string `json:"result"`
+	ResultSHA256     string `json:"result_sha256"`
+}
+
+// ImageSnapshot records the independently extracted image-model baseline.
+type ImageSnapshot struct {
+	SourceCommit    string `json:"source_commit"`
+	SourcePath      string `json:"source_path"`
+	SourceSHA256    string `json:"source_sha256"`
+	GeneratorPath   string `json:"generator_path"`
+	GeneratorSHA256 string `json:"generator_sha256"`
+	Method          string `json:"method"`
+	Artifact        string `json:"artifact"`
+	Providers       int    `json:"providers"`
+	Models          int    `json:"models"`
+}
+
 // Artifact is a single locked snapshot file plus its SHA-256.
 type Artifact struct {
 	Path   string `json:"path"`
 	SHA256 string `json:"sha256"`
+	Role   string `json:"role,omitempty"`
 }
 
 // Attribution records the snapshot data's license and source.
@@ -136,6 +185,7 @@ const (
 	KindIllegalStatus    Kind = "illegal-status"
 	KindNotIndependent   Kind = "not-independent"
 	KindCheckoutFailed   Kind = "checkout-failed"
+	KindCatalogMismatch  Kind = "catalog-mismatch"
 )
 
 // Sentinel errors, one per Kind, so callers can match failures with errors.Is
@@ -149,6 +199,7 @@ var (
 	ErrIllegalStatus    = errors.New("baseline: illegal snapshot status")
 	ErrNotIndependent   = errors.New("baseline: upstream must not be a submodule or runtime dependency")
 	ErrCheckoutFailed   = errors.New("baseline: checkout verification failed")
+	ErrCatalogMismatch  = errors.New("baseline: catalog mismatch")
 )
 
 func sentinelFor(k Kind) error {
@@ -169,6 +220,8 @@ func sentinelFor(k Kind) error {
 		return ErrNotIndependent
 	case KindCheckoutFailed:
 		return ErrCheckoutFailed
+	case KindCatalogMismatch:
+		return ErrCatalogMismatch
 	default:
 		return nil
 	}
@@ -259,8 +312,12 @@ func Load(dir string) (*Lock, *Manifest, error) {
 	if strings.TrimSpace(manifestName) == "" {
 		manifestName = defaultManifestFile
 	}
+	manifestPath, err := secureFile(dir, manifestName)
+	if err != nil {
+		return nil, nil, fmt.Errorf("baseline: invalid catalog manifest path: %w", err)
+	}
 	var manifest Manifest
-	if err := readJSON(filepath.Join(dir, manifestName), &manifest); err != nil {
+	if err := readJSON(manifestPath, &manifest); err != nil {
 		return nil, nil, err
 	}
 	return &lock, &manifest, nil
@@ -302,7 +359,7 @@ func Verify(dir string, opts ...Option) error {
 	if err := verifyCommitConsistency(lock, manifest); err != nil {
 		return err
 	}
-	if err := verifyManifestIntegrity(dir, manifest); err != nil {
+	if err := verifyManifestIntegrity(dir, lock, manifest); err != nil {
 		return err
 	}
 	if cfg.checkout != "" {
@@ -316,6 +373,7 @@ func Verify(dir string, opts ...Option) error {
 func verifyRequired(lock *Lock, manifest *Manifest) error {
 	for _, f := range []struct{ name, value string }{
 		{"schema_version", lock.SchemaVersion},
+		{"baseline_id", lock.BaselineID},
 		{"upstream.repository", lock.Upstream.Repository},
 		{"upstream.commit", lock.Upstream.Commit},
 		{"source_verification.expected_commit", lock.SourceVerification.ExpectedCommit},
@@ -358,10 +416,10 @@ func commitEqual(a, b string) bool {
 	return strings.EqualFold(strings.TrimSpace(a), strings.TrimSpace(b))
 }
 
-func verifyManifestIntegrity(dir string, manifest *Manifest) error {
+func verifyManifestIntegrity(dir string, lock *Lock, manifest *Manifest) error {
 	switch manifest.Status {
 	case StatusCaptured:
-		return verifyCaptured(dir, manifest)
+		return verifyCaptured(dir, lock, manifest)
 	case StatusPendingCapture:
 		return verifyPending(manifest)
 	default:
@@ -369,33 +427,33 @@ func verifyManifestIntegrity(dir string, manifest *Manifest) error {
 	}
 }
 
-func verifyCaptured(dir string, manifest *Manifest) error {
+func verifyCaptured(dir string, lock *Lock, manifest *Manifest) error {
+	if lock.SchemaVersion != capturedSchema || manifest.SchemaVersion != capturedSchema {
+		return newError(KindCatalogMismatch, "captured lock and manifest schema must be %s", capturedSchema)
+	}
 	if manifest.Generation.GeneratedAt == nil || strings.TrimSpace(*manifest.Generation.GeneratedAt) == "" {
 		return newError(KindMissingField, "captured manifest requires generation.generated_at")
+	}
+	if manifest.Generation.CapturedAt == nil || strings.TrimSpace(*manifest.Generation.CapturedAt) == "" {
+		return newError(KindMissingField, "captured manifest requires generation.captured_at")
 	}
 	if len(manifest.Generation.InputSources) == 0 {
 		return newError(KindMissingField, "captured manifest requires generation.input_sources")
 	}
+	if len(manifest.Generation.ToolVersions) == 0 {
+		return newError(KindMissingField, "captured manifest requires generation.tool_versions")
+	}
 	if len(manifest.Artifacts) == 0 {
 		return newError(KindMissingField, "captured manifest requires at least one artifact")
 	}
-	for _, artifact := range manifest.Artifacts {
-		if strings.TrimSpace(artifact.Path) == "" {
-			return newError(KindMissingField, "captured artifact requires a path")
-		}
-		if strings.TrimSpace(artifact.SHA256) == "" {
-			return newError(KindMissingHash, "artifact %q has no sha256", artifact.Path)
-		}
-		actual, err := hashFile(filepath.Join(dir, artifact.Path))
-		if err != nil {
-			return wrapError(KindHashMismatch, err, "artifact %q unreadable", artifact.Path)
-		}
-		if !strings.EqualFold(actual, strings.TrimSpace(artifact.SHA256)) {
-			return newError(KindHashMismatch,
-				"artifact %q sha256 %s != recorded %s", artifact.Path, actual, artifact.SHA256)
-		}
+	if !manifest.ExcludesSecrets {
+		return newError(KindMissingField, "captured manifest requires excludes_secrets=true")
 	}
-	return nil
+	artifacts, err := verifyArtifacts(dir, manifest.Artifacts)
+	if err != nil {
+		return err
+	}
+	return verifySnapshotData(dir, lock, manifest, artifacts)
 }
 
 func verifyPending(manifest *Manifest) error {
@@ -405,6 +463,10 @@ func verifyPending(manifest *Manifest) error {
 	if manifest.Generation.GeneratedAt != nil {
 		return newError(KindDishonestPending,
 			"pending-capture manifest must have null generated_at, got %q", *manifest.Generation.GeneratedAt)
+	}
+	if manifest.Generation.CapturedAt != nil {
+		return newError(KindDishonestPending,
+			"pending-capture manifest must have null captured_at, got %q", *manifest.Generation.CapturedAt)
 	}
 	if len(manifest.Artifacts) != 0 {
 		return newError(KindDishonestPending,

@@ -208,7 +208,7 @@ func LoadFixture(path string) (Fixture, error) {
 }
 
 // Replay verifies a captured fixture fully offline against the expected baseline
-// commit. It refuses any fixture not marked deterministic, checks required
+// identity and commit. It refuses any fixture not marked deterministic, checks required
 // fields and provenance, then independently re-derives the length-prefixed frame
 // header via encoding/binary.BigEndian and confirms the recorded output, header,
 // payload and hash are mutually consistent.
@@ -220,7 +220,7 @@ func LoadFixture(path string) (Fixture, error) {
 // disagree with the decoded bytes; a frame header that disagrees with the
 // re-derived big-endian length of the payload; a payload that differs from the
 // recorded CBOR output; and a recorded hash that differs from the framed bytes.
-func Replay(f Fixture, expectedCommit string) error {
+func Replay(f Fixture, expectedBaselineID, expectedCommit string) error {
 	// Honesty gate first: an on-demand Oracle must never accept a fixture that
 	// does not claim to be a deterministic, reproducible capture.
 	if !f.Deterministic {
@@ -233,6 +233,9 @@ func Replay(f Fixture, expectedCommit string) error {
 
 	if f.Upstream.Repository != Repository {
 		return newError(KindProvenance, f.ID, "upstream.repository %q != %q", f.Upstream.Repository, Repository)
+	}
+	if f.BaselineID != expectedBaselineID {
+		return newError(KindProvenance, f.ID, "baseline_id %s != expected %s", f.BaselineID, expectedBaselineID)
 	}
 	if f.Hash.Algorithm != "sha256" {
 		return newError(KindUnsupportedHash, f.ID, "%s", f.Hash.Algorithm)

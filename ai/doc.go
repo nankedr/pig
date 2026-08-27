@@ -16,10 +16,9 @@
 // This package is a partial M1 AI contract/runtime. Pure value and codec
 // behavior is live, along with the in-memory CredentialStore and ModelsStore,
 // provider/model runtime composition, built-in provider/model registry
-// assembly, and model catalog/query helpers. Those helpers intentionally keep
-// the fixed baseline model snapshot in honest pending-capture state: built-in
-// providers exist, but built-in model lists and generated-at provenance remain
-// absent until the real catalog snapshot is captured.
+// assembly, and model catalog/query helpers. M0 audits the frozen Catalog
+// artifact separately without loading it into the runtime: built-in providers
+// exist, while model lists and generated-at provenance remain absent until M1.
 //
 // The M0.11 surface also includes API and Provider factories, lazy-loading,
 // legacy OAuth and ambient-auth entry points, image registries, Faux shapes,

@@ -31,6 +31,8 @@ var update = flag.Bool("update", false, "regenerate committed artifacts derived 
 
 const baselineCommit = "936aff00918de1187f085f123c2812d8f2d67745"
 
+const catalogBaselineCommit = "53fa77ccd8a279eb87e92294ef3687b03ff80112"
+
 // repoRoot locates the repository root relative to this test file, mirroring
 // the runtime.Caller approach used by internal/capability tests.
 func repoRoot(t *testing.T) string {
@@ -114,14 +116,17 @@ func base() ([]catalog.Entry, catalog.Manifest) {
 		counts[e.Status]++
 	}
 	manifest := catalog.Manifest{
-		SchemaVersion:   catalog.SchemaVersion,
-		CatalogVersion:  catalog.SchemaVersion,
-		BaselineCommit:  baselineCommit,
-		Catalog:         "catalog.jsonl",
-		Schema:          "catalog.schema.json",
-		GeneratedReport: "reports/catalog.md",
-		EntryCount:      len(entries),
-		StatusCounts:    counts,
+		SchemaVersion:           catalog.SchemaVersion,
+		CatalogVersion:          catalog.SchemaVersion,
+		BaselineCommit:          baselineCommit,
+		Catalog:                 "catalog.jsonl",
+		Schema:                  "catalog.schema.json",
+		InventoryManifest:       "inventory/manifest.json",
+		SurfaceManifest:         "surface/manifest.json",
+		CatalogSnapshotManifest: "baseline/snapshot.manifest.json",
+		GeneratedReport:         "reports/catalog.md",
+		EntryCount:              len(entries),
+		StatusCounts:            counts,
 	}
 	return entries, manifest
 }
@@ -130,6 +135,53 @@ func TestValidateAcceptsSyntheticBaseline(t *testing.T) {
 	entries, manifest := base()
 	if err := catalog.Validate(entries, manifest); err != nil {
 		t.Fatalf("Validate(valid baseline) = %v", err)
+	}
+}
+
+func TestValidateAcceptsCatalogBaselineArtifact(t *testing.T) {
+	entries, _ := base()
+	const id = "contract:baseline/catalog-snapshot"
+	entries = append(entries, catalog.Entry{
+		SchemaVersion: catalog.SchemaVersion,
+		ID:            id,
+		BaselineRole:  catalog.BaselineRoleCatalog,
+		Upstream: catalog.Upstream{
+			Module: "ai", Repository: "https://github.com/earendil-works/pi", Commit: catalogBaselineCommit,
+			Reference: "releases/download/v0.84.1/pi-0.84.1-source.tar.gz",
+		},
+		Mapping:        catalog.Mapping{Module: "ai", Target: "parity/baseline/snapshot.manifest.json", Kind: "contract"},
+		Status:         catalog.StatusVerified,
+		Milestone:      "M0",
+		Classification: "direct-entry",
+		Evidence: []catalog.Evidence{{
+			Kind: "go-test", Ref: "internal/m0gate/gate_test.go#TestM0CatalogSnapshotIsCaptured", Baseline: catalogBaselineCommit,
+			CaseID: "issue35-dual-source-catalog-snapshot", InputHash: "sha256:294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7",
+			ExecutionMethod: "go test ./internal/m0gate", Expected: "lossless snapshot", Actual: "snapshot verified", Platform: "any", CatalogID: id,
+		}},
+	})
+	manifest := catalog.BuildManifest(entries, baselineCommit, catalog.DefaultManifestPaths)
+
+	if manifest.CatalogBaselineCommit != catalogBaselineCommit {
+		t.Fatalf("catalog baseline commit = %q, want %q", manifest.CatalogBaselineCommit, catalogBaselineCommit)
+	}
+	if err := catalog.Validate(entries, manifest); err != nil {
+		t.Fatalf("Validate(catalog baseline artifact) = %v", err)
+	}
+
+	entries[len(entries)-1].Evidence[0].Baseline = baselineCommit
+	if err := catalog.Validate(entries, manifest); !errors.Is(err, catalog.ErrMissingEvidence) {
+		t.Fatalf("Validate(wrong catalog evidence baseline) = %v, want ErrMissingEvidence", err)
+	}
+}
+
+func TestValidateRejectsCatalogRoleWithWrongCommit(t *testing.T) {
+	entries, _ := base()
+	entries[0].BaselineRole = catalog.BaselineRoleCatalog
+	manifest := catalog.BuildManifest(entries, baselineCommit, catalog.DefaultManifestPaths)
+	manifest.CatalogBaselineCommit = catalogBaselineCommit
+
+	if err := catalog.Validate(entries, manifest); !errors.Is(err, catalog.ErrCommitMismatch) {
+		t.Fatalf("Validate(catalog role with code commit) = %v, want ErrCommitMismatch", err)
 	}
 }
 
@@ -1106,6 +1158,33 @@ func TestValidateRejections(t *testing.T) {
 			},
 			sentinel: catalog.ErrSchemaVersion,
 			kind:     catalog.KindSchemaVersion,
+		},
+		{
+			name: "catalog snapshot manifest missing",
+			mutate: func(entries []catalog.Entry, m *catalog.Manifest) []catalog.Entry {
+				m.CatalogSnapshotManifest = ""
+				return entries
+			},
+			sentinel: catalog.ErrManifestMismatch,
+			kind:     catalog.KindManifestMismatch,
+		},
+		{
+			name: "catalog baseline has no entry",
+			mutate: func(entries []catalog.Entry, m *catalog.Manifest) []catalog.Entry {
+				m.CatalogBaselineCommit = catalogBaselineCommit
+				return entries
+			},
+			sentinel: catalog.ErrManifestMismatch,
+			kind:     catalog.KindManifestMismatch,
+		},
+		{
+			name: "invalid baseline role",
+			mutate: func(entries []catalog.Entry, m *catalog.Manifest) []catalog.Entry {
+				entries[0].BaselineRole = "mixed"
+				return entries
+			},
+			sentinel: catalog.ErrCommitMismatch,
+			kind:     catalog.KindCommitMismatch,
 		},
 		{
 			name: "entry count mismatch",

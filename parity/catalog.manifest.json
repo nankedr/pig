@@ -1,17 +1,21 @@
 {
-  "schema_version": "1.1.0",
-  "catalog_version": "1.1.0",
+  "schema_version": "1.2.0",
+  "catalog_version": "1.2.0",
   "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "catalog_baseline_commit": "53fa77ccd8a279eb87e92294ef3687b03ff80112",
   "catalog": "catalog.jsonl",
   "schema": "catalog.schema.json",
+  "inventory_manifest": "inventory/manifest.json",
+  "surface_manifest": "surface/manifest.json",
+  "catalog_snapshot_manifest": "baseline/snapshot.manifest.json",
   "generated_report": "reports/catalog.md",
-  "entry_count": 6525,
+  "entry_count": 9639,
   "status_counts": {
     "deferred": 2,
     "implemented": 2,
-    "inventoried": 2251,
+    "inventoried": 5363,
     "partial": 32,
     "scaffolded": 4231,
-    "verified": 7
+    "verified": 9
   }
 }

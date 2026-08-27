@@ -296,11 +296,10 @@ func expectedNonCodingAgentConstructors(symbols []surface.Symbol, entries []cata
 		}
 
 		metadataID := symbolID
-		metadataRows := entriesByID[metadataID]
-		if len(metadataRows) == 0 && spec.metadataFrom != "" {
+		if spec.metadataFrom != "" {
 			metadataID = spec.metadataFrom
-			metadataRows = entriesByID[metadataID]
 		}
+		metadataRows := entriesByID[metadataID]
 		if len(metadataRows) != 1 {
 			return nil, fmt.Errorf("constructor %s metadata source %s has %d Catalog rows, want 1", symbolID, metadataID, len(metadataRows))
 		}

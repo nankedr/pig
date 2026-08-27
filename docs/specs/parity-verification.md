@@ -6,12 +6,14 @@
 
 ## 固定基线
 
-Pig V1 的 Parity Baseline 由两部分共同组成：
+Pig V1 的 Parity Baseline 有两个独立来源：
 
-1. Pi 源码 commit `936aff00918de1187f085f123c2812d8f2d67745`；
-2. 与该源码配套的不可变 Catalog Snapshot。
+1. Code Baseline：Pi 源码 commit `936aff00918de1187f085f123c2812d8f2d67745`；
+2. Catalog Baseline：Pi v0.84.1 官方 source tar，来源 commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，包含 39 个 Provider、1220 个 chat model，artifact SHA-256 为 `294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7`。
 
-仓库提交 upstream lock，记录仓库 URL、commit、许可证和校验信息。Pi Oracle 按需检出到被忽略的 `.upstream/pi`，或验证用户提供的现有 checkout 恰好位于该 commit。Pi 不是 submodule、复制进来的源码树或 Pig 运行时依赖。
+`53fa77c` 是 `936aff0` 的祖先，两者相差 40 个 commit。Code Baseline 当次生成的目录 artifact 已过期且没有可恢复发布副本，已知日志和 hash 不能重建响应体；因此 V1 选择最近的较早官方不可变发布物，而不使用实时抓取。这是双来源基线，不是 fixed-run parity：代码、API、行为和 Pi Oracle 以 Code Baseline 为准，模型目录内容以 Catalog Baseline 为准。
+
+仓库分别提交 upstream lock 与 Catalog Snapshot manifest，记录 URL、commit、许可证和校验信息；Parity Catalog 的 `contract:baseline/catalog-snapshot` 与 `contract:baseline/image-catalog-snapshot` 条目分别将 chat、image 制品绑定到各自来源 commit 和完整 evidence。普通门禁只离线重放已提交 fixture；专门的 differential/freeze 门禁才验证用户显式提供的 prepared Oracle checkout 与 pristine source checkout 恰好位于 Code Baseline，且不会自动 fetch、install 或 build。Pi 不是 submodule、复制进来的源码树或 Pig 运行时依赖。
 
 ## Parity Catalog 是唯一权威
 
@@ -88,7 +90,7 @@ matrix 至少覆盖，并明确区分“上游公开 API”与“仅供 adapter 
 
 ## Pi Oracle
 
-Pi Oracle 用于回答：相同输入进入固定版本 Pi 与 Pig 后，是否得到等价的值、事件、状态和副作用。
+Pi Oracle 用于回答：相同输入进入 Code Baseline 与 Pig 后，是否得到等价的值、事件、状态和副作用。它不证明 Code Baseline 的生成器产出 Catalog Baseline。
 
 Oracle 流程：
 
@@ -100,7 +102,7 @@ Oracle 流程：
 6. 比较语义值、事件顺序、错误、持久化和副作用；
 7. 把 fixture、期望结果、hash 和命令绑定回 Catalog entry。
 
-默认测试使用已提交 fixture，保持快速、离线且不要求 Node。专门的 differential job 才运行 Pi Oracle，用于重新生成或核验 fixture。真实 Provider 输出不稳定，不能作为 Oracle 期望值。
+默认测试使用已提交 fixture，保持快速、离线且不要求 Node。专门的 differential job 才运行 Pi Oracle，用于重新生成或核验 fixture；它显式接收预先安装依赖、构建 `dist` 且 tracked clean 的 Oracle checkout。Inventory、Surface 和 image catalog 源码漂移使用另一个无 tracked、untracked、ignored 状态的 pristine checkout。真实 Provider 输出不稳定，不能作为 Oracle 期望值。
 
 ## 每项能力的实现循环
 
@@ -146,7 +148,7 @@ Oracle 流程：
 
 ## 证据与完成门禁
 
-一条有效证据至少记录：baseline、case ID、输入/fixture hash、执行方式、期望语义、实际结果、适用平台和对应 Catalog entry。人工证据还要说明无法自动化的原因和复现步骤。
+一条有效证据至少记录：适用的 Code/Catalog Baseline、case ID、输入/fixture hash、执行方式、期望语义、实际结果、适用平台和对应 Catalog entry。人工证据还要说明无法自动化的原因和复现步骤。
 
 每个 Runnable Milestone 必须同时满足：
 

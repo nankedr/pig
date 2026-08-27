@@ -107,7 +107,7 @@ func TestBuiltinCatalogReportsStaticProvidersAndHonestEmptySnapshot(t *testing.T
 
 	for _, provider := range wantProviders {
 		if models := ai.GetBuiltinModels(provider); len(models) != 0 {
-			t.Fatalf("GetBuiltinModels(%q) = %#v, want honest empty snapshot", provider, models)
+			t.Fatalf("GetBuiltinModels(%q) = %#v, want M0-unloaded catalog", provider, models)
 		}
 	}
 	if models := ai.GetBuiltinModels(ai.BuiltinProvider("unknown")); len(models) != 0 {
@@ -238,7 +238,7 @@ func TestBuiltinProvidersAndModelsAreFreshOrderedOfflineAssemblies(t *testing.T)
 			t.Fatalf("provider %q base URL = (%q, %t), want %q", first[index].ID(), baseURL, present, want.baseURL)
 		}
 		if models := first[index].GetModels(); len(models) != 0 {
-			t.Fatalf("provider %q models = %#v, want honest empty snapshot", first[index].ID(), models)
+			t.Fatalf("provider %q models = %#v, want M0-unloaded catalog", first[index].ID(), models)
 		}
 	}
 

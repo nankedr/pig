@@ -22,7 +22,15 @@ import (
 )
 
 // SchemaVersion is the current catalog entry/manifest schema version.
-const SchemaVersion = "1.1.0"
+const SchemaVersion = "1.2.0"
+
+// BaselineRole values distinguish ordinary code/API entries from artifacts
+// sourced from the independently locked Catalog Baseline. Empty means code so
+// older code-baseline rows stay compact.
+const (
+	BaselineRoleCode    = "code"
+	BaselineRoleCatalog = "catalog"
+)
 
 // NonAuthoritativeBanner is emitted verbatim at the top of the generated
 // report. It must make clear the report is a non-authoritative, generated view
@@ -131,6 +139,7 @@ type Deferred struct {
 type Entry struct {
 	SchemaVersion  string            `json:"schema_version"`
 	ID             string            `json:"id"`
+	BaselineRole   string            `json:"baseline_role,omitempty"`
 	Upstream       Upstream          `json:"upstream"`
 	Mapping        Mapping           `json:"mapping"`
 	Status         string            `json:"status"`
@@ -146,14 +155,18 @@ type Entry struct {
 
 // Manifest is the versioned catalog manifest.
 type Manifest struct {
-	SchemaVersion   string         `json:"schema_version"`
-	CatalogVersion  string         `json:"catalog_version"`
-	BaselineCommit  string         `json:"baseline_commit"`
-	Catalog         string         `json:"catalog"`
-	Schema          string         `json:"schema"`
-	GeneratedReport string         `json:"generated_report"`
-	EntryCount      int            `json:"entry_count"`
-	StatusCounts    map[string]int `json:"status_counts"`
+	SchemaVersion           string         `json:"schema_version"`
+	CatalogVersion          string         `json:"catalog_version"`
+	BaselineCommit          string         `json:"baseline_commit"`
+	CatalogBaselineCommit   string         `json:"catalog_baseline_commit,omitempty"`
+	Catalog                 string         `json:"catalog"`
+	Schema                  string         `json:"schema"`
+	InventoryManifest       string         `json:"inventory_manifest"`
+	SurfaceManifest         string         `json:"surface_manifest"`
+	CatalogSnapshotManifest string         `json:"catalog_snapshot_manifest"`
+	GeneratedReport         string         `json:"generated_report"`
+	EntryCount              int            `json:"entry_count"`
+	StatusCounts            map[string]int `json:"status_counts"`
 }
 
 // Canonical capability status values (docs/specs/parity-verification.md).
@@ -445,7 +458,7 @@ func ParseManifest(data []byte) (Manifest, error) {
 //
 // It rejects: duplicate ids; illegal status/milestone/classification/kind;
 // missing upstream provenance (repository/commit/reference) or mapping target;
-// upstream commit that differs from the manifest baseline; deferred entries
+// upstream commit that differs from the entry's manifest-selected baseline; deferred entries
 // without an ADR or target milestone; partial entries without both supported
 // and unsupported branches; implemented/verified entries without evidence; and
 // manifests whose entry_count or status_counts disagree with the entries.
@@ -458,10 +471,15 @@ func Validate(entries []Entry, manifest Manifest) error {
 		return newValidationError(KindSchemaVersion, ErrSchemaVersion, "",
 			fmt.Sprintf("manifest catalog_version=%q want=%q", manifest.CatalogVersion, SchemaVersion))
 	}
+	if strings.TrimSpace(manifest.InventoryManifest) == "" || strings.TrimSpace(manifest.SurfaceManifest) == "" ||
+		strings.TrimSpace(manifest.CatalogSnapshotManifest) == "" {
+		return newValidationError(KindManifestMismatch, ErrManifestMismatch, "", "linked manifests are required")
+	}
 
 	seen := make(map[string]bool, len(entries))
 	seenMatrix := make(map[string]string, len(entries))
 	counts := make(map[string]int, len(StatusOrder))
+	catalogEntries := 0
 
 	for _, entry := range entries {
 		if entry.SchemaVersion != SchemaVersion {
@@ -504,7 +522,19 @@ func Validate(entries []Entry, manifest Manifest) error {
 			return newValidationError(KindMissingProvenance, ErrMissingProvenance, entry.ID, "mapping.target")
 		}
 
-		if entry.Upstream.Commit != manifest.BaselineCommit {
+		entryBaseline := manifest.BaselineCommit
+		switch entry.BaselineRole {
+		case "", BaselineRoleCode:
+		case BaselineRoleCatalog:
+			catalogEntries++
+			entryBaseline = manifest.CatalogBaselineCommit
+			if entryBaseline == "" {
+				return newValidationError(KindManifestMismatch, ErrManifestMismatch, entry.ID, "catalog baseline commit is missing")
+			}
+		default:
+			return newValidationError(KindCommitMismatch, ErrCommitMismatch, entry.ID, "baseline_role="+entry.BaselineRole)
+		}
+		if entry.Upstream.Commit != entryBaseline {
 			return newValidationError(KindCommitMismatch, ErrCommitMismatch, entry.ID, entry.Upstream.Commit)
 		}
 
@@ -528,7 +558,7 @@ func Validate(entries []Entry, manifest Manifest) error {
 				return newValidationError(KindMissingEvidence, ErrMissingEvidence, entry.ID, entry.Status)
 			}
 		}
-		if err := validateEvidence(entry, manifest.BaselineCommit); err != nil {
+		if err := validateEvidence(entry, entryBaseline); err != nil {
 			return err
 		}
 
@@ -552,6 +582,9 @@ func Validate(entries []Entry, manifest Manifest) error {
 	if manifest.EntryCount != len(entries) {
 		return newValidationError(KindManifestMismatch, ErrManifestMismatch, "",
 			fmt.Sprintf("entry_count=%d actual=%d", manifest.EntryCount, len(entries)))
+	}
+	if catalogEntries == 0 && manifest.CatalogBaselineCommit != "" {
+		return newValidationError(KindManifestMismatch, ErrManifestMismatch, "", "catalog baseline commit has no catalog entry")
 	}
 	if err := compareCounts(manifest.StatusCounts, counts); err != nil {
 		return err
@@ -836,16 +869,22 @@ func EncodeEntries(entries []Entry) ([]byte, error) {
 // They are stable repository conventions, so BuildManifest takes them as one
 // value rather than several positional strings.
 type ManifestPaths struct {
-	Catalog         string
-	Schema          string
-	GeneratedReport string
+	Catalog                 string
+	Schema                  string
+	InventoryManifest       string
+	SurfaceManifest         string
+	CatalogSnapshotManifest string
+	GeneratedReport         string
 }
 
 // DefaultManifestPaths are the committed relative paths under parity/.
 var DefaultManifestPaths = ManifestPaths{
-	Catalog:         "catalog.jsonl",
-	Schema:          "catalog.schema.json",
-	GeneratedReport: "reports/catalog.md",
+	Catalog:                 "catalog.jsonl",
+	Schema:                  "catalog.schema.json",
+	InventoryManifest:       "inventory/manifest.json",
+	SurfaceManifest:         "surface/manifest.json",
+	CatalogSnapshotManifest: "baseline/snapshot.manifest.json",
+	GeneratedReport:         "reports/catalog.md",
 }
 
 // BuildManifest derives the catalog manifest from entries. status_counts always
@@ -853,21 +892,29 @@ var DefaultManifestPaths = ManifestPaths{
 // stable and diff-minimal as statuses come and go.
 func BuildManifest(entries []Entry, baselineCommit string, paths ManifestPaths) Manifest {
 	counts := make(map[string]int, len(StatusOrder))
+	catalogBaselineCommit := ""
 	for _, s := range StatusOrder {
 		counts[s] = 0
 	}
 	for _, e := range entries {
 		counts[e.Status]++
+		if e.BaselineRole == BaselineRoleCatalog && catalogBaselineCommit == "" {
+			catalogBaselineCommit = e.Upstream.Commit
+		}
 	}
 	return Manifest{
-		SchemaVersion:   SchemaVersion,
-		CatalogVersion:  SchemaVersion,
-		BaselineCommit:  baselineCommit,
-		Catalog:         paths.Catalog,
-		Schema:          paths.Schema,
-		GeneratedReport: paths.GeneratedReport,
-		EntryCount:      len(entries),
-		StatusCounts:    counts,
+		SchemaVersion:           SchemaVersion,
+		CatalogVersion:          SchemaVersion,
+		BaselineCommit:          baselineCommit,
+		CatalogBaselineCommit:   catalogBaselineCommit,
+		Catalog:                 paths.Catalog,
+		Schema:                  paths.Schema,
+		InventoryManifest:       paths.InventoryManifest,
+		SurfaceManifest:         paths.SurfaceManifest,
+		CatalogSnapshotManifest: paths.CatalogSnapshotManifest,
+		GeneratedReport:         paths.GeneratedReport,
+		EntryCount:              len(entries),
+		StatusCounts:            counts,
 	}
 }
 

@@ -164,11 +164,9 @@ var builtinProviderAuthMetadataByID = map[ProviderID]builtinProviderAuthMetadata
 	ProviderIDZAICodingCN:             {apiKeyName: "Z.AI Coding CN API key"},
 }
 
-// builtinModelsByProvider remains empty while the locked Catalog Snapshot is
-// in pending-capture state. Each provider uses a slice so a future captured
-// snapshot preserves generated Object.values order; a map would make model
-// enumeration nondeterministic. Do not populate this from the source checkout
-// or a live service: model data and provenance must be captured together.
+// M0 audits the frozen Catalog artifact without loading it into the runtime.
+// Runtime model data is wired from M1 onward; it must never come from the source
+// checkout or a live service during ordinary build and test.
 var builtinModelsByProvider = map[BuiltinProvider][]Model{}
 
 // FlattenModelCatalog merges ordered groups into one catalog. As in the fixed
@@ -192,7 +190,7 @@ func GetBuiltinProviders() []BuiltinProvider {
 }
 
 // GetBuiltinModels returns a fresh snapshot of one provider's built-in models.
-// The result is empty until the fixed Catalog Snapshot is captured.
+// It remains empty in the M0 runtime skeleton.
 func GetBuiltinModels(provider BuiltinProvider) []Model {
 	builtinModels := builtinModelsByProvider[provider]
 	models := make([]Model, len(builtinModels))
@@ -213,8 +211,7 @@ func GetBuiltinModel(provider BuiltinProvider, modelID string) (Model, bool) {
 }
 
 // GetBuiltinModelDataGeneratedAt returns the catalog generation time as Unix
-// milliseconds. The false result is intentional while snapshot provenance is
-// pending capture.
+// milliseconds. M0 keeps it absent until runtime catalog loading starts.
 func GetBuiltinModelDataGeneratedAt() (int64, bool) {
 	return 0, false
 }

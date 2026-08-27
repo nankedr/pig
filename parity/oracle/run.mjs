@@ -19,9 +19,9 @@
 // asserts and what --check re-verifies.
 //
 // Usage:
-//   node run.mjs [<pi-checkout-root>] [--out <path>]   capture the fixture
-//   node run.mjs --check [<pi-checkout-root>]           verify it reproduces
-//   node run.mjs --fetch [<pi-checkout-root>]           fetch the baseline first
+//   node --experimental-strip-types run.mjs [<pi-checkout-root>] [--out <path>]
+//   node --experimental-strip-types run.mjs --check [<pi-checkout-root>]
+//   node --experimental-strip-types run.mjs --fetch [<pi-checkout-root>]
 // Default checkout: <repo>/.upstream/pi. Default out: ./fixtures/protocol-frame.json.
 // The default managed checkout is fetched on demand when absent; an explicitly
 // supplied checkout is only verified (never modified). --fetch forces a fetch.
@@ -189,11 +189,12 @@ function buildFixture(lock, { message, cbor, frame }) {
 	};
 }
 
-// protocolFacts extracts the environment-independent wire facts that must
-// reproduce byte-for-byte: the raw output and its hash. --check compares only
-// these, so host provenance (env) never causes a false reproduction failure.
+// protocolFacts excludes only host-specific environment metadata. Baseline,
+// upstream, input, output and hashes must all reproduce byte-for-byte.
 function protocolFacts(fixture) {
-	return JSON.stringify({ raw_output: fixture.raw_output, hash: fixture.hash });
+	const facts = { ...fixture };
+	delete facts.env;
+	return JSON.stringify(facts);
 }
 
 async function main() {

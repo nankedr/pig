@@ -9,7 +9,7 @@
     "matrix:ai/openai-completions/option/simple-stream-options-deferred",
     "matrix:ai/openai-completions/option/simple-stream-options-deferred-window"
   ],
-  "baseline_id": "pi-936aff0-v1",
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
   "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
   "deterministic": true,
   "upstream": {

@@ -34,7 +34,7 @@ function assertLockedCheckout(piRoot, commit) {
 	try {
 		head = execFileSync("git", ["-C", piRoot, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
 	} catch (error) {
-		throw new Error(`Pi checkout is unavailable at ${piRoot}; provision it with parity/oracle/run.mjs --fetch: ${error.message}`);
+		throw new Error(`Pi checkout is unavailable at ${piRoot}; provision it with node --experimental-strip-types parity/oracle/run.mjs --fetch: ${error.message}`);
 	}
 	if (head !== commit) throw new Error(`Pi checkout HEAD ${head} != locked commit ${commit}`);
 	const dirty = spawnSync("git", ["-C", piRoot, "status", "--porcelain", "--untracked-files=no"], { encoding: "utf8" });

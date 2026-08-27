@@ -110,7 +110,7 @@ func TestImagesModelsProvidesPureInMemoryRegistry(t *testing.T) {
 		t.Fatalf("GetProviders() = %#v", providers)
 	}
 	if got := models.GetModels(); got == nil || len(got) != 0 {
-		t.Fatalf("GetModels() = %#v, want pending-capture empty snapshot", got)
+		t.Fatalf("GetModels() = %#v, want M0-unloaded catalog", got)
 	}
 	if _, err := models.GetProviderAuth(context.Background(), ai.ImagesProviderIDOpenRouter); !errors.Is(err, ai.ErrNotImplemented) {
 		t.Fatalf("GetProviderAuth error = %v, want ErrNotImplemented", err)
@@ -195,7 +195,7 @@ func TestImagesModelClonePreservesPresentEmptySlices(t *testing.T) {
 	}
 }
 
-func TestBuiltinImageEntriesRemainPendingCaptureAndSideEffectFree(t *testing.T) {
+func TestBuiltinImageEntriesRemainUnloadedAndSideEffectFree(t *testing.T) {
 	t.Parallel()
 
 	apiProvider, ok := ai.GetImagesAPIProvider(ai.ImagesAPIOpenRouter)
@@ -206,13 +206,13 @@ func TestBuiltinImageEntriesRemainPendingCaptureAndSideEffectFree(t *testing.T) 
 		t.Fatalf("RegisterBuiltinImagesAPIProviders error = %v", err)
 	}
 	if providers := ai.GetImageProviders(); len(providers) != 0 {
-		t.Fatalf("GetImageProviders() = %#v, want pending-capture empty snapshot", providers)
+		t.Fatalf("GetImageProviders() = %#v, want M0-unloaded catalog", providers)
 	}
 	if models := ai.GetImageModels(ai.ImagesProviderIDOpenRouter); len(models) != 0 {
 		t.Fatalf("GetImageModels() = %#v, want empty", models)
 	}
 	if _, ok := ai.GetImageModel(ai.ImagesProviderIDOpenRouter, "missing"); ok {
-		t.Fatal("GetImageModel found a model in pending-capture snapshot")
+		t.Fatal("GetImageModel found a model before runtime catalog loading")
 	}
 
 	providers := ai.BuiltinImagesProviders()
