@@ -116,19 +116,20 @@ func TestFauxM1RuntimeKeepsThinkingAndDeferredExplicit(t *testing.T) {
 	}
 }
 
-func TestConvertOpenAICompletionsMessagesIsAnExplicitCapabilityStub(t *testing.T) {
+func TestConvertOpenAICompletionsMessagesHandlesEmptyTextContext(t *testing.T) {
 	messages, err := ai.ConvertOpenAICompletionsMessages(
 		ai.Model{API: ai.APIOpenAICompletions},
 		ai.Context{},
 		ai.OpenAICompletionsCompat{},
 		ai.ConvertOpenAICompletionsMessagesOptions{GrammarToolInputProperties: map[string]string{"grammar": "input"}},
 	)
-	if messages != nil || !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("ConvertOpenAICompletionsMessages = (%#v, %v), want nil and ErrNotImplemented", messages, err)
+	if err != nil || len(messages) != 0 {
+		t.Fatalf("ConvertOpenAICompletionsMessages = (%#v, %v), want empty live conversion", messages, err)
 	}
 }
 
-func TestOpenAICompletionsEntrypointsRemainExplicitCapabilityStubs(t *testing.T) {
+func TestOpenAICompletionsDeferredReasoningRemainsAnExplicitCapabilityStub(t *testing.T) {
+	reasoning := ai.OpenAIReasoningEffortHigh
 	options := ai.OpenAICompletionsOptions{
 		StreamOptions: ai.StreamOptions{
 			ProviderRequestOptions: ai.ProviderRequestOptions{
@@ -138,29 +139,18 @@ func TestOpenAICompletionsEntrypointsRemainExplicitCapabilityStubs(t *testing.T)
 				},
 			},
 		},
+		ReasoningEffort: &reasoning,
 	}
 	stream := ai.StreamOpenAICompletions(context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, options)
-	if stream == nil {
-		t.Fatal("StreamOpenAICompletions returned nil stream")
-	}
-	if _, err := stream.Result(context.Background()); !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("StreamOpenAICompletions.Result() error = %v, want ErrNotImplemented", err)
-	}
+	assertOpenAICompletionsStubOutcome(t, stream, "OpenAICompletions.Reasoning")
 
 	streams := ai.OpenAICompletionsAPI()
 	if streams.Stream == nil || streams.StreamSimple == nil {
 		t.Fatal("OpenAICompletionsAPI returned an incomplete capability bundle")
 	}
-	if _, err := streams.Stream(context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.StreamOptions{}).Result(context.Background()); !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("OpenAICompletionsAPI().Stream().Result() error = %v, want ErrNotImplemented", err)
-	}
-	temperature := 0.5
-	assertOpenAICompletionsStubOutcome(t, streams.Stream(
-		context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.StreamOptions{Temperature: &temperature},
-	), "OpenAICompletions.Stream.Options")
 }
 
-func TestOpenAICompletionsStubAcceptsDocumentedNoOpOptions(t *testing.T) {
+func TestOpenAICompletionsRuntimeAcceptsDocumentedNoOpOptions(t *testing.T) {
 	t.Parallel()
 
 	fixture := loadOpenAICompletionsNoOpFixture(t)
@@ -174,27 +164,31 @@ func TestOpenAICompletionsStubAcceptsDocumentedNoOpOptions(t *testing.T) {
 			t.Run(testCase.ID+"/"+variant.ID, func(t *testing.T) {
 				telemetryRecorder := &recordingTelemetryContext{}
 				streamOptions, deferred := noOpOptionsFromFixture(t, variant.Option, telemetryRecorder)
-				var stream *ai.AssistantMessageEventStream
-				wantOperation := "OpenAICompletions.Stream"
-				if testCase.Input.Entrypoint == "streamSimple" {
-					wantOperation = "OpenAICompletions.StreamSimple"
-					stream = ai.StreamSimpleOpenAICompletions(context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.SimpleStreamOptions{StreamOptions: streamOptions, Deferred: deferred})
-				} else {
-					stream = ai.StreamOpenAICompletions(context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.OpenAICompletionsOptions{StreamOptions: streamOptions})
+				key := "fixture-key"
+				streamOptions.APIKey = &key
+				streamOptions.Fetch = func(context.Context, ai.FetchRequest) (ai.FetchResponse, error) {
+					return ai.FetchResponse{Status: 200, Body: []byte(openAITextSSE)}, nil
 				}
-				assertOpenAICompletionsStubOutcome(t, stream, wantOperation)
+				model := openAITextModel("https://fixture.example.test/v1")
+				var stream *ai.AssistantMessageEventStream
+				if testCase.Input.Entrypoint == "streamSimple" {
+					stream = ai.StreamSimpleOpenAICompletions(context.Background(), model, ai.Context{}, ai.SimpleStreamOptions{StreamOptions: streamOptions, Deferred: deferred})
+				} else {
+					stream = ai.StreamOpenAICompletions(context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{StreamOptions: streamOptions})
+				}
+				result, err := stream.Result(context.Background())
+				if err != nil || result.StopReason != ai.StopReasonStop {
+					t.Fatalf("no-op option outcome = (%#v, %v)", result, err)
+				}
 
-				// A documented no-op must not erase an unrelated unsupported
-				// option while the adapter remains a Capability Stub.
 				if testCase.Input.Entrypoint == "streamSimple" {
 					reasoning := ai.ThinkingLevelHigh
-					stream = ai.StreamSimpleOpenAICompletions(context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.SimpleStreamOptions{StreamOptions: streamOptions, Deferred: deferred, Reasoning: &reasoning})
-					assertOpenAICompletionsStubOutcome(t, stream, "OpenAICompletions.StreamSimple.Options")
+					stream = ai.StreamSimpleOpenAICompletions(context.Background(), model, ai.Context{}, ai.SimpleStreamOptions{StreamOptions: streamOptions, Deferred: deferred, Reasoning: &reasoning})
+					assertOpenAICompletionsStubOutcome(t, stream, "OpenAICompletions.StreamSimple.Reasoning")
 				} else {
-					temperature := 0.5
-					streamOptions.Temperature = &temperature
-					stream = ai.StreamOpenAICompletions(context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.OpenAICompletionsOptions{StreamOptions: streamOptions})
-					assertOpenAICompletionsStubOutcome(t, stream, "OpenAICompletions.Stream.Options")
+					reasoning := ai.OpenAIReasoningEffortHigh
+					stream = ai.StreamOpenAICompletions(context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{StreamOptions: streamOptions, ReasoningEffort: &reasoning})
+					assertOpenAICompletionsStubOutcome(t, stream, "OpenAICompletions.Reasoning")
 				}
 				if got := telemetryRecorder.starts.Load(); got != 0 {
 					t.Fatalf("telemetry StartSpan calls = %d, want 0", got)
@@ -265,19 +259,43 @@ func noOpOptionsFromFixture(t *testing.T, option map[string]any, telemetryContex
 	return stream, deferred
 }
 
-func TestOpenAICompletionsStubRejectsOtherNonDefaultOptionsExplicitly(t *testing.T) {
+func TestOpenAICompletionsFutureMilestoneOptionsRemainExplicitStubs(t *testing.T) {
 	t.Parallel()
 
-	temperature := 0.5
-	reasoning := ai.ThinkingLevelHigh
+	reasoning := ai.OpenAIReasoningEffortHigh
 	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
 		context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.OpenAICompletionsOptions{
-			StreamOptions: ai.StreamOptions{Temperature: &temperature},
+			ReasoningEffort: &reasoning,
 		},
-	), "OpenAICompletions.Stream.Options")
+	), "OpenAICompletions.Reasoning")
+	_, err := ai.ConvertOpenAICompletionsMessages(
+		ai.Model{API: ai.APIOpenAICompletions, Reasoning: true}, ai.Context{}, ai.OpenAICompletionsCompat{},
+	)
+	assertOpenAICompletionsStubError(t, err, "OpenAICompletions.Reasoning")
+	retention := ai.CacheRetentionLong
+	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
+		context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.OpenAICompletionsOptions{
+			StreamOptions: ai.StreamOptions{CacheRetention: &retention},
+		},
+	), "OpenAICompletions.AdvancedOptions")
+	simpleReasoning := ai.ThinkingLevelHigh
 	assertOpenAICompletionsStubOutcome(t, ai.StreamSimpleOpenAICompletions(
-		context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.SimpleStreamOptions{Reasoning: &reasoning},
-	), "OpenAICompletions.StreamSimple.Options")
+		context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.SimpleStreamOptions{Reasoning: &simpleReasoning},
+	), "OpenAICompletions.StreamSimple.Reasoning")
+	model := ai.Model{
+		API:    ai.APIOpenAICompletions,
+		Compat: ai.Some(json.RawMessage(`{"supportsStore":false}`)),
+	}
+	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
+		context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{},
+	), "OpenAICompletions.Compat.supportsStore")
+	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
+		context.Background(), ai.Model{API: ai.APIOpenAICompletions, Provider: ai.ProviderIDDeepSeek}, ai.Context{}, ai.OpenAICompletionsOptions{},
+	), "OpenAICompletions.Compat.ProviderDetection")
+	_, err = ai.ConvertOpenAICompletionsMessages(ai.Model{API: ai.APIOpenAICompletions}, ai.Context{Messages: []ai.Message{
+		ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserBlocks(ai.ImageContent{Type: ai.ContentTypeImage, Data: "aGk=", MIMEType: "image/png"})},
+	}}, ai.OpenAICompletionsCompat{})
+	assertOpenAICompletionsStubError(t, err, "OpenAICompletions.ConvertMessages.Image")
 }
 
 func assertOpenAICompletionsStubOutcome(t *testing.T, stream *ai.AssistantMessageEventStream, wantOperation string) {

@@ -43,8 +43,8 @@ func TestCommandStubsHaveNoSideEffects(t *testing.T) {
 				t.Fatalf("list dependencies: %v\n%s", err, output)
 			}
 			for _, dependency := range strings.Fields(string(output)) {
-				if dependency == "net" || strings.HasPrefix(dependency, "net/") || dependency == "os/exec" {
-					t.Fatalf("network dependency = %s", dependency)
+				if dependency == "os/exec" {
+					t.Fatalf("process dependency = %s", dependency)
 				}
 			}
 

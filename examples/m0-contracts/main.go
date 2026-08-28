@@ -11,7 +11,8 @@ import (
 
 func main() {
 	ctx := context.Background()
-	stream := ai.StreamOpenAICompletions(ctx, ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.OpenAICompletionsOptions{})
+	reasoning := ai.OpenAIReasoningEffortHigh
+	stream := ai.StreamOpenAICompletions(ctx, ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.OpenAICompletionsOptions{ReasoningEffort: &reasoning})
 	_, err := stream.Result(ctx)
 	if !errors.Is(err, ai.ErrNotImplemented) {
 		fmt.Fprintln(os.Stderr, "unexpected M0 result:", err)

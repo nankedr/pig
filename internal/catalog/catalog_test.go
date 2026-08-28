@@ -789,13 +789,14 @@ func TestOpenAICompletionsMatrixUsesExplicitStubOrBaselineNoOpPolicy(t *testing.
 	}
 }
 
-func TestOpenAICompletionsMatrixRowsAreCurrentDeclarationsNotParityClaims(t *testing.T) {
+func TestOpenAICompletionsMatrixTracksVerifiedTextSlice(t *testing.T) {
 	root := repoRoot(t)
 	entries, err := catalog.LoadCatalog(filepath.Join(root, "parity", "catalog.jsonl"))
 	if err != nil {
 		t.Fatalf("LoadCatalog(real) = %v", err)
 	}
 
+	textFixtureIDs := openAICompletionsTextFixtureCatalogIDs(t, root)
 	for _, entry := range entries {
 		if entry.Matrix == nil || entry.Matrix.API != "openai-completions" {
 			continue
@@ -820,15 +821,54 @@ func TestOpenAICompletionsMatrixRowsAreCurrentDeclarationsNotParityClaims(t *tes
 			}
 			continue
 		}
+		if textFixtureIDs[entry.ID] {
+			if entry.Status != catalog.StatusVerified || len(entry.Evidence) == 0 {
+				t.Errorf("text-stream matrix row %s = status %q, evidence %d", entry.ID, entry.Status, len(entry.Evidence))
+			}
+			continue
+		}
 		switch entry.Status {
 		case catalog.StatusInventoried, catalog.StatusScaffolded:
+		case catalog.StatusPartial:
+			if entry.Partial == nil || len(entry.Partial.Supported) == 0 || len(entry.Partial.Unsupported) == 0 {
+				t.Errorf("partial matrix row %s has no explicit supported/unsupported split", entry.ID)
+			}
+			if len(entry.Evidence) == 0 {
+				t.Errorf("partial matrix row %s has no achieved evidence", entry.ID)
+			}
+			continue
 		default:
-			t.Errorf("matrix row %s status = %q, want inventoried or scaffolded until field-level parity evidence exists", entry.ID, entry.Status)
+			t.Errorf("matrix row %s status = %q, want inventoried, scaffolded, or partial until field-level parity evidence exists", entry.ID, entry.Status)
 		}
 		if len(entry.Evidence) != 0 {
 			t.Errorf("matrix row %s claims achieved evidence before a Chat Completions parity case exists", entry.ID)
 		}
 	}
+}
+
+func openAICompletionsTextFixtureCatalogIDs(t *testing.T, root string) map[string]bool {
+	t.Helper()
+	data, err := os.ReadFile(filepath.Join(root, "parity", "oracle", "fixtures", "openai-completions-text.json"))
+	if err != nil {
+		t.Fatalf("read text fixture: %v", err)
+	}
+	var fixture struct {
+		ID             string   `json:"id"`
+		CatalogIDs     []string `json:"catalog_ids"`
+		BaselineCommit string   `json:"baseline_commit"`
+		Deterministic  bool     `json:"deterministic"`
+	}
+	if err := json.Unmarshal(data, &fixture); err != nil {
+		t.Fatalf("decode text fixture: %v", err)
+	}
+	if fixture.ID != "ai/openai-completions/m1-text" || fixture.BaselineCommit != baselineCommit || !fixture.Deterministic {
+		t.Fatalf("text fixture provenance is incomplete: %#v", fixture)
+	}
+	ids := make(map[string]bool, len(fixture.CatalogIDs))
+	for _, id := range fixture.CatalogIDs {
+		ids[id] = true
+	}
+	return ids
 }
 
 func TestOpenAICompletionsNoOpFixtureBindsVerifiedCatalogRows(t *testing.T) {

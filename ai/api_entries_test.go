@@ -38,7 +38,7 @@ var (
 	_ = ai.BedrockProviderModule    // upstream: bedrockProviderModule
 )
 
-func TestBuiltinAPIEntriesAreCompleteSideEffectFreeStubs(t *testing.T) {
+func TestDeferredBuiltinAPIEntriesAreCompleteSideEffectFreeStubs(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -52,7 +52,6 @@ func TestBuiltinAPIEntriesAreCompleteSideEffectFreeStubs(t *testing.T) {
 		{ai.APIGoogleVertex, ai.GoogleVertexAPI},
 		{ai.APIMistralConversations, ai.MistralConversationsAPI},
 		{ai.APIOpenAICodexResponses, ai.OpenAICodexResponsesAPI},
-		{ai.APIOpenAICompletions, ai.OpenAICompletionsAPI},
 		{ai.APIOpenAIResponses, ai.OpenAIResponsesAPI},
 		{ai.APIPiMessages, ai.PiMessagesAPI},
 	}

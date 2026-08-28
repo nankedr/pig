@@ -17,7 +17,7 @@ M0 的成果是可编译、可审计的兼容骨架，不是可运行的 AI Agen
 go run ./examples/m0-contracts
 ```
 
-示例调用公开的 OpenAI Completions 边界。M0 不访问网络，也不返回伪造消息，而是由 `AssistantMessageEventStream.Result` 明确给出 `ErrNotImplemented`。输出中的 `true` 证明调用者可以稳定识别 Capability Stub。
+示例通过公开的 OpenAI Completions 边界调用尚未支持的 reasoning 能力。基础文本流已经可用，而后续能力仍由 `AssistantMessageEventStream.Result` 明确给出 `ErrNotImplemented`，且不会访问网络或返回伪造消息。输出中的 `true` 证明调用者仍可稳定识别 Capability Stub。
 
 七个公开包分别是 `ai`、`agent`、`codingagent`、`telemetry`、`tui`、`protocol` 和 `client`；命令是 `pig` 与 `pig-ai`。M0 只要求本机 `darwin-arm64` 的 CGO-free 编译，不包含 browser、Worker、WebAssembly 或六平台发布门禁。
 

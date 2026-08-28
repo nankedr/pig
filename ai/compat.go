@@ -34,7 +34,7 @@ func newCompatAPIRegistry() *compatRegistry {
 	registry := &compatRegistry{providers: make(map[API]registeredAPIProvider)}
 	registry.order = builtinCompatAPIs()
 	for _, api := range registry.order {
-		registry.providers[api] = registeredAPIProvider{provider: guardedCompatAPIProvider(stubCompatAPIProvider(api))}
+		registry.providers[api] = registeredAPIProvider{provider: guardedCompatAPIProvider(builtinCompatAPIProvider(api))}
 	}
 	return registry
 }
@@ -99,7 +99,7 @@ func RegisterBuiltinAPIProviders() error {
 		if _, exists := compatAPIRegistry.providers[api]; exists {
 			continue
 		}
-		compatAPIRegistry.providers[api] = registeredAPIProvider{provider: guardedCompatAPIProvider(stubCompatAPIProvider(api))}
+		compatAPIRegistry.providers[api] = registeredAPIProvider{provider: guardedCompatAPIProvider(builtinCompatAPIProvider(api))}
 		compatAPIRegistry.order = append(compatAPIRegistry.order, api)
 	}
 	return nil
@@ -124,7 +124,7 @@ func ResetAPIProviders() error {
 	providers := make(map[API]registeredAPIProvider)
 	order := builtinCompatAPIs()
 	for _, api := range order {
-		providers[api] = registeredAPIProvider{provider: guardedCompatAPIProvider(stubCompatAPIProvider(api))}
+		providers[api] = registeredAPIProvider{provider: guardedCompatAPIProvider(builtinCompatAPIProvider(api))}
 	}
 	compatAPIRegistry.Lock()
 	compatAPIRegistry.providers = providers
@@ -161,6 +161,33 @@ func stubCompatAPIProvider(api API) APIProvider {
 		StreamSimple: func(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
 			return failedProviderStream(newNotImplemented("Compat.APIProvider.StreamSimple"))
 		},
+	}
+}
+
+func builtinCompatAPIProvider(api API) APIProvider {
+	if api != APIOpenAICompletions {
+		return stubCompatAPIProvider(api)
+	}
+	return APIProvider{
+		API: api,
+		Stream: func(ctx context.Context, model Model, input Context, options ProviderStreamOptions) *AssistantMessageEventStream {
+			switch value := options.(type) {
+			case OpenAICompletionsOptions:
+				return StreamOpenAICompletions(ctx, model, input, value)
+			case *OpenAICompletionsOptions:
+				if value != nil {
+					return StreamOpenAICompletions(ctx, model, input, *value)
+				}
+			case StreamOptions:
+				return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: value})
+			case *StreamOptions:
+				if value != nil {
+					return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: *value})
+				}
+			}
+			return failedProviderStream(fmt.Errorf("%w: OpenAI Completions options type %T", ErrEventStreamInvariant, options))
+		},
+		StreamSimple: StreamSimpleOpenAICompletions,
 	}
 }
 

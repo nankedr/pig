@@ -2,8 +2,6 @@ package ai
 
 import (
 	"context"
-	"encoding/json"
-	"reflect"
 )
 
 type LazyAPICapabilities struct {
@@ -71,7 +69,7 @@ func OpenAICodexResponsesAPI() ProviderStreams {
 }
 
 func OpenAICompletionsAPI() ProviderStreams {
-	streams := stubAPIEntry(APIOpenAICompletions)
+	streams := NewTypedProviderStreams(StreamOpenAICompletions)
 	streams.Stream = func(ctx context.Context, model Model, input Context, options StreamOptions) *AssistantMessageEventStream {
 		return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: options})
 	}
@@ -124,25 +122,12 @@ func StreamOpenAICodexResponses(context.Context, Model, Context, OpenAICodexResp
 	return failedAPIEntry("OpenAICodexResponses.Stream")
 }
 
-func StreamOpenAICompletions(_ context.Context, _ Model, _ Context, options OpenAICompletionsOptions) *AssistantMessageEventStream {
-	return failedProviderStream(openAICompletionsStubError("OpenAICompletions.Stream", options))
-}
-
 // ConvertOpenAICompletionsMessagesOptions configures the published message
 // conversion helper. GrammarToolInputProperties maps a grammar-constrained
 // Tool name to the wire input-property name used while replaying ToolCall
 // arguments.
 type ConvertOpenAICompletionsMessagesOptions struct {
 	GrammarToolInputProperties map[string]string
-}
-
-// ConvertOpenAICompletionsMessages maps model-context messages to OpenAI Chat
-// Completions request-message objects. The result remains raw JSON so Pig does
-// not expose third-party SDK types as part of its interface. Message conversion
-// becomes live with the staged Chat Completions adapter; until then it is an
-// explicit, side-effect-free Capability Stub.
-func ConvertOpenAICompletionsMessages(Model, Context, OpenAICompletionsCompat, ...ConvertOpenAICompletionsMessagesOptions) ([]json.RawMessage, error) {
-	return nil, newNotImplemented("OpenAICompletions.ConvertMessages")
 }
 
 func StreamOpenAIResponses(context.Context, Model, Context, OpenAIResponsesOptions) *AssistantMessageEventStream {
@@ -181,10 +166,6 @@ func StreamSimpleOpenAICodexResponses(context.Context, Model, Context, SimpleStr
 	return failedAPIEntry("OpenAICodexResponses.StreamSimple")
 }
 
-func StreamSimpleOpenAICompletions(_ context.Context, _ Model, _ Context, options SimpleStreamOptions) *AssistantMessageEventStream {
-	return failedProviderStream(openAICompletionsSimpleStubError(options))
-}
-
 func StreamSimpleOpenAIResponses(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
 	return failedAPIEntry("OpenAIResponses.StreamSimple")
 }
@@ -195,32 +176,4 @@ func StreamSimplePiMessages(context.Context, Model, Context, SimpleStreamOptions
 
 func failedAPIEntry(operation string) *AssistantMessageEventStream {
 	return failedProviderStream(newNotImplemented(operation))
-}
-
-// openAICompletionsStubError distinguishes the adapter's baseline no-op
-// options from unsupported options while the M1 request path remains a
-// Capability Stub. The no-op fields are deliberately erased before checking
-// whether a more specific unsupported-options error is required.
-func openAICompletionsStubError(operation string, options OpenAICompletionsOptions) error {
-	normalizeOpenAICompletionsNoOpOptions(&options.StreamOptions)
-	if !reflect.ValueOf(options).IsZero() {
-		return newNotImplemented(operation + ".Options")
-	}
-	return newNotImplemented(operation)
-}
-
-func openAICompletionsSimpleStubError(options SimpleStreamOptions) error {
-	normalizeOpenAICompletionsNoOpOptions(&options.StreamOptions)
-	options.Deferred = nil
-	if !reflect.ValueOf(options).IsZero() {
-		return newNotImplemented("OpenAICompletions.StreamSimple.Options")
-	}
-	return newNotImplemented("OpenAICompletions.StreamSimple")
-}
-
-func normalizeOpenAICompletionsNoOpOptions(options *StreamOptions) {
-	options.TelemetryContext = nil
-	options.Transport = nil
-	options.WebSocketConnectTimeoutMS = nil
-	options.Metadata = nil
 }

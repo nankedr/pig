@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"reflect"
 
 	"github.com/nankedr/pig/telemetry"
@@ -19,7 +20,7 @@ type ProviderEnv map[string]string
 type ProviderHeaders map[string]*string
 
 // FetchRequest and FetchResponse keep the injectable transport seam independent
-// of net/http. Real HTTP behavior belongs to later API-adapter milestones.
+// of net/http. BodyReader takes precedence over the legacy buffered Body.
 type FetchRequest struct {
 	URL     string
 	Method  string
@@ -28,9 +29,10 @@ type FetchRequest struct {
 }
 
 type FetchResponse struct {
-	Status  int
-	Headers map[string]string
-	Body    []byte
+	Status     int
+	Headers    map[string]string
+	Body       []byte
+	BodyReader io.ReadCloser
 }
 
 // FetchFunction is an injectable provider transport boundary.
