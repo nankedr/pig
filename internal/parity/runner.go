@@ -283,7 +283,7 @@ func canonicalizeObservation(observation Observation) (Observation, error) {
 		result.Error = &observedError
 	}
 	if observation.Wire != nil {
-		wire := append([]WireObservation(nil), (*observation.Wire)...)
+		wire := cloneSlice(*observation.Wire)
 		for i := range wire {
 			canonical, err := canonicalJSON(wire[i].Value)
 			if err != nil {
@@ -294,7 +294,7 @@ func canonicalizeObservation(observation Observation) (Observation, error) {
 		result.Wire = &wire
 	}
 	if observation.Sessions != nil {
-		sessions := append([]SessionState(nil), (*observation.Sessions)...)
+		sessions := cloneSlice(*observation.Sessions)
 		for i := range sessions {
 			canonical, err := canonicalJSON(sessions[i].Value)
 			if err != nil {
@@ -305,7 +305,7 @@ func canonicalizeObservation(observation Observation) (Observation, error) {
 		result.Sessions = &sessions
 	}
 	if observation.SideEffects != nil {
-		effects := append([]SideEffect(nil), (*observation.SideEffects)...)
+		effects := cloneSlice(*observation.SideEffects)
 		for i := range effects {
 			canonical, err := canonicalJSON(effects[i].Detail)
 			if err != nil {

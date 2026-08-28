@@ -164,20 +164,41 @@ func stubCompatAPIProvider(api API) APIProvider {
 	}
 }
 
-func Stream(context.Context, Model, Context, ...ProviderStreamOptions) *AssistantMessageEventStream {
-	return failedProviderStream(newNotImplemented("Compat.Stream"))
+func Stream(ctx context.Context, model Model, input Context, options ...ProviderStreamOptions) *AssistantMessageEventStream {
+	provider, ok := GetAPIProvider(model.API)
+	if !ok {
+		return failedProviderStream(fmt.Errorf("No API provider registered for api: %s", model.API))
+	}
+	configured := ProviderStreamOptions(StreamOptions{})
+	if len(options) != 0 {
+		configured = options[0]
+	}
+	if isNilRuntimeValue(configured) {
+		return failedProviderStream(fmt.Errorf("%w: compat stream options must not be nil", ErrEventStreamInvariant))
+	}
+	return provider.Stream(nonNilContext(ctx), model, input, configured)
 }
 
-func Complete(context.Context, Model, Context, ...ProviderStreamOptions) (AssistantMessage, error) {
-	return AssistantMessage{}, newNotImplemented("Compat.Complete")
+func Complete(ctx context.Context, model Model, input Context, options ...ProviderStreamOptions) (AssistantMessage, error) {
+	ctx = nonNilContext(ctx)
+	return Stream(ctx, model, input, options...).Result(context.WithoutCancel(ctx))
 }
 
-func StreamSimple(context.Context, Model, Context, ...SimpleStreamOptions) *AssistantMessageEventStream {
-	return failedProviderStream(newNotImplemented("Compat.StreamSimple"))
+func StreamSimple(ctx context.Context, model Model, input Context, options ...SimpleStreamOptions) *AssistantMessageEventStream {
+	provider, ok := GetAPIProvider(model.API)
+	if !ok {
+		return failedProviderStream(fmt.Errorf("No API provider registered for api: %s", model.API))
+	}
+	configured := SimpleStreamOptions{}
+	if len(options) != 0 {
+		configured = options[0]
+	}
+	return provider.StreamSimple(nonNilContext(ctx), model, input, configured)
 }
 
-func CompleteSimple(context.Context, Model, Context, ...SimpleStreamOptions) (AssistantMessage, error) {
-	return AssistantMessage{}, newNotImplemented("Compat.CompleteSimple")
+func CompleteSimple(ctx context.Context, model Model, input Context, options ...SimpleStreamOptions) (AssistantMessage, error) {
+	ctx = nonNilContext(ctx)
+	return StreamSimple(ctx, model, input, options...).Result(context.WithoutCancel(ctx))
 }
 
 func GetModel(provider BuiltinProvider, modelID string) (Model, bool) {
@@ -305,24 +326,24 @@ func FauxThinking(thinking string) ThinkingContent {
 	return ThinkingContent{Type: ContentTypeThinking, Thinking: thinking}
 }
 
-func FauxToolCall(string, map[string]any, ...FauxToolCallOptions) (ToolCall, error) {
-	return ToolCall{}, newNotImplemented("Faux.ToolCall")
+func FauxToolCall(name string, arguments map[string]any, options ...FauxToolCallOptions) (ToolCall, error) {
+	return newFauxToolCall(name, arguments, options...)
 }
 
-func FauxAssistantMessage(FauxAssistantMessageContent, ...FauxAssistantMessageOptions) (AssistantMessage, error) {
-	return AssistantMessage{}, newNotImplemented("Faux.AssistantMessage")
+func FauxAssistantMessage(content FauxAssistantMessageContent, options ...FauxAssistantMessageOptions) (AssistantMessage, error) {
+	return newFauxAssistantMessage(content, options...)
 }
 
-func CreateFauxCore(RegisterFauxProviderOptions) (*FauxCore, error) {
-	return nil, newNotImplemented("Faux.CreateCore")
+func CreateFauxCore(options RegisterFauxProviderOptions) (*FauxCore, error) {
+	return createFauxCore(options)
 }
 
-func NewFauxProvider(...RegisterFauxProviderOptions) (*FauxProviderHandle, error) {
-	return nil, newNotImplemented("Faux.Provider")
+func NewFauxProvider(options ...RegisterFauxProviderOptions) (*FauxProviderHandle, error) {
+	return newFauxProvider(options...)
 }
 
-func RegisterFauxProvider(...RegisterFauxProviderOptions) (*FauxProviderRegistration, error) {
-	return nil, newNotImplemented("Compat.RegisterFauxProvider")
+func RegisterFauxProvider(options ...RegisterFauxProviderOptions) (*FauxProviderRegistration, error) {
+	return registerFauxProvider(options...)
 }
 
 func StreamAnthropic(ctx context.Context, model Model, input Context, options AnthropicOptions) *AssistantMessageEventStream {

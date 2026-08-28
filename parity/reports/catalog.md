@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9639
+- Total entries: 9640
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5363 |
 | scaffolded | 4231 |
 | partial | 32 |
-| implemented | 2 |
+| implemented | 3 |
 | verified | 9 |
 | deferred | 2 |
 
@@ -5181,6 +5181,7 @@
 | contract:ai/tool | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:auth/pig-ai/login-cli | partial | M11 | contract | github.com/nankedr/pig/internal/pigaicli | ai |
 | module-ai | partial | M1 | package | github.com/nankedr/pig/ai | ai |
+| contract:ai/faux-provider/core-stream | implemented | M1 | contract | github.com/nankedr/pig/ai.CreateFauxCore | ai |
 | contract:baseline/catalog-snapshot | verified | M0 | contract | parity/baseline/snapshot.manifest.json | ai |
 | contract:baseline/image-catalog-snapshot | verified | M0 | contract | parity/baseline/catalog/image/models.json | ai |
 | matrix:ai/openai-completions/option/open-aicompletions-options-metadata | verified | M0 | field | github.com/nankedr/pig/ai.OpenAICompletionsOptions.Metadata | ai |

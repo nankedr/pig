@@ -207,7 +207,9 @@ func cloneSlice[T any](value []T) []T {
 	if value == nil {
 		return nil
 	}
-	return append([]T(nil), value...)
+	clone := make([]T, len(value))
+	copy(clone, value)
+	return clone
 }
 
 func cloneRawMessage(value json.RawMessage) json.RawMessage {

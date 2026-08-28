@@ -79,7 +79,7 @@ var (
 	_ func(ai.Model, ai.Context, ai.OpenAICompletionsCompat, ...ai.ConvertOpenAICompletionsMessagesOptions) ([]json.RawMessage, error) = ai.ConvertOpenAICompletionsMessages          // upstream: convertMessages
 )
 
-func TestFauxPureValuesAndRuntimeStubsStaySeparated(t *testing.T) {
+func TestFauxM1RuntimeKeepsThinkingAndDeferredExplicit(t *testing.T) {
 	t.Parallel()
 
 	if text := ai.FauxText("hello"); text.Type != ai.ContentTypeText || text.Text != "hello" {
@@ -88,17 +88,31 @@ func TestFauxPureValuesAndRuntimeStubsStaySeparated(t *testing.T) {
 	if thinking := ai.FauxThinking("hmm"); thinking.Type != ai.ContentTypeThinking || thinking.Thinking != "hmm" {
 		t.Fatalf("FauxThinking = %#v", thinking)
 	}
-	if _, err := ai.FauxToolCall("tool", nil); !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("FauxToolCall error = %v", err)
+	toolCall, err := ai.FauxToolCall("tool", map[string]any{"value": "ok"})
+	if err != nil || toolCall.Type != ai.ContentTypeToolCall || toolCall.ID == "" {
+		t.Fatalf("FauxToolCall = (%#v, %v)", toolCall, err)
 	}
-	if _, err := ai.FauxAssistantMessage(ai.FauxAssistantText("response")); !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("FauxAssistantMessage error = %v", err)
+	emptyID, err := ai.FauxToolCall("tool", nil, ai.FauxToolCallOptions{ID: ai.Some("")})
+	if err != nil || emptyID.ID != "" {
+		t.Fatalf("FauxToolCall explicit empty id = (%#v, %v)", emptyID, err)
 	}
-	if core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{}); core != nil || !errors.Is(err, ai.ErrNotImplemented) {
+	message, err := ai.FauxAssistantMessage(ai.FauxAssistantText("response"))
+	if err != nil || len(message.Content) != 1 || message.StopReason != ai.StopReasonStop {
+		t.Fatalf("FauxAssistantMessage = (%#v, %v)", message, err)
+	}
+	if core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{}); err != nil || core == nil {
 		t.Fatalf("CreateFauxCore = (%#v, %v)", core, err)
 	}
-	if provider, err := ai.NewFauxProvider(); provider != nil || !errors.Is(err, ai.ErrNotImplemented) {
+	if provider, err := ai.NewFauxProvider(); err != nil || provider == nil {
 		t.Fatalf("NewFauxProvider = (%#v, %v)", provider, err)
+	}
+	if _, err := ai.FauxAssistantMessage(ai.FauxAssistantText("deferred"), ai.FauxAssistantMessageOptions{
+		StopReason: ai.Some(ai.StopReasonDeferred),
+	}); !errors.Is(err, ai.ErrNotImplemented) {
+		t.Fatalf("deferred FauxAssistantMessage error = %v, want ErrNotImplemented", err)
+	}
+	if core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{Deferred: &ai.FauxDeferredOptions{}}); core != nil || !errors.Is(err, ai.ErrNotImplemented) {
+		t.Fatalf("deferred CreateFauxCore = (%#v, %v)", core, err)
 	}
 }
 

@@ -122,27 +122,9 @@ func customCompatProvider(api ai.API) ai.APIProvider {
 	}
 }
 
-func TestCompatExecutionStubsDoNotConsultRegistryEnvironmentOrHooks(t *testing.T) {
-	apiCalls := 0
-	if err := ai.RegisterAPIProvider(ai.APIProvider{
-		API: "poison-api",
-		Stream: func(context.Context, ai.Model, ai.Context, ai.ProviderStreamOptions) *ai.AssistantMessageEventStream {
-			apiCalls++
-			return ai.NewAssistantMessageEventStream()
-		},
-		StreamSimple: func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
-			apiCalls++
-			return ai.NewAssistantMessageEventStream()
-		},
-	}, "poison"); err != nil {
-		t.Fatalf("RegisterAPIProvider error = %v", err)
-	}
-	t.Cleanup(func() {
-		ai.UnregisterAPIProviders("poison")
-	})
-
+func TestCompatBuiltinExecutionStubsDoNotInvokeHooks(t *testing.T) {
 	hooks := 0
-	model := ai.Model{API: "poison-api", Provider: ai.ProviderIDOpenAI}
+	model := ai.Model{API: ai.APIOpenAIResponses, Provider: ai.ProviderIDOpenAI}
 	stream := ai.Stream(context.Background(), model, ai.Context{}, ai.StreamOptions{
 		ProviderRequestOptions: poisonedRequestOptions(&hooks),
 	})
@@ -159,8 +141,8 @@ func TestCompatExecutionStubsDoNotConsultRegistryEnvironmentOrHooks(t *testing.T
 	if _, err := ai.CompleteSimple(context.Background(), model, ai.Context{}); !errors.Is(err, ai.ErrNotImplemented) {
 		t.Fatalf("CompleteSimple error = %v, want ErrNotImplemented", err)
 	}
-	if apiCalls != 0 || hooks != 0 {
-		t.Fatalf("compat stub side effects = API %d/hooks %d, want zero", apiCalls, hooks)
+	if hooks != 0 {
+		t.Fatalf("compat builtin stub invoked %d hooks, want zero", hooks)
 	}
 }
 
@@ -176,10 +158,6 @@ func TestCompatCatalogAliasesAndDeferredEntriesAreExplicit(t *testing.T) {
 	if _, ok := ai.GetModel(ai.ProviderIDOpenAI, "missing"); ok {
 		t.Fatal("GetModel found a model before runtime catalog loading")
 	}
-	if _, err := ai.RegisterFauxProvider(); !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("RegisterFauxProvider error = %v, want ErrNotImplemented", err)
-	}
-
 	cleanups := 0
 	unregister, err := ai.RegisterSessionResourceCleanup(func(...string) { cleanups++ })
 	if unregister != nil || !errors.Is(err, ai.ErrNotImplemented) {

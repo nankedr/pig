@@ -1,0 +1,661 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/providers/faux.ts#createFauxCore"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/ai/faux-stream-outcomes",
+    "catalog_id": "contract:ai/faux-provider/core-stream",
+    "surface": "go-sdk",
+    "input": {
+      "api": "faux:parity",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "hi",
+            "timestamp": 1
+          }
+        ]
+      },
+      "entrypoints": {
+        "stream": "Provider.stream",
+        "complete": "Models.complete"
+      },
+      "model_id": "faux-1",
+      "network": "forbidden",
+      "projection": {
+        "event": [
+          "scenario",
+          "type",
+          "reason",
+          "contentIndex",
+          "delta",
+          "content",
+          "toolCall",
+          "partial",
+          "message",
+          "error"
+        ],
+        "message": [
+          "role",
+          "content",
+          "api",
+          "provider",
+          "model",
+          "stopReason",
+          "errorMessage"
+        ],
+        "partial": [
+          "role",
+          "api",
+          "provider",
+          "model",
+          "stopReason",
+          "errorMessage"
+        ]
+      },
+      "provider": "faux-parity",
+      "repeat_result": 2,
+      "scenarios": [
+        {
+          "id": "stream",
+          "method": "stream",
+          "content": [
+            {
+              "type": "text",
+              "text": "answer"
+            },
+            {
+              "type": "toolCall",
+              "id": "tool-1",
+              "name": "echo",
+              "arguments": {
+                "count": 12,
+                "text": "hi"
+              }
+            }
+          ],
+          "stop_reason": "toolUse",
+          "timestamp": 2
+        },
+        {
+          "id": "complete",
+          "method": "complete",
+          "content": [
+            {
+              "type": "text",
+              "text": "answer"
+            },
+            {
+              "type": "toolCall",
+              "id": "tool-1",
+              "name": "echo",
+              "arguments": {
+                "count": 12,
+                "text": "hi"
+              }
+            }
+          ],
+          "stop_reason": "toolUse",
+          "timestamp": 2
+        },
+        {
+          "id": "error",
+          "method": "stream",
+          "content": [
+            {
+              "type": "text",
+              "text": "partial response"
+            }
+          ],
+          "error_message": "provider failed",
+          "stop_reason": "error",
+          "timestamp": 3
+        },
+        {
+          "id": "aborted",
+          "method": "stream",
+          "abort_after": "text_delta",
+          "content": [
+            {
+              "type": "text",
+              "text": "abcdefghijklmnop"
+            }
+          ],
+          "stop_reason": "stop",
+          "timestamp": 4
+        }
+      ],
+      "token_size": {
+        "min": 1,
+        "max": 1
+      },
+      "tokens_per_second": 64
+    },
+    "observe": [
+      "events",
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "events": [
+      {
+        "scenario": "stream",
+        "type": "start",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "text_start",
+        "contentIndex": 0,
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "text_delta",
+        "contentIndex": 0,
+        "delta": "answ",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "text_delta",
+        "contentIndex": 0,
+        "delta": "er",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "text_end",
+        "contentIndex": 0,
+        "content": "answer",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "toolcall_start",
+        "contentIndex": 1,
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "toolcall_delta",
+        "contentIndex": 1,
+        "delta": "{\"co",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "toolcall_delta",
+        "contentIndex": 1,
+        "delta": "unt\"",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "toolcall_delta",
+        "contentIndex": 1,
+        "delta": ":12,",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "toolcall_delta",
+        "contentIndex": 1,
+        "delta": "\"tex",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "toolcall_delta",
+        "contentIndex": 1,
+        "delta": "t\":\"",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "toolcall_delta",
+        "contentIndex": 1,
+        "delta": "hi\"}",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "toolcall_end",
+        "contentIndex": 1,
+        "toolCall": {
+          "type": "toolCall",
+          "id": "tool-1",
+          "name": "echo",
+          "arguments": {
+            "count": 12,
+            "text": "hi"
+          }
+        },
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "stream",
+        "type": "done",
+        "reason": "toolUse",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "answer"
+            },
+            {
+              "type": "toolCall",
+              "id": "tool-1",
+              "name": "echo",
+              "arguments": {
+                "count": 12,
+                "text": "hi"
+              }
+            }
+          ],
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "toolUse"
+        }
+      },
+      {
+        "scenario": "error",
+        "type": "start",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending",
+          "errorMessage": "provider failed"
+        }
+      },
+      {
+        "scenario": "error",
+        "type": "text_start",
+        "contentIndex": 0,
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending",
+          "errorMessage": "provider failed"
+        }
+      },
+      {
+        "scenario": "error",
+        "type": "text_delta",
+        "contentIndex": 0,
+        "delta": "part",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending",
+          "errorMessage": "provider failed"
+        }
+      },
+      {
+        "scenario": "error",
+        "type": "text_delta",
+        "contentIndex": 0,
+        "delta": "ial ",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending",
+          "errorMessage": "provider failed"
+        }
+      },
+      {
+        "scenario": "error",
+        "type": "text_delta",
+        "contentIndex": 0,
+        "delta": "resp",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending",
+          "errorMessage": "provider failed"
+        }
+      },
+      {
+        "scenario": "error",
+        "type": "text_delta",
+        "contentIndex": 0,
+        "delta": "onse",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending",
+          "errorMessage": "provider failed"
+        }
+      },
+      {
+        "scenario": "error",
+        "type": "text_end",
+        "contentIndex": 0,
+        "content": "partial response",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending",
+          "errorMessage": "provider failed"
+        }
+      },
+      {
+        "scenario": "error",
+        "type": "error",
+        "reason": "error",
+        "error": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "partial response"
+            }
+          ],
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "error",
+          "errorMessage": "provider failed"
+        }
+      },
+      {
+        "scenario": "aborted",
+        "type": "start",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "aborted",
+        "type": "text_start",
+        "contentIndex": 0,
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "aborted",
+        "type": "text_delta",
+        "contentIndex": 0,
+        "delta": "abcd",
+        "partial": {
+          "role": "assistant",
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "pending"
+        }
+      },
+      {
+        "scenario": "aborted",
+        "type": "error",
+        "reason": "aborted",
+        "error": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "abcd"
+            }
+          ],
+          "api": "faux:parity",
+          "provider": "faux-parity",
+          "model": "faux-1",
+          "stopReason": "aborted",
+          "errorMessage": "Request was aborted"
+        }
+      }
+    ],
+    "outcome": {
+      "stream_result": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "answer"
+          },
+          {
+            "type": "toolCall",
+            "id": "tool-1",
+            "name": "echo",
+            "arguments": {
+              "count": 12,
+              "text": "hi"
+            }
+          }
+        ],
+        "api": "faux:parity",
+        "provider": "faux-parity",
+        "model": "faux-1",
+        "stopReason": "toolUse"
+      },
+      "stream_result_repeat": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "answer"
+          },
+          {
+            "type": "toolCall",
+            "id": "tool-1",
+            "name": "echo",
+            "arguments": {
+              "count": 12,
+              "text": "hi"
+            }
+          }
+        ],
+        "api": "faux:parity",
+        "provider": "faux-parity",
+        "model": "faux-1",
+        "stopReason": "toolUse"
+      },
+      "complete_result": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "answer"
+          },
+          {
+            "type": "toolCall",
+            "id": "tool-1",
+            "name": "echo",
+            "arguments": {
+              "count": 12,
+              "text": "hi"
+            }
+          }
+        ],
+        "api": "faux:parity",
+        "provider": "faux-parity",
+        "model": "faux-1",
+        "stopReason": "toolUse"
+      },
+      "stream_complete_equal": true,
+      "error_result": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "partial response"
+          }
+        ],
+        "api": "faux:parity",
+        "provider": "faux-parity",
+        "model": "faux-1",
+        "stopReason": "error",
+        "errorMessage": "provider failed"
+      },
+      "error_result_repeat": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "partial response"
+          }
+        ],
+        "api": "faux:parity",
+        "provider": "faux-parity",
+        "model": "faux-1",
+        "stopReason": "error",
+        "errorMessage": "provider failed"
+      },
+      "aborted_result": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "abcd"
+          }
+        ],
+        "api": "faux:parity",
+        "provider": "faux-parity",
+        "model": "faux-1",
+        "stopReason": "aborted",
+        "errorMessage": "Request was aborted"
+      },
+      "aborted_result_repeat": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "abcd"
+          }
+        ],
+        "api": "faux:parity",
+        "provider": "faux-parity",
+        "model": "faux-1",
+        "stopReason": "aborted",
+        "errorMessage": "Request was aborted"
+      },
+      "state": {
+        "call_count": 4,
+        "pending_response_count": 0
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:185017a60e494ca929c32b4e19be5d5e5f560828de67591b7b870b709d8ea45a",
+  "observation_hash": "sha256:0533a60e74f0ba96def69374a120723324b966060e7040c5f173d6b11948be8a",
+  "execution_method": "node --experimental-strip-types parity/oracle/faux-stream-outcomes.mjs <locked-pi-checkout>; source modules with optional built-dist differential",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/ai/src/providers/faux.ts + packages/ai/src/models.ts",
+    "provider_source_sha256": "sha256:d819e22fcfba388d043246d34d770f2e2614f351de47f102c69f310c21fc6c65",
+    "models_source_sha256": "sha256:b53c99c5fa787af57790fa1d971987faab7e7b917ab5cb985374db407a4d88dd"
+  }
+}

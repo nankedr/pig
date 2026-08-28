@@ -112,6 +112,35 @@ func TestHashObservationPreservesNestedAbsentAndEmptyBytes(t *testing.T) {
 	}
 }
 
+func TestHashObservationPreservesObservedEmptyCollections(t *testing.T) {
+	emptyEvents := []json.RawMessage{}
+	emptyWire := []parity.WireObservation{}
+	emptySessions := []parity.SessionState{}
+	emptyEffects := []parity.SideEffect{}
+	observed := parity.Observation{
+		Events: &emptyEvents, Wire: &emptyWire, Sessions: &emptySessions, SideEffects: &emptyEffects,
+	}
+	nilEvents := []json.RawMessage(nil)
+	nilWire := []parity.WireObservation(nil)
+	nilSessions := []parity.SessionState(nil)
+	nilEffects := []parity.SideEffect(nil)
+	collapsed := parity.Observation{
+		Events: &nilEvents, Wire: &nilWire, Sessions: &nilSessions, SideEffects: &nilEffects,
+	}
+
+	observedHash, err := parity.HashObservation(observed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	collapsedHash, err := parity.HashObservation(collapsed)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if observedHash == collapsedHash {
+		t.Fatalf("observed empty collections collapsed to null with hash %q", observedHash)
+	}
+}
+
 func TestFixtureDriverReplaysOnlyItsDeclaredCase(t *testing.T) {
 	baseline := parity.Baseline{
 		ID:         "pi-936aff0-v1",
