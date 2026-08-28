@@ -476,6 +476,10 @@ func unsupportedFauxOptions(options *SimpleStreamOptions) error {
 	if options.Reasoning != nil || options.ThinkingBudgets != nil {
 		return newNotImplemented("Faux.Thinking")
 	}
+	if options.SessionID != nil && *options.SessionID != "" &&
+		(options.CacheRetention == nil || *options.CacheRetention != CacheRetentionNone) {
+		return newNotImplemented("Faux.Cache")
+	}
 	return nil
 }
 

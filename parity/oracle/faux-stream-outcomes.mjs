@@ -11,17 +11,23 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, "..", "..");
 const defaultPiRoot = join(repoRoot, ".upstream", "pi");
 const defaultOutput = join(here, "fixtures", "faux-stream-outcomes.json");
+const factoryStateOutput = join(here, "fixtures", "faux-factory-state-snapshot-deviation.json");
 
 function parseArgs(argv) {
-	const result = { piRoot: defaultPiRoot, out: defaultOutput, check: false, requireDist: false };
+	const result = { piRoot: defaultPiRoot, out: "", caseName: "stream-outcomes", check: false, requireDist: false };
 	const args = argv.slice(2);
 	for (let index = 0; index < args.length; index++) {
 		if (args[index] === "--check") result.check = true;
 		else if (args[index] === "--require-dist") result.requireDist = true;
+		else if (args[index] === "--case") result.caseName = args[++index];
 		else if (args[index] === "--out") result.out = args[++index];
 		else if (result.piRoot === defaultPiRoot) result.piRoot = args[index];
 		else throw new Error(`unexpected argument: ${args[index]}`);
 	}
+	if (!["stream-outcomes", "factory-state"].includes(result.caseName)) {
+		throw new Error(`unknown case: ${result.caseName}`);
+	}
+	if (!result.out) result.out = result.caseName === "factory-state" ? factoryStateOutput : defaultOutput;
 	return result;
 }
 
@@ -72,11 +78,7 @@ function hashCase(declaration) {
 }
 
 function hashObservation(observation) {
-	return digestJSON({
-		events: observation.events.map(canonical),
-		outcome: canonical(observation.outcome),
-		side_effects: observation.side_effects.map(canonical),
-	});
+	return digestJSON(canonical(observation));
 }
 
 function fileDigest(path) {
@@ -144,6 +146,24 @@ function caseDeclaration() {
 			tokens_per_second: 64,
 		},
 		observe: ["events", "outcome", "side_effects"],
+	};
+}
+
+function factoryStateDeclaration() {
+	return {
+		schema_version: "1.0.0",
+		id: "go-sdk/ai/faux-factory-state-snapshot-deviation",
+		catalog_id: "contract:ai/faux-provider",
+		surface: "go-sdk",
+		input: {
+			api: "faux:factory-state-parity",
+			calls: 2,
+			entrypoint: "createFauxCore.stream",
+			model_id: "faux-1",
+			network: "forbidden",
+			provider: "faux-factory-state",
+		},
+		observe: ["outcome", "side_effects"],
 	};
 }
 
@@ -296,6 +316,60 @@ async function captureModulesFromPaths(providerPath, modelsPath, declaration) {
 	return captureModules(ai, models, declaration);
 }
 
+async function captureFactoryStateModule(providerPath, declaration) {
+	const ai = await import(pathToFileURL(providerPath).href);
+	const input = declaration.input;
+	let release;
+	const barrier = new Promise((resolve) => {
+		release = resolve;
+	});
+	const factory = async (_context, _options, state) => {
+		await barrier;
+		return ai.fauxAssistantMessage(String(state.callCount), { timestamp: 1 });
+	};
+	const faux = ai.createFauxCore({
+		api: input.api,
+		provider: input.provider,
+		models: [{ id: input.model_id }],
+		tokenSize: { min: 1, max: 1 },
+	});
+	faux.setResponses(Array.from({ length: input.calls }, () => factory));
+	const model = faux.getModel(input.model_id);
+	if (!model) throw new Error(`configured model is unavailable: ${input.model_id}`);
+	const streams = Array.from({ length: input.calls }, () => faux.stream(model, { messages: [] }, {}));
+	release();
+	const messages = await Promise.all(streams.map((stream) => stream.result()));
+	const factoryCallCounts = messages.map((message) => {
+		const content = message.content[0];
+		const count = content?.type === "text" ? Number(content.text) : Number.NaN;
+		if (!Number.isInteger(count)) throw new Error("factory did not return an integer state snapshot");
+		return count;
+	});
+	return {
+		outcome: {
+			factory_call_counts: factoryCallCounts,
+			provider_call_count: faux.state.callCount,
+		},
+		side_effects: [],
+	};
+}
+
+async function captureFactoryState(piRoot, requireDist) {
+	const declaration = factoryStateDeclaration();
+	const sourceProvider = join(piRoot, "packages", "ai", "src", "providers", "faux.ts");
+	const distProvider = join(piRoot, "packages", "ai", "dist", "providers", "faux.js");
+	const sourceObservation = await withForbiddenFetch(() => captureFactoryStateModule(sourceProvider, declaration));
+	const hasDist = existsSync(distProvider);
+	if (requireDist && !hasDist) throw new Error("prepared Pi dist is required but packages/ai/dist is absent");
+	if (hasDist) {
+		const distObservation = await withForbiddenFetch(() => captureFactoryStateModule(distProvider, declaration));
+		if (JSON.stringify(canonical(distObservation)) !== JSON.stringify(canonical(sourceObservation))) {
+			throw new Error("Pi built Faux module differs from the locked source module");
+		}
+	}
+	return { declaration, observation: sourceObservation, sourceProvider };
+}
+
 async function withForbiddenFetch(run) {
 	const originalFetch = globalThis.fetch;
 	const calls = [];
@@ -340,11 +414,41 @@ async function buildFixture(piRoot, lock, requireDist) {
 	};
 }
 
+async function buildFactoryStateFixture(piRoot, lock, requireDist) {
+	const captured = await captureFactoryState(piRoot, requireDist);
+	return {
+		schema_version: "1.0.0",
+		deterministic: true,
+		baseline_id: lock.baseline_id,
+		baseline_commit: lock.upstream.commit,
+		upstream: {
+			repository: lock.upstream.repository,
+			commit: lock.upstream.commit,
+			reference: "packages/ai/src/providers/faux.ts#createFauxCore",
+		},
+		case: captured.declaration,
+		observation: captured.observation,
+		input_hash: hashCase(captured.declaration),
+		observation_hash: hashObservation(captured.observation),
+		execution_method:
+			"node --experimental-strip-types parity/oracle/faux-stream-outcomes.mjs <locked-pi-checkout> --case factory-state; source module with optional built-module differential",
+		platform: "any",
+		environment: {
+			node: process.version,
+			oracle_entry: "packages/ai/src/providers/faux.ts#createFauxCore",
+			provider_source_sha256: fileDigest(captured.sourceProvider),
+		},
+	};
+}
+
 async function main() {
 	const args = parseArgs(process.argv);
 	const lock = loadLock();
 	assertLockedCheckout(args.piRoot, lock.upstream.commit);
-	const fixture = await buildFixture(args.piRoot, lock, args.requireDist);
+	const fixture =
+		args.caseName === "factory-state"
+			? await buildFactoryStateFixture(args.piRoot, lock, args.requireDist)
+			: await buildFixture(args.piRoot, lock, args.requireDist);
 	if (args.check) {
 		const recorded = JSON.parse(readFileSync(args.out, "utf8"));
 		fixture.environment.node = recorded.environment.node;

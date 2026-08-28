@@ -69,7 +69,7 @@ OpenAI Chat Completions 的完整类型和 options 在 M0 就声明，并逐字�
 
 以下偏离不算遗漏，但必须保留 ADR 和验证：
 
-- 跨 goroutine 发布不可变 event snapshot，不复刻 JavaScript 共享引用的后续 mutation。
+- 跨 goroutine 发布不可变 event snapshot；Faux factory 也接收出队时捕获的逐调用 state snapshot，不复刻 JavaScript 共享引用的后续 mutation。见 ADR-0006。
 - Client 请求允许调用方 context 取消本地 waiter，并用 tombstone 吸收迟到 response；固定 Pi Client 本身没有 request cancellation API。
 - 统一解释 Offline Mode：仅 `1/true/yes` 开启，其余值或缺省关闭，不复刻 Pi 各路径对 `PI_OFFLINE=0` 的矛盾判断。
 - Pig 在 Project Trust 决定前不读取 trust-sensitive 项目 `sessionDir`，修复 Pi 固定快照的启动安全缺口。

@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/providers/faux.ts#createFauxCore"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/ai/faux-factory-state-snapshot-deviation",
+    "catalog_id": "contract:ai/faux-provider",
+    "surface": "go-sdk",
+    "input": {
+      "api": "faux:factory-state-parity",
+      "calls": 2,
+      "entrypoint": "createFauxCore.stream",
+      "model_id": "faux-1",
+      "network": "forbidden",
+      "provider": "faux-factory-state"
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "factory_call_counts": [
+        2,
+        2
+      ],
+      "provider_call_count": 2
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:2b57328922eb519e12c20ae9e496057b84043c491b867e5f7c9980200d83d733",
+  "observation_hash": "sha256:33687dbe2e91b5c7a72442d6b0890c968b47c6824bd6cab5d0502081dca32754",
+  "execution_method": "node --experimental-strip-types parity/oracle/faux-stream-outcomes.mjs <locked-pi-checkout> --case factory-state; source module with optional built-module differential",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/ai/src/providers/faux.ts#createFauxCore",
+    "provider_source_sha256": "sha256:d819e22fcfba388d043246d34d770f2e2614f351de47f102c69f310c21fc6c65"
+  }
+}

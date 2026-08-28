@@ -92,6 +92,7 @@ func TestFauxConcurrentFactoriesSeePerCallStateSnapshots(t *testing.T) {
 	for i := range steps {
 		steps[i] = ai.FauxResponseFactory(func(_ ai.Context, _ *ai.SimpleStreamOptions, state *ai.FauxProviderState, _ ai.Model) (ai.AssistantMessage, error) {
 			<-release
+			state.DeferredFetchCount++
 			return ai.FauxAssistantMessage(ai.FauxAssistantText(strconv.Itoa(state.CallCount)))
 		})
 	}
@@ -129,8 +130,8 @@ func TestFauxConcurrentFactoriesSeePerCallStateSnapshots(t *testing.T) {
 	if !reflect.DeepEqual(values, want) {
 		t.Fatalf("factory CallCount snapshots = %v, want %v", values, want)
 	}
-	if handle.State.CallCount != calls || handle.GetPendingResponseCount() != 0 {
-		t.Fatalf("state calls=%d pending=%d", handle.State.CallCount, handle.GetPendingResponseCount())
+	if handle.State.CallCount != calls || handle.State.DeferredFetchCount != 0 || handle.GetPendingResponseCount() != 0 {
+		t.Fatalf("state=%#v pending=%d", handle.State, handle.GetPendingResponseCount())
 	}
 }
 
@@ -369,15 +370,13 @@ func TestFauxM2OptionsFailWithoutConsumingScript(t *testing.T) {
 	handle.SetResponses([]ai.FauxResponseStep{message})
 	model, _ := handle.GetModel()
 	hookCalls := 0
+	requestOptions := ai.ProviderRequestOptions{OnResponse: func(context.Context, ai.ProviderResponse, ai.Model) error {
+		hookCalls++
+		return nil
+	}}
 	reasoning := ai.ThinkingLevelHigh
 	stream := handle.Provider.StreamSimple(context.Background(), model, ai.Context{}, ai.SimpleStreamOptions{
-		Reasoning: &reasoning,
-		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{
-			OnResponse: func(context.Context, ai.ProviderResponse, ai.Model) error {
-				hookCalls++
-				return nil
-			},
-		}},
+		Reasoning: &reasoning, StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions},
 	})
 	if event, ok, err := stream.Next(context.Background()); event != nil || ok || err != nil {
 		t.Fatalf("Next() = (%#v, %t, %v), want event-free closed stream", event, ok, err)
@@ -398,6 +397,9 @@ func TestFauxM2OptionsFailWithoutConsumingScript(t *testing.T) {
 	}
 
 	budgets := &ai.ThinkingBudgets{}
+	sessionID := "cache-session"
+	shortCache := ai.CacheRetentionShort
+	longCache := ai.CacheRetentionLong
 	for _, test := range []struct {
 		name      string
 		options   ai.SimpleStreamOptions
@@ -406,6 +408,9 @@ func TestFauxM2OptionsFailWithoutConsumingScript(t *testing.T) {
 		{name: "thinking budgets", options: ai.SimpleStreamOptions{ThinkingBudgets: budgets}, operation: "Faux.Thinking"},
 		{name: "enabled deferred", options: ai.SimpleStreamOptions{Deferred: ai.DeferredBoolean{Enabled: true}}, operation: "Faux.Deferred"},
 		{name: "deferred window", options: ai.SimpleStreamOptions{Deferred: ai.DeferredWindowOptions{}}, operation: "Faux.Deferred"},
+		{name: "default cache", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions, SessionID: &sessionID}}, operation: "Faux.Cache"},
+		{name: "short cache", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions, SessionID: &sessionID, CacheRetention: &shortCache}}, operation: "Faux.Cache"},
+		{name: "long cache", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions, SessionID: &sessionID, CacheRetention: &longCache}}, operation: "Faux.Cache"},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			_, err := handle.Provider.StreamSimple(context.Background(), model, ai.Context{}, test.options).Result(context.Background())
@@ -418,8 +423,8 @@ func TestFauxM2OptionsFailWithoutConsumingScript(t *testing.T) {
 			}
 		})
 	}
-	if handle.State.CallCount != 0 || handle.GetPendingResponseCount() != 1 {
-		t.Fatalf("M2 option calls=%d pending=%d, want 0/1", handle.State.CallCount, handle.GetPendingResponseCount())
+	if hookCalls != 0 || handle.State.CallCount != 0 || handle.GetPendingResponseCount() != 1 {
+		t.Fatalf("M2 option hooks=%d calls=%d pending=%d, want 0/0/1", hookCalls, handle.State.CallCount, handle.GetPendingResponseCount())
 	}
 }
 
@@ -536,7 +541,7 @@ func (c *cancelAfterErrChecks) Err() error {
 	return nil
 }
 
-func TestFauxDisabledDeferredOptionIsANoOp(t *testing.T) {
+func TestFauxM2NoOpOptionsDoNotSelectUnsupportedBranches(t *testing.T) {
 	message, _ := ai.FauxAssistantMessage(ai.FauxAssistantText("not deferred"))
 	handle, err := ai.NewFauxProvider(ai.RegisterFauxProviderOptions{
 		API: "faux:no-deferred", Provider: "faux-no-deferred", Models: []ai.FauxModelDefinition{{ID: "no-deferred-model"}},
@@ -544,13 +549,28 @@ func TestFauxDisabledDeferredOptionIsANoOp(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewFauxProvider() error = %v", err)
 	}
-	handle.SetResponses([]ai.FauxResponseStep{message})
+	emptySession := ""
+	sessionID := "cache-session"
+	noCache := ai.CacheRetentionNone
+	shortCache := ai.CacheRetentionShort
+	tests := []ai.SimpleStreamOptions{
+		{Deferred: ai.DeferredBoolean{Enabled: false}},
+		{StreamOptions: ai.StreamOptions{SessionID: &emptySession}},
+		{StreamOptions: ai.StreamOptions{SessionID: &sessionID, CacheRetention: &noCache}},
+		{StreamOptions: ai.StreamOptions{CacheRetention: &shortCache}},
+		{StreamOptions: ai.StreamOptions{SessionID: &emptySession, CacheRetention: &shortCache}},
+	}
+	responses := make([]ai.FauxResponseStep, len(tests))
+	for i := range responses {
+		responses[i] = message
+	}
+	handle.SetResponses(responses)
 	model, _ := handle.GetModel()
-	result, err := handle.Provider.StreamSimple(context.Background(), model, ai.Context{}, ai.SimpleStreamOptions{
-		Deferred: ai.DeferredBoolean{Enabled: false},
-	}).Result(context.Background())
-	if err != nil || result.StopReason != ai.StopReasonStop {
-		t.Fatalf("disabled deferred Result() = (%#v, %v)", result, err)
+	for i, options := range tests {
+		result, err := handle.Provider.StreamSimple(context.Background(), model, ai.Context{}, options).Result(context.Background())
+		if err != nil || result.StopReason != ai.StopReasonStop {
+			t.Fatalf("no-op option %d Result() = (%#v, %v)", i, result, err)
+		}
 	}
 }
 
