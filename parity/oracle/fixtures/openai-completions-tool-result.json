@@ -1,0 +1,423 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ai/openai-completions/m1-tool-result-round-trip",
+  "catalog_ids": [
+    "matrix:ai/openai-completions/content/assistant-message-content-tool-call",
+    "matrix:ai/openai-completions/content/tool-result-message-content-text",
+    "matrix:ai/openai-completions/entrypoint/convert-messages",
+    "matrix:ai/openai-completions/message/conversion-assistant-function-tool-call",
+    "matrix:ai/openai-completions/message/conversion-tool-call-id-open-ai",
+    "matrix:ai/openai-completions/message/conversion-tool-call-id-pipe",
+    "matrix:ai/openai-completions/message/conversion-tool-call-id-result-remap",
+    "matrix:ai/openai-completions/message/conversion-tool-result-empty",
+    "matrix:ai/openai-completions/message/conversion-tool-result-text",
+    "matrix:ai/openai-completions/message/tool-result-message-content",
+    "matrix:ai/openai-completions/message/tool-result-message-is-error",
+    "matrix:ai/openai-completions/message/tool-result-message-role",
+    "matrix:ai/openai-completions/message/tool-result-message-tool-call-id",
+    "matrix:ai/openai-completions/request/context-messages",
+    "matrix:ai/openai-completions/request/request-messages"
+  ],
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "upstream": {
+    "module": "ai",
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/api/openai-completions.ts#stream"
+  },
+  "input": {
+    "finalSSE": "data: {\"id\":\"chatcmpl-final\",\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n",
+    "firstSSE": "data: {\"id\":\"chatcmpl-tool-result\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"call+/read|item=read\",\"type\":\"function\",\"function\":{\"name\":\"read\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}},{\"index\":1,\"id\":\"call-empty+with/special|item-empty=abcdefghijklmnopqrstuvwxyz0123456789\",\"type\":\"function\",\"function\":{\"name\":\"empty\",\"arguments\":\"{}\"}},{\"index\":2,\"id\":\"call-error-abcdefghijklmnopqrstuvwxyz-0123456789\",\"type\":\"function\",\"function\":{\"name\":\"fail\",\"arguments\":\"{}\"}}]},\"finish_reason\":\"tool_calls\"}]}\n\ndata: [DONE]\n\n",
+    "results": [
+      "text",
+      "empty",
+      "error"
+    ],
+    "sourceModel": {
+      "api": "openai-completions",
+      "baseUrl": "https://local.invalid/v1",
+      "contextWindow": 32000,
+      "cost": {
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "input": 0,
+        "output": 0
+      },
+      "id": "source-model",
+      "input": [
+        "text"
+      ],
+      "maxTokens": 2048,
+      "name": "Source Model",
+      "provider": "local-openai",
+      "reasoning": false
+    },
+    "targetModel": {
+      "api": "openai-completions",
+      "baseUrl": "https://local.invalid/v1",
+      "contextWindow": 32000,
+      "cost": {
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "input": 0,
+        "output": 0
+      },
+      "id": "target-model",
+      "input": [
+        "text"
+      ],
+      "maxTokens": 2048,
+      "name": "Target Model",
+      "provider": "openai",
+      "reasoning": false
+    },
+    "tools": [
+      {
+        "description": "Read a file",
+        "name": "read",
+        "parameters": {
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "type": "object"
+        }
+      },
+      {
+        "description": "Return no output",
+        "name": "empty",
+        "parameters": {
+          "properties": {},
+          "type": "object"
+        }
+      },
+      {
+        "description": "Return an error",
+        "name": "fail",
+        "parameters": {
+          "properties": {},
+          "type": "object"
+        }
+      }
+    ],
+    "user": {
+      "content": "Read README",
+      "role": "user"
+    }
+  },
+  "input_sha256": "5c4f2e9882ca34b494fed52d7852a0bc5e557e9a691150056a9168641f9057d6",
+  "actual": {
+    "first": {
+      "events": [
+        {
+          "type": "start"
+        },
+        {
+          "type": "toolcall_start"
+        },
+        {
+          "type": "toolcall_delta"
+        },
+        {
+          "type": "toolcall_start"
+        },
+        {
+          "type": "toolcall_delta"
+        },
+        {
+          "type": "toolcall_start"
+        },
+        {
+          "type": "toolcall_delta"
+        },
+        {
+          "type": "toolcall_end"
+        },
+        {
+          "type": "toolcall_end"
+        },
+        {
+          "type": "toolcall_end"
+        },
+        {
+          "type": "done"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [
+          {
+            "arguments": {
+              "path": "README.md"
+            },
+            "id": "call+/read|item=read",
+            "name": "read",
+            "type": "toolCall"
+          },
+          {
+            "arguments": {},
+            "id": "call-empty+with/special|item-empty=abcdefghijklmnopqrstuvwxyz0123456789",
+            "name": "empty",
+            "type": "toolCall"
+          },
+          {
+            "arguments": {},
+            "id": "call-error-abcdefghijklmnopqrstuvwxyz-0123456789",
+            "name": "fail",
+            "type": "toolCall"
+          }
+        ],
+        "model": "source-model",
+        "provider": "local-openai",
+        "rawStopReason": "tool_calls",
+        "responseId": "chatcmpl-tool-result",
+        "role": "assistant",
+        "stopReason": "toolUse",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "requests": [
+      {
+        "messages": [
+          {
+            "content": "Read README",
+            "role": "user"
+          }
+        ],
+        "model": "source-model",
+        "store": false,
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "tool_choice": "required",
+        "tools": [
+          {
+            "function": {
+              "description": "Read a file",
+              "name": "read",
+              "parameters": {
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ],
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          },
+          {
+            "function": {
+              "description": "Return no output",
+              "name": "empty",
+              "parameters": {
+                "properties": {},
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          },
+          {
+            "function": {
+              "description": "Return an error",
+              "name": "fail",
+              "parameters": {
+                "properties": {},
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          }
+        ]
+      },
+      {
+        "messages": [
+          {
+            "content": "Read README",
+            "role": "user"
+          },
+          {
+            "content": null,
+            "role": "assistant",
+            "tool_calls": [
+              {
+                "function": {
+                  "arguments": "{\"path\":\"README.md\"}",
+                  "name": "read"
+                },
+                "id": "call__read_item_read",
+                "type": "function"
+              },
+              {
+                "function": {
+                  "arguments": "{}",
+                  "name": "empty"
+                },
+                "id": "call-empty_with_special_ru6r3z1u",
+                "type": "function"
+              },
+              {
+                "function": {
+                  "arguments": "{}",
+                  "name": "fail"
+                },
+                "id": "call-error-abcdefghijklmnopqrstuvwxyz-01",
+                "type": "function"
+              }
+            ]
+          },
+          {
+            "content": "README contents",
+            "role": "tool",
+            "tool_call_id": "call__read_item_read"
+          },
+          {
+            "content": "(no tool output)",
+            "role": "tool",
+            "tool_call_id": "call-empty_with_special_ru6r3z1u"
+          },
+          {
+            "content": "permission denied",
+            "role": "tool",
+            "tool_call_id": "call-error-abcdefghijklmnopqrstuvwxyz-01"
+          }
+        ],
+        "model": "target-model",
+        "store": false,
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "tools": [
+          {
+            "function": {
+              "description": "Read a file",
+              "name": "read",
+              "parameters": {
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ],
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          },
+          {
+            "function": {
+              "description": "Return no output",
+              "name": "empty",
+              "parameters": {
+                "properties": {},
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          },
+          {
+            "function": {
+              "description": "Return an error",
+              "name": "fail",
+              "parameters": {
+                "properties": {},
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          }
+        ]
+      }
+    ],
+    "second": {
+      "events": [
+        {
+          "type": "start"
+        },
+        {
+          "type": "text_start"
+        },
+        {
+          "type": "text_delta"
+        },
+        {
+          "type": "text_end"
+        },
+        {
+          "type": "done"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [
+          {
+            "text": "done",
+            "type": "text"
+          }
+        ],
+        "model": "target-model",
+        "provider": "openai",
+        "rawStopReason": "stop",
+        "responseId": "chatcmpl-final",
+        "role": "assistant",
+        "stopReason": "stop",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    }
+  },
+  "hash": {
+    "algorithm": "sha256",
+    "observations_sha256": "9e392df735f401df1a9734394ea878624b60b5a473866a95592d8db34063eb18"
+  },
+  "exec_method": "node --experimental-strip-types parity/oracle/openai-completions-tool-result.mjs",
+  "env": {
+    "node_version": "v24.14.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  }
+}

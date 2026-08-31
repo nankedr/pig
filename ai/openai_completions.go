@@ -127,6 +127,7 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 			return nil, err
 		}
 	}
+	toolCallIDs := map[string]string{}
 	for _, message := range input.Messages {
 		switch value := message.(type) {
 		case UserMessage:
@@ -141,18 +142,27 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 				return nil, err
 			}
 		case AssistantMessage:
-			if err := appendOpenAIAssistantMessage(&messages, value); err != nil {
+			if err := appendOpenAIAssistantMessage(&messages, model, value, toolCallIDs); err != nil {
 				return nil, err
 			}
 		case *AssistantMessage:
 			if value == nil {
 				return nil, fmt.Errorf("nil assistant message")
 			}
-			if err := appendOpenAIAssistantMessage(&messages, *value); err != nil {
+			if err := appendOpenAIAssistantMessage(&messages, model, *value, toolCallIDs); err != nil {
 				return nil, err
 			}
-		case ToolResultMessage, *ToolResultMessage:
-			return nil, newNotImplemented("OpenAICompletions.ConvertMessages.ToolResult")
+		case ToolResultMessage:
+			if err := appendOpenAIToolResultMessage(&messages, value, toolCallIDs); err != nil {
+				return nil, err
+			}
+		case *ToolResultMessage:
+			if value == nil {
+				return nil, fmt.Errorf("nil tool result message")
+			}
+			if err := appendOpenAIToolResultMessage(&messages, *value, toolCallIDs); err != nil {
+				return nil, err
+			}
 		default:
 			return nil, fmt.Errorf("unsupported message %T", message)
 		}
@@ -193,11 +203,30 @@ func appendOpenAIUserMessage(messages *[]json.RawMessage, message UserMessage) e
 	return err
 }
 
-func appendOpenAIAssistantMessage(messages *[]json.RawMessage, message AssistantMessage) error {
+func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, message AssistantMessage, toolCallIDs map[string]string) error {
 	if message.StopReason == StopReasonError || message.StopReason == StopReasonAborted {
 		return nil
 	}
 	var text strings.Builder
+	var toolCalls []map[string]any
+	appendToolCall := func(call ToolCall) error {
+		arguments, err := json.Marshal(call.Arguments)
+		if err != nil {
+			return err
+		}
+		id := call.ID
+		if message.Provider != model.Provider || message.API != model.API || message.Model != model.ID {
+			id = normalizeOpenAIToolCallID(model, id)
+			if id != call.ID {
+				toolCallIDs[call.ID] = id
+			}
+		}
+		toolCalls = append(toolCalls, map[string]any{
+			"id": id, "type": "function",
+			"function": map[string]any{"name": call.Name, "arguments": string(arguments)},
+		})
+		return nil
+	}
 	for _, block := range message.Content {
 		switch value := block.(type) {
 		case TextContent:
@@ -210,20 +239,121 @@ func appendOpenAIAssistantMessage(messages *[]json.RawMessage, message Assistant
 			}
 		case ThinkingContent, *ThinkingContent:
 			return newNotImplemented("OpenAICompletions.ConvertMessages.Thinking")
-		case ToolCall, *ToolCall:
-			return newNotImplemented("OpenAICompletions.ConvertMessages.ToolCall")
+		case ToolCall:
+			if err := appendToolCall(value); err != nil {
+				return err
+			}
+		case *ToolCall:
+			if value != nil {
+				if err := appendToolCall(*value); err != nil {
+					return err
+				}
+			}
 		default:
 			return fmt.Errorf("unsupported assistant content %T", block)
 		}
 	}
-	if text.Len() == 0 {
+	if text.Len() == 0 && len(toolCalls) == 0 {
 		return nil
 	}
-	raw, err := json.Marshal(map[string]any{"role": "assistant", "content": text.String()})
+	converted := map[string]any{"role": "assistant", "content": nil}
+	if text.Len() > 0 {
+		converted["content"] = text.String()
+	}
+	if len(toolCalls) > 0 {
+		converted["tool_calls"] = toolCalls
+	}
+	raw, err := json.Marshal(converted)
 	if err == nil {
 		*messages = append(*messages, raw)
 	}
 	return err
+}
+
+func appendOpenAIToolResultMessage(messages *[]json.RawMessage, message ToolResultMessage, toolCallIDs map[string]string) error {
+	if message.AddedToolNames.IsSet() {
+		return newNotImplemented("OpenAICompletions.ConvertMessages.ToolResultAddedToolNames")
+	}
+	var text []string
+	for _, block := range message.Content {
+		switch value := block.(type) {
+		case TextContent:
+			text = append(text, value.Text)
+		case *TextContent:
+			if value != nil {
+				text = append(text, value.Text)
+			}
+		case ImageContent, *ImageContent:
+			return newNotImplemented("OpenAICompletions.ConvertMessages.ToolResultImage")
+		default:
+			return fmt.Errorf("unsupported tool result content %T", block)
+		}
+	}
+	content := strings.Join(text, "\n")
+	if content == "" {
+		content = "(no tool output)"
+	}
+	id := message.ToolCallID
+	if normalized, ok := toolCallIDs[id]; ok {
+		id = normalized
+	}
+	raw, err := json.Marshal(map[string]any{
+		"role": "tool", "content": sanitizeOpenAIText(content), "tool_call_id": id,
+	})
+	if err == nil {
+		*messages = append(*messages, raw)
+	}
+	return err
+}
+
+func normalizeOpenAIToolCallID(model Model, id string) string {
+	if separator := strings.IndexByte(id, '|'); separator >= 0 {
+		callID := sanitizeOpenAIToolCallIDPart(id[:separator])
+		itemID := sanitizeOpenAIToolCallIDPart(id[separator+1:])
+		combined := callID
+		if itemID != "" {
+			combined += "_" + itemID
+		}
+		if len(combined) <= 40 {
+			return combined
+		}
+		hash := openAIShortHash(id)
+		if len(hash) > 8 {
+			hash = hash[:8]
+		}
+		prefixLength := max(1, 40-len(hash)-1)
+		if len(callID) > prefixLength {
+			callID = callID[:prefixLength]
+		}
+		return callID + "_" + hash
+	}
+	if model.Provider == ProviderIDOpenAI && len(id) > 40 {
+		return id[:40]
+	}
+	return id
+}
+
+func sanitizeOpenAIToolCallIDPart(value string) string {
+	var sanitized strings.Builder
+	for _, unit := range utf16.Encode([]rune(value)) {
+		if unit >= 'a' && unit <= 'z' || unit >= 'A' && unit <= 'Z' || unit >= '0' && unit <= '9' || unit == '_' || unit == '-' {
+			sanitized.WriteByte(byte(unit))
+		} else {
+			sanitized.WriteByte('_')
+		}
+	}
+	return sanitized.String()
+}
+
+func openAIShortHash(value string) string {
+	h1, h2 := uint32(0xdeadbeef), uint32(0x41c6ce57)
+	for _, unit := range utf16.Encode([]rune(value)) {
+		h1 = (h1 ^ uint32(unit)) * 2654435761
+		h2 = (h2 ^ uint32(unit)) * 1597334677
+	}
+	h1 = (h1^(h1>>16))*2246822507 ^ (h2^(h2>>13))*3266489909
+	h2 = (h2^(h2>>16))*2246822507 ^ (h1^(h1>>13))*3266489909
+	return strconv.FormatUint(uint64(h2), 36) + strconv.FormatUint(uint64(h1), 36)
 }
 
 func runOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStream, model Model, input Context, options OpenAICompletionsOptions) {

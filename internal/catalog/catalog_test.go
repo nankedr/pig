@@ -814,6 +814,19 @@ func TestOpenAICompletionsMatrixTracksVerifiedSlices(t *testing.T) {
 		"matrix:ai/openai-completions/tool/tool-call-name":                         true,
 		"matrix:ai/openai-completions/tool/tool-call-type":                         true,
 	}
+	toolResultFixtureIDs := openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-tool-result.json", "ai/openai-completions/m1-tool-result-round-trip")
+	toolResultFixturePartialIDs := map[string]bool{
+		"matrix:ai/openai-completions/content/assistant-message-content-tool-call": true,
+		"matrix:ai/openai-completions/entrypoint/convert-messages":                 true,
+		"matrix:ai/openai-completions/request/context-messages":                    true,
+		"matrix:ai/openai-completions/request/request-messages":                    true,
+	}
+	for id := range toolResultFixtureIDs {
+		toolFixtureIDs[id] = true
+	}
+	for id := range toolResultFixturePartialIDs {
+		toolFixturePartialIDs[id] = true
+	}
 	for _, entry := range entries {
 		if entry.Matrix == nil || entry.Matrix.API != "openai-completions" {
 			continue
