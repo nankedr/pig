@@ -789,7 +789,7 @@ func TestOpenAICompletionsMatrixUsesExplicitStubOrBaselineNoOpPolicy(t *testing.
 	}
 }
 
-func TestOpenAICompletionsMatrixTracksVerifiedTextSlice(t *testing.T) {
+func TestOpenAICompletionsMatrixTracksVerifiedSlices(t *testing.T) {
 	root := repoRoot(t)
 	entries, err := catalog.LoadCatalog(filepath.Join(root, "parity", "catalog.jsonl"))
 	if err != nil {
@@ -802,6 +802,17 @@ func TestOpenAICompletionsMatrixTracksVerifiedTextSlice(t *testing.T) {
 	}
 	for id := range openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-retry.json", "ai/openai-completions/m1-transport-retry") {
 		verifiedFixtureIDs[id] = true
+	}
+	toolFixtureIDs := openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-tools.json", "ai/openai-completions/m1-streaming-tools")
+	toolFixturePartialIDs := map[string]bool{
+		"matrix:ai/openai-completions/content/assistant-message-content-tool-call": true,
+		"matrix:ai/openai-completions/delta/partial-json-empty":                    true,
+		"matrix:ai/openai-completions/request/request-tool-choice":                 true,
+		"matrix:ai/openai-completions/request/request-tools":                       true,
+		"matrix:ai/openai-completions/tool/tool-call-arguments":                    true,
+		"matrix:ai/openai-completions/tool/tool-call-id":                           true,
+		"matrix:ai/openai-completions/tool/tool-call-name":                         true,
+		"matrix:ai/openai-completions/tool/tool-call-type":                         true,
 	}
 	for _, entry := range entries {
 		if entry.Matrix == nil || entry.Matrix.API != "openai-completions" {
@@ -830,6 +841,16 @@ func TestOpenAICompletionsMatrixTracksVerifiedTextSlice(t *testing.T) {
 		if verifiedFixtureIDs[entry.ID] {
 			if entry.Status != catalog.StatusVerified || len(entry.Evidence) == 0 {
 				t.Errorf("fixture-backed matrix row %s = status %q, evidence %d", entry.ID, entry.Status, len(entry.Evidence))
+			}
+			continue
+		}
+		if toolFixtureIDs[entry.ID] {
+			if toolFixturePartialIDs[entry.ID] {
+				if entry.Status != catalog.StatusPartial || entry.Partial == nil || len(entry.Evidence) == 0 {
+					t.Errorf("partial tool fixture row %s = status %q, evidence %d", entry.ID, entry.Status, len(entry.Evidence))
+				}
+			} else if entry.Status != catalog.StatusVerified || len(entry.Evidence) == 0 {
+				t.Errorf("verified tool fixture row %s = status %q, evidence %d", entry.ID, entry.Status, len(entry.Evidence))
 			}
 			continue
 		}

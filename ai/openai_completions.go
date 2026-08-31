@@ -46,7 +46,28 @@ type openAICompletionChoice struct {
 }
 
 type openAICompletionDelta struct {
-	Content *string `json:"content"`
+	Content   *string                        `json:"content"`
+	ToolCalls []openAIStreamingToolCallDelta `json:"tool_calls"`
+}
+
+type openAIStreamingToolCallDelta struct {
+	Index    *int                          `json:"index"`
+	ID       string                        `json:"id"`
+	Function *openAIStreamingFunctionDelta `json:"function"`
+}
+
+type openAIStreamingFunctionDelta struct {
+	Name      *string                `json:"name"`
+	Arguments *openAIStreamingString `json:"arguments"`
+}
+
+type openAIStreamingString struct{ value string }
+
+type openAIToolCallState struct {
+	contentIndex int
+	call         ToolCall
+	rawArguments string
+	streamIndex  *int
 }
 
 type openAICompletionUsage struct {
@@ -256,6 +277,16 @@ func executeOpenAICompletions(ctx context.Context, stream *AssistantMessageEvent
 	if options.Temperature != nil {
 		payload["temperature"] = *options.Temperature
 	}
+	if len(input.Tools) > 0 {
+		tools, err := convertOpenAIFunctionTools(input.Tools)
+		if err != nil {
+			return err
+		}
+		payload["tools"] = tools
+	}
+	if !isNilRuntimeValue(options.ToolChoice) {
+		payload["tool_choice"] = options.ToolChoice
+	}
 	if options.OnPayload != nil {
 		result, hookErr := options.OnPayload(ctx, payload, model)
 		if hookErr != nil {
@@ -274,6 +305,26 @@ func executeOpenAICompletions(ctx context.Context, stream *AssistantMessageEvent
 		return err
 	}
 	return sendOpenAICompletions(ctx, stream, model, options, apiKey, compat, encoded, output)
+}
+
+func convertOpenAIFunctionTools(tools []Tool) ([]any, error) {
+	converted := make([]any, len(tools))
+	for i, tool := range tools {
+		if tool.ConstrainedSampling != nil {
+			return nil, newNotImplemented("OpenAICompletions.Tool.ConstrainedSampling")
+		}
+		if err := validateJSONSchemaRoot(tool.Parameters); err != nil {
+			return nil, newCodecError("tool parameters", "", err)
+		}
+		converted[i] = map[string]any{
+			"type": "function",
+			"function": map[string]any{
+				"name": tool.Name, "description": tool.Description,
+				"parameters": append(json.RawMessage(nil), tool.Parameters...), "strict": false,
+			},
+		}
+	}
+	return converted, nil
 }
 
 func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStream, model Model, options OpenAICompletionsOptions, apiKey string, compat openAICompletionsCompat, payload []byte, output *AssistantMessage) error {
@@ -304,6 +355,9 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	hasFinishReason := false
 	sawFrame := false
 	textIndex := -1
+	toolCallsByIndex := map[int]*openAIToolCallState{}
+	toolCallsByID := map[string]*openAIToolCallState{}
+	var toolCalls []*openAIToolCallState
 	err = consumeOpenAISSE(body, func(data string) (bool, error) {
 		sawFrame = true
 		if strings.HasPrefix(data, "[DONE]") {
@@ -358,6 +412,14 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 				Type: AssistantMessageEventTypeTextDelta, ContentIndex: textIndex, Delta: *choice.Delta.Content, Partial: *output,
 			})
 		}
+		if choice.Delta != nil {
+			for _, delta := range choice.Delta.ToolCalls {
+				state, created := applyOpenAIToolCallDelta(stream, output, delta, toolCallsByIndex, toolCallsByID)
+				if created {
+					toolCalls = append(toolCalls, state)
+				}
+			}
+		}
 		return false, nil
 	})
 	if ctx.Err() != nil {
@@ -380,8 +442,26 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 		text := output.Content[textIndex].(TextContent).Text
 		stream.Push(AssistantMessageTextEndEvent{Type: AssistantMessageEventTypeTextEnd, ContentIndex: textIndex, Content: text, Partial: *output})
 	}
+	finalArguments := make([]map[string]any, len(toolCalls))
+	for i, state := range toolCalls {
+		arguments := map[string]any{}
+		if err := json.Unmarshal([]byte(state.rawArguments), &arguments); err != nil {
+			return fmt.Errorf("parse tool call %q arguments: %w", state.call.Name, err)
+		}
+		finalArguments[i] = arguments
+	}
+	for i, state := range toolCalls {
+		state.call.Arguments = finalArguments[i]
+		output.Content[state.contentIndex] = state.call
+		stream.Push(AssistantMessageToolCallEndEvent{
+			Type: AssistantMessageEventTypeToolCallEnd, ContentIndex: state.contentIndex, ToolCall: state.call, Partial: *output,
+		})
+	}
 	if !hasFinishReason && !compat.supportsFinishReason {
 		output.StopReason = StopReasonStop
+		if len(toolCalls) > 0 {
+			output.StopReason = StopReasonToolUse
+		}
 	}
 	if output.StopReason == StopReasonError {
 		if message, ok := output.ErrorMessage.Value(); ok {
@@ -394,6 +474,64 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	}
 	stream.Push(AssistantMessageDoneEvent{Type: AssistantMessageEventTypeDone, Reason: output.StopReason, Message: *output})
 	return nil
+}
+
+func applyOpenAIToolCallDelta(
+	stream *AssistantMessageEventStream,
+	output *AssistantMessage,
+	delta openAIStreamingToolCallDelta,
+	byIndex map[int]*openAIToolCallState,
+	byID map[string]*openAIToolCallState,
+) (*openAIToolCallState, bool) {
+	var state *openAIToolCallState
+	if delta.Index != nil {
+		state = byIndex[*delta.Index]
+	}
+	if state == nil && delta.ID != "" {
+		state = byID[delta.ID]
+	}
+	name := ""
+	if delta.Function != nil && delta.Function.Name != nil {
+		name = *delta.Function.Name
+	}
+	created := state == nil
+	if state == nil {
+		state = &openAIToolCallState{
+			contentIndex: len(output.Content),
+			call:         ToolCall{Type: ContentTypeToolCall, ID: delta.ID, Name: name, Arguments: map[string]any{}},
+		}
+		output.Content = append(output.Content, state.call)
+		stream.Push(AssistantMessageToolCallStartEvent{
+			Type: AssistantMessageEventTypeToolCallStart, ContentIndex: state.contentIndex, Partial: *output,
+		})
+	}
+	if delta.Index != nil && state.streamIndex == nil {
+		index := *delta.Index
+		state.streamIndex = &index
+		byIndex[index] = state
+	}
+	if delta.ID != "" {
+		byID[delta.ID] = state
+		if state.call.ID == "" {
+			state.call.ID = delta.ID
+		}
+	}
+	if state.call.Name == "" && name != "" {
+		state.call.Name = name
+	}
+	fragment := ""
+	if delta.Function != nil && delta.Function.Arguments != nil {
+		fragment = delta.Function.Arguments.value
+		if fragment != "" {
+			state.rawArguments += encodeOpenAIArgumentFragment(fragment)
+			state.call.Arguments = parseOpenAIPartialObject(state.rawArguments)
+		}
+	}
+	output.Content[state.contentIndex] = state.call
+	stream.Push(AssistantMessageToolCallDeltaEvent{
+		Type: AssistantMessageEventTypeToolCallDelta, ContentIndex: state.contentIndex, Delta: fragment, Partial: *output,
+	})
+	return state, created
 }
 
 type openAIProviderError struct {
@@ -768,14 +906,8 @@ func validateOpenAICompletionsM1(model Model, input Context, options OpenAICompl
 	if model.Reasoning || options.ReasoningEffort != nil || options.ThinkingBudgets != nil {
 		return newNotImplemented("OpenAICompletions.Reasoning")
 	}
-	if !isNilRuntimeValue(options.ToolChoice) {
-		return newNotImplemented("OpenAICompletions.ToolChoice")
-	}
 	if model.SamplingParams != nil || options.SamplingParams != nil || options.CacheRetention != nil || options.SessionID != nil || options.Env != nil {
 		return newNotImplemented("OpenAICompletions.AdvancedOptions")
-	}
-	if len(input.Tools) > 0 {
-		return newNotImplemented("OpenAICompletions.Tools")
 	}
 	if openAIRequiresProviderCompat(model) {
 		return newNotImplemented("OpenAICompletions.Compat.ProviderDetection")

@@ -34,6 +34,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+## partial-json
+
+- Source: https://github.com/promplate/partial-json-parser-js
+- Version: 0.1.7
+- License: MIT
+
+Pig's streaming JSON parser follows the partial-json parsing behavior. The
+retained license text is in `THIRD_PARTY_LICENSES/partial-json-MIT.txt`.
+
 ## models.dev
 
 - Source: https://github.com/anomalyco/models.dev

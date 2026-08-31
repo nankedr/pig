@@ -18,6 +18,8 @@ import (
 	"sync/atomic"
 	"testing"
 	"time"
+	"unicode/utf16"
+	"unicode/utf8"
 
 	"github.com/nankedr/pig/ai"
 )
@@ -132,6 +134,353 @@ func TestOpenAICompletionsTextStreamUsesPublicRequestAndEventSeams(t *testing.T)
 	}
 	if !reflect.DeepEqual(requestBody, fixture.Actual.Request.Body) {
 		t.Fatalf("request body = %#v, want pinned Pi %#v", requestBody, fixture.Actual.Request.Body)
+	}
+}
+
+func TestOpenAICompletionsFunctionToolsAndChoiceEnterRequest(t *testing.T) {
+	var requestBody map[string]any
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			t.Errorf("decode request: %v", err)
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		_, _ = io.WriteString(w, "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n")
+	}))
+	defer server.Close()
+
+	key := "test-key"
+	stream := ai.StreamOpenAICompletions(context.Background(), openAITextModel(server.URL), ai.Context{
+		Messages: []ai.Message{ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("Read README.md"), Timestamp: 1}},
+		Tools: []ai.Tool{{
+			Name: "read", Description: "Read a file",
+			Parameters: json.RawMessage(`{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}`),
+		}},
+	}, ai.OpenAICompletionsOptions{
+		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{APIKey: &key}},
+		ToolChoice:    ai.OpenAIChatToolChoiceRequired,
+	})
+	if result, err := stream.Result(context.Background()); err != nil || result.StopReason != ai.StopReasonStop {
+		t.Fatalf("Result() = (%#v, %v)", result, err)
+	}
+
+	wantTools := []any{map[string]any{
+		"type": "function",
+		"function": map[string]any{
+			"name": "read", "description": "Read a file", "strict": false,
+			"parameters": map[string]any{
+				"type": "object", "properties": map[string]any{"path": map[string]any{"type": "string"}}, "required": []any{"path"},
+			},
+		},
+	}}
+	if !reflect.DeepEqual(requestBody["tools"], wantTools) {
+		t.Fatalf("tools = %#v, want %#v", requestBody["tools"], wantTools)
+	}
+	if requestBody["tool_choice"] != "required" {
+		t.Fatalf("tool_choice = %#v, want required", requestBody["tool_choice"])
+	}
+}
+
+func TestOpenAICompletionsInterleavesToolCallsWithImmutablePartialArguments(t *testing.T) {
+	sse := "data: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[" +
+		"{\"index\":0,\"id\":\"call-read\",\"type\":\"function\",\"function\":{\"name\":\"read\",\"arguments\":\"{\\\"path\\\":\\\"READ\"}}," +
+		"{\"id\":\"call-write\",\"type\":\"function\",\"function\":{\"name\":\"write\",\"arguments\":\"{\\\"path\\\":\\\"out\"}}]}}]}\n\n" +
+		"data: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[" +
+		"{\"id\":\"call-write\",\"function\":{\"arguments\":\".txt\\\",\\\"content\\\":\\\"ok\\\"}\"}}," +
+		"{\"index\":0,\"id\":\"changed-read\",\"function\":{\"arguments\":\"ME.md\\\"}\"}}]},\"finish_reason\":\"tool_calls\"}]}\n\n" +
+		"data: [DONE]\n\n"
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "text/event-stream")
+		flusher, _ := w.(http.Flusher)
+		for _, fragment := range strings.SplitAfter(sse, "\n\n") {
+			_, _ = io.WriteString(w, fragment)
+			flusher.Flush()
+		}
+	}))
+	defer server.Close()
+
+	key := "test-key"
+	stream := ai.StreamOpenAICompletions(context.Background(), openAITextModel(server.URL), ai.Context{}, ai.OpenAICompletionsOptions{
+		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{APIKey: &key}},
+	})
+	events := collectAssistantEvents(t, stream)
+	wantTypes := []ai.AssistantMessageEventType{
+		ai.AssistantMessageEventTypeStart,
+		ai.AssistantMessageEventTypeToolCallStart, ai.AssistantMessageEventTypeToolCallDelta,
+		ai.AssistantMessageEventTypeToolCallStart, ai.AssistantMessageEventTypeToolCallDelta,
+		ai.AssistantMessageEventTypeToolCallDelta, ai.AssistantMessageEventTypeToolCallDelta,
+		ai.AssistantMessageEventTypeToolCallEnd, ai.AssistantMessageEventTypeToolCallEnd,
+		ai.AssistantMessageEventTypeDone,
+	}
+	if got := eventTypes(events); !reflect.DeepEqual(got, wantTypes) {
+		t.Fatalf("event types = %#v, want %#v", got, wantTypes)
+	}
+	wantIndexes := []int{0, 0, 1, 1, 1, 0, 0, 1}
+	var gotIndexes []int
+	for _, event := range events {
+		switch event := event.(type) {
+		case ai.AssistantMessageToolCallStartEvent:
+			gotIndexes = append(gotIndexes, event.ContentIndex)
+		case ai.AssistantMessageToolCallDeltaEvent:
+			gotIndexes = append(gotIndexes, event.ContentIndex)
+		case ai.AssistantMessageToolCallEndEvent:
+			gotIndexes = append(gotIndexes, event.ContentIndex)
+		}
+	}
+	if !reflect.DeepEqual(gotIndexes, wantIndexes) {
+		t.Fatalf("tool content indexes = %#v, want %#v", gotIndexes, wantIndexes)
+	}
+	firstRead := events[2].(ai.AssistantMessageToolCallDeltaEvent)
+	if got := firstRead.Partial.Content[0].(ai.ToolCall).Arguments["path"]; got != "READ" {
+		t.Fatalf("first read partial path = %#v, want READ", got)
+	}
+	firstRead.Partial.Content[0].(ai.ToolCall).Arguments["path"] = "mutated"
+	lastRead := events[6].(ai.AssistantMessageToolCallDeltaEvent)
+	if got := lastRead.Partial.Content[0].(ai.ToolCall).Arguments["path"]; got != "README.md" {
+		t.Fatalf("last immutable read partial path = %#v, want README.md", got)
+	}
+
+	result, err := stream.Result(context.Background())
+	if err != nil || result.StopReason != ai.StopReasonToolUse || len(result.Content) != 2 {
+		t.Fatalf("Result() = (%#v, %v)", result, err)
+	}
+	read := result.Content[0].(ai.ToolCall)
+	write := result.Content[1].(ai.ToolCall)
+	if read.ID != "call-read" || read.Name != "read" || !reflect.DeepEqual(read.Arguments, map[string]any{"path": "README.md"}) {
+		t.Fatalf("read tool call = %#v", read)
+	}
+	if write.ID != "call-write" || write.Name != "write" || !reflect.DeepEqual(write.Arguments, map[string]any{"path": "out.txt", "content": "ok"}) {
+		t.Fatalf("write tool call = %#v", write)
+	}
+}
+
+func TestOpenAICompletionsEveryToolArgumentPrefixMatchesPi(t *testing.T) {
+	fixture := loadOpenAICompletionsToolsFixture(t)
+	var requestBody map[string]any
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
+			t.Errorf("decode request: %v", err)
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		flusher, _ := w.(http.Flusher)
+		for _, frame := range strings.SplitAfter(fixture.Input.SSE, "\n\n") {
+			_, _ = io.WriteString(w, frame)
+			flusher.Flush()
+		}
+	}))
+	defer server.Close()
+
+	key := "test-key"
+	model := openAITextModel(server.URL)
+	model.ID = "tool-model"
+	model.Cost = ai.ModelCost{}
+	tools := []ai.Tool{
+		{
+			Name: "read", Description: "Read a file",
+			Parameters: json.RawMessage(`{"type":"object","properties":{"path":{"type":"string"},"query":{"type":"string"}},"required":["path"]}`),
+		},
+		{
+			Name: "write", Description: "Write a file",
+			Parameters: json.RawMessage(`{"type":"object","properties":{"path":{"type":"string"},"content":{"type":"string"}},"required":["path","content"]}`),
+		},
+	}
+	stream := ai.StreamOpenAICompletions(context.Background(), model, ai.Context{
+		Messages: []ai.Message{ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("Use tools"), Timestamp: 1}},
+		Tools:    tools,
+	}, ai.OpenAICompletionsOptions{
+		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{APIKey: &key}},
+		ToolChoice:    ai.OpenAIChatToolChoiceRequired,
+	})
+	events := collectAssistantEvents(t, stream)
+	if len(events) != len(fixture.Actual.Events) {
+		t.Fatalf("event count = %d, want Pi %d", len(events), len(fixture.Actual.Events))
+	}
+	for i, event := range events {
+		got := projectOpenAIToolEvent(t, event)
+		if !reflect.DeepEqual(got, fixture.Actual.Events[i]) {
+			t.Fatalf("event %d = %#v, want Pi %#v", i, got, fixture.Actual.Events[i])
+		}
+	}
+	result, err := stream.Result(context.Background())
+	if err != nil {
+		t.Fatalf("Result() error = %v", err)
+	}
+	if got := normalizedOpenAIJSON(t, result); !reflect.DeepEqual(got, fixture.Actual.Outcome) {
+		t.Fatalf("outcome = %#v, want Pi %#v", got, fixture.Actual.Outcome)
+	}
+	repeated, err := stream.Result(context.Background())
+	if err != nil || !reflect.DeepEqual(normalizedOpenAIJSON(t, repeated), fixture.Actual.Outcome) {
+		t.Fatalf("repeated Result() = (%#v, %v), want stable Pi outcome", repeated, err)
+	}
+	if !reflect.DeepEqual(requestBody, fixture.Actual.Request.Body) {
+		t.Fatalf("request body = %#v, want Pi %#v", requestBody, fixture.Actual.Request.Body)
+	}
+	readDeltas := 0
+	var surrogateDeltas [][]byte
+	for _, event := range fixture.Actual.Events {
+		if event["type"] == "toolcall_delta" && event["contentIndex"] == float64(0) {
+			readDeltas++
+		}
+	}
+	for _, event := range events {
+		if delta, ok := event.(ai.AssistantMessageToolCallDeltaEvent); ok && !utf8.ValidString(delta.Delta) {
+			surrogateDeltas = append(surrogateDeltas, []byte(delta.Delta))
+			if len(surrogateDeltas) == 1 {
+				native := delta.Partial.Content[delta.ContentIndex].(ai.ToolCall).Arguments["native"]
+				if got, ok := native.(string); !ok || !bytes.Equal([]byte(got), append([]byte("原生"), 0xed, 0xa0, 0xbd)) {
+					t.Fatalf("high-surrogate partial native = %#v, want Pi UTF-16 prefix", native)
+				}
+			}
+		}
+	}
+	if !reflect.DeepEqual(surrogateDeltas, [][]byte{{0xed, 0xa0, 0xbd}, {0xed, 0xb8, 0x80}}) {
+		t.Fatalf("surrogate deltas = %#v, want original UTF-16 pair", surrogateDeltas)
+	}
+	wantReadDeltas := len(utf16.Encode([]rune(fixture.Input.Arguments.Read))) + 3
+	if readDeltas != wantReadDeltas {
+		t.Fatalf("read delta prefixes = %d, want %d", readDeltas, wantReadDeltas)
+	}
+}
+
+func TestOpenAICompletionsInvalidToolArgumentsHaveExplicitErrorOutcome(t *testing.T) {
+	for _, test := range []struct {
+		name, arguments string
+		wantPartial     map[string]any
+	}{
+		{name: "truncated", arguments: `{"path":"README`, wantPartial: map[string]any{"path": "README"}},
+		{name: "malformed", arguments: `{"path":}`, wantPartial: map[string]any{}},
+		{name: "repaired invalid escape", arguments: `{"path":"bad\q"}`, wantPartial: map[string]any{"path": `bad\q`}},
+		{name: "repaired control character", arguments: "{\"path\":\"line\nnext\"}", wantPartial: map[string]any{"path": "line\nnext"}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			chunk, err := json.Marshal(map[string]any{
+				"id": "chatcmpl-invalid-tool",
+				"choices": []any{map[string]any{
+					"delta": map[string]any{"tool_calls": []any{map[string]any{
+						"index": 0, "id": "call-read", "type": "function",
+						"function": map[string]any{"name": "read", "arguments": test.arguments},
+					}}},
+					"finish_reason": "tool_calls",
+				}},
+			})
+			if err != nil {
+				t.Fatalf("marshal chunk: %v", err)
+			}
+			stream := openAIStreamFromReader(strings.NewReader("data: " + string(chunk) + "\n\ndata: [DONE]\n\n"))
+			events := collectAssistantEvents(t, stream)
+			wantTypes := []ai.AssistantMessageEventType{
+				ai.AssistantMessageEventTypeStart,
+				ai.AssistantMessageEventTypeToolCallStart,
+				ai.AssistantMessageEventTypeToolCallDelta,
+				ai.AssistantMessageEventTypeError,
+			}
+			if got := eventTypes(events); !reflect.DeepEqual(got, wantTypes) {
+				t.Fatalf("event types = %#v, want %#v", got, wantTypes)
+			}
+			result, err := stream.Result(context.Background())
+			if err != nil || result.StopReason != ai.StopReasonError || len(result.Content) != 1 {
+				t.Fatalf("Result() = (%#v, %v)", result, err)
+			}
+			call := result.Content[0].(ai.ToolCall)
+			if call.ID != "call-read" || call.Name != "read" || !reflect.DeepEqual(call.Arguments, test.wantPartial) {
+				t.Fatalf("partial tool call = %#v, want arguments %#v", call, test.wantPartial)
+			}
+			message, ok := result.ErrorMessage.Value()
+			if !ok || !strings.Contains(message, `parse tool call "read" arguments`) {
+				t.Fatalf("error message = %#v", result.ErrorMessage)
+			}
+		})
+	}
+}
+
+func TestOpenAICompletionsInvalidLaterToolCallEmitsNoToolEnd(t *testing.T) {
+	chunk, err := json.Marshal(map[string]any{
+		"choices": []any{map[string]any{
+			"delta": map[string]any{"tool_calls": []any{
+				map[string]any{"index": 0, "id": "valid", "function": map[string]any{"name": "read", "arguments": `{"path":"README.md"}`}},
+				map[string]any{"index": 1, "id": "invalid", "function": map[string]any{"name": "write", "arguments": `{"path":"out.txt"`}},
+			}},
+			"finish_reason": "tool_calls",
+		}},
+	})
+	if err != nil {
+		t.Fatalf("marshal chunk: %v", err)
+	}
+	events := collectAssistantEvents(t, openAIStreamFromReader(strings.NewReader("data: "+string(chunk)+"\n\ndata: [DONE]\n\n")))
+	want := []ai.AssistantMessageEventType{
+		ai.AssistantMessageEventTypeStart,
+		ai.AssistantMessageEventTypeToolCallStart, ai.AssistantMessageEventTypeToolCallDelta,
+		ai.AssistantMessageEventTypeToolCallStart, ai.AssistantMessageEventTypeToolCallDelta,
+		ai.AssistantMessageEventTypeError,
+	}
+	if got := eventTypes(events); !reflect.DeepEqual(got, want) {
+		t.Fatalf("event types = %#v, want atomic terminal %#v", got, want)
+	}
+}
+
+func TestOpenAICompletionsToolCallKeepsFirstIndexBinding(t *testing.T) {
+	chunks := []map[string]any{
+		{"choices": []any{
+			map[string]any{"delta": map[string]any{"tool_calls": []any{
+				map[string]any{"index": 0, "id": "call-a", "function": map[string]any{"name": "a", "arguments": `{"a":`}},
+			}}},
+		}},
+		{"choices": []any{
+			map[string]any{"delta": map[string]any{"tool_calls": []any{
+				map[string]any{"index": 1, "id": "call-a", "function": map[string]any{"arguments": `1}`}},
+			}}},
+		}},
+		{"choices": []any{
+			map[string]any{
+				"delta": map[string]any{"tool_calls": []any{
+					map[string]any{"index": 1, "id": "call-b", "function": map[string]any{"name": "b", "arguments": `{"b":2}`}},
+				}},
+				"finish_reason": "tool_calls",
+			},
+		}},
+	}
+	var sse strings.Builder
+	for _, chunk := range chunks {
+		encoded, err := json.Marshal(chunk)
+		if err != nil {
+			t.Fatalf("marshal chunk: %v", err)
+		}
+		sse.WriteString("data: " + string(encoded) + "\n\n")
+	}
+	sse.WriteString("data: [DONE]\n\n")
+	stream := openAIStreamFromReader(strings.NewReader(sse.String()))
+	events := collectAssistantEvents(t, stream)
+	result, err := stream.Result(context.Background())
+	if err != nil || result.StopReason != ai.StopReasonToolUse || len(result.Content) != 2 {
+		t.Fatalf("Result() = (%#v, %v), event types %#v", result, err, eventTypes(events))
+	}
+	if got := result.Content[0].(ai.ToolCall).Arguments; !reflect.DeepEqual(got, map[string]any{"a": float64(1)}) {
+		t.Fatalf("first arguments = %#v", got)
+	}
+	if got := result.Content[1].(ai.ToolCall).Arguments; !reflect.DeepEqual(got, map[string]any{"b": float64(2)}) {
+		t.Fatalf("second arguments = %#v", got)
+	}
+}
+
+func TestOpenAICompletionsMissingFinishReasonInfersToolUse(t *testing.T) {
+	model := openAISSEModel("https://example.test/v1")
+	model.Compat = ai.Some(json.RawMessage(`{"supportsFinishReason":false}`))
+	key := "test-key"
+	stream := ai.StreamOpenAICompletions(context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{
+		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{
+			APIKey: &key,
+			Fetch: func(context.Context, ai.FetchRequest) (ai.FetchResponse, error) {
+				body := "data: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"call-a\",\"function\":{\"name\":\"a\",\"arguments\":\"{}\"}}]}}]}\n\ndata: [DONE]\n\n"
+				return ai.FetchResponse{Status: http.StatusOK, BodyReader: io.NopCloser(strings.NewReader(body))}, nil
+			},
+		}},
+	})
+	events := collectAssistantEvents(t, stream)
+	result, err := stream.Result(context.Background())
+	if err != nil || result.StopReason != ai.StopReasonToolUse {
+		t.Fatalf("Result() = (%#v, %v), event types %#v", result, err, eventTypes(events))
+	}
+	if done := events[len(events)-1].(ai.AssistantMessageDoneEvent); done.Reason != ai.StopReasonToolUse {
+		t.Fatalf("done reason = %q, want toolUse", done.Reason)
 	}
 }
 
@@ -695,6 +1044,57 @@ func eventTypes(events []ai.AssistantMessageEvent) []ai.AssistantMessageEventTyp
 	return types
 }
 
+func projectOpenAIToolEvent(t *testing.T, event ai.AssistantMessageEvent) map[string]any {
+	t.Helper()
+	projected := map[string]any{"type": string(event.AssistantMessageEventType())}
+	var contentIndex int
+	var partial ai.AssistantMessage
+	switch event := event.(type) {
+	case ai.AssistantMessageToolCallStartEvent:
+		contentIndex, partial = event.ContentIndex, event.Partial
+	case ai.AssistantMessageToolCallDeltaEvent:
+		contentIndex, partial = event.ContentIndex, event.Partial
+		projected["delta"] = strings.ToValidUTF8(event.Delta, "�")
+	case ai.AssistantMessageToolCallEndEvent:
+		contentIndex, partial = event.ContentIndex, event.Partial
+		projected["toolCall"] = normalizedOpenAIJSON(t, event.ToolCall)
+	case ai.AssistantMessageDoneEvent:
+		projected["reason"] = string(event.Reason)
+		return projected
+	default:
+		return projected
+	}
+	projected["contentIndex"] = float64(contentIndex)
+	arguments := partial.Content[contentIndex].(ai.ToolCall).Arguments
+	normalizedArguments := normalizedOpenAIJSON(t, arguments).(map[string]any)
+	if native, ok := arguments["native"].(string); ok {
+		normalizedArguments["native"] = strings.ToValidUTF8(native, "�")
+		projected["partialNativeCodeUnits"] = openAIUTF16CodeUnits(native)
+	}
+	projected["partialArguments"] = normalizedArguments
+	return projected
+}
+
+func openAIUTF16CodeUnits(value string) []any {
+	units := make([]any, 0, len(value))
+	for i := 0; i < len(value); {
+		if i+2 < len(value) && value[i] == 0xed && value[i+1]&0xe0 == 0xa0 && value[i+2]&0xc0 == 0x80 {
+			unit := uint16(value[i]&0x0f)<<12 | uint16(value[i+1]&0x3f)<<6 | uint16(value[i+2]&0x3f)
+			if unit >= 0xd800 && unit <= 0xdfff {
+				units = append(units, float64(unit))
+				i += 3
+				continue
+			}
+		}
+		r, size := utf8.DecodeRuneInString(value[i:])
+		for _, unit := range utf16.Encode([]rune{r}) {
+			units = append(units, float64(unit))
+		}
+		i += size
+	}
+	return units
+}
+
 func assertOpenAITextResult(t *testing.T, result ai.AssistantMessage) {
 	t.Helper()
 	if result.StopReason != ai.StopReasonStop || result.API != ai.APIOpenAICompletions || result.ResponseID != ai.Some("chatcmpl-44") || result.ResponseModel != ai.Some("reply-model") {
@@ -774,6 +1174,26 @@ type openAICompletionsSSEFixture struct {
 		PrematureClose     openAICompletionsSSEObservation `json:"premature_close"`
 		Cancel             openAICompletionsSSEObservation `json:"cancel"`
 		Timeout            openAICompletionsSSEObservation `json:"timeout"`
+	} `json:"actual"`
+}
+
+type openAICompletionsToolsFixture struct {
+	ID             string `json:"id"`
+	BaselineCommit string `json:"baseline_commit"`
+	Deterministic  bool   `json:"deterministic"`
+	Input          struct {
+		SSE       string `json:"sse"`
+		Arguments struct {
+			Read  string `json:"read"`
+			Write string `json:"write"`
+		} `json:"arguments"`
+	} `json:"input"`
+	Actual struct {
+		Request struct {
+			Body map[string]any `json:"body"`
+		} `json:"request"`
+		Events  []map[string]any `json:"events"`
+		Outcome map[string]any   `json:"outcome"`
 	} `json:"actual"`
 }
 
@@ -862,6 +1282,26 @@ func loadOpenAICompletionsSSEFixture(t *testing.T) openAICompletionsSSEFixture {
 	}
 	if fixture.ID != "ai/openai-completions/m1-sse-boundaries" || fixture.BaselineCommit != "936aff00918de1187f085f123c2812d8f2d67745" || !fixture.Deterministic || len(fixture.CatalogIDs) == 0 {
 		t.Fatalf("SSE fixture provenance = %#v", fixture)
+	}
+	return fixture
+}
+
+func loadOpenAICompletionsToolsFixture(t *testing.T) openAICompletionsToolsFixture {
+	t.Helper()
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("runtime.Caller failed")
+	}
+	data, err := os.ReadFile(filepath.Join(filepath.Dir(file), "..", "parity", "oracle", "fixtures", "openai-completions-tools.json"))
+	if err != nil {
+		t.Fatalf("read tools fixture: %v", err)
+	}
+	var fixture openAICompletionsToolsFixture
+	if err := json.Unmarshal(data, &fixture); err != nil {
+		t.Fatalf("decode tools fixture: %v", err)
+	}
+	if fixture.ID != "ai/openai-completions/m1-streaming-tools" || fixture.BaselineCommit != "936aff00918de1187f085f123c2812d8f2d67745" || !fixture.Deterministic {
+		t.Fatalf("tools fixture provenance = %#v", fixture)
 	}
 	return fixture
 }

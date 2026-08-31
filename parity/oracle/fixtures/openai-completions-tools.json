@@ -1,0 +1,2264 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ai/openai-completions/m1-streaming-tools",
+  "catalog_ids": [
+    "matrix:ai/openai-completions/content/assistant-message-content-tool-call",
+    "matrix:ai/openai-completions/delta/delta-tool-calls",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-cleanup-success",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-coalesce-id",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-coalesce-index",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-coalesce-interleaved",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-coalesce-late-index",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-coalesce-mutable-id",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-finalize-function",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-items-function",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-items-function-arguments",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-items-function-name",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-items-id",
+    "matrix:ai/openai-completions/delta/delta-tool-calls-items-index",
+    "matrix:ai/openai-completions/delta/partial-json-complete",
+    "matrix:ai/openai-completions/delta/partial-json-empty",
+    "matrix:ai/openai-completions/delta/partial-json-partial",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-delta",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-delta-content-index",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-delta-delta",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-delta-partial",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-delta-type",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-end",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-end-content-index",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-end-partial",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-end-tool-call",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-end-type",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-start",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-start-content-index",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-start-partial",
+    "matrix:ai/openai-completions/event/assistant-message-event-toolcall-start-type",
+    "matrix:ai/openai-completions/error/finish-tool-calls",
+    "matrix:ai/openai-completions/request/request-tool-choice",
+    "matrix:ai/openai-completions/request/request-tools",
+    "matrix:ai/openai-completions/tool/tool-call-arguments",
+    "matrix:ai/openai-completions/tool/tool-call-id",
+    "matrix:ai/openai-completions/tool/tool-call-name",
+    "matrix:ai/openai-completions/tool/tool-call-type"
+  ],
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "normalization": {
+    "unpaired_surrogates": "JSON strings use U+FFFD; partialNativeCodeUnits retains exact UTF-16 units"
+  },
+  "upstream": {
+    "module": "ai",
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/api/openai-completions.ts#stream"
+  },
+  "input": {
+    "arguments": {
+      "read": "{\"path\":\"docs/\\u76ee\\u5f55/README.md\",\"query\":\"line\\n\\\"quoted\\\"\\\\tail\",\"flags\":[true,false,null],\"nested\":{\"count\":12.5},\"native\":\"原生😀\"}",
+      "write": "{\"path\":\"out.txt\",\"content\":\"\\u4f60\\u597d\"}"
+    },
+    "context": {
+      "messages": [
+        {
+          "content": "Use tools",
+          "role": "user"
+        }
+      ],
+      "tools": [
+        {
+          "description": "Read a file",
+          "name": "read",
+          "parameters": {
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "query": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "type": "object"
+          }
+        },
+        {
+          "description": "Write a file",
+          "name": "write",
+          "parameters": {
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "content"
+            ],
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "model": {
+      "api": "openai-completions",
+      "baseUrl": "https://local.invalid/v1",
+      "contextWindow": 32000,
+      "cost": {
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "input": 0,
+        "output": 0
+      },
+      "id": "tool-model",
+      "input": [
+        "text"
+      ],
+      "maxTokens": 2048,
+      "name": "Tool Model",
+      "provider": "local-openai",
+      "reasoning": false
+    },
+    "options": {
+      "apiKey": "test-key",
+      "toolChoice": "required"
+    },
+    "sse": "data: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"call-read\",\"type\":\"function\",\"function\":{\"name\":\"read\",\"arguments\":\"\"}},{\"id\":\"call-write\",\"type\":\"function\",\"function\":{\"name\":\"write\",\"arguments\":\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"\",\"function\":{}},{\"index\":1,\"id\":\"call-write\"}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"name\":\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"changed-read\",\"function\":{\"arguments\":\"{\"}},{\"index\":1,\"function\":{\"arguments\":\"{\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"p\"}},{\"index\":1,\"function\":{\"arguments\":\"p\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"a\"}},{\"index\":1,\"function\":{\"arguments\":\"a\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"t\"}},{\"index\":1,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"h\"}},{\"index\":1,\"function\":{\"arguments\":\"h\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\":\"}},{\"index\":1,\"function\":{\"arguments\":\":\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"d\"}},{\"index\":1,\"function\":{\"arguments\":\"o\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"o\"}},{\"index\":1,\"function\":{\"arguments\":\"u\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"c\"}},{\"index\":1,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"s\"}},{\"index\":1,\"function\":{\"arguments\":\".\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"/\"}},{\"index\":1,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\\\"}},{\"index\":1,\"function\":{\"arguments\":\"x\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"u\"}},{\"index\":1,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"7\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"6\"}},{\"index\":1,\"function\":{\"arguments\":\",\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}},{\"index\":1,\"function\":{\"arguments\":\"c\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\\\"}},{\"index\":1,\"function\":{\"arguments\":\"o\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"u\"}},{\"index\":1,\"function\":{\"arguments\":\"n\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"5\"}},{\"index\":1,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"f\"}},{\"index\":1,\"function\":{\"arguments\":\"e\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"5\"}},{\"index\":1,\"function\":{\"arguments\":\"n\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"5\"}},{\"index\":1,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"/\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"R\"}},{\"index\":1,\"function\":{\"arguments\":\":\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"E\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"A\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\\\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"D\"}},{\"index\":1,\"function\":{\"arguments\":\"u\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"M\"}},{\"index\":1,\"function\":{\"arguments\":\"4\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"E\"}},{\"index\":1,\"function\":{\"arguments\":\"f\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\".\"}},{\"index\":1,\"function\":{\"arguments\":\"6\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"m\"}},{\"index\":1,\"function\":{\"arguments\":\"0\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"d\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\\\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}},{\"index\":1,\"function\":{\"arguments\":\"u\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\"}},{\"index\":1,\"function\":{\"arguments\":\"5\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}},{\"index\":1,\"function\":{\"arguments\":\"9\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"q\"}},{\"index\":1,\"function\":{\"arguments\":\"7\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"u\"}},{\"index\":1,\"function\":{\"arguments\":\"d\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}},{\"index\":1,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"r\"}},{\"index\":1,\"function\":{\"arguments\":\"}\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"y\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\":\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"l\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"i\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"n\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\\\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"n\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\\\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"q\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"u\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"o\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"d\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\\\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\\\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\\\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"a\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"i\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"l\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"f\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"l\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"a\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"g\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"s\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\":\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"[\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"r\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"u\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"f\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"a\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"l\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"s\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"n\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"u\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"l\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"l\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"]\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"n\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"s\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"d\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\":\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"{\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"c\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"o\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"u\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"n\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\":\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"1\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"2\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\".\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"5\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"}\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\",\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"n\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"a\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"t\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"i\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"v\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"e\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\":\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"原\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"生\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\ud83d\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\ude00\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"\\\"\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"}\"}}]},\"finish_reason\":null}]}\n\ndata: {\"id\":\"chatcmpl-tools\",\"choices\":[{\"delta\":{\"tool_calls\":[]},\"finish_reason\":\"tool_calls\"}]}\n\ndata: [DONE]\n\n"
+  },
+  "input_sha256": "e57bad6815bd4f13497208ce5d44c4374c251b74a920848005fe4dde7ef5cd68",
+  "actual": {
+    "events": [
+      {
+        "type": "start"
+      },
+      {
+        "contentIndex": 0,
+        "partialArguments": {},
+        "type": "toolcall_start"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "partialArguments": {},
+        "type": "toolcall_start"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "{",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "{",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\"",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "p",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "p",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "a",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "a",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "t",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "t",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "h",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "h",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\"",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ":",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": ":",
+        "partialArguments": {},
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": ""
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\"",
+        "partialArguments": {
+          "path": ""
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "d",
+        "partialArguments": {
+          "path": "d"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "o",
+        "partialArguments": {
+          "path": "o"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "o",
+        "partialArguments": {
+          "path": "do"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "u",
+        "partialArguments": {
+          "path": "ou"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "c",
+        "partialArguments": {
+          "path": "doc"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "t",
+        "partialArguments": {
+          "path": "out"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "s",
+        "partialArguments": {
+          "path": "docs"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": ".",
+        "partialArguments": {
+          "path": "out."
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "/",
+        "partialArguments": {
+          "path": "docs/"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "t",
+        "partialArguments": {
+          "path": "out.t"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\\",
+        "partialArguments": {
+          "path": "docs/"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "x",
+        "partialArguments": {
+          "path": "out.tx"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "u",
+        "partialArguments": {
+          "path": "docs/"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "t",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "7",
+        "partialArguments": {
+          "path": "docs/"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "6",
+        "partialArguments": {
+          "path": "docs/"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": ",",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "path": "docs/"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "path": "docs/目"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "c",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\\",
+        "partialArguments": {
+          "path": "docs/目"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "o",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "u",
+        "partialArguments": {
+          "path": "docs/目"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "n",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "5",
+        "partialArguments": {
+          "path": "docs/目"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "t",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "f",
+        "partialArguments": {
+          "path": "docs/目"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "e",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "5",
+        "partialArguments": {
+          "path": "docs/目"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "n",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "5",
+        "partialArguments": {
+          "path": "docs/目录"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "t",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "/",
+        "partialArguments": {
+          "path": "docs/目录/"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "R",
+        "partialArguments": {
+          "path": "docs/目录/R"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": ":",
+        "partialArguments": {
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "E",
+        "partialArguments": {
+          "path": "docs/目录/RE"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\"",
+        "partialArguments": {
+          "content": "",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "A",
+        "partialArguments": {
+          "path": "docs/目录/REA"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\\",
+        "partialArguments": {
+          "content": "",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "D",
+        "partialArguments": {
+          "path": "docs/目录/READ"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "u",
+        "partialArguments": {
+          "content": "",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "M",
+        "partialArguments": {
+          "path": "docs/目录/READM"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "4",
+        "partialArguments": {
+          "content": "",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "E",
+        "partialArguments": {
+          "path": "docs/目录/README"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "f",
+        "partialArguments": {
+          "content": "",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ".",
+        "partialArguments": {
+          "path": "docs/目录/README."
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "6",
+        "partialArguments": {
+          "content": "",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "m",
+        "partialArguments": {
+          "path": "docs/目录/README.m"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "0",
+        "partialArguments": {
+          "content": "你",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "d",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\\",
+        "partialArguments": {
+          "content": "你",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "u",
+        "partialArguments": {
+          "content": "你",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ",",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "5",
+        "partialArguments": {
+          "content": "你",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "9",
+        "partialArguments": {
+          "content": "你",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "q",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "7",
+        "partialArguments": {
+          "content": "你",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "u",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "d",
+        "partialArguments": {
+          "content": "你好",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "\"",
+        "partialArguments": {
+          "content": "你好",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "r",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "}",
+        "partialArguments": {
+          "content": "你好",
+          "path": "out.txt"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "y",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ":",
+        "partialArguments": {
+          "path": "docs/目录/README.md"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": ""
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "l",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "l"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "i",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "li"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "n",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "lin"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\\",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "n",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\\",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\""
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "q",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"q"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "u",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"qu"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "o",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quo"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "t",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quot"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quote"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "d",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\\",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\""
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\\",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\""
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\\",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "t",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\t"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "a",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\ta"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "i",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tai"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "l",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ",",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "f",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "l",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "a",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "g",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "s",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ":",
+        "partialArguments": {
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "[",
+        "partialArguments": {
+          "flags": [],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "t",
+        "partialArguments": {
+          "flags": [
+            true
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "r",
+        "partialArguments": {
+          "flags": [
+            true
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "u",
+        "partialArguments": {
+          "flags": [
+            true
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "flags": [
+            true
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ",",
+        "partialArguments": {
+          "flags": [
+            true
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "f",
+        "partialArguments": {
+          "flags": [
+            true,
+            false
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "a",
+        "partialArguments": {
+          "flags": [
+            true,
+            false
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "l",
+        "partialArguments": {
+          "flags": [
+            true,
+            false
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "s",
+        "partialArguments": {
+          "flags": [
+            true,
+            false
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "flags": [
+            true,
+            false
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ",",
+        "partialArguments": {
+          "flags": [
+            true,
+            false
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "n",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "u",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "l",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "l",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "]",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ",",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "n",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "s",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "t",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "d",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ":",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "{",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "c",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "o",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "u",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "n",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "t",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ":",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "1",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 1
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "2",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ".",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {},
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "5",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "}",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ",",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "n",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "a",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "t",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "i",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "v",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "e",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": ":",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "native": "",
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "partialNativeCodeUnits": [],
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "原",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "native": "原",
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "partialNativeCodeUnits": [
+          21407
+        ],
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "生",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "native": "原生",
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "partialNativeCodeUnits": [
+          21407,
+          29983
+        ],
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "�",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "native": "原生�",
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "partialNativeCodeUnits": [
+          21407,
+          29983,
+          55357
+        ],
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "�",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "native": "原生😀",
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "partialNativeCodeUnits": [
+          21407,
+          29983,
+          55357,
+          56832
+        ],
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "\"",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "native": "原生😀",
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "partialNativeCodeUnits": [
+          21407,
+          29983,
+          55357,
+          56832
+        ],
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "}",
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "native": "原生😀",
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "partialNativeCodeUnits": [
+          21407,
+          29983,
+          55357,
+          56832
+        ],
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 0,
+        "partialArguments": {
+          "flags": [
+            true,
+            false,
+            null
+          ],
+          "native": "原生😀",
+          "nested": {
+            "count": 12.5
+          },
+          "path": "docs/目录/README.md",
+          "query": "line\n\"quoted\"\\tail"
+        },
+        "partialNativeCodeUnits": [
+          21407,
+          29983,
+          55357,
+          56832
+        ],
+        "toolCall": {
+          "arguments": {
+            "flags": [
+              true,
+              false,
+              null
+            ],
+            "native": "原生😀",
+            "nested": {
+              "count": 12.5
+            },
+            "path": "docs/目录/README.md",
+            "query": "line\n\"quoted\"\\tail"
+          },
+          "id": "call-read",
+          "name": "read",
+          "type": "toolCall"
+        },
+        "type": "toolcall_end"
+      },
+      {
+        "contentIndex": 1,
+        "partialArguments": {
+          "content": "你好",
+          "path": "out.txt"
+        },
+        "toolCall": {
+          "arguments": {
+            "content": "你好",
+            "path": "out.txt"
+          },
+          "id": "call-write",
+          "name": "write",
+          "type": "toolCall"
+        },
+        "type": "toolcall_end"
+      },
+      {
+        "reason": "toolUse",
+        "type": "done"
+      }
+    ],
+    "outcome": {
+      "api": "openai-completions",
+      "content": [
+        {
+          "arguments": {
+            "flags": [
+              true,
+              false,
+              null
+            ],
+            "native": "原生😀",
+            "nested": {
+              "count": 12.5
+            },
+            "path": "docs/目录/README.md",
+            "query": "line\n\"quoted\"\\tail"
+          },
+          "id": "call-read",
+          "name": "read",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "content": "你好",
+            "path": "out.txt"
+          },
+          "id": "call-write",
+          "name": "write",
+          "type": "toolCall"
+        }
+      ],
+      "model": "tool-model",
+      "provider": "local-openai",
+      "rawStopReason": "tool_calls",
+      "responseId": "chatcmpl-tools",
+      "role": "assistant",
+      "stopReason": "toolUse",
+      "usage": {
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "cost": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "input": 0,
+          "output": 0,
+          "total": 0
+        },
+        "input": 0,
+        "output": 0,
+        "totalTokens": 0
+      }
+    },
+    "request": {
+      "body": {
+        "messages": [
+          {
+            "content": "Use tools",
+            "role": "user"
+          }
+        ],
+        "model": "tool-model",
+        "store": false,
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "tool_choice": "required",
+        "tools": [
+          {
+            "function": {
+              "description": "Read a file",
+              "name": "read",
+              "parameters": {
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ],
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          },
+          {
+            "function": {
+              "description": "Write a file",
+              "name": "write",
+              "parameters": {
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  },
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "content"
+                ],
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          }
+        ]
+      }
+    }
+  },
+  "hash": {
+    "algorithm": "sha256",
+    "observations_sha256": "ee50661543b4f4de773afc5a69e1ad3defb758478a4afb9fc0546fe509917681"
+  },
+  "exec_method": "node --experimental-strip-types parity/oracle/openai-completions-tools.mjs",
+  "env": {
+    "node_version": "v24.14.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  }
+}
