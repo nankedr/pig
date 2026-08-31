@@ -796,7 +796,10 @@ func TestOpenAICompletionsMatrixTracksVerifiedTextSlice(t *testing.T) {
 		t.Fatalf("LoadCatalog(real) = %v", err)
 	}
 
-	textFixtureIDs := openAICompletionsTextFixtureCatalogIDs(t, root)
+	verifiedFixtureIDs := openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-text.json", "ai/openai-completions/m1-text")
+	for id := range openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-sse.json", "ai/openai-completions/m1-sse-boundaries") {
+		verifiedFixtureIDs[id] = true
+	}
 	for _, entry := range entries {
 		if entry.Matrix == nil || entry.Matrix.API != "openai-completions" {
 			continue
@@ -821,9 +824,9 @@ func TestOpenAICompletionsMatrixTracksVerifiedTextSlice(t *testing.T) {
 			}
 			continue
 		}
-		if textFixtureIDs[entry.ID] {
+		if verifiedFixtureIDs[entry.ID] {
 			if entry.Status != catalog.StatusVerified || len(entry.Evidence) == 0 {
-				t.Errorf("text-stream matrix row %s = status %q, evidence %d", entry.ID, entry.Status, len(entry.Evidence))
+				t.Errorf("fixture-backed matrix row %s = status %q, evidence %d", entry.ID, entry.Status, len(entry.Evidence))
 			}
 			continue
 		}
@@ -846,11 +849,11 @@ func TestOpenAICompletionsMatrixTracksVerifiedTextSlice(t *testing.T) {
 	}
 }
 
-func openAICompletionsTextFixtureCatalogIDs(t *testing.T, root string) map[string]bool {
+func openAICompletionsFixtureCatalogIDs(t *testing.T, root, name, wantID string) map[string]bool {
 	t.Helper()
-	data, err := os.ReadFile(filepath.Join(root, "parity", "oracle", "fixtures", "openai-completions-text.json"))
+	data, err := os.ReadFile(filepath.Join(root, "parity", "oracle", "fixtures", name))
 	if err != nil {
-		t.Fatalf("read text fixture: %v", err)
+		t.Fatalf("read %s: %v", name, err)
 	}
 	var fixture struct {
 		ID             string   `json:"id"`
@@ -859,10 +862,10 @@ func openAICompletionsTextFixtureCatalogIDs(t *testing.T, root string) map[strin
 		Deterministic  bool     `json:"deterministic"`
 	}
 	if err := json.Unmarshal(data, &fixture); err != nil {
-		t.Fatalf("decode text fixture: %v", err)
+		t.Fatalf("decode %s: %v", name, err)
 	}
-	if fixture.ID != "ai/openai-completions/m1-text" || fixture.BaselineCommit != baselineCommit || !fixture.Deterministic {
-		t.Fatalf("text fixture provenance is incomplete: %#v", fixture)
+	if fixture.ID != wantID || fixture.BaselineCommit != baselineCommit || !fixture.Deterministic {
+		t.Fatalf("%s provenance is incomplete: %#v", name, fixture)
 	}
 	ids := make(map[string]bool, len(fixture.CatalogIDs))
 	for _, id := range fixture.CatalogIDs {

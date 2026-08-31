@@ -16,6 +16,14 @@ import (
 	"unicode/utf16"
 )
 
+// SSE protocol errors cross Result as Go errors instead of business outcomes.
+var (
+	ErrOpenAISSEProtocol  = errors.New("OpenAI Completions SSE protocol error")
+	ErrOpenAISSEMalformed = errors.New("OpenAI Completions SSE contains malformed JSON")
+	ErrOpenAISSETruncated = errors.New("OpenAI Completions SSE ended with a truncated frame")
+	ErrOpenAISSEEmpty     = errors.New("OpenAI Completions SSE response body is empty")
+)
+
 type openAICompletionsCompat struct {
 	supportsUsageInStreaming bool
 	supportsFinishReason     bool
@@ -207,7 +215,7 @@ func runOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStre
 	defer cancel()
 
 	if err := executeOpenAICompletions(requestCtx, stream, model, input, options, &output); err != nil {
-		if errors.Is(err, ErrNotImplemented) {
+		if errors.Is(err, ErrNotImplemented) || errors.Is(err, ErrOpenAISSEProtocol) {
 			stream.stream.endWithError(err)
 			return
 		}
@@ -299,18 +307,23 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	}
 	stream.Push(AssistantMessageStartEvent{Type: AssistantMessageEventTypeStart, Partial: *output})
 	hasFinishReason := false
+	sawFrame := false
 	textIndex := -1
 	err = consumeOpenAISSE(body, func(data string) (bool, error) {
+		sawFrame = true
 		if strings.HasPrefix(data, "[DONE]") {
 			return true, nil
 		}
 		trimmed := bytes.TrimSpace([]byte(data))
-		if len(trimmed) == 0 || trimmed[0] != '{' {
+		if len(trimmed) == 0 {
 			return false, nil
+		}
+		if trimmed[0] != '{' {
+			return false, errors.Join(ErrOpenAISSEProtocol, ErrOpenAISSEMalformed, errors.New("SSE data is not a JSON object"))
 		}
 		var chunk openAICompletionChunk
 		if err := json.Unmarshal(trimmed, &chunk); err != nil {
-			return false, err
+			return false, errors.Join(ErrOpenAISSEProtocol, ErrOpenAISSEMalformed, err)
 		}
 		if chunk.ID != "" && !output.ResponseID.IsSet() {
 			output.ResponseID = Some(chunk.ID)
@@ -352,11 +365,21 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 		}
 		return false, nil
 	})
+	if ctx.Err() != nil {
+		cause := context.Cause(ctx)
+		output.StopReason = StopReasonAborted
+		output.ErrorMessage = Some(openAIErrorMessage(cause))
+		if textIndex != -1 {
+			text := output.Content[textIndex].(TextContent).Text
+			stream.Push(AssistantMessageTextEndEvent{Type: AssistantMessageEventTypeTextEnd, ContentIndex: textIndex, Content: text, Partial: *output})
+		}
+		return cause
+	}
 	if err != nil {
 		return err
 	}
-	if ctx.Err() != nil {
-		return context.Cause(ctx)
+	if !sawFrame {
+		return errors.Join(ErrOpenAISSEProtocol, ErrOpenAISSEEmpty)
 	}
 	if textIndex != -1 {
 		text := output.Content[textIndex].(TextContent).Text
@@ -372,7 +395,7 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 		return errors.New("provider returned an error stop reason")
 	}
 	if (compat.supportsFinishReason && !hasFinishReason) || output.StopReason == StopReasonPending {
-		return errors.New("stream ended without finish_reason")
+		return errors.Join(ErrOpenAISSEProtocol, ErrOpenAISSETruncated, errors.New("stream ended without finish_reason"))
 	}
 	stream.Push(AssistantMessageDoneEvent{Type: AssistantMessageEventTypeDone, Reason: output.StopReason, Message: *output})
 	return nil
@@ -389,30 +412,54 @@ func consumeOpenAISSE(reader io.Reader, handle func(string) (bool, error)) error
 		data = data[:0]
 		return handle(joined)
 	}
-	for {
-		line, err := buffered.ReadString('\n')
-		if len(line) > 0 {
-			line = strings.TrimSuffix(line, "\n")
-			line = strings.TrimSuffix(line, "\r")
-			if line == "" {
-				done, dispatchErr := dispatch()
-				if dispatchErr != nil || done {
-					return dispatchErr
-				}
-			} else if !strings.HasPrefix(line, ":") {
-				field, value, found := strings.Cut(line, ":")
-				if found && field == "data" {
-					data = append(data, strings.TrimPrefix(value, " "))
-				}
-			}
+	var line []byte
+	skipLF := false
+	consumeLine := func() (bool, error) {
+		value := string(line)
+		line = line[:0]
+		if value == "" {
+			return dispatch()
 		}
+		if strings.HasPrefix(value, ":") {
+			return false, nil
+		}
+		field, fieldValue, _ := strings.Cut(value, ":")
+		if field == "data" {
+			data = append(data, strings.TrimPrefix(fieldValue, " "))
+		}
+		return false, nil
+	}
+	for {
+		value, err := buffered.ReadByte()
 		if err != nil {
 			if !errors.Is(err, io.EOF) {
 				return err
 			}
-			_, dispatchErr := dispatch()
-			return dispatchErr
+			if len(line) > 0 {
+				if done, lineErr := consumeLine(); lineErr != nil || done {
+					return lineErr
+				}
+			}
+			if len(data) > 0 {
+				return errors.Join(ErrOpenAISSEProtocol, ErrOpenAISSETruncated)
+			}
+			return nil
 		}
+		if skipLF {
+			skipLF = false
+			if value == '\n' {
+				continue
+			}
+		}
+		if value == '\r' || value == '\n' {
+			done, lineErr := consumeLine()
+			if lineErr != nil || done {
+				return lineErr
+			}
+			skipLF = value == '\r'
+			continue
+		}
+		line = append(line, value)
 	}
 }
 

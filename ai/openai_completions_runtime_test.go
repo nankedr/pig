@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"math"
 	"net/http"
@@ -131,6 +132,123 @@ func TestOpenAICompletionsTextStreamUsesPublicRequestAndEventSeams(t *testing.T)
 	}
 	if !reflect.DeepEqual(requestBody, fixture.Actual.Request.Body) {
 		t.Fatalf("request body = %#v, want pinned Pi %#v", requestBody, fixture.Actual.Request.Body)
+	}
+}
+
+func TestOpenAICompletionsSSELineSyntaxHasEquivalentOutcome(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	wantEvents := normalizedOpenAIJSON(t, fixture.Actual.Whole.Events)
+	wantResult := normalizedOpenAIJSON(t, fixture.Actual.Whole.Outcome)
+	for _, test := range []struct{ name, newline string }{
+		{name: "lf", newline: "\n"},
+		{name: "crlf", newline: "\r\n"},
+		{name: "cr", newline: "\r"},
+	} {
+		name, newline := test.name, test.newline
+		t.Run(name, func(t *testing.T) {
+			if !fixture.Actual.LineEndings[name] {
+				t.Fatalf("pinned Pi %s equivalence = false", name)
+			}
+			gotEvents, gotResult := observeOpenAISSE(t, strings.NewReader(strings.Join(fixture.Input.Lines, newline)))
+			if !reflect.DeepEqual(gotEvents, wantEvents) || !reflect.DeepEqual(gotResult, wantResult) {
+				t.Fatalf("observation differs from pinned Pi fixture")
+			}
+		})
+	}
+}
+
+func TestOpenAICompletionsSSEEveryByteSplitMatchesWholeBody(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	if !fixture.Actual.Fragmentation.OneByte {
+		t.Fatal("pinned Pi one-byte fragmentation equivalence = false")
+	}
+	for index, equivalent := range fixture.Actual.Fragmentation.SplitEquivalent {
+		if !equivalent {
+			t.Fatalf("pinned Pi representative split %d equivalence = false", index)
+		}
+	}
+	sse := strings.Join(fixture.Input.Lines, "\r\n")
+	wantEvents := normalizedOpenAIJSON(t, fixture.Actual.Whole.Events)
+	wantResult := normalizedOpenAIJSON(t, fixture.Actual.Whole.Outcome)
+	for split := 0; split <= len(sse); split++ {
+		reader := io.MultiReader(strings.NewReader(sse[:split]), strings.NewReader(sse[split:]))
+		gotEvents, gotResult := observeOpenAISSE(t, reader)
+		if !reflect.DeepEqual(gotEvents, wantEvents) || !reflect.DeepEqual(gotResult, wantResult) {
+			t.Fatalf("split at byte %d changed observation", split)
+		}
+	}
+}
+
+func TestOpenAICompletionsSSEDoesNotDispatchUnterminatedTrailingFrame(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	assertPinnedOpenAISSEErrorObservation(t, fixture.Actual.Trailing, "start", "error")
+	stream := openAIStreamFromReader(strings.NewReader(fixture.Input.Scenarios.Trailing))
+	_, err := stream.Result(context.Background())
+	if !errors.Is(err, ai.ErrOpenAISSETruncated) {
+		t.Fatalf("Result() error = %v, want truncated SSE protocol error", err)
+	}
+	if got, want := eventTypes(collectAssistantEvents(t, stream)), []ai.AssistantMessageEventType{ai.AssistantMessageEventTypeStart}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("event types = %#v, want %#v", got, want)
+	}
+}
+
+func TestOpenAICompletionsMalformedSSEIsGoProtocolError(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	for _, test := range []struct {
+		name        string
+		sse         string
+		observation openAICompletionsSSEObservation
+	}{
+		{name: "object", sse: fixture.Input.Scenarios.Malformed, observation: fixture.Actual.Malformed},
+		{name: "non-object", sse: fixture.Input.Scenarios.MalformedNonObject, observation: fixture.Actual.MalformedNonObject},
+	} {
+		assertPinnedOpenAISSEErrorObservation(t, test.observation, "start", "error")
+		stream := openAIStreamFromReader(strings.NewReader(test.sse))
+		_, err := stream.Result(context.Background())
+		if !errors.Is(err, ai.ErrOpenAISSEProtocol) || !errors.Is(err, ai.ErrOpenAISSEMalformed) {
+			t.Fatalf("%s: Result() error = %v, want malformed SSE protocol error", test.name, err)
+		}
+		if got, want := eventTypes(collectAssistantEvents(t, stream)), []ai.AssistantMessageEventType{ai.AssistantMessageEventTypeStart}; !reflect.DeepEqual(got, want) {
+			t.Fatalf("%s: event types = %#v, want %#v", test.name, got, want)
+		}
+	}
+}
+
+func TestOpenAICompletionsTruncatedJSONHasDistinctProtocolError(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	assertPinnedOpenAISSEErrorObservation(t, fixture.Actual.Truncated, "start", "error")
+	stream := openAIStreamFromReader(strings.NewReader(fixture.Input.Scenarios.Truncated))
+	_, err := stream.Result(context.Background())
+	if !errors.Is(err, ai.ErrOpenAISSEProtocol) || !errors.Is(err, ai.ErrOpenAISSETruncated) || errors.Is(err, ai.ErrOpenAISSEMalformed) {
+		t.Fatalf("Result() error = %v, want truncated SSE protocol error", err)
+	}
+}
+
+func TestOpenAICompletionsEmptyBodyHasDistinctProtocolError(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	assertPinnedOpenAISSEErrorObservation(t, fixture.Actual.Empty, "start", "error")
+	stream := openAIStreamFromReader(strings.NewReader(fixture.Input.Scenarios.Empty))
+	_, err := stream.Result(context.Background())
+	if !errors.Is(err, ai.ErrOpenAISSEProtocol) || !errors.Is(err, ai.ErrOpenAISSEEmpty) || errors.Is(err, ai.ErrOpenAISSETruncated) {
+		t.Fatalf("Result() error = %v, want empty SSE protocol error", err)
+	}
+}
+
+func TestOpenAICompletionsPrematureCloseIsTruncatedProtocolError(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	assertPinnedOpenAISSEErrorObservation(t, fixture.Actual.PrematureClose, "start", "text_start", "text_delta", "text_end", "error")
+	stream := openAIStreamFromReader(strings.NewReader(fixture.Input.Scenarios.PrematureClose))
+	_, err := stream.Result(context.Background())
+	if !errors.Is(err, ai.ErrOpenAISSEProtocol) || !errors.Is(err, ai.ErrOpenAISSETruncated) {
+		t.Fatalf("Result() error = %v, want truncated SSE protocol error", err)
+	}
+	if got, want := eventTypes(collectAssistantEvents(t, stream)), []ai.AssistantMessageEventType{
+		ai.AssistantMessageEventTypeStart,
+		ai.AssistantMessageEventTypeTextStart,
+		ai.AssistantMessageEventTypeTextDelta,
+		ai.AssistantMessageEventTypeTextEnd,
+	}; !reflect.DeepEqual(got, want) {
+		t.Fatalf("event types = %#v, want %#v", got, want)
 	}
 }
 
@@ -328,11 +446,13 @@ func TestOpenAICompletionsPublicEntrypointsReachLocalService(t *testing.T) {
 }
 
 func TestOpenAICompletionsCancellationClosesStreamingBodyAndKeepsPartialText(t *testing.T) {
-	body := newBlockingReadCloser("data: {\"id\":\"partial\",\"choices\":[{\"delta\":{\"content\":\"你\"}}]}\n\n")
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	assertPinnedOpenAISSEErrorObservation(t, fixture.Actual.Cancel, "start", "text_start", "text_delta", "text_end", "error")
+	body := newBlockingReadCloser(fixture.Input.Scenarios.Blocked)
 	key := "test-key"
 	ctx, cancel := context.WithCancel(context.Background())
 	var signalForwarded atomic.Bool
-	stream := ai.StreamOpenAICompletions(ctx, openAITextModel("https://example.test/v1"), ai.Context{}, ai.OpenAICompletionsOptions{
+	stream := ai.StreamOpenAICompletions(ctx, openAISSEModel("https://example.test/v1"), ai.Context{}, ai.OpenAICompletionsOptions{
 		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{
 			APIKey: &key,
 			Fetch: func(fetchContext context.Context, _ ai.FetchRequest) (ai.FetchResponse, error) {
@@ -341,11 +461,13 @@ func TestOpenAICompletionsCancellationClosesStreamingBodyAndKeepsPartialText(t *
 			},
 		}},
 	})
+	var observed []ai.AssistantMessageEvent
 	for {
 		event, ok, err := stream.Next(context.Background())
 		if err != nil || !ok {
 			t.Fatalf("Next() before cancellation = (%#v, %t, %v)", event, ok, err)
 		}
+		observed = append(observed, event)
 		if event.AssistantMessageEventType() == ai.AssistantMessageEventTypeTextDelta {
 			break
 		}
@@ -359,6 +481,9 @@ func TestOpenAICompletionsCancellationClosesStreamingBodyAndKeepsPartialText(t *
 	}
 	if result.StopReason != ai.StopReasonAborted || len(result.Content) != 1 || result.Content[0].(ai.TextContent).Text != "你" {
 		t.Fatalf("aborted result = %#v", result)
+	}
+	if got, want := normalizedOpenAIJSON(t, result), normalizedOpenAIJSON(t, fixture.Actual.Cancel.Outcome); !reflect.DeepEqual(got, want) {
+		t.Fatalf("aborted result = %#v, want pinned Pi %#v", got, want)
 	}
 	if !body.closed.Load() {
 		t.Fatal("cancellation did not close the streaming body")
@@ -376,16 +501,21 @@ func TestOpenAICompletionsCancellationClosesStreamingBodyAndKeepsPartialText(t *
 		if !ok {
 			break
 		}
+		observed = append(observed, event)
 		remaining = append(remaining, event.AssistantMessageEventType())
 		if value, ok := event.(ai.AssistantMessageErrorEvent); ok {
 			terminalError = value
 		}
-		if event.AssistantMessageEventType() == ai.AssistantMessageEventTypeTextEnd {
-			t.Fatal("cancellation emitted text_end for an unfinished text block")
-		}
 	}
-	if want := []ai.AssistantMessageEventType{ai.AssistantMessageEventTypeError}; !reflect.DeepEqual(remaining, want) {
+	if want := []ai.AssistantMessageEventType{ai.AssistantMessageEventTypeTextEnd, ai.AssistantMessageEventTypeError}; !reflect.DeepEqual(remaining, want) {
 		t.Fatalf("events after cancellation = %#v, want %#v", remaining, want)
+	}
+	gotEvents := make([]any, len(observed))
+	for index, event := range observed {
+		gotEvents[index] = normalizedOpenAIJSON(t, event)
+	}
+	if want := normalizedOpenAIJSON(t, fixture.Actual.Cancel.Events); !reflect.DeepEqual(gotEvents, want) {
+		t.Fatalf("cancellation events = %#v, want pinned Pi %#v", gotEvents, want)
 	}
 	if terminalError.Type != ai.AssistantMessageEventTypeError || terminalError.Reason != ai.StopReasonAborted || terminalError.Error.StopReason != ai.StopReasonAborted {
 		t.Fatalf("terminal error event = %#v", terminalError)
@@ -398,12 +528,148 @@ func TestOpenAICompletionsCancellationClosesStreamingBodyAndKeepsPartialText(t *
 	}
 }
 
+func TestOpenAICompletionsTimeoutClosesStreamingBodyAndKeepsPartialText(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	assertPinnedOpenAISSEErrorObservation(t, fixture.Actual.Timeout, "start", "text_start", "text_delta", "text_end", "error")
+	body := newBlockingReadCloser(fixture.Input.Scenarios.Blocked)
+	key := "test-key"
+	timeout := int64(200)
+	stream := ai.StreamOpenAICompletions(context.Background(), openAISSEModel("https://example.test/v1"), ai.Context{}, ai.OpenAICompletionsOptions{
+		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{
+			APIKey:    &key,
+			TimeoutMS: &timeout,
+			Fetch: func(context.Context, ai.FetchRequest) (ai.FetchResponse, error) {
+				return ai.FetchResponse{Status: http.StatusOK, BodyReader: body}, nil
+			},
+		}},
+	})
+	result, err := stream.Result(context.Background())
+	if err != nil {
+		t.Fatalf("Result() error = %v", err)
+	}
+	if result.StopReason != ai.StopReasonAborted || len(result.Content) != 1 || result.Content[0].(ai.TextContent).Text != "你" {
+		t.Fatalf("aborted result = %#v", result)
+	}
+	if message, ok := result.ErrorMessage.Value(); !ok || message != "Request timed out" {
+		t.Fatalf("error message = (%q, %t), want Request timed out", message, ok)
+	}
+	if !body.closed.Load() {
+		t.Fatal("timeout did not close the streaming body")
+	}
+}
+
+func TestOpenAICompletionsSSEBoundariesThroughLocalService(t *testing.T) {
+	fixture := loadOpenAICompletionsSSEFixture(t)
+	timeoutCanceled := make(chan struct{})
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/event-stream")
+		scenario := strings.Split(strings.TrimPrefix(r.URL.Path, "/"), "/")[0]
+		switch scenario {
+		case "success":
+			for _, value := range []byte(strings.Join(fixture.Input.Lines, "\r\n")) {
+				_, _ = w.Write([]byte{value})
+				w.(http.Flusher).Flush()
+			}
+		case "malformed":
+			_, _ = io.WriteString(w, fixture.Input.Scenarios.Malformed)
+		case "malformed-non-object":
+			_, _ = io.WriteString(w, fixture.Input.Scenarios.MalformedNonObject)
+		case "trailing":
+			_, _ = io.WriteString(w, fixture.Input.Scenarios.Trailing)
+		case "premature":
+			_, _ = io.WriteString(w, fixture.Input.Scenarios.PrematureClose)
+		case "timeout":
+			_, _ = io.WriteString(w, fixture.Input.Scenarios.Blocked)
+			w.(http.Flusher).Flush()
+			<-r.Context().Done()
+			close(timeoutCanceled)
+		}
+	}))
+	defer server.Close()
+
+	key := "test-key"
+	for _, test := range []struct {
+		name string
+		err  error
+	}{
+		{name: "success"},
+		{name: "malformed", err: ai.ErrOpenAISSEMalformed},
+		{name: "malformed-non-object", err: ai.ErrOpenAISSEMalformed},
+		{name: "trailing", err: ai.ErrOpenAISSETruncated},
+		{name: "premature", err: ai.ErrOpenAISSETruncated},
+		{name: "empty", err: ai.ErrOpenAISSEEmpty},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			stream := ai.StreamOpenAICompletions(context.Background(), openAITextModel(server.URL+"/"+test.name), ai.Context{}, ai.OpenAICompletionsOptions{
+				StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{APIKey: &key}},
+			})
+			result, err := stream.Result(context.Background())
+			if test.err != nil {
+				if !errors.Is(err, test.err) {
+					t.Fatalf("Result() error = %v, want %v", err, test.err)
+				}
+				return
+			}
+			if err != nil || result.StopReason != ai.StopReasonStop || len(result.Content) != 1 || result.Content[0].(ai.TextContent).Text != "你好" {
+				t.Fatalf("Result() = (%#v, %v)", result, err)
+			}
+		})
+	}
+
+	timeout := int64(200)
+	result, err := ai.StreamOpenAICompletions(context.Background(), openAITextModel(server.URL+"/timeout"), ai.Context{}, ai.OpenAICompletionsOptions{
+		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{APIKey: &key, TimeoutMS: &timeout}},
+	}).Result(context.Background())
+	if err != nil || result.StopReason != ai.StopReasonAborted || len(result.Content) != 1 || result.Content[0].(ai.TextContent).Text != "你" {
+		t.Fatalf("timeout Result() = (%#v, %v)", result, err)
+	}
+	select {
+	case <-timeoutCanceled:
+	case <-time.After(time.Second):
+		t.Fatal("timeout did not cancel the local service request")
+	}
+}
+
 func openAITextModel(baseURL string) ai.Model {
 	return ai.Model{
 		ID: "text-model", API: ai.APIOpenAICompletions, Provider: "local-openai", BaseURL: baseURL,
 		ContextWindow: 32_000, MaxTokens: 2_048,
 		Cost: ai.ModelCost{ModelCostRates: ai.ModelCostRates{Input: 1, Output: 2, CacheRead: .5, CacheWrite: 1.5}},
 	}
+}
+
+func openAISSEModel(baseURL string) ai.Model {
+	model := openAITextModel(baseURL)
+	model.ID = "sse-model"
+	model.Cost = ai.ModelCost{}
+	return model
+}
+
+func openAIStreamFromReader(reader io.Reader) *ai.AssistantMessageEventStream {
+	key := "test-key"
+	return ai.StreamOpenAICompletions(context.Background(), openAISSEModel("https://example.test/v1"), ai.Context{}, ai.OpenAICompletionsOptions{
+		StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{
+			APIKey: &key,
+			Fetch: func(context.Context, ai.FetchRequest) (ai.FetchResponse, error) {
+				return ai.FetchResponse{Status: http.StatusOK, BodyReader: io.NopCloser(reader)}, nil
+			},
+		}},
+	})
+}
+
+func observeOpenAISSE(t *testing.T, reader io.Reader) ([]any, any) {
+	t.Helper()
+	stream := openAIStreamFromReader(reader)
+	events := collectAssistantEvents(t, stream)
+	result, err := stream.Result(context.Background())
+	if err != nil {
+		t.Fatalf("Result() error = %v", err)
+	}
+	normalizedEvents := make([]any, len(events))
+	for index, event := range events {
+		normalizedEvents[index] = normalizedOpenAIJSON(t, event)
+	}
+	return normalizedEvents, normalizedOpenAIJSON(t, result)
 }
 
 func collectAssistantEvents(t *testing.T, stream *ai.AssistantMessageEventStream) []ai.AssistantMessageEvent {
@@ -475,6 +741,62 @@ type openAICompletionsTextFixture struct {
 	} `json:"actual"`
 }
 
+type openAICompletionsSSEFixture struct {
+	ID             string   `json:"id"`
+	CatalogIDs     []string `json:"catalog_ids"`
+	BaselineCommit string   `json:"baseline_commit"`
+	Deterministic  bool     `json:"deterministic"`
+	Input          struct {
+		Lines        []string `json:"lines"`
+		SplitIndexes []int    `json:"split_indexes"`
+		Scenarios    struct {
+			Trailing           string `json:"trailing"`
+			Malformed          string `json:"malformed"`
+			MalformedNonObject string `json:"malformed_non_object"`
+			Truncated          string `json:"truncated"`
+			Empty              string `json:"empty"`
+			PrematureClose     string `json:"premature_close"`
+			Blocked            string `json:"blocked"`
+		} `json:"scenarios"`
+	} `json:"input"`
+	Actual struct {
+		Whole         openAICompletionsSSEObservation `json:"whole"`
+		LineEndings   map[string]bool                 `json:"line_endings"`
+		Fragmentation struct {
+			OneByte         bool   `json:"one_byte"`
+			SplitEquivalent []bool `json:"split_equivalent"`
+		} `json:"fragmentation"`
+		Trailing           openAICompletionsSSEObservation `json:"trailing"`
+		Malformed          openAICompletionsSSEObservation `json:"malformed"`
+		MalformedNonObject openAICompletionsSSEObservation `json:"malformed_non_object"`
+		Truncated          openAICompletionsSSEObservation `json:"truncated"`
+		Empty              openAICompletionsSSEObservation `json:"empty"`
+		PrematureClose     openAICompletionsSSEObservation `json:"premature_close"`
+		Cancel             openAICompletionsSSEObservation `json:"cancel"`
+		Timeout            openAICompletionsSSEObservation `json:"timeout"`
+	} `json:"actual"`
+}
+
+type openAICompletionsSSEObservation struct {
+	Events  []any          `json:"events"`
+	Outcome map[string]any `json:"outcome"`
+}
+
+func assertPinnedOpenAISSEErrorObservation(t *testing.T, observation openAICompletionsSSEObservation, wantTypes ...string) {
+	t.Helper()
+	gotTypes := make([]string, len(observation.Events))
+	for index, event := range observation.Events {
+		gotTypes[index], _ = event.(map[string]any)["type"].(string)
+	}
+	if !reflect.DeepEqual(gotTypes, wantTypes) {
+		t.Fatalf("pinned Pi event types = %#v, want %#v", gotTypes, wantTypes)
+	}
+	last := observation.Events[len(observation.Events)-1].(map[string]any)
+	if observation.Outcome["stopReason"] == nil || observation.Outcome["errorMessage"] == nil || !reflect.DeepEqual(last["error"], observation.Outcome) {
+		t.Fatalf("pinned Pi terminal observation = %#v", observation)
+	}
+}
+
 func normalizedOpenAIJSON(t *testing.T, value any) any {
 	t.Helper()
 	data, err := json.Marshal(value)
@@ -520,6 +842,26 @@ func loadOpenAICompletionsTextFixture(t *testing.T) openAICompletionsTextFixture
 	}
 	if fixture.ID != "ai/openai-completions/m1-text" || fixture.BaselineCommit != "936aff00918de1187f085f123c2812d8f2d67745" || !fixture.Deterministic || len(fixture.CatalogIDs) == 0 {
 		t.Fatalf("text fixture provenance = %#v", fixture)
+	}
+	return fixture
+}
+
+func loadOpenAICompletionsSSEFixture(t *testing.T) openAICompletionsSSEFixture {
+	t.Helper()
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("runtime.Caller failed")
+	}
+	data, err := os.ReadFile(filepath.Join(filepath.Dir(file), "..", "parity", "oracle", "fixtures", "openai-completions-sse.json"))
+	if err != nil {
+		t.Fatalf("read SSE fixture: %v", err)
+	}
+	var fixture openAICompletionsSSEFixture
+	if err := json.Unmarshal(data, &fixture); err != nil {
+		t.Fatalf("decode SSE fixture: %v", err)
+	}
+	if fixture.ID != "ai/openai-completions/m1-sse-boundaries" || fixture.BaselineCommit != "936aff00918de1187f085f123c2812d8f2d67745" || !fixture.Deterministic || len(fixture.CatalogIDs) == 0 {
+		t.Fatalf("SSE fixture provenance = %#v", fixture)
 	}
 	return fixture
 }

@@ -1,0 +1,1283 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ai/openai-completions/m1-sse-boundaries",
+  "catalog_ids": [
+    "matrix:ai/openai-completions/sse/sse-data",
+    "matrix:ai/openai-completions/sse/sse-data-multiline",
+    "matrix:ai/openai-completions/sse/sse-done",
+    "matrix:ai/openai-completions/sse/sse-done-post-events",
+    "matrix:ai/openai-completions/sse/sse-done-prefix",
+    "matrix:ai/openai-completions/sse/sse-frame-cr",
+    "matrix:ai/openai-completions/sse/sse-frame-crlf",
+    "matrix:ai/openai-completions/sse/sse-frame-lf",
+    "matrix:ai/openai-completions/sse/sse-frame-trailing",
+    "matrix:ai/openai-completions/sse/sse-frame-truncated-json",
+    "matrix:ai/openai-completions/sse/sse-frame-truncated-valid-json",
+    "matrix:ai/openai-completions/sse/sse-json-malformed",
+    "matrix:ai/openai-completions/sse/sse-line-comment",
+    "matrix:ai/openai-completions/sse/sse-line-newline",
+    "matrix:ai/openai-completions/sse/sse-line-split-cr",
+    "matrix:ai/openai-completions/sse/sse-line-unknown-field",
+    "matrix:ai/openai-completions/sse/sse-response-empty-body",
+    "matrix:ai/openai-completions/sse/sse-response-premature-eof"
+  ],
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "upstream": {
+    "module": "ai",
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/package.json#openai@6.40.0"
+  },
+  "input": {
+    "lines": [
+      ": heartbeat",
+      "id: ignored",
+      "retry: 1000",
+      "unknown: ignored",
+      "data: {\"id\":\"boundary\",\"choices\":[",
+      "data: {\"delta\":{\"content\":\"你\"}}]}",
+      "",
+      "data: {\"choices\":[{\"delta\":{\"content\":\"好\"},\"finish_reason\":\"stop\"}]}",
+      "",
+      "data: [DONE] suffix ignored",
+      "",
+      "data: {malformed after done",
+      ""
+    ],
+    "scenarios": {
+      "blocked": "data: {\"id\":\"partial\",\"choices\":[{\"delta\":{\"content\":\"你\"}}]}\n\ndata: {\"choices\":[",
+      "empty": "",
+      "malformed": "data: {\n\n",
+      "malformed_non_object": "data: nope\n\n",
+      "premature_close": "data: {\"choices\":[{\"delta\":{\"content\":\"半\"}}]}\n\n",
+      "trailing": "data: {\"id\":\"trailing\",\"choices\":[{\"delta\":{\"content\":\"尾\"},\"finish_reason\":\"stop\"}]}",
+      "truncated": "data: {\"choices\":["
+    },
+    "split_indexes": [
+      1,
+      12,
+      121,
+      265
+    ]
+  },
+  "input_sha256": "be8830983d07f042dc60a086b06338cb38d1d3caa5657774bdb79125268819f1",
+  "actual": {
+    "cancel": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "contentIndex": 0,
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "partial",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_start"
+        },
+        {
+          "contentIndex": 0,
+          "delta": "你",
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "partial",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_delta"
+        },
+        {
+          "content": "你",
+          "contentIndex": 0,
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "errorMessage": "Request was aborted",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "partial",
+            "role": "assistant",
+            "stopReason": "aborted",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_end"
+        },
+        {
+          "error": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "errorMessage": "Request was aborted",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "partial",
+            "role": "assistant",
+            "stopReason": "aborted",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "aborted",
+          "type": "error"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [
+          {
+            "text": "你",
+            "type": "text"
+          }
+        ],
+        "errorMessage": "Request was aborted",
+        "model": "sse-model",
+        "provider": "local-openai",
+        "responseId": "partial",
+        "role": "assistant",
+        "stopReason": "aborted",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "empty": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "error": {
+            "api": "openai-completions",
+            "content": [],
+            "errorMessage": "Stream ended without finish_reason",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "error",
+          "type": "error"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [],
+        "errorMessage": "Stream ended without finish_reason",
+        "model": "sse-model",
+        "provider": "local-openai",
+        "role": "assistant",
+        "stopReason": "error",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "fragmentation": {
+      "one_byte": true,
+      "split_equivalent": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "split_indexes": [
+        1,
+        12,
+        121,
+        265
+      ]
+    },
+    "line_endings": {
+      "cr": true,
+      "crlf": true,
+      "lf": true
+    },
+    "malformed": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "error": {
+            "api": "openai-completions",
+            "content": [],
+            "errorMessage": "Expected property name or '}' in JSON at position 1 (line 1 column 2)",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "error",
+          "type": "error"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [],
+        "errorMessage": "Expected property name or '}' in JSON at position 1 (line 1 column 2)",
+        "model": "sse-model",
+        "provider": "local-openai",
+        "role": "assistant",
+        "stopReason": "error",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "malformed_non_object": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "error": {
+            "api": "openai-completions",
+            "content": [],
+            "errorMessage": "Unexpected token 'o', \"nope\" is not valid JSON",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "error",
+          "type": "error"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [],
+        "errorMessage": "Unexpected token 'o', \"nope\" is not valid JSON",
+        "model": "sse-model",
+        "provider": "local-openai",
+        "role": "assistant",
+        "stopReason": "error",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "premature_close": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "contentIndex": 0,
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "半",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_start"
+        },
+        {
+          "contentIndex": 0,
+          "delta": "半",
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "半",
+                "type": "text"
+              }
+            ],
+            "errorMessage": "Stream ended without finish_reason",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_delta"
+        },
+        {
+          "content": "半",
+          "contentIndex": 0,
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "半",
+                "type": "text"
+              }
+            ],
+            "errorMessage": "Stream ended without finish_reason",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_end"
+        },
+        {
+          "error": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "半",
+                "type": "text"
+              }
+            ],
+            "errorMessage": "Stream ended without finish_reason",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "error",
+          "type": "error"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [
+          {
+            "text": "半",
+            "type": "text"
+          }
+        ],
+        "errorMessage": "Stream ended without finish_reason",
+        "model": "sse-model",
+        "provider": "local-openai",
+        "role": "assistant",
+        "stopReason": "error",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "timeout": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "contentIndex": 0,
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "partial",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_start"
+        },
+        {
+          "contentIndex": 0,
+          "delta": "你",
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "partial",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_delta"
+        },
+        {
+          "content": "你",
+          "contentIndex": 0,
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "errorMessage": "Stream ended without finish_reason",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "partial",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_end"
+        },
+        {
+          "error": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "errorMessage": "Stream ended without finish_reason",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "partial",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "error",
+          "type": "error"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [
+          {
+            "text": "你",
+            "type": "text"
+          }
+        ],
+        "errorMessage": "Stream ended without finish_reason",
+        "model": "sse-model",
+        "provider": "local-openai",
+        "responseId": "partial",
+        "role": "assistant",
+        "stopReason": "error",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "trailing": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "error": {
+            "api": "openai-completions",
+            "content": [],
+            "errorMessage": "Stream ended without finish_reason",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "error",
+          "type": "error"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [],
+        "errorMessage": "Stream ended without finish_reason",
+        "model": "sse-model",
+        "provider": "local-openai",
+        "role": "assistant",
+        "stopReason": "error",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "truncated": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "error": {
+            "api": "openai-completions",
+            "content": [],
+            "errorMessage": "Stream ended without finish_reason",
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "error",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "error",
+          "type": "error"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [],
+        "errorMessage": "Stream ended without finish_reason",
+        "model": "sse-model",
+        "provider": "local-openai",
+        "role": "assistant",
+        "stopReason": "error",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    },
+    "whole": {
+      "events": [
+        {
+          "partial": {
+            "api": "openai-completions",
+            "content": [],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "start"
+        },
+        {
+          "contentIndex": 0,
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "boundary",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_start"
+        },
+        {
+          "contentIndex": 0,
+          "delta": "你",
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "responseId": "boundary",
+            "role": "assistant",
+            "stopReason": "pending",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_delta"
+        },
+        {
+          "contentIndex": 0,
+          "delta": "好",
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你好",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "rawStopReason": "stop",
+            "responseId": "boundary",
+            "role": "assistant",
+            "stopReason": "stop",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_delta"
+        },
+        {
+          "content": "你好",
+          "contentIndex": 0,
+          "partial": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你好",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "rawStopReason": "stop",
+            "responseId": "boundary",
+            "role": "assistant",
+            "stopReason": "stop",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "type": "text_end"
+        },
+        {
+          "message": {
+            "api": "openai-completions",
+            "content": [
+              {
+                "text": "你好",
+                "type": "text"
+              }
+            ],
+            "model": "sse-model",
+            "provider": "local-openai",
+            "rawStopReason": "stop",
+            "responseId": "boundary",
+            "role": "assistant",
+            "stopReason": "stop",
+            "usage": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "cost": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "input": 0,
+                "output": 0,
+                "total": 0
+              },
+              "input": 0,
+              "output": 0,
+              "totalTokens": 0
+            }
+          },
+          "reason": "stop",
+          "type": "done"
+        }
+      ],
+      "outcome": {
+        "api": "openai-completions",
+        "content": [
+          {
+            "text": "你好",
+            "type": "text"
+          }
+        ],
+        "model": "sse-model",
+        "provider": "local-openai",
+        "rawStopReason": "stop",
+        "responseId": "boundary",
+        "role": "assistant",
+        "stopReason": "stop",
+        "usage": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 0,
+          "output": 0,
+          "totalTokens": 0
+        }
+      }
+    }
+  },
+  "hash": {
+    "algorithm": "sha256",
+    "observations_sha256": "eb87b791d643efd770764ac495c7c01109e1757a7a46b9fd39a2474480897403"
+  },
+  "exec_method": "node --experimental-strip-types parity/oracle/openai-completions-sse.mjs",
+  "env": {
+    "node_version": "v24.14.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  }
+}
