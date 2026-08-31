@@ -51,7 +51,7 @@ func TestFlattenModelCatalogPreservesOrderedLastGroupWinsSemantics(t *testing.T)
 	}
 }
 
-func TestBuiltinCatalogReportsStaticProvidersAndHonestEmptySnapshot(t *testing.T) {
+func TestBuiltinCatalogReportsStaticProvidersAndStagedSnapshot(t *testing.T) {
 	t.Parallel()
 
 	wantProviders := []ai.BuiltinProvider{
@@ -106,8 +106,13 @@ func TestBuiltinCatalogReportsStaticProvidersAndHonestEmptySnapshot(t *testing.T
 	}
 
 	for _, provider := range wantProviders {
-		if models := ai.GetBuiltinModels(provider); len(models) != 0 {
-			t.Fatalf("GetBuiltinModels(%q) = %#v, want M0-unloaded catalog", provider, models)
+		models := ai.GetBuiltinModels(provider)
+		if provider == ai.ProviderIDDeepSeek {
+			if len(models) != 2 {
+				t.Fatalf("GetBuiltinModels(deepseek) = %#v, want two M1 models", models)
+			}
+		} else if len(models) != 0 {
+			t.Fatalf("GetBuiltinModels(%q) = %#v, want deferred catalog", provider, models)
 		}
 	}
 	if models := ai.GetBuiltinModels(ai.BuiltinProvider("unknown")); len(models) != 0 {
@@ -116,8 +121,8 @@ func TestBuiltinCatalogReportsStaticProvidersAndHonestEmptySnapshot(t *testing.T
 	if model, ok := ai.GetBuiltinModel(ai.ProviderIDOpenAI, "missing"); ok || !reflect.DeepEqual(model, ai.Model{}) {
 		t.Fatalf("GetBuiltinModel() = (%#v, %t), want zero, false", model, ok)
 	}
-	if generatedAt, ok := ai.GetBuiltinModelDataGeneratedAt(); ok || generatedAt != 0 {
-		t.Fatalf("GetBuiltinModelDataGeneratedAt() = (%d, %t), want honest absent value", generatedAt, ok)
+	if generatedAt, ok := ai.GetBuiltinModelDataGeneratedAt(); !ok || generatedAt != 1786081866002 {
+		t.Fatalf("GetBuiltinModelDataGeneratedAt() = (%d, %t), want locked snapshot time", generatedAt, ok)
 	}
 }
 
@@ -237,8 +242,13 @@ func TestBuiltinProvidersAndModelsAreFreshOrderedOfflineAssemblies(t *testing.T)
 		} else if !present || baseURL != want.baseURL {
 			t.Fatalf("provider %q base URL = (%q, %t), want %q", first[index].ID(), baseURL, present, want.baseURL)
 		}
-		if models := first[index].GetModels(); len(models) != 0 {
-			t.Fatalf("provider %q models = %#v, want M0-unloaded catalog", first[index].ID(), models)
+		models := first[index].GetModels()
+		if first[index].ID() == ai.ProviderIDDeepSeek {
+			if len(models) != 2 {
+				t.Fatalf("provider deepseek models = %#v, want two M1 models", models)
+			}
+		} else if len(models) != 0 {
+			t.Fatalf("provider %q models = %#v, want deferred catalog", first[index].ID(), models)
 		}
 	}
 
@@ -413,15 +423,24 @@ func TestBuiltinProviderAuthMetadataMatchesFixedPiBaseline(t *testing.T) {
 					t.Errorf("API-key name = %q, want %q", auth.APIKey.Name, wantMetadata.apiKeyName)
 				}
 				if auth.APIKey.Login == nil {
-					t.Error("API-key Login is nil, want side-effect-free Capability Stub")
-				} else if _, err := auth.APIKey.Login(context.Background(), nil); !errors.Is(err, ai.ErrNotImplemented) {
-					t.Errorf("API-key Login error = %v, want ErrNotImplemented", err)
+					t.Error("API-key Login is nil")
+				} else if provider.ID() != ai.ProviderIDDeepSeek {
+					if _, err := auth.APIKey.Login(context.Background(), nil); !errors.Is(err, ai.ErrNotImplemented) {
+						t.Errorf("API-key Login error = %v, want ErrNotImplemented", err)
+					}
 				}
 				if got := auth.APIKey.Check != nil; got != wantMetadata.apiKeyCheck {
 					t.Errorf("API-key Check present = %t, want %t", got, wantMetadata.apiKeyCheck)
 				}
 				if auth.APIKey.Resolve == nil {
-					t.Error("API-key Resolve is nil, want side-effect-free Capability Stub")
+					t.Error("API-key Resolve is nil")
+				} else if provider.ID() == ai.ProviderIDDeepSeek {
+					resolved, err := auth.APIKey.Resolve(context.Background(), ai.APIKeyResolveInput{Context: &fakeAuthContext{env: map[string]string{"DEEPSEEK_API_KEY": "test-key"}}})
+					result, ok := resolved.Value()
+					key, hasKey := result.Auth.APIKey.Value()
+					if err != nil || !ok || !hasKey || key != "test-key" {
+						t.Errorf("DeepSeek Resolve() = (%#v, %v)", resolved, err)
+					}
 				} else if _, err := auth.APIKey.Resolve(context.Background(), ai.APIKeyResolveInput{}); !errors.Is(err, ai.ErrNotImplemented) {
 					t.Errorf("API-key Resolve error = %v, want ErrNotImplemented", err)
 				}
@@ -561,6 +580,12 @@ func TestBuiltinProviderCapabilityMatrixMatchesFixedPiBaseline(t *testing.T) {
 			for _, apiID := range allAPIs {
 				model := ai.Model{ID: "capability-probe", Provider: provider.ID(), API: apiID}
 				result, err := provider.Stream(context.Background(), model, ai.Context{}, ai.StreamOptions{}).Result(context.Background())
+				if provider.ID() == ai.ProviderIDDeepSeek && apiID == ai.APIOpenAICompletions {
+					if err != nil || result.StopReason != ai.StopReasonError {
+						t.Errorf("DeepSeek live Stream() = (%#v, %v)", result, err)
+					}
+					continue
+				}
 				if wantAPIs[apiID] {
 					if !errors.Is(err, ai.ErrNotImplemented) {
 						t.Errorf("Stream(api=%q) error = %v, want declared API Capability Stub", apiID, err)

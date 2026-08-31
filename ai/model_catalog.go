@@ -2,7 +2,9 @@ package ai
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"os"
 )
 
 // ModelGroup is one ordered source group in a generated model catalog. Model
@@ -164,10 +166,34 @@ var builtinProviderAuthMetadataByID = map[ProviderID]builtinProviderAuthMetadata
 	ProviderIDZAICodingCN:             {apiKeyName: "Z.AI Coding CN API key"},
 }
 
-// M0 audits the frozen Catalog artifact without loading it into the runtime.
-// Runtime model data is wired from M1 onward; it must never come from the source
-// checkout or a live service during ordinary build and test.
-var builtinModelsByProvider = map[BuiltinProvider][]Model{}
+var builtinModelsByProvider = map[BuiltinProvider][]Model{
+	ProviderIDDeepSeek: {
+		{
+			ID: "deepseek-v4-flash", Name: "DeepSeek V4 Flash", API: APIOpenAICompletions,
+			Provider: ProviderIDDeepSeek, BaseURL: "https://api.deepseek.com", Reasoning: true,
+			Input:         []ModelInput{ModelInputText},
+			Cost:          ModelCost{ModelCostRates: ModelCostRates{Input: 0.14, Output: 0.28, CacheRead: 0.0028}},
+			ContextWindow: 1_000_000, MaxTokens: 384_000,
+			Compat: Some(json.RawMessage(`{"supportsStore":false,"supportsDeveloperRole":false,"requiresReasoningContentOnAssistantMessages":true,"thinkingFormat":"deepseek"}`)),
+			ThinkingLevelMap: ThinkingLevelMap{
+				ModelThinkingLevelMinimal: Null[string](), ModelThinkingLevelLow: Null[string](),
+				ModelThinkingLevelMedium: Null[string](), ModelThinkingLevelHigh: Some("high"), ModelThinkingLevelMax: Some("max"),
+			},
+		},
+		{
+			ID: "deepseek-v4-pro", Name: "DeepSeek V4 Pro", API: APIOpenAICompletions,
+			Provider: ProviderIDDeepSeek, BaseURL: "https://api.deepseek.com", Reasoning: true,
+			Input:         []ModelInput{ModelInputText},
+			Cost:          ModelCost{ModelCostRates: ModelCostRates{Input: 0.435, Output: 0.87, CacheRead: 0.003625}},
+			ContextWindow: 1_000_000, MaxTokens: 384_000,
+			Compat: Some(json.RawMessage(`{"supportsStore":false,"supportsDeveloperRole":false,"requiresReasoningContentOnAssistantMessages":true,"thinkingFormat":"deepseek"}`)),
+			ThinkingLevelMap: ThinkingLevelMap{
+				ModelThinkingLevelMinimal: Null[string](), ModelThinkingLevelLow: Null[string](),
+				ModelThinkingLevelMedium: Null[string](), ModelThinkingLevelHigh: Some("high"), ModelThinkingLevelMax: Some("max"),
+			},
+		},
+	},
+}
 
 // FlattenModelCatalog merges ordered groups into one catalog. As in the fixed
 // Pi baseline, provider is a build-time typing aid and does not rewrite or
@@ -190,7 +216,6 @@ func GetBuiltinProviders() []BuiltinProvider {
 }
 
 // GetBuiltinModels returns a fresh snapshot of one provider's built-in models.
-// It remains empty in the M0 runtime skeleton.
 func GetBuiltinModels(provider BuiltinProvider) []Model {
 	builtinModels := builtinModelsByProvider[provider]
 	models := make([]Model, len(builtinModels))
@@ -211,15 +236,14 @@ func GetBuiltinModel(provider BuiltinProvider, modelID string) (Model, bool) {
 }
 
 // GetBuiltinModelDataGeneratedAt returns the catalog generation time as Unix
-// milliseconds. M0 keeps it absent until runtime catalog loading starts.
+// milliseconds.
 func GetBuiltinModelDataGeneratedAt() (int64, bool) {
-	return 0, false
+	return 1786081866002, true
 }
 
 // BuiltinProviders constructs every built-in runtime provider in fixed source
 // order. Radius is included as a purely dynamic provider even though it has no
-// static catalog entry. Each call returns independent provider instances whose
-// auth and stream operations are side-effect-free Capability Stubs.
+// static catalog entry. Each call returns independent provider instances.
 func BuiltinProviders() []Provider {
 	providers := make([]Provider, 0, len(builtinProviderIDs)+1)
 	for _, providerID := range builtinProviderIDs {
@@ -234,11 +258,31 @@ func BuiltinProviders() []Provider {
 // BuiltinModels constructs a new model collection and registers all built-in
 // providers. It accepts zero or one options value, matching CreateModels.
 func BuiltinModels(options ...CreateModelsOptions) MutableModels {
-	models := CreateModels(options...)
+	configured := CreateModelsOptions{}
+	if len(options) != 0 {
+		configured = options[0]
+	}
+	if configured.AuthContext == nil {
+		configured.AuthContext = builtinAuthContext{}
+	}
+	models := CreateModels(configured)
 	for _, provider := range BuiltinProviders() {
 		models.SetProvider(provider)
 	}
 	return models
+}
+
+type builtinAuthContext struct{}
+
+func (builtinAuthContext) Env(ctx context.Context, name string) (string, error) {
+	if err := ctx.Err(); err != nil {
+		return "", err
+	}
+	return os.Getenv(name), nil
+}
+
+func (builtinAuthContext) FileExists(context.Context, string) (bool, error) {
+	return false, newNotImplemented("AuthContext.FileExists")
 }
 
 func newBuiltinProvider(providerID ProviderID) Provider {
@@ -248,7 +292,7 @@ func newBuiltinProvider(providerID ProviderID) Provider {
 		Name:   metadata.name,
 		Auth:   newBuiltinProviderAuth(providerID),
 		Models: GetBuiltinModels(providerID),
-		API:    newBuiltinProviderAPIs(metadata.apis),
+		API:    newBuiltinProviderAPIs(providerID, metadata.apis),
 	}
 	if metadata.baseURL != "" {
 		options.BaseURL = Some(metadata.baseURL)
@@ -318,6 +362,9 @@ func newBuiltinProviderAuth(providerID ProviderID) ProviderAuth {
 	auth := ProviderAuth{}
 	if metadata.apiKeyName != "" {
 		apiKey := NewStubAPIKeyAuth(metadata.apiKeyName)
+		if providerID == ProviderIDDeepSeek {
+			apiKey = EnvAPIKeyAuth(metadata.apiKeyName, "DEEPSEEK_API_KEY")
+		}
 		if !metadata.apiKeyCheck {
 			apiKey.Check = nil
 		}
@@ -332,10 +379,14 @@ func newBuiltinProviderAuth(providerID ProviderID) ProviderAuth {
 	return auth
 }
 
-func newBuiltinProviderAPIs(apiIDs []API) ProviderAPIConfig {
+func newBuiltinProviderAPIs(providerID ProviderID, apiIDs []API) ProviderAPIConfig {
 	streams := make(map[API]ProviderStreams, len(apiIDs))
 	for _, apiID := range apiIDs {
-		streams[apiID] = NewStubProviderStreams()
+		if providerID == ProviderIDDeepSeek && apiID == APIOpenAICompletions {
+			streams[apiID] = OpenAICompletionsAPI()
+		} else {
+			streams[apiID] = NewStubProviderStreams()
+		}
 	}
 	return ProviderAPIs(streams)
 }

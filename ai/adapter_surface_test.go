@@ -289,9 +289,10 @@ func TestOpenAICompletionsFutureMilestoneOptionsRemainExplicitStubs(t *testing.T
 	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
 		context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{},
 	), "OpenAICompletions.Compat.supportsStore")
+	deepSeekReasoning := ai.OpenAIReasoningEffortHigh
 	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
-		context.Background(), ai.Model{API: ai.APIOpenAICompletions, Provider: ai.ProviderIDDeepSeek}, ai.Context{}, ai.OpenAICompletionsOptions{},
-	), "OpenAICompletions.Compat.ProviderDetection")
+		context.Background(), ai.Model{API: ai.APIOpenAICompletions, Provider: ai.ProviderIDDeepSeek, Reasoning: true}, ai.Context{}, ai.OpenAICompletionsOptions{ReasoningEffort: &deepSeekReasoning},
+	), "OpenAICompletions.Reasoning")
 	_, err = ai.ConvertOpenAICompletionsMessages(ai.Model{API: ai.APIOpenAICompletions}, ai.Context{Messages: []ai.Message{
 		ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserBlocks(ai.ImageContent{Type: ai.ContentTypeImage, Data: "aGk=", MIMEType: "image/png"})},
 	}}, ai.OpenAICompletionsCompat{})

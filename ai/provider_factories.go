@@ -93,7 +93,7 @@ func RadiusProvider(options ...RadiusProviderOptions) Provider {
 		ID:     configured.ID,
 		Name:   configured.Name,
 		Auth:   auth,
-		API:    newBuiltinProviderAPIs([]API{APIPiMessages}),
+		API:    newBuiltinProviderAPIs(configured.ID, []API{APIPiMessages}),
 		Models: nil,
 		FetchModels: func(RefreshModelsContext) ([]Model, error) {
 			return nil, newNotImplemented("Radius.FetchModels")

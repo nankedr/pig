@@ -82,10 +82,10 @@ func TestProviderFactoriesExposeEveryBuiltinProvider(t *testing.T) {
 	}
 }
 
-func TestProviderFactoryStubDoesNotInvokeRequestHooks(t *testing.T) {
+func TestDeferredProviderFactoryDoesNotInvokeRequestHooks(t *testing.T) {
 	t.Parallel()
 
-	provider := ai.DeepSeekProvider()
+	provider := ai.GroqProvider()
 	model := ai.Model{ID: "stub", Provider: provider.ID(), API: ai.APIOpenAICompletions}
 	invoked := 0
 	stream := provider.Stream(context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{

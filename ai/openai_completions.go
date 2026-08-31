@@ -105,7 +105,7 @@ func StreamSimpleOpenAICompletions(ctx context.Context, model Model, input Conte
 }
 
 func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAICompletionsCompat, _ ...ConvertOpenAICompletionsMessagesOptions) ([]json.RawMessage, error) {
-	if model.Reasoning {
+	if model.Reasoning && model.Provider != ProviderIDDeepSeek {
 		return nil, newNotImplemented("OpenAICompletions.Reasoning")
 	}
 	if err := validateOpenAICompletionsCompat(compat); err != nil {
@@ -976,10 +976,37 @@ func resolveOpenAICompletionsCompat(model Model) (openAICompletionsCompat, error
 		if err := json.Unmarshal(raw, &fields); err != nil {
 			return openAICompletionsCompat{}, err
 		}
-		delete(fields, "supportsUsageInStreaming")
-		delete(fields, "supportsFinishReason")
+		supported := make(map[string]json.RawMessage, 2)
+		for _, name := range []string{"supportsUsageInStreaming", "supportsFinishReason"} {
+			if value, present := fields[name]; present {
+				supported[name] = value
+				delete(fields, name)
+			}
+		}
+		if model.Provider == ProviderIDDeepSeek {
+			for _, field := range []struct {
+				name string
+				want string
+			}{
+				{name: "supportsStore", want: "false"},
+				{name: "supportsDeveloperRole", want: "false"},
+				{name: "requiresReasoningContentOnAssistantMessages", want: "true"},
+				{name: "thinkingFormat", want: `"deepseek"`},
+			} {
+				if value, present := fields[field.name]; present {
+					if string(bytes.TrimSpace(value)) != field.want {
+						return openAICompletionsCompat{}, newNotImplemented("OpenAICompletions.Compat." + field.name)
+					}
+					delete(fields, field.name)
+				}
+			}
+		}
 		if names := sortedStringKeys(fields); len(names) > 0 {
 			return openAICompletionsCompat{}, newNotImplemented("OpenAICompletions.Compat." + names[0])
+		}
+		raw, err := json.Marshal(supported)
+		if err != nil {
+			return openAICompletionsCompat{}, err
 		}
 		if err := json.Unmarshal(raw, &compat); err != nil {
 			return openAICompletionsCompat{}, err
@@ -1033,7 +1060,7 @@ func validateOpenAICompletionsM1(model Model, input Context, options OpenAICompl
 	if model.API != APIOpenAICompletions {
 		return fmt.Errorf("%w: model API %q is not %q", ErrEventStreamInvariant, model.API, APIOpenAICompletions)
 	}
-	if model.Reasoning || options.ReasoningEffort != nil || options.ThinkingBudgets != nil {
+	if (model.Reasoning && model.Provider != ProviderIDDeepSeek) || options.ReasoningEffort != nil || options.ThinkingBudgets != nil {
 		return newNotImplemented("OpenAICompletions.Reasoning")
 	}
 	if model.SamplingParams != nil || options.SamplingParams != nil || options.CacheRetention != nil || options.SessionID != nil || options.Env != nil {
@@ -1047,10 +1074,13 @@ func validateOpenAICompletionsM1(model Model, input Context, options OpenAICompl
 }
 
 func openAIRequiresProviderCompat(model Model) bool {
+	if model.Provider == ProviderIDDeepSeek {
+		return false
+	}
 	baseURL := model.BaseURL
 	switch model.Provider {
 	case ProviderIDAntLing, ProviderIDCerebras, ProviderIDCloudflareAIGateway, ProviderIDCloudflareWorkersAI,
-		ProviderIDDeepSeek, ProviderIDMoonshotAI, ProviderIDMoonshotAICN, ProviderIDNVIDIA, ProviderIDOpenCode,
+		ProviderIDMoonshotAI, ProviderIDMoonshotAICN, ProviderIDNVIDIA, ProviderIDOpenCode,
 		ProviderIDOpenRouter, ProviderIDTogether, ProviderIDXAI, ProviderIDZAI, ProviderIDZAICodingCN:
 		return true
 	}
