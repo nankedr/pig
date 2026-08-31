@@ -800,6 +800,9 @@ func TestOpenAICompletionsMatrixTracksVerifiedTextSlice(t *testing.T) {
 	for id := range openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-sse.json", "ai/openai-completions/m1-sse-boundaries") {
 		verifiedFixtureIDs[id] = true
 	}
+	for id := range openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-retry.json", "ai/openai-completions/m1-transport-retry") {
+		verifiedFixtureIDs[id] = true
+	}
 	for _, entry := range entries {
 		if entry.Matrix == nil || entry.Matrix.API != "openai-completions" {
 			continue

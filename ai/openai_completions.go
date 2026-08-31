@@ -8,8 +8,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
+	"math/rand/v2"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -283,23 +286,15 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	if fetch == nil {
 		fetch = defaultOpenAIFetch
 	}
-	response, err := fetch(ctx, request)
+	response, body, err := fetchOpenAICompletions(ctx, fetch, request, options.MaxRetries, options.MaxRetryDelayMS)
 	if err != nil {
 		return err
-	}
-	body := response.BodyReader
-	if body == nil {
-		body = io.NopCloser(bytes.NewReader(response.Body))
 	}
 	var closeOnce sync.Once
 	closeBody := func() { closeOnce.Do(func() { _ = body.Close() }) }
 	defer closeBody()
 	stopClose := context.AfterFunc(ctx, closeBody)
 	defer stopClose()
-	if response.Status < 200 || response.Status >= 300 {
-		detail, _ := io.ReadAll(io.LimitReader(body, 4096))
-		return fmt.Errorf("provider response %d: %s", response.Status, strings.TrimSpace(string(detail)))
-	}
 	if options.OnResponse != nil {
 		if err := options.OnResponse(ctx, ProviderResponse{Status: response.Status, Headers: cloneOpenAIHeaders(response.Headers)}, model); err != nil {
 			return err
@@ -401,6 +396,146 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	return nil
 }
 
+type openAIProviderError struct {
+	status  *int
+	headers map[string]string
+	message string
+	cause   error
+}
+
+func (e *openAIProviderError) Error() string { return e.message }
+func (e *openAIProviderError) Unwrap() error { return e.cause }
+
+type openAIRequestConstructionError struct{ cause error }
+
+func (e *openAIRequestConstructionError) Error() string { return e.cause.Error() }
+func (e *openAIRequestConstructionError) Unwrap() error { return e.cause }
+
+func fetchOpenAICompletions(ctx context.Context, fetch FetchFunction, request FetchRequest, maxRetries *int, maxRetryDelayMS *int64) (FetchResponse, io.ReadCloser, error) {
+	retries := 0
+	if maxRetries != nil && *maxRetries > 0 {
+		retries = *maxRetries
+	}
+	retryIndex := 0
+	for {
+		response, err := fetch(ctx, request)
+		var providerErr *openAIProviderError
+		if err != nil {
+			if response.BodyReader != nil {
+				_ = response.BodyReader.Close()
+			}
+			if ctx.Err() != nil {
+				return FetchResponse{}, nil, context.Cause(ctx)
+			}
+			var constructionErr *openAIRequestConstructionError
+			if errors.As(err, &constructionErr) {
+				return FetchResponse{}, nil, constructionErr.cause
+			}
+			providerErr = &openAIProviderError{message: err.Error(), cause: err}
+		} else {
+			body := response.BodyReader
+			if body == nil {
+				body = io.NopCloser(bytes.NewReader(response.Body))
+			}
+			if response.Status >= 200 && response.Status < 300 {
+				return response, body, nil
+			}
+			var closeOnce sync.Once
+			closeBody := func() { closeOnce.Do(func() { _ = body.Close() }) }
+			stopClose := context.AfterFunc(ctx, closeBody)
+			detail, _ := io.ReadAll(io.LimitReader(body, 4096))
+			stopClose()
+			closeBody()
+			if ctx.Err() != nil {
+				return FetchResponse{}, nil, context.Cause(ctx)
+			}
+			providerErr = &openAIProviderError{
+				status: &response.Status, headers: cloneOpenAIHeaders(response.Headers),
+				message: fmt.Sprintf("provider response %d: %s", response.Status, strings.TrimSpace(string(detail))),
+			}
+		}
+		if retries == 0 || !isRetryableOpenAIProviderError(providerErr) {
+			return FetchResponse{}, nil, providerErr
+		}
+		delay, delayErr := openAIRetryDelay(providerErr, retryIndex, maxRetryDelayMS, time.Now(), rand.Float64())
+		if delayErr != nil {
+			return FetchResponse{}, nil, delayErr
+		}
+		retries--
+		retryIndex++
+		if err := waitOpenAIRetry(ctx, delay); err != nil {
+			return FetchResponse{}, nil, err
+		}
+	}
+}
+
+func isRetryableOpenAIProviderError(err *openAIProviderError) bool {
+	if shouldRetry, ok := openAIHeader(err.headers, "x-should-retry"); ok {
+		if shouldRetry == "true" {
+			return true
+		}
+		if shouldRetry == "false" {
+			return false
+		}
+	}
+	return err.status == nil || *err.status == http.StatusRequestTimeout || *err.status == http.StatusConflict || *err.status == http.StatusTooManyRequests || *err.status >= 500
+}
+
+func openAIHeader(headers map[string]string, name string) (string, bool) {
+	for key, value := range headers {
+		if equalFoldASCII(key, name) {
+			return value, true
+		}
+	}
+	return "", false
+}
+
+func openAIRetryDelay(err *openAIProviderError, retryIndex int, maxRetryDelayMS *int64, now time.Time, random float64) (time.Duration, error) {
+	if value, ok := openAIHeader(err.headers, "retry-after-ms"); ok && value != "" {
+		if milliseconds, parseErr := strconv.ParseFloat(strings.TrimSpace(value), 64); parseErr == nil && !math.IsNaN(milliseconds) {
+			return validateOpenAIServerRetryDelay(milliseconds, maxRetryDelayMS, err.message)
+		}
+	}
+	if value, ok := openAIHeader(err.headers, "retry-after"); ok && value != "" {
+		if seconds, parseErr := strconv.ParseFloat(strings.TrimSpace(value), 64); parseErr == nil {
+			return validateOpenAIServerRetryDelay(seconds*1_000, maxRetryDelayMS, err.message)
+		}
+		retryAt, parseErr := http.ParseTime(value)
+		if parseErr != nil {
+			return 0, nil
+		}
+		milliseconds := float64(retryAt.UnixMilli() - now.UnixMilli())
+		return validateOpenAIServerRetryDelay(milliseconds, maxRetryDelayMS, err.message)
+	}
+	base := math.Min(500*math.Pow(2, float64(retryIndex)), 8_000)
+	return time.Duration(base * (1 - random*.25) * float64(time.Millisecond)), nil
+}
+
+func validateOpenAIServerRetryDelay(milliseconds float64, maxDelayMS *int64, providerError string) (time.Duration, error) {
+	maxDelay := int64(60_000)
+	if maxDelayMS != nil {
+		maxDelay = *maxDelayMS
+	}
+	if maxDelay > 0 && milliseconds > float64(maxDelay) {
+		return 0, fmt.Errorf("Server requested %.0fs retry delay (max: %.0fs). %s", math.Ceil(milliseconds/1_000), math.Ceil(float64(maxDelay)/1_000), providerError)
+	}
+	if milliseconds <= 0 {
+		return 0, nil
+	}
+	return time.Duration(milliseconds * float64(time.Millisecond)), nil
+}
+
+func waitOpenAIRetry(ctx context.Context, delay time.Duration) error {
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-timer.C:
+		return nil
+	case <-ctx.Done():
+		return context.Cause(ctx)
+	}
+}
+
 func consumeOpenAISSE(reader io.Reader, handle func(string) (bool, error)) error {
 	buffered := bufio.NewReader(reader)
 	var data []string
@@ -466,7 +601,7 @@ func consumeOpenAISSE(reader io.Reader, handle func(string) (bool, error)) error
 func defaultOpenAIFetch(ctx context.Context, request FetchRequest) (FetchResponse, error) {
 	httpRequest, err := http.NewRequestWithContext(ctx, request.Method, request.URL, bytes.NewReader(request.Body))
 	if err != nil {
-		return FetchResponse{}, err
+		return FetchResponse{}, &openAIRequestConstructionError{cause: err}
 	}
 	for name, value := range request.Headers {
 		httpRequest.Header[name] = []string{value}
@@ -638,9 +773,6 @@ func validateOpenAICompletionsM1(model Model, input Context, options OpenAICompl
 	}
 	if model.SamplingParams != nil || options.SamplingParams != nil || options.CacheRetention != nil || options.SessionID != nil || options.Env != nil {
 		return newNotImplemented("OpenAICompletions.AdvancedOptions")
-	}
-	if (options.MaxRetries != nil && *options.MaxRetries > 0) || options.MaxRetryDelayMS != nil {
-		return newNotImplemented("OpenAICompletions.TransportRetry")
 	}
 	if len(input.Tools) > 0 {
 		return newNotImplemented("OpenAICompletions.Tools")

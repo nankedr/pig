@@ -1,0 +1,348 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ai/openai-completions/m1-transport-retry",
+  "catalog_ids": [
+    "matrix:ai/openai-completions/error/retry-budget-exhausted",
+    "matrix:ai/openai-completions/error/retry-delay-cap-configured",
+    "matrix:ai/openai-completions/error/retry-delay-cap-default",
+    "matrix:ai/openai-completions/error/retry-delay-cap-disabled",
+    "matrix:ai/openai-completions/error/retry-delay-exponential-jitter",
+    "matrix:ai/openai-completions/error/retry-delay-retry-after-date",
+    "matrix:ai/openai-completions/error/retry-delay-retry-after-ms",
+    "matrix:ai/openai-completions/error/retry-delay-retry-after-ms-invalid",
+    "matrix:ai/openai-completions/error/retry-delay-retry-after-seconds",
+    "matrix:ai/openai-completions/error/retry-header-x-should-retry-false",
+    "matrix:ai/openai-completions/error/retry-header-x-should-retry-true",
+    "matrix:ai/openai-completions/error/retry-max-retries-default",
+    "matrix:ai/openai-completions/error/retry-signal-abort-during-sleep",
+    "matrix:ai/openai-completions/error/retry-signal-pre-aborted",
+    "matrix:ai/openai-completions/error/retry-status-408",
+    "matrix:ai/openai-completions/error/retry-status-409",
+    "matrix:ai/openai-completions/error/retry-status-429",
+    "matrix:ai/openai-completions/error/retry-status-5xx",
+    "matrix:ai/openai-completions/error/retry-status-other",
+    "matrix:ai/openai-completions/error/retry-status-undefined",
+    "matrix:ai/openai-completions/header/header-retry-after",
+    "matrix:ai/openai-completions/header/header-retry-after-ms",
+    "matrix:ai/openai-completions/header/header-x-should-retry",
+    "matrix:ai/openai-completions/option/open-aicompletions-options-max-retries",
+    "matrix:ai/openai-completions/option/open-aicompletions-options-max-retry-delay-ms"
+  ],
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "upstream": {
+    "module": "ai",
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/utils/provider-retry.ts#retryProviderRequest"
+  },
+  "input": {
+    "fixed_now": "2026-08-31T00:00:00.000Z",
+    "random_cases": [
+      0,
+      0.333,
+      0.4,
+      0.8
+    ]
+  },
+  "input_sha256": "4ea591ddf4f21d854f2cb258d770faf595c50f1b5ac23bcdda46c10a31050429",
+  "actual": {
+    "budget": {
+      "absent": {
+        "attempts": 1,
+        "delays_ms": [],
+        "outcome": {
+          "kind": "error",
+          "message": "provider error 503",
+          "name": "Error"
+        }
+      },
+      "exhausted": {
+        "attempts": 3,
+        "delays_ms": [
+          500,
+          1000
+        ],
+        "outcome": {
+          "kind": "error",
+          "message": "provider error 503",
+          "name": "Error"
+        }
+      },
+      "zero": {
+        "attempts": 1,
+        "delays_ms": [],
+        "outcome": {
+          "kind": "error",
+          "message": "provider error 503",
+          "name": "Error"
+        }
+      }
+    },
+    "cancel": {
+      "during_sleep": {
+        "attempts": 1,
+        "cleared_timers": 1,
+        "delays_ms": [
+          277403000
+        ],
+        "outcome": {
+          "kind": "error",
+          "message": "Request aborted",
+          "name": "AbortError"
+        }
+      },
+      "pre_aborted": {
+        "attempts": 1,
+        "delays_ms": [],
+        "outcome": {
+          "kind": "error",
+          "message": "Request aborted",
+          "name": "AbortError"
+        }
+      }
+    },
+    "cap": {
+      "configured_equal": {
+        "attempts": 2,
+        "delays_ms": [
+          1000
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "configured_exceeded": {
+        "attempts": 1,
+        "delays_ms": [],
+        "outcome": {
+          "kind": "error",
+          "message": "Server requested 2s retry delay (max: 1s). rate limited",
+          "name": "Error"
+        }
+      },
+      "default": {
+        "attempts": 1,
+        "delays_ms": [],
+        "outcome": {
+          "kind": "error",
+          "message": "Server requested 61s retry delay (max: 60s). rate limited",
+          "name": "Error"
+        }
+      },
+      "disabled": {
+        "attempts": 2,
+        "delays_ms": [
+          277403000
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      }
+    },
+    "delay": {
+      "eight_second_cap": {
+        "attempts": 7,
+        "delays_ms": [
+          400,
+          800,
+          1600,
+          3200,
+          6400,
+          6400
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "exponential_jitter": {
+        "attempts": 4,
+        "delays_ms": [
+          450,
+          900,
+          1800
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "fractional_jitter": {
+        "attempts": 2,
+        "delays_ms": [
+          458.375
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "invalid_ms_fallback": {
+        "attempts": 2,
+        "delays_ms": [
+          500
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "retry_after_date": {
+        "attempts": 2,
+        "delays_ms": [
+          2000
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "retry_after_ms_precedence": {
+        "attempts": 2,
+        "delays_ms": [
+          125
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "retry_after_seconds": {
+        "attempts": 2,
+        "delays_ms": [
+          1500
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      }
+    },
+    "status": {
+      "forbidden": {
+        "attempts": 1,
+        "delays_ms": [],
+        "outcome": {
+          "kind": "error",
+          "message": "provider error 429",
+          "name": "Error"
+        }
+      },
+      "forced": {
+        "attempts": 2,
+        "delays_ms": [
+          500
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "network": {
+        "attempts": 2,
+        "delays_ms": [
+          500
+        ],
+        "outcome": {
+          "kind": "success",
+          "value": "ok"
+        }
+      },
+      "rejected": {
+        "400": {
+          "attempts": 1,
+          "delays_ms": [],
+          "outcome": {
+            "kind": "error",
+            "message": "provider error 400",
+            "name": "Error"
+          }
+        },
+        "404": {
+          "attempts": 1,
+          "delays_ms": [],
+          "outcome": {
+            "kind": "error",
+            "message": "provider error 404",
+            "name": "Error"
+          }
+        },
+        "499": {
+          "attempts": 1,
+          "delays_ms": [],
+          "outcome": {
+            "kind": "error",
+            "message": "provider error 499",
+            "name": "Error"
+          }
+        }
+      },
+      "retryable": {
+        "408": {
+          "attempts": 2,
+          "delays_ms": [
+            0
+          ],
+          "outcome": {
+            "kind": "success",
+            "value": "ok"
+          }
+        },
+        "409": {
+          "attempts": 2,
+          "delays_ms": [
+            0
+          ],
+          "outcome": {
+            "kind": "success",
+            "value": "ok"
+          }
+        },
+        "429": {
+          "attempts": 2,
+          "delays_ms": [
+            0
+          ],
+          "outcome": {
+            "kind": "success",
+            "value": "ok"
+          }
+        },
+        "500": {
+          "attempts": 2,
+          "delays_ms": [
+            0
+          ],
+          "outcome": {
+            "kind": "success",
+            "value": "ok"
+          }
+        },
+        "599": {
+          "attempts": 2,
+          "delays_ms": [
+            0
+          ],
+          "outcome": {
+            "kind": "success",
+            "value": "ok"
+          }
+        }
+      }
+    }
+  },
+  "hash": {
+    "algorithm": "sha256",
+    "observations_sha256": "94abead8cae21cb6cc49e4d27471dececb575d9b715f8c005232dda65cb52d36"
+  },
+  "exec_method": "node --experimental-strip-types parity/oracle/openai-completions-retry.mjs",
+  "env": {
+    "node_version": "v24.12.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  }
+}
