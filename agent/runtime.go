@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/nankedr/pig/ai"
@@ -104,6 +105,37 @@ func failedAgentEventStream(operation string) *AgentEventStream {
 	return &AgentEventStream{done: true, resultErr: newNotImplemented(operation), changed: make(chan struct{})}
 }
 
+func newAgentEventStream() *AgentEventStream {
+	return &AgentEventStream{changed: make(chan struct{})}
+}
+
+func (s *AgentEventStream) push(event AgentEvent) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.done {
+		return
+	}
+	s.queue = append(s.queue, event)
+	s.signalLocked()
+}
+
+func (s *AgentEventStream) end(result []AgentMessage, err error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.done {
+		return
+	}
+	s.done = true
+	s.result = cloneAgentMessages(result)
+	s.resultErr = err
+	s.signalLocked()
+}
+
+func (s *AgentEventStream) signalLocked() {
+	close(s.changed)
+	s.changed = make(chan struct{})
+}
+
 func (s *AgentEventStream) Next(ctx context.Context) (AgentEvent, bool, error) {
 	for {
 		s.mu.Lock()
@@ -131,7 +163,7 @@ func (s *AgentEventStream) Result(ctx context.Context) ([]AgentMessage, error) {
 	for {
 		s.mu.Lock()
 		if s.done {
-			result, err := append([]AgentMessage(nil), s.result...), s.resultErr
+			result, err := cloneAgentMessages(s.result), s.resultErr
 			s.mu.Unlock()
 			return result, err
 		}
@@ -145,20 +177,295 @@ func (s *AgentEventStream) Result(ctx context.Context) ([]AgentMessage, error) {
 	}
 }
 
-func AgentLoop(context.Context, []AgentMessage, AgentContext, AgentLoopConfig, StreamFunction) *AgentEventStream {
-	return failedAgentEventStream("AgentLoop")
+func AgentLoop(ctx context.Context, prompts []AgentMessage, agentContext AgentContext, config AgentLoopConfig, streamFunction StreamFunction) *AgentEventStream {
+	stream := newAgentEventStream()
+	go func() {
+		result, err := RunAgentLoop(ctx, prompts, agentContext, config, func(_ context.Context, event AgentEvent) error {
+			stream.push(event)
+			return nil
+		}, streamFunction)
+		stream.end(result, err)
+	}()
+	return stream
 }
 
-func AgentLoopContinue(context.Context, AgentContext, AgentLoopConfig, StreamFunction) *AgentEventStream {
-	return failedAgentEventStream("AgentLoopContinue")
+func AgentLoopContinue(ctx context.Context, agentContext AgentContext, config AgentLoopConfig, streamFunction StreamFunction) *AgentEventStream {
+	stream := newAgentEventStream()
+	go func() {
+		result, err := RunAgentLoopContinue(ctx, agentContext, config, func(_ context.Context, event AgentEvent) error {
+			stream.push(event)
+			return nil
+		}, streamFunction)
+		stream.end(result, err)
+	}()
+	return stream
 }
 
-func RunAgentLoop(context.Context, []AgentMessage, AgentContext, AgentLoopConfig, AgentEventSink, StreamFunction) ([]AgentMessage, error) {
-	return nil, newNotImplemented("RunAgentLoop")
+func RunAgentLoop(ctx context.Context, prompts []AgentMessage, agentContext AgentContext, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) ([]AgentMessage, error) {
+	ownedPrompts, err := cloneAgentMessagesForOwnership(prompts)
+	if err != nil {
+		return nil, err
+	}
+	currentContext, err := cloneAgentContext(agentContext)
+	if err != nil {
+		return nil, err
+	}
+	currentContext.Messages = append(currentContext.Messages, cloneAgentMessages(ownedPrompts)...)
+	newMessages := cloneAgentMessages(ownedPrompts)
+	if err := emitAgentEvent(ctx, emit, AgentStartEvent{Type: AgentEventTypeAgentStart}); err != nil {
+		return nil, err
+	}
+	if err := emitAgentEvent(ctx, emit, TurnStartEvent{Type: AgentEventTypeTurnStart}); err != nil {
+		return nil, err
+	}
+	for _, prompt := range ownedPrompts {
+		if err := emitMessageLifecycle(ctx, emit, prompt); err != nil {
+			return nil, err
+		}
+	}
+	return runToolFreeTurn(ctx, currentContext, newMessages, config, emit, streamFunction)
 }
 
-func RunAgentLoopContinue(context.Context, AgentContext, AgentLoopConfig, AgentEventSink, StreamFunction) ([]AgentMessage, error) {
-	return nil, newNotImplemented("RunAgentLoopContinue")
+func RunAgentLoopContinue(ctx context.Context, agentContext AgentContext, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) ([]AgentMessage, error) {
+	currentContext, err := cloneAgentContext(agentContext)
+	if err != nil {
+		return nil, err
+	}
+	if len(currentContext.Messages) == 0 {
+		return nil, fmt.Errorf("cannot continue: no messages in context")
+	}
+	if currentContext.Messages[len(currentContext.Messages)-1].MessageRole() == ai.MessageRoleAssistant {
+		return nil, fmt.Errorf("cannot continue from message role: assistant")
+	}
+	if err := emitAgentEvent(ctx, emit, AgentStartEvent{Type: AgentEventTypeAgentStart}); err != nil {
+		return nil, err
+	}
+	if err := emitAgentEvent(ctx, emit, TurnStartEvent{Type: AgentEventTypeTurnStart}); err != nil {
+		return nil, err
+	}
+	return runToolFreeTurn(ctx, currentContext, []AgentMessage{}, config, emit, streamFunction)
+}
+
+func runToolFreeTurn(ctx context.Context, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) ([]AgentMessage, error) {
+	if ctx == nil {
+		return nil, fmt.Errorf("Agent loop context must not be nil")
+	}
+	if emit == nil {
+		return nil, fmt.Errorf("Agent event sink must not be nil")
+	}
+	if streamFunction == nil {
+		return nil, newNotImplemented("Agent.DefaultStreamFunction")
+	}
+	messages := cloneAgentMessages(agentContext.Messages)
+	var err error
+	if config.TransformContext != nil {
+		messages, err = config.TransformContext(ctx, messages)
+		if err != nil {
+			return nil, err
+		}
+	}
+	convertToLLM := config.ConvertToLLM
+	if convertToLLM == nil {
+		convertToLLM = DefaultConvertToLLM
+	}
+	llmMessages, err := convertToLLM(ctx, messages)
+	if err != nil {
+		return nil, err
+	}
+	options := config.SimpleStreamOptions
+	if config.GetAPIKey != nil {
+		if key, ok, err := config.GetAPIKey(ctx, config.Model.Provider); err != nil {
+			return nil, err
+		} else if ok {
+			options.APIKey = &key
+		}
+	}
+	modelContext := ai.Context{SystemPrompt: ai.Some(agentContext.SystemPrompt), Messages: llmMessages}
+	if len(agentContext.Tools) != 0 {
+		modelContext.Tools = make([]ai.Tool, len(agentContext.Tools))
+		for i := range agentContext.Tools {
+			modelContext.Tools[i] = cloneAgentToolMetadata(agentContext.Tools[i].Tool)
+		}
+	}
+	response := streamFunction(ctx, config.Model, modelContext, options)
+	if response == nil {
+		return nil, fmt.Errorf("Agent stream function returned nil")
+	}
+	waitContext := context.WithoutCancel(ctx)
+	started := false
+	for {
+		event, ok, err := response.Next(waitContext)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			break
+		}
+		partial, hasPartial := assistantEventPartial(event)
+		switch event.AssistantMessageEventType() {
+		case ai.AssistantMessageEventTypeStart:
+			started = true
+			if err := emitAgentEvent(ctx, emit, MessageStartEvent{Type: AgentEventTypeMessageStart, Message: partial}); err != nil {
+				return nil, err
+			}
+		case ai.AssistantMessageEventTypeDone, ai.AssistantMessageEventTypeError:
+			message, err := response.Result(waitContext)
+			if err != nil {
+				return nil, err
+			}
+			return finishToolFreeTurn(ctx, emit, newMessages, message, started)
+		default:
+			if hasPartial {
+				if err := emitAgentEvent(ctx, emit, MessageUpdateEvent{
+					Type: AgentEventTypeMessageUpdate, Message: partial, AssistantMessageEvent: event,
+				}); err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+	message, err := response.Result(waitContext)
+	if err != nil {
+		return nil, err
+	}
+	return finishToolFreeTurn(ctx, emit, newMessages, message, started)
+}
+
+func finishToolFreeTurn(ctx context.Context, emit AgentEventSink, newMessages []AgentMessage, message ai.AssistantMessage, started bool) ([]AgentMessage, error) {
+	message = ai.CloneAssistantMessage(message)
+	if !started {
+		if err := emitAgentEvent(ctx, emit, MessageStartEvent{Type: AgentEventTypeMessageStart, Message: message}); err != nil {
+			return nil, err
+		}
+	}
+	if err := emitAgentEvent(ctx, emit, MessageEndEvent{Type: AgentEventTypeMessageEnd, Message: message}); err != nil {
+		return nil, err
+	}
+	newMessages = append(newMessages, message)
+	for _, content := range message.Content {
+		switch content.(type) {
+		case ai.ToolCall, *ai.ToolCall:
+			return cloneAgentMessages(newMessages), newNotImplemented("Agent.ToolExecution")
+		}
+	}
+	if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: []ai.ToolResultMessage{}}); err != nil {
+		return nil, err
+	}
+	if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: newMessages}); err != nil {
+		return nil, err
+	}
+	return cloneAgentMessages(newMessages), nil
+}
+
+func emitMessageLifecycle(ctx context.Context, emit AgentEventSink, message AgentMessage) error {
+	if err := emitAgentEvent(ctx, emit, MessageStartEvent{Type: AgentEventTypeMessageStart, Message: message}); err != nil {
+		return err
+	}
+	return emitAgentEvent(ctx, emit, MessageEndEvent{Type: AgentEventTypeMessageEnd, Message: message})
+}
+
+func emitAgentEvent(ctx context.Context, emit AgentEventSink, event AgentEvent) error {
+	if emit == nil {
+		return fmt.Errorf("Agent event sink must not be nil")
+	}
+	return emit(ctx, cloneAgentEvent(event))
+}
+
+func cloneAgentContext(agentContext AgentContext) (AgentContext, error) {
+	messages, err := cloneAgentMessagesForOwnership(agentContext.Messages)
+	if err != nil {
+		return AgentContext{}, err
+	}
+	return AgentContext{
+		SystemPrompt: agentContext.SystemPrompt,
+		Messages:     messages,
+		Tools:        cloneAgentTools(agentContext.Tools),
+	}, nil
+}
+
+func cloneAgentEvent(event AgentEvent) AgentEvent {
+	switch event := event.(type) {
+	case AgentStartEvent, TurnStartEvent:
+		return event
+	case AgentEndEvent:
+		event.Messages = cloneAgentMessages(event.Messages)
+		return event
+	case MessageStartEvent:
+		event.Message = cloneAgentMessage(event.Message)
+		return event
+	case MessageUpdateEvent:
+		event.Message = cloneAgentMessage(event.Message)
+		event.AssistantMessageEvent = cloneAssistantMessageEvent(event.AssistantMessageEvent)
+		return event
+	case MessageEndEvent:
+		event.Message = cloneAgentMessage(event.Message)
+		return event
+	case TurnEndEvent:
+		event.Message = cloneAgentMessage(event.Message)
+		event.ToolResults = append([]ai.ToolResultMessage(nil), event.ToolResults...)
+		return event
+	default:
+		return event
+	}
+}
+
+func cloneAssistantMessageEvent(event ai.AssistantMessageEvent) ai.AssistantMessageEvent {
+	encoded, err := ai.MarshalAssistantMessageEvent(event)
+	if err != nil {
+		return event
+	}
+	cloned, err := ai.UnmarshalAssistantMessageEvent(encoded)
+	if err != nil {
+		return event
+	}
+	return cloned
+}
+
+func assistantEventPartial(event ai.AssistantMessageEvent) (ai.AssistantMessage, bool) {
+	switch event := event.(type) {
+	case ai.AssistantMessageStartEvent:
+		return event.Partial, true
+	case ai.AssistantMessageTextStartEvent:
+		return event.Partial, true
+	case ai.AssistantMessageTextDeltaEvent:
+		return event.Partial, true
+	case ai.AssistantMessageTextEndEvent:
+		return event.Partial, true
+	case ai.AssistantMessageThinkingStartEvent:
+		return event.Partial, true
+	case ai.AssistantMessageThinkingDeltaEvent:
+		return event.Partial, true
+	case ai.AssistantMessageThinkingEndEvent:
+		return event.Partial, true
+	case ai.AssistantMessageToolCallStartEvent:
+		return event.Partial, true
+	case ai.AssistantMessageToolCallDeltaEvent:
+		return event.Partial, true
+	case ai.AssistantMessageToolCallEndEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageStartEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageTextStartEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageTextDeltaEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageTextEndEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageThinkingStartEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageThinkingDeltaEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageThinkingEndEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageToolCallStartEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageToolCallDeltaEvent:
+		return event.Partial, true
+	case *ai.AssistantMessageToolCallEndEvent:
+		return event.Partial, true
+	default:
+		return ai.AssistantMessage{}, false
+	}
 }
 
 // SetDefaultStreamFunction is an M0 side-effect-free stub: it deliberately

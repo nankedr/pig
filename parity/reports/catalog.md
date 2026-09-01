@@ -12,8 +12,8 @@
 | Status | Count |
 | --- | --- |
 | inventoried | 5251 |
-| scaffolded | 4125 |
-| partial | 163 |
+| scaffolded | 4124 |
+| partial | 164 |
 | implemented | 3 |
 | verified | 98 |
 | deferred | 2 |
@@ -831,7 +831,6 @@
 | constructor:agent/src/harness/session/memory.ts#InMemorySessionRepo | scaffolded | M8 | contract | github.com/nankedr/pig/agent.NewInMemorySessionRepo | agent |
 | constructor:agent/src/harness/session/memory.ts#InMemorySessionStorage | scaffolded | M8 | contract | github.com/nankedr/pig/agent.NewInMemorySessionStorage | agent |
 | constructor:agent/src/harness/session/session.ts#Session | scaffolded | M8 | contract | github.com/nankedr/pig/agent.NewSession | agent |
-| contract:agent/runtime | scaffolded | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:session/v4-harness | scaffolded | M8 | contract | github.com/nankedr/pig/agent | agent |
 | member:agent/src/agent.ts#Agent.abort | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Abort | agent |
 | member:agent/src/agent.ts#Agent.afterToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).AfterToolCall / github.com/nankedr/pig/agent.(*Agent).SetAfterToolCall | agent |
@@ -2073,6 +2072,7 @@
 | contract:agent/events | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/messages | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/proxy | partial | M2 | contract | github.com/nankedr/pig/agent | agent |
+| contract:agent/runtime | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/state-and-queues | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/tools | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 

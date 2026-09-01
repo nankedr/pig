@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/nankedr/pig/ai"
 )
@@ -82,9 +83,10 @@ type Agent struct {
 	steeringMode  QueueMode
 	followUpMode  QueueMode
 	listeners     map[uint64]AgentEventListener
+	listenerOrder []uint64
 	nextListener  uint64
 	activeContext context.Context
-	activeCancel  context.CancelFunc
+	activeCancel  context.CancelCauseFunc
 	idle          chan struct{}
 
 	convertToLLM               ConvertToLLMFunc
@@ -218,8 +220,7 @@ func (a *Agent) State() AgentState {
 	return cloneAgentState(a.state)
 }
 
-// Busy reports whether a Prompt or continuation is active. Capability stubs
-// never enter the busy state.
+// Busy reports whether a Prompt or continuation is active.
 func (a *Agent) Busy() bool {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
@@ -507,6 +508,7 @@ func (a *Agent) Subscribe(listener AgentEventListener) Unsubscribe {
 	id := a.nextListener
 	a.nextListener++
 	a.listeners[id] = listener
+	a.listenerOrder = append(a.listenerOrder, id)
 	a.mu.Unlock()
 	var once sync.Once
 	return func() {
@@ -610,7 +612,7 @@ func (a *Agent) Abort() {
 	cancel := a.activeCancel
 	a.mu.RUnlock()
 	if cancel != nil {
-		cancel()
+		cancel(context.Canceled)
 	}
 }
 
@@ -653,20 +655,187 @@ func (a *Agent) Reset() error {
 	return nil
 }
 
-// Prompt is an M0 Capability Stub. It validates no runtime input and has no
-// state, queue, listener, callback, Tool, or transport side effects.
-func (a *Agent) Prompt(context.Context, ...AgentMessage) error {
-	return newNotImplemented("Agent.Prompt")
+// Prompt starts one Tool-free legacy Agent run with the supplied messages.
+func (a *Agent) Prompt(ctx context.Context, messages ...AgentMessage) error {
+	owned, err := cloneAgentMessagesForOwnership(messages)
+	if err != nil {
+		return err
+	}
+	return a.run(ctx, func(runContext context.Context, agentContext AgentContext, config AgentLoopConfig, streamFunction StreamFunction) error {
+		_, err := RunAgentLoop(runContext, owned, agentContext, config, a.processEvent, streamFunction)
+		return err
+	})
 }
 
-// PromptText is the text/image convenience Capability Stub.
-func (a *Agent) PromptText(context.Context, string, ...ai.ImageContent) error {
-	return newNotImplemented("Agent.PromptText")
+// PromptText starts one Tool-free run from text and optional images.
+func (a *Agent) PromptText(ctx context.Context, text string, images ...ai.ImageContent) error {
+	content := make([]ai.UserContent, 0, len(images)+1)
+	content = append(content, ai.TextContent{Type: ai.ContentTypeText, Text: text})
+	for _, image := range images {
+		content = append(content, image)
+	}
+	return a.Prompt(ctx, ai.UserMessage{
+		Role: ai.MessageRoleUser, Content: ai.UserBlocks(content...), Timestamp: time.Now().UnixMilli(),
+	})
 }
 
-// Continue is an M0 Capability Stub.
-func (a *Agent) Continue(context.Context) error {
-	return newNotImplemented("Agent.Continue")
+// Continue runs from an existing transcript whose last message is user or
+// ToolResult. Queue consumption remains deferred to M2.
+func (a *Agent) Continue(ctx context.Context) error {
+	a.mu.RLock()
+	messages := cloneAgentMessages(a.state.Messages)
+	busy := a.activeContext != nil
+	a.mu.RUnlock()
+	if busy {
+		return fmt.Errorf("Agent is already processing; wait for completion before continuing")
+	}
+	if len(messages) == 0 {
+		return fmt.Errorf("no messages to continue from")
+	}
+	if messages[len(messages)-1].MessageRole() == ai.MessageRoleAssistant {
+		return fmt.Errorf("cannot continue from message role: assistant")
+	}
+	return a.run(ctx, func(runContext context.Context, agentContext AgentContext, config AgentLoopConfig, streamFunction StreamFunction) error {
+		_, err := RunAgentLoopContinue(runContext, agentContext, config, a.processEvent, streamFunction)
+		return err
+	})
+}
+
+func (a *Agent) run(ctx context.Context, execute func(context.Context, AgentContext, AgentLoopConfig, StreamFunction) error) error {
+	if ctx == nil {
+		return fmt.Errorf("Agent run context must not be nil")
+	}
+	runContext, agentContext, config, streamFunction, err := a.startRun(ctx)
+	if err != nil {
+		return err
+	}
+	defer a.finishRun(runContext)
+	return execute(runContext, agentContext, config, streamFunction)
+}
+
+func (a *Agent) startRun(ctx context.Context) (context.Context, AgentContext, AgentLoopConfig, StreamFunction, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.activeContext != nil {
+		return nil, AgentContext{}, AgentLoopConfig{}, nil, fmt.Errorf("Agent is already processing")
+	}
+	runContext, cancel := context.WithCancelCause(ctx)
+	a.activeContext = runContext
+	a.activeCancel = cancel
+	a.idle = make(chan struct{})
+	a.state.IsStreaming = true
+	a.state.StreamingMessage = nil
+	a.state.ErrorMessage = nil
+
+	streamOptions := ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{
+		ProviderRequestOptions: ai.ProviderRequestOptions{
+			OnPayload: a.onPayload, OnResponse: a.onResponse, MaxRetryDelayMS: cloneInt64(a.maxRetryDelayMS),
+		},
+	}}
+	if a.state.ThinkingLevel != ai.ModelThinkingLevelOff {
+		reasoning := ai.ThinkingLevel(a.state.ThinkingLevel)
+		streamOptions.Reasoning = &reasoning
+	}
+	if a.sessionID != "" {
+		sessionID := a.sessionID
+		streamOptions.SessionID = &sessionID
+	}
+	transport := a.transport
+	streamOptions.Transport = &transport
+	streamOptions.ThinkingBudgets = cloneThinkingBudgets(a.thinkingBudgets)
+	config := AgentLoopConfig{
+		SimpleStreamOptions: streamOptions,
+		Model:               cloneAgentModel(a.state.Model),
+		ConvertToLLM:        a.convertToLLM,
+		TransformContext:    a.transformContext,
+		GetAPIKey:           a.getAPIKey,
+		ShouldStopAfterTurn: a.shouldStopAfterTurn,
+		BeforeToolCall:      a.beforeToolCall,
+		AfterToolCall:       a.afterToolCall,
+		ToolExecution:       a.toolExecution,
+		GetSteeringMessages: nil,
+		GetFollowUpMessages: nil,
+	}
+	if a.prepareNextTurnWithContext != nil {
+		config.PrepareNextTurn = a.prepareNextTurnWithContext
+	} else if a.prepareNextTurn != nil {
+		prepareNextTurn := a.prepareNextTurn
+		config.PrepareNextTurn = func(ctx context.Context, _ PrepareNextTurnContext) (*AgentLoopTurnUpdate, error) {
+			return prepareNextTurn(ctx)
+		}
+	}
+	agentContext := AgentContext{
+		SystemPrompt: a.state.SystemPrompt,
+		Messages:     cloneAgentMessages(a.state.Messages),
+		Tools:        cloneAgentTools(a.state.Tools),
+	}
+	return runContext, agentContext, config, a.streamFunction, nil
+}
+
+func (a *Agent) finishRun(runContext context.Context) {
+	a.mu.Lock()
+	if a.activeContext != runContext {
+		a.mu.Unlock()
+		return
+	}
+	cancel := a.activeCancel
+	a.state.IsStreaming = false
+	a.state.StreamingMessage = nil
+	a.state.PendingToolCalls = make(map[string]struct{})
+	a.activeContext = nil
+	a.activeCancel = nil
+	idle := a.idle
+	close(idle)
+	a.mu.Unlock()
+	if cancel != nil {
+		cancel(nil)
+	}
+}
+
+func (a *Agent) processEvent(ctx context.Context, event AgentEvent) error {
+	a.mu.Lock()
+	switch event := event.(type) {
+	case MessageStartEvent:
+		a.state.StreamingMessage = cloneAgentMessage(event.Message)
+	case MessageUpdateEvent:
+		a.state.StreamingMessage = cloneAgentMessage(event.Message)
+	case MessageEndEvent:
+		a.state.StreamingMessage = nil
+		a.state.Messages = append(a.state.Messages, cloneAgentMessage(event.Message))
+	case TurnEndEvent:
+		if assistant, ok := agentAssistantMessage(event.Message); ok {
+			if errorMessage, ok := assistant.ErrorMessage.Value(); ok {
+				a.state.ErrorMessage = &errorMessage
+			}
+		}
+	case AgentEndEvent:
+		a.state.StreamingMessage = nil
+	}
+	listeners := make([]AgentEventListener, 0, len(a.listeners))
+	for _, id := range a.listenerOrder {
+		if listener, ok := a.listeners[id]; ok {
+			listeners = append(listeners, listener)
+		}
+	}
+	a.mu.Unlock()
+	for _, listener := range listeners {
+		if err := listener(ctx, cloneAgentEvent(event)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func agentAssistantMessage(message AgentMessage) (ai.AssistantMessage, bool) {
+	switch message := message.(type) {
+	case ai.AssistantMessage:
+		return message, true
+	case *ai.AssistantMessage:
+		if message != nil {
+			return *message, true
+		}
+	}
+	return ai.AssistantMessage{}, false
 }
 
 func queueModeOrDefault(mode QueueMode) (QueueMode, error) {

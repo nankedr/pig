@@ -5,13 +5,243 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
-	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
 )
+
+func TestAgentPromptTextSettlesAfterOrderedAgentEndListeners(t *testing.T) {
+	response, err := ai.FauxAssistantMessage(ai.FauxAssistantText("ok"), ai.FauxAssistantMessageOptions{
+		Timestamp: ai.Some(int64(2)),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{response})
+	model, _ := core.GetModel()
+	created, err := agent.NewAgent(agent.AgentOptions{
+		InitialState:   &agent.AgentInitialState{Model: model},
+		StreamFunction: agent.StreamFunction(core.StreamSimple),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	agentEndStarted := make(chan struct{})
+	releaseAgentEnd := make(chan struct{})
+	var listenerOrder []string
+	created.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+		if event.AgentEventType() == agent.AgentEventTypeAgentEnd {
+			listenerOrder = append(listenerOrder, "first-start")
+			close(agentEndStarted)
+			<-releaseAgentEnd
+			listenerOrder = append(listenerOrder, "first-end")
+		}
+		return nil
+	})
+	created.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+		if event.AgentEventType() == agent.AgentEventTypeAgentEnd {
+			listenerOrder = append(listenerOrder, "second")
+		}
+		return nil
+	})
+
+	promptDone := make(chan error, 1)
+	go func() { promptDone <- created.PromptText(context.Background(), "hello") }()
+	select {
+	case <-agentEndStarted:
+	case err := <-promptDone:
+		t.Fatalf("PromptText() completed before agent_end listener: %v", err)
+	case <-time.After(time.Second):
+		t.Fatal("PromptText() did not reach agent_end listener")
+	}
+	if !created.Busy() || !created.State().IsStreaming {
+		t.Fatal("Agent became idle before agent_end listeners settled")
+	}
+	waitContext, cancel := context.WithTimeout(context.Background(), 10*time.Millisecond)
+	defer cancel()
+	if err := created.WaitForIdle(waitContext); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("WaitForIdle() error = %v, want deadline while listener is blocked", err)
+	}
+	close(releaseAgentEnd)
+	if err := <-promptDone; err != nil {
+		t.Fatalf("PromptText() error = %v", err)
+	}
+	if !reflect.DeepEqual(listenerOrder, []string{"first-start", "first-end", "second"}) {
+		t.Fatalf("listener order = %v", listenerOrder)
+	}
+	if created.Busy() || created.State().IsStreaming {
+		t.Fatal("Agent remained busy after PromptText settled")
+	}
+	state := created.State()
+	if len(state.Messages) != 2 || state.Messages[0].MessageRole() != ai.MessageRoleUser || state.Messages[1].MessageRole() != ai.MessageRoleAssistant {
+		t.Fatalf("transcript = %#v, want user and assistant", state.Messages)
+	}
+}
+
+func TestAgentProviderErrorAndAbortKeepPartialAssistantContent(t *testing.T) {
+	t.Run("provider error", func(t *testing.T) {
+		response, err := ai.FauxAssistantMessage(ai.FauxAssistantText("partial"), ai.FauxAssistantMessageOptions{
+			StopReason:   ai.Some(ai.StopReasonError),
+			ErrorMessage: ai.Some("provider failed"),
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		created := newFauxAgent(t, ai.RegisterFauxProviderOptions{}, response)
+		if err := created.PromptText(context.Background(), "hello"); err != nil {
+			t.Fatalf("PromptText() error = %v", err)
+		}
+		assertAgentFailureState(t, created, ai.StopReasonError, "partial", "provider failed")
+	})
+
+	t.Run("abort", func(t *testing.T) {
+		rate := 100.0
+		minTokenSize := 1
+		response, err := ai.FauxAssistantMessage(ai.FauxAssistantText("partial content that should stop"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		created := newFauxAgent(t, ai.RegisterFauxProviderOptions{
+			TokensPerSecond: &rate,
+			TokenSize:       &ai.FauxTokenSize{Min: &minTokenSize},
+		}, response)
+		created.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+			update, ok := event.(agent.MessageUpdateEvent)
+			if !ok {
+				return nil
+			}
+			assistant := update.Message.(ai.AssistantMessage)
+			if len(assistant.Content) != 0 {
+				if text, ok := assistant.Content[0].(ai.TextContent); ok && text.Text != "" {
+					created.Abort()
+				}
+			}
+			return nil
+		})
+		if err := created.PromptText(context.Background(), "hello"); err != nil {
+			t.Fatalf("PromptText() error = %v", err)
+		}
+		state := created.State()
+		assistant := state.Messages[len(state.Messages)-1].(ai.AssistantMessage)
+		text := assistant.Content[0].(ai.TextContent).Text
+		if text == "" || len(text) >= len("partial content that should stop") {
+			t.Fatalf("aborted partial text = %q", text)
+		}
+		assertAgentFailureState(t, created, ai.StopReasonAborted, text, "Request was aborted")
+	})
+}
+
+func TestAgentPromptAndContinueKeepM2QueuesOutOfRuntime(t *testing.T) {
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	response := func(text string, wantMessages int) ai.FauxResponseFactory {
+		return func(input ai.Context, _ *ai.SimpleStreamOptions, _ *ai.FauxProviderState, _ ai.Model) (ai.AssistantMessage, error) {
+			if len(input.Messages) != wantMessages {
+				t.Fatalf("model messages = %d, want %d", len(input.Messages), wantMessages)
+			}
+			for _, message := range input.Messages {
+				if message.MessageRole() != ai.MessageRoleUser && message.MessageRole() != ai.MessageRoleAssistant {
+					t.Fatalf("custom Agent message reached model context: %T", message)
+				}
+			}
+			return ai.FauxAssistantMessage(ai.FauxAssistantText(text))
+		}
+	}
+	core.SetResponses([]ai.FauxResponseStep{response("continued", 1), response("prompted", 3)})
+	model, _ := core.GetModel()
+	created, err := agent.NewAgent(agent.AgentOptions{
+		InitialState: &agent.AgentInitialState{
+			Model:    model,
+			Messages: []agent.AgentMessage{userMessage("existing")},
+		},
+		StreamFunction: agent.StreamFunction(core.StreamSimple),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := created.Steer(userMessage("queued steering")); err != nil {
+		t.Fatal(err)
+	}
+	if err := created.FollowUp(userMessage("queued follow-up")); err != nil {
+		t.Fatal(err)
+	}
+	if err := created.Continue(context.Background()); err != nil {
+		t.Fatalf("Continue() error = %v", err)
+	}
+	custom, err := agent.NewRawAgentMessage(json.RawMessage(`{"role":"notice","text":"private"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := created.Prompt(context.Background(), custom, userMessage("next")); err != nil {
+		t.Fatalf("Prompt() error = %v", err)
+	}
+	state := created.State()
+	wantRoles := []ai.MessageRole{ai.MessageRoleUser, ai.MessageRoleAssistant, "notice", ai.MessageRoleUser, ai.MessageRoleAssistant}
+	gotRoles := make([]ai.MessageRole, len(state.Messages))
+	for i, message := range state.Messages {
+		gotRoles[i] = message.MessageRole()
+	}
+	if !reflect.DeepEqual(gotRoles, wantRoles) {
+		t.Fatalf("transcript roles = %v, want %v", gotRoles, wantRoles)
+	}
+	if !created.HasQueuedMessages() {
+		t.Fatal("M2 steering/follow-up queues were consumed by M1 runtime")
+	}
+	if err := created.Continue(context.Background()); err == nil {
+		t.Fatal("Continue() accepted an assistant transcript tail")
+	}
+	if !created.HasQueuedMessages() {
+		t.Fatal("illegal Continue consumed M2 queues")
+	}
+}
+
+func newFauxAgent(t *testing.T, options ai.RegisterFauxProviderOptions, responses ...ai.FauxResponseStep) *agent.Agent {
+	t.Helper()
+	core, err := ai.CreateFauxCore(options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses(responses)
+	model, _ := core.GetModel()
+	created, err := agent.NewAgent(agent.AgentOptions{
+		InitialState:   &agent.AgentInitialState{Model: model},
+		StreamFunction: agent.StreamFunction(core.StreamSimple),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return created
+}
+
+func assertAgentFailureState(t *testing.T, created *agent.Agent, reason ai.StopReason, text, errorMessage string) {
+	t.Helper()
+	state := created.State()
+	if created.Busy() || state.IsStreaming {
+		t.Fatal("failed Agent run did not become idle")
+	}
+	if len(state.Messages) != 2 {
+		t.Fatalf("transcript length = %d, want 2", len(state.Messages))
+	}
+	assistant := state.Messages[1].(ai.AssistantMessage)
+	gotError, _ := assistant.ErrorMessage.Value()
+	gotText := assistant.Content[0].(ai.TextContent).Text
+	if assistant.StopReason != reason || gotText != text || gotError != errorMessage {
+		t.Fatalf("assistant = %#v, text = %q, error = %q", assistant, gotText, gotError)
+	}
+	if state.ErrorMessage == nil || *state.ErrorMessage != errorMessage {
+		t.Fatalf("State.ErrorMessage = %v", state.ErrorMessage)
+	}
+}
 
 func TestAgentOptionsExposeRuntimeConfigurationCallbacks(t *testing.T) {
 	t.Parallel()
@@ -506,7 +736,7 @@ func TestAgentQueuesModesAndResetAreLocalStateOperations(t *testing.T) {
 	}
 }
 
-func TestAgentRuntimeStubsHaveNoSideEffects(t *testing.T) {
+func TestAgentRuntimeValidationHasNoSideEffects(t *testing.T) {
 	t.Parallel()
 
 	var callbackCalls atomic.Int64
@@ -517,8 +747,7 @@ func TestAgentRuntimeStubsHaveNoSideEffects(t *testing.T) {
 	})
 	created, err := agent.NewAgent(agent.AgentOptions{
 		InitialState: &agent.AgentInitialState{
-			Messages: []agent.AgentMessage{userMessage("existing")},
-			Tools:    []agent.ErasedAgentTool{counterTool},
+			Tools: []agent.ErasedAgentTool{counterTool},
 		},
 		ConvertToLLM: func(context.Context, []agent.AgentMessage) ([]ai.Message, error) { markCalled(); return nil, nil },
 		TransformContext: func(context.Context, []agent.AgentMessage) ([]agent.AgentMessage, error) {
@@ -570,34 +799,29 @@ func TestAgentRuntimeStubsHaveNoSideEffects(t *testing.T) {
 
 	before := created.State()
 	for name, call := range map[string]func() error{
-		"Prompt":     func() error { return created.Prompt(context.Background(), nil) },
-		"PromptText": func() error { return created.PromptText(context.Background(), "hello") },
-		"Continue":   func() error { return created.Continue(context.Background()) },
+		"Prompt":   func() error { return created.Prompt(context.Background(), nil) },
+		"Continue": func() error { return created.Continue(context.Background()) },
 	} {
 		err := call()
-		if !errors.Is(err, agent.ErrNotImplemented) {
-			t.Errorf("%s() error = %v, want ErrNotImplemented", name, err)
-		}
-		var capabilityErr *agent.NotImplementedError
-		if !errors.As(err, &capabilityErr) || !strings.HasPrefix(capabilityErr.Operation, "Agent.") {
-			t.Errorf("%s() error = %#v, want structured Agent operation", name, err)
+		if err == nil {
+			t.Errorf("%s() error = nil", name)
 		}
 	}
 	if got := callbackCalls.Load(); got != 0 {
-		t.Fatalf("runtime stubs invoked callbacks %d times", got)
+		t.Fatalf("invalid runtime calls invoked callbacks %d times", got)
 	}
 	if got := listenerCalls.Load(); got != 0 {
-		t.Fatalf("runtime stubs invoked listeners %d times", got)
+		t.Fatalf("invalid runtime calls invoked listeners %d times", got)
 	}
 	after := created.State()
 	if !reflect.DeepEqual(after.Model, before.Model) || !reflect.DeepEqual(after.Messages, before.Messages) || len(after.Tools) != len(before.Tools) || after.IsStreaming != before.IsStreaming || after.StreamingMessage != before.StreamingMessage || !reflect.DeepEqual(after.PendingToolCalls, before.PendingToolCalls) || !reflect.DeepEqual(after.ErrorMessage, before.ErrorMessage) || !created.HasQueuedMessages() {
-		t.Fatalf("runtime stubs mutated state or drained queues: before %#v, after %#v, queued %t", before, created.State(), created.HasQueuedMessages())
+		t.Fatalf("invalid runtime calls mutated state or drained queues: before %#v, after %#v, queued %t", before, created.State(), created.HasQueuedMessages())
 	}
 	if created.Busy() {
-		t.Fatal("runtime stub left Agent busy")
+		t.Fatal("invalid runtime call left Agent busy")
 	}
 	if _, ok := created.ActiveContext(); ok {
-		t.Fatal("runtime stub installed an active context")
+		t.Fatal("invalid runtime call installed an active context")
 	}
 	created.Abort()
 	if err := created.WaitForIdle(context.Background()); err != nil {

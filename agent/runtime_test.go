@@ -6,11 +6,130 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
+	"slices"
 	"testing"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
 )
+
+func TestRunAgentLoopCompletesToolFreeTextTurnThroughContextBoundary(t *testing.T) {
+	custom, err := agent.NewRawAgentMessage(json.RawMessage(`{"role":"notice","text":"private"}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	response, err := ai.FauxAssistantMessage(ai.FauxAssistantText("hello"), ai.FauxAssistantMessageOptions{
+		Timestamp: ai.Some(int64(2)),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	minTokenSize := 100
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{TokenSize: &ai.FauxTokenSize{Min: &minTokenSize}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var calls []string
+	core.SetResponses([]ai.FauxResponseStep{ai.FauxResponseFactory(func(input ai.Context, _ *ai.SimpleStreamOptions, _ *ai.FauxProviderState, _ ai.Model) (ai.AssistantMessage, error) {
+		calls = append(calls, "stream")
+		systemPrompt, _ := input.SystemPrompt.Value()
+		if systemPrompt != "system" || len(input.Messages) != 1 || input.Messages[0].MessageRole() != ai.MessageRoleUser {
+			t.Fatalf("model context = %#v, want system prompt and one user message", input)
+		}
+		return response, nil
+	})})
+	model, _ := core.GetModel()
+	prompt := ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("prompt"), Timestamp: 1}
+	config := agent.AgentLoopConfig{
+		Model: model,
+		TransformContext: func(_ context.Context, messages []agent.AgentMessage) ([]agent.AgentMessage, error) {
+			calls = append(calls, "transform")
+			return messages, nil
+		},
+		ConvertToLLM: func(ctx context.Context, messages []agent.AgentMessage) ([]ai.Message, error) {
+			calls = append(calls, "convert")
+			return agent.DefaultConvertToLLM(ctx, messages)
+		},
+	}
+	var eventTypes []agent.AgentEventType
+	messages, err := agent.RunAgentLoop(
+		context.Background(),
+		[]agent.AgentMessage{prompt},
+		agent.AgentContext{SystemPrompt: "system", Messages: []agent.AgentMessage{custom}},
+		config,
+		func(_ context.Context, event agent.AgentEvent) error {
+			eventTypes = append(eventTypes, event.AgentEventType())
+			return nil
+		},
+		agent.StreamFunction(core.StreamSimple),
+	)
+	if err != nil {
+		t.Fatalf("RunAgentLoop() error = %v", err)
+	}
+	if !slices.Equal(calls, []string{"transform", "convert", "stream"}) {
+		t.Fatalf("context boundary calls = %v", calls)
+	}
+	wantEvents := []agent.AgentEventType{
+		agent.AgentEventTypeAgentStart,
+		agent.AgentEventTypeTurnStart,
+		agent.AgentEventTypeMessageStart,
+		agent.AgentEventTypeMessageEnd,
+		agent.AgentEventTypeMessageStart,
+		agent.AgentEventTypeMessageUpdate,
+		agent.AgentEventTypeMessageUpdate,
+		agent.AgentEventTypeMessageUpdate,
+		agent.AgentEventTypeMessageEnd,
+		agent.AgentEventTypeTurnEnd,
+		agent.AgentEventTypeAgentEnd,
+	}
+	if !slices.Equal(eventTypes, wantEvents) {
+		t.Fatalf("event types = %v, want %v", eventTypes, wantEvents)
+	}
+	if len(messages) != 2 || messages[0].MessageRole() != ai.MessageRoleUser || messages[1].MessageRole() != ai.MessageRoleAssistant {
+		t.Fatalf("new messages = %#v, want user and assistant", messages)
+	}
+	assistant := messages[1].(ai.AssistantMessage)
+	if len(assistant.Content) != 1 || assistant.Content[0].(ai.TextContent).Text != "hello" {
+		t.Fatalf("assistant = %#v", assistant)
+	}
+}
+
+func TestRunAgentLoopKeepsToolExecutionAsExplicitCapabilityStub(t *testing.T) {
+	toolCall, err := ai.FauxToolCall("echo", map[string]any{"text": "hello"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	response, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(toolCall), ai.FauxAssistantMessageOptions{
+		StopReason: ai.Some(ai.StopReasonToolUse),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{response})
+	model, _ := core.GetModel()
+	var events []agent.AgentEventType
+	_, err = agent.RunAgentLoop(
+		context.Background(),
+		[]agent.AgentMessage{userMessage("prompt")},
+		agent.AgentContext{},
+		agent.AgentLoopConfig{Model: model},
+		func(_ context.Context, event agent.AgentEvent) error {
+			events = append(events, event.AgentEventType())
+			return nil
+		},
+		agent.StreamFunction(core.StreamSimple),
+	)
+	if !errors.Is(err, agent.ErrNotImplemented) {
+		t.Fatalf("RunAgentLoop() error = %v, want ErrNotImplemented", err)
+	}
+	if slices.Contains(events, agent.AgentEventTypeAgentEnd) {
+		t.Fatalf("Tool capability stub published agent_end: %v", events)
+	}
+}
 
 func TestProxyAssistantMessageEventCodecRoundTripsClosedVariants(t *testing.T) {
 	t.Parallel()
@@ -145,55 +264,65 @@ func TestProxyStreamOptionsExposePinnedFields(t *testing.T) {
 	}
 }
 
-func TestAgentLoopStubIsImmediateEventFreeAndDoesNotInvokeCallbacks(t *testing.T) {
-	t.Parallel()
-
-	called := false
-	streamFn := func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
-		called = true
-		return ai.NewAssistantMessageEventStream()
+func TestAgentLoopPublishesEventsAndRepeatableResult(t *testing.T) {
+	response, err := ai.FauxAssistantMessage(ai.FauxAssistantText("done"))
+	if err != nil {
+		t.Fatal(err)
 	}
-	config := agent.AgentLoopConfig{
-		ConvertToLLM: func(context.Context, []agent.AgentMessage) ([]ai.Message, error) {
-			called = true
-			return nil, nil
-		},
-		GetSteeringMessages: func(context.Context) ([]agent.AgentMessage, error) {
-			called = true
-			return nil, nil
-		},
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
 	}
-
-	stream := agent.AgentLoop(context.Background(), nil, agent.AgentContext{}, config, streamFn)
+	core.SetResponses([]ai.FauxResponseStep{response})
+	model, _ := core.GetModel()
+	stream := agent.AgentLoop(
+		context.Background(),
+		[]agent.AgentMessage{userMessage("prompt")},
+		agent.AgentContext{},
+		agent.AgentLoopConfig{Model: model},
+		agent.StreamFunction(core.StreamSimple),
+	)
 	if stream == nil {
 		t.Fatal("AgentLoop returned nil stream")
 	}
-	if event, ok, err := stream.Next(context.Background()); event != nil || ok || err != nil {
-		t.Fatalf("Next() = (%T, %t, %v), want (nil, false, nil)", event, ok, err)
+	var events []agent.AgentEventType
+	for {
+		event, ok, err := stream.Next(context.Background())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !ok {
+			break
+		}
+		events = append(events, event.AgentEventType())
 	}
-	if result, err := stream.Result(context.Background()); result != nil || !errors.Is(err, agent.ErrNotImplemented) {
-		t.Fatalf("Result() = (%v, %v), want nil and ErrNotImplemented", result, err)
+	first, err := stream.Result(context.Background())
+	if err != nil {
+		t.Fatal(err)
 	}
-	if called {
-		t.Fatal("AgentLoop stub invoked a callback")
+	second, err := stream.Result(context.Background())
+	if err != nil || !reflect.DeepEqual(first, second) {
+		t.Fatalf("repeat Result() = (%#v, %v), want %#v", second, err, first)
+	}
+	if len(first) != 2 || events[0] != agent.AgentEventTypeAgentStart || events[len(events)-1] != agent.AgentEventTypeAgentEnd {
+		t.Fatalf("events = %v, result = %#v", events, first)
 	}
 }
 
-func TestRunAgentLoopStubDoesNotInvokeSinkOrStreamFunction(t *testing.T) {
+func TestRunAgentLoopRejectsNilEventSinkBeforeStreaming(t *testing.T) {
 	t.Parallel()
 
 	called := false
-	sink := func(context.Context, agent.AgentEvent) error { called = true; return nil }
 	streamFn := func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
 		called = true
 		return nil
 	}
-	result, err := agent.RunAgentLoop(context.Background(), nil, agent.AgentContext{}, agent.AgentLoopConfig{}, sink, streamFn)
-	if result != nil || !errors.Is(err, agent.ErrNotImplemented) {
-		t.Fatalf("RunAgentLoop() = (%v, %v), want nil and ErrNotImplemented", result, err)
+	result, err := agent.RunAgentLoop(context.Background(), nil, agent.AgentContext{}, agent.AgentLoopConfig{}, nil, streamFn)
+	if result != nil || err == nil {
+		t.Fatalf("RunAgentLoop() = (%v, %v), want nil and error", result, err)
 	}
 	if called {
-		t.Fatal("RunAgentLoop stub invoked a callback")
+		t.Fatal("RunAgentLoop invoked stream function after rejecting nil sink")
 	}
 }
 
