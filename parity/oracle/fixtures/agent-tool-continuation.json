@@ -1,0 +1,412 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/agent/src/agent-loop.ts#runAgentLoop"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/agent/tool-result-continuation",
+    "catalog_id": "contract:agent/runtime",
+    "surface": "go-sdk",
+    "input": {
+      "entrypoint": "runAgentLoop",
+      "network": "forbidden",
+      "provider": {
+        "api": "faux:agent-continuation",
+        "id": "faux-agent-continuation",
+        "model_id": "faux-1"
+      },
+      "prompt": {
+        "role": "user",
+        "content": "look it up",
+        "timestamp": 1
+      },
+      "tool": {
+        "call": {
+          "id": "call-52",
+          "name": "lookup",
+          "arguments": {}
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "42"
+            }
+          ],
+          "details": {
+            "value": 42
+          }
+        }
+      },
+      "final_text": "The model saw the ToolResult: forty-two.",
+      "token_size": {
+        "min": 100,
+        "max": 100
+      }
+    },
+    "observe": [
+      "events",
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "events": [
+      {
+        "type": "agent_start"
+      },
+      {
+        "type": "turn_start"
+      },
+      {
+        "type": "message_start",
+        "message": {
+          "role": "user",
+          "content": "look it up"
+        }
+      },
+      {
+        "type": "message_end",
+        "message": {
+          "role": "user",
+          "content": "look it up"
+        }
+      },
+      {
+        "type": "message_start",
+        "message": {
+          "role": "assistant",
+          "content": [],
+          "stopReason": "pending"
+        }
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_start"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_delta"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_end"
+      },
+      {
+        "type": "message_end",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "toolCall",
+              "id": "call-52",
+              "name": "lookup",
+              "arguments": {}
+            }
+          ],
+          "stopReason": "toolUse"
+        }
+      },
+      {
+        "type": "tool_execution_start",
+        "toolCallId": "call-52",
+        "toolName": "lookup",
+        "args": {}
+      },
+      {
+        "type": "tool_execution_end",
+        "toolCallId": "call-52",
+        "toolName": "lookup",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "42"
+            }
+          ],
+          "details": {
+            "value": 42
+          }
+        },
+        "isError": false
+      },
+      {
+        "type": "message_start",
+        "message": {
+          "role": "toolResult",
+          "toolCallId": "call-52",
+          "toolName": "lookup",
+          "content": [
+            {
+              "type": "text",
+              "text": "42"
+            }
+          ],
+          "details": {
+            "value": 42
+          },
+          "isError": false
+        }
+      },
+      {
+        "type": "message_end",
+        "message": {
+          "role": "toolResult",
+          "toolCallId": "call-52",
+          "toolName": "lookup",
+          "content": [
+            {
+              "type": "text",
+              "text": "42"
+            }
+          ],
+          "details": {
+            "value": 42
+          },
+          "isError": false
+        }
+      },
+      {
+        "type": "turn_end",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "toolCall",
+              "id": "call-52",
+              "name": "lookup",
+              "arguments": {}
+            }
+          ],
+          "stopReason": "toolUse"
+        },
+        "toolResults": [
+          {
+            "role": "toolResult",
+            "toolCallId": "call-52",
+            "toolName": "lookup",
+            "content": [
+              {
+                "type": "text",
+                "text": "42"
+              }
+            ],
+            "details": {
+              "value": 42
+            },
+            "isError": false
+          }
+        ]
+      },
+      {
+        "type": "turn_start"
+      },
+      {
+        "type": "message_start",
+        "message": {
+          "role": "assistant",
+          "content": [],
+          "stopReason": "pending"
+        }
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "text_start"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "text_delta"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "text_end"
+      },
+      {
+        "type": "message_end",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "The model saw the ToolResult: forty-two."
+            }
+          ],
+          "stopReason": "stop"
+        }
+      },
+      {
+        "type": "turn_end",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "The model saw the ToolResult: forty-two."
+            }
+          ],
+          "stopReason": "stop"
+        },
+        "toolResults": []
+      },
+      {
+        "type": "agent_end",
+        "messages": [
+          {
+            "role": "user",
+            "content": "look it up"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-52",
+                "name": "lookup",
+                "arguments": {}
+              }
+            ],
+            "stopReason": "toolUse"
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call-52",
+            "toolName": "lookup",
+            "content": [
+              {
+                "type": "text",
+                "text": "42"
+              }
+            ],
+            "details": {
+              "value": 42
+            },
+            "isError": false
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "The model saw the ToolResult: forty-two."
+              }
+            ],
+            "stopReason": "stop"
+          }
+        ]
+      }
+    ],
+    "outcome": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "look it up"
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "toolCall",
+              "id": "call-52",
+              "name": "lookup",
+              "arguments": {}
+            }
+          ],
+          "stopReason": "toolUse"
+        },
+        {
+          "role": "toolResult",
+          "toolCallId": "call-52",
+          "toolName": "lookup",
+          "content": [
+            {
+              "type": "text",
+              "text": "42"
+            }
+          ],
+          "details": {
+            "value": 42
+          },
+          "isError": false
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "text",
+              "text": "The model saw the ToolResult: forty-two."
+            }
+          ],
+          "stopReason": "stop"
+        }
+      ],
+      "providerContexts": [
+        [
+          {
+            "role": "user",
+            "content": "look it up"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "content": "look it up"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-52",
+                "name": "lookup",
+                "arguments": {}
+              }
+            ],
+            "stopReason": "toolUse"
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call-52",
+            "toolName": "lookup",
+            "content": [
+              {
+                "type": "text",
+                "text": "42"
+              }
+            ],
+            "details": {
+              "value": 42
+            },
+            "isError": false
+          }
+        ]
+      ],
+      "executions": [
+        {
+          "toolCallId": "call-52",
+          "args": {}
+        }
+      ],
+      "state": {
+        "callCount": 2,
+        "pendingResponseCount": 0
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:06716438b4802f3e09e2439ce54dc0979fca1aa917078e79f61ea5a3462de965",
+  "observation_hash": "sha256:ec4ed8ab2b0eb53246a1a03467e855fb8beb9bbcd6de9aaee7dece18908d56ab",
+  "execution_method": "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs <locked-pi-checkout>; source modules with built-dist differential",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/agent/src/agent-loop.ts + packages/ai/src/providers/faux.ts",
+    "agent_source_sha256": "sha256:9bc5704c40ee78f4f07ab3fea20ff3aecce45f54c697e6f4ccc6718052a918aa",
+    "faux_source_sha256": "sha256:d819e22fcfba388d043246d34d770f2e2614f351de47f102c69f310c21fc6c65"
+  }
+}

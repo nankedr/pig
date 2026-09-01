@@ -7,7 +7,6 @@ import (
 	"errors"
 	"reflect"
 	"slices"
-	"strings"
 	"testing"
 
 	"github.com/nankedr/pig/agent"
@@ -166,7 +165,7 @@ func TestRunAgentLoopKeepsPrepareNextTurnAsExplicitCapabilityStub(t *testing.T) 
 	}
 }
 
-func TestRunAgentLoopKeepsToolExecutionAsExplicitCapabilityStub(t *testing.T) {
+func TestRunAgentLoopTurnsMissingToolIntoResultThenContinues(t *testing.T) {
 	toolCall, err := ai.FauxToolCall("echo", map[string]any{"text": "hello"})
 	if err != nil {
 		t.Fatal(err)
@@ -181,10 +180,14 @@ func TestRunAgentLoopKeepsToolExecutionAsExplicitCapabilityStub(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	core.SetResponses([]ai.FauxResponseStep{response})
+	finalResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantText("recovered"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{response, finalResponse})
 	model, _ := core.GetModel()
 	var events []agent.AgentEventType
-	_, err = agent.RunAgentLoop(
+	messages, err := agent.RunAgentLoop(
 		context.Background(),
 		[]agent.AgentMessage{userMessage("prompt")},
 		agent.AgentContext{},
@@ -195,14 +198,14 @@ func TestRunAgentLoopKeepsToolExecutionAsExplicitCapabilityStub(t *testing.T) {
 		},
 		agent.StreamFunction(core.StreamSimple),
 	)
-	if !errors.Is(err, agent.ErrNotImplemented) {
-		t.Fatalf("RunAgentLoop() error = %v, want ErrNotImplemented", err)
+	if err != nil {
+		t.Fatalf("RunAgentLoop() error = %v", err)
 	}
-	if !strings.Contains(err.Error(), "Agent.ToolContinuation") {
-		t.Fatalf("RunAgentLoop() error = %v, want ToolContinuation boundary", err)
+	if len(messages) != 4 || messages[2].MessageRole() != ai.MessageRoleToolResult || !messages[2].(ai.ToolResultMessage).IsError || messages[3].MessageRole() != ai.MessageRoleAssistant {
+		t.Fatalf("new messages = %#v, want user, ToolCall, error ToolResult, and final Assistant", messages)
 	}
-	if slices.Contains(events, agent.AgentEventTypeAgentEnd) {
-		t.Fatalf("Tool capability stub published agent_end: %v", events)
+	if !slices.Contains(events, agent.AgentEventTypeAgentEnd) || core.GetPendingResponseCount() != 0 {
+		t.Fatalf("continuation events = %v, pending responses = %d", events, core.GetPendingResponseCount())
 	}
 }
 

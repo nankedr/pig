@@ -106,11 +106,11 @@ func assistantToolCalls(message ai.AssistantMessage) []AgentToolCall {
 	return calls
 }
 
-func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, message ai.AssistantMessage, toolCall AgentToolCall) ([]AgentMessage, error) {
+func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, message ai.AssistantMessage, toolCall AgentToolCall) (agentTurnCompletion, error) {
 	if err := emitAgentEvent(ctx, emit, ToolExecutionStartEvent{
 		Type: AgentEventTypeToolExecutionStart, ToolCallID: toolCall.ID, ToolName: toolCall.Name, Arguments: toolCall.Arguments,
 	}); err != nil {
-		return nil, err
+		return agentTurnCompletion{}, err
 	}
 
 	var finalized finalizedAgentToolCall
@@ -123,18 +123,18 @@ func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext
 	} else {
 		prepared, immediate, err := prepareSingleAgentToolCall(ctx, agentContext, message, config, toolCall)
 		if err != nil {
-			return nil, err
+			return agentTurnCompletion{}, err
 		}
 		if immediate != nil {
 			finalized = *immediate
 		} else {
 			executed, err := executeSingleAgentToolCall(ctx, emit, prepared)
 			if err != nil {
-				return nil, err
+				return agentTurnCompletion{}, err
 			}
 			finalized, err = finalizeSingleAgentToolCall(ctx, agentContext, message, config, prepared, executed)
 			if err != nil {
-				return nil, err
+				return agentTurnCompletion{}, err
 			}
 		}
 	}
@@ -143,42 +143,44 @@ func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext
 		Type: AgentEventTypeToolExecutionEnd, ToolCallID: toolCall.ID, ToolName: toolCall.Name,
 		Result: finalized.result, IsError: finalized.isError,
 	}); err != nil {
-		return nil, err
+		return agentTurnCompletion{}, err
 	}
 	toolResult := createAgentToolResultMessage(finalized)
 	if err := emitMessageLifecycle(ctx, emit, toolResult); err != nil {
-		return nil, err
+		return agentTurnCompletion{}, err
 	}
 	agentContext.Messages = append(agentContext.Messages, cloneToolResultMessage(toolResult))
 	newMessages = append(newMessages, cloneToolResultMessage(toolResult))
 	toolResults := []ai.ToolResultMessage{toolResult}
 	if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: toolResults}); err != nil {
-		return nil, err
+		return agentTurnCompletion{}, err
 	}
+	completed := agentTurnCompletion{agentContext: agentContext, newMessages: newMessages}
 	shouldStop := false
 	if config.ShouldStopAfterTurn != nil {
 		callbackContext, err := cloneAgentContext(agentContext)
 		if err != nil {
-			return nil, err
+			return agentTurnCompletion{}, err
 		}
 		shouldStop, err = config.ShouldStopAfterTurn(ctx, ShouldStopAfterTurnContext{
 			Message: ai.CloneAssistantMessage(message), ToolResults: cloneToolResultMessages(toolResults), Context: callbackContext, NewMessages: cloneAgentMessages(newMessages),
 		})
 		if cause := context.Cause(ctx); cause != nil {
-			return nil, cause
+			return agentTurnCompletion{}, cause
 		}
 		if err != nil {
-			return nil, err
+			return agentTurnCompletion{}, err
 		}
 	}
 	terminate, _ := finalized.result.Terminate.Value()
 	if !terminate && !shouldStop {
-		return cloneAgentMessages(newMessages), newNotImplemented("Agent.ToolContinuation")
+		completed.continueRun = true
+		return completed, nil
 	}
 	if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: newMessages}); err != nil {
-		return nil, err
+		return agentTurnCompletion{}, err
 	}
-	return cloneAgentMessages(newMessages), nil
+	return completed, nil
 }
 
 func prepareSingleAgentToolCall(ctx context.Context, agentContext AgentContext, assistantMessage ai.AssistantMessage, config AgentLoopConfig, toolCall AgentToolCall) (preparedAgentToolCall, *finalizedAgentToolCall, error) {

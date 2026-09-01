@@ -14,6 +14,313 @@ import (
 	"github.com/nankedr/pig/ai"
 )
 
+func TestAgentContinuesFromToolResultToFinalAssistantResponse(t *testing.T) {
+	tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+		Tool:            ai.Tool{Name: "lookup", Description: "Look up a value", Parameters: json.RawMessage(`{"type":"object"}`)},
+		DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+		Execute: func(context.Context, string, map[string]any, agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+			return agent.AgentToolResult[map[string]any]{
+				Content: []ai.ToolResultContent{ai.TextContent{Type: ai.ContentTypeText, Text: "42"}},
+				Details: map[string]any{"value": float64(42)},
+			}, nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	toolCall, err := ai.FauxToolCall("lookup", map[string]any{}, ai.FauxToolCallOptions{ID: ai.Some("call-52")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	firstResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(toolCall), ai.FauxAssistantMessageOptions{
+		StopReason: ai.Some(ai.StopReasonToolUse), Timestamp: ai.Some(int64(2)),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	finalResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantText("The result is 42."), ai.FauxAssistantMessageOptions{
+		Timestamp: ai.Some(int64(4)),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	providerCalls := 0
+	core.SetResponses([]ai.FauxResponseStep{
+		ai.FauxResponseFactory(func(input ai.Context, _ *ai.SimpleStreamOptions, _ *ai.FauxProviderState, _ ai.Model) (ai.AssistantMessage, error) {
+			providerCalls++
+			if roles := messageRoles(input.Messages); !reflect.DeepEqual(roles, []ai.MessageRole{ai.MessageRoleUser}) {
+				t.Fatalf("first Provider context roles = %v", roles)
+			}
+			return firstResponse, nil
+		}),
+		ai.FauxResponseFactory(func(input ai.Context, _ *ai.SimpleStreamOptions, _ *ai.FauxProviderState, _ ai.Model) (ai.AssistantMessage, error) {
+			providerCalls++
+			if roles := messageRoles(input.Messages); !reflect.DeepEqual(roles, []ai.MessageRole{
+				ai.MessageRoleUser, ai.MessageRoleAssistant, ai.MessageRoleToolResult,
+			}) {
+				t.Fatalf("continuation Provider context roles = %v", roles)
+			}
+			assistant := input.Messages[1].(ai.AssistantMessage)
+			call := assistant.Content[0].(ai.ToolCall)
+			result := input.Messages[2].(ai.ToolResultMessage)
+			if call.ID != "call-52" || result.ToolCallID != call.ID || result.Content[0].(ai.TextContent).Text != "42" {
+				t.Fatalf("continuation context = %#v", input.Messages)
+			}
+			return finalResponse, nil
+		}),
+	})
+	model, _ := core.GetModel()
+	created, err := agent.NewAgent(agent.AgentOptions{
+		InitialState:   &agent.AgentInitialState{Model: model, Tools: []agent.ErasedAgentTool{tool}},
+		StreamFunction: agent.StreamFunction(core.StreamSimple),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var events []agent.AgentEventType
+	var ended []agent.AgentMessage
+	created.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+		events = append(events, event.AgentEventType())
+		if event, ok := event.(agent.AgentEndEvent); ok {
+			ended = event.Messages
+		}
+		return nil
+	})
+
+	if err := created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("look it up"), Timestamp: 1}); err != nil {
+		t.Fatalf("Prompt() error = %v", err)
+	}
+	if providerCalls != 2 {
+		t.Fatalf("Provider calls = %d, want 2", providerCalls)
+	}
+	wantEvents := []agent.AgentEventType{
+		agent.AgentEventTypeAgentStart, agent.AgentEventTypeTurnStart,
+		agent.AgentEventTypeMessageStart, agent.AgentEventTypeMessageEnd,
+		agent.AgentEventTypeMessageStart,
+		agent.AgentEventTypeMessageUpdate, agent.AgentEventTypeMessageUpdate, agent.AgentEventTypeMessageUpdate,
+		agent.AgentEventTypeMessageEnd,
+		agent.AgentEventTypeToolExecutionStart, agent.AgentEventTypeToolExecutionEnd,
+		agent.AgentEventTypeMessageStart, agent.AgentEventTypeMessageEnd, agent.AgentEventTypeTurnEnd,
+		agent.AgentEventTypeTurnStart, agent.AgentEventTypeMessageStart,
+		agent.AgentEventTypeMessageUpdate, agent.AgentEventTypeMessageUpdate, agent.AgentEventTypeMessageUpdate, agent.AgentEventTypeMessageUpdate,
+		agent.AgentEventTypeMessageEnd, agent.AgentEventTypeTurnEnd, agent.AgentEventTypeAgentEnd,
+	}
+	if !reflect.DeepEqual(events, wantEvents) {
+		t.Fatalf("events = %v, want %v", events, wantEvents)
+	}
+	state := created.State()
+	if roles := messageRolesFromAgent(state.Messages); !reflect.DeepEqual(roles, []ai.MessageRole{
+		ai.MessageRoleUser, ai.MessageRoleAssistant, ai.MessageRoleToolResult, ai.MessageRoleAssistant,
+	}) {
+		t.Fatalf("transcript roles = %v", roles)
+	}
+	final := state.Messages[3].(ai.AssistantMessage)
+	if final.Content[0].(ai.TextContent).Text != "The result is 42." || !reflect.DeepEqual(ended, state.Messages) {
+		t.Fatalf("final transcript = %#v, agent_end = %#v", state.Messages, ended)
+	}
+}
+
+func TestAgentWaitsForToolTurnBarriersBeforeContinuationRequest(t *testing.T) {
+	assistantEndStarted := make(chan struct{})
+	releaseAssistantEnd := make(chan struct{})
+	toolResultEndStarted := make(chan struct{})
+	releaseToolResultEnd := make(chan struct{})
+	var beforeCalls, executeCalls, providerCalls atomic.Int64
+
+	tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+		Tool:            ai.Tool{Name: "lookup", Description: "Look up a value", Parameters: json.RawMessage(`{"type":"object"}`)},
+		DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+		Execute: func(context.Context, string, map[string]any, agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+			executeCalls.Add(1)
+			return agent.AgentToolResult[map[string]any]{Content: []ai.ToolResultContent{ai.TextContent{Type: ai.ContentTypeText, Text: "42"}}}, nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	toolCall, err := ai.FauxToolCall("lookup", map[string]any{}, ai.FauxToolCallOptions{ID: ai.Some("call-52")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	firstResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(toolCall), ai.FauxAssistantMessageOptions{StopReason: ai.Some(ai.StopReasonToolUse)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	finalResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantText("done"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{
+		ai.FauxResponseFactory(func(ai.Context, *ai.SimpleStreamOptions, *ai.FauxProviderState, ai.Model) (ai.AssistantMessage, error) {
+			providerCalls.Add(1)
+			return firstResponse, nil
+		}),
+		ai.FauxResponseFactory(func(ai.Context, *ai.SimpleStreamOptions, *ai.FauxProviderState, ai.Model) (ai.AssistantMessage, error) {
+			providerCalls.Add(1)
+			return finalResponse, nil
+		}),
+	})
+	model, _ := core.GetModel()
+	created, err := agent.NewAgent(agent.AgentOptions{
+		InitialState:   &agent.AgentInitialState{Model: model, Tools: []agent.ErasedAgentTool{tool}},
+		StreamFunction: agent.StreamFunction(core.StreamSimple),
+		BeforeToolCall: func(context.Context, agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error) {
+			beforeCalls.Add(1)
+			return nil, nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	created.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+		messageEnd, ok := event.(agent.MessageEndEvent)
+		if !ok {
+			return nil
+		}
+		switch messageEnd.Message.MessageRole() {
+		case ai.MessageRoleAssistant:
+			assistant := messageEnd.Message.(ai.AssistantMessage)
+			if assistant.StopReason == ai.StopReasonToolUse {
+				close(assistantEndStarted)
+				<-releaseAssistantEnd
+			}
+		case ai.MessageRoleToolResult:
+			close(toolResultEndStarted)
+			<-releaseToolResultEnd
+		}
+		return nil
+	})
+
+	promptDone := make(chan error, 1)
+	go func() {
+		promptDone <- created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("look it up"), Timestamp: 1})
+	}()
+	waitForSignal(t, assistantEndStarted, "first Assistant message_end listener")
+	if providerCalls.Load() != 1 || beforeCalls.Load() != 0 || executeCalls.Load() != 0 {
+		t.Fatalf("work crossed Assistant message_end barrier: provider=%d before=%d execute=%d", providerCalls.Load(), beforeCalls.Load(), executeCalls.Load())
+	}
+	close(releaseAssistantEnd)
+	waitForSignal(t, toolResultEndStarted, "ToolResult message_end listener")
+	if providerCalls.Load() != 1 || beforeCalls.Load() != 1 || executeCalls.Load() != 1 {
+		t.Fatalf("continuation crossed ToolResult barrier: provider=%d before=%d execute=%d", providerCalls.Load(), beforeCalls.Load(), executeCalls.Load())
+	}
+	close(releaseToolResultEnd)
+	select {
+	case err := <-promptDone:
+		if err != nil {
+			t.Fatalf("Prompt() error = %v", err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Prompt() did not settle after continuation barriers")
+	}
+	if providerCalls.Load() != 2 {
+		t.Fatalf("Provider calls = %d, want 2", providerCalls.Load())
+	}
+}
+
+func TestAgentContinuationStopsAfterTurnOrTerminatingTool(t *testing.T) {
+	tests := []struct {
+		name       string
+		terminate  bool
+		shouldStop bool
+	}{
+		{name: "shouldStopAfterTurn", shouldStop: true},
+		{name: "terminating ToolResult", terminate: true},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+				Tool:            ai.Tool{Name: "lookup", Description: "Look up a value", Parameters: json.RawMessage(`{"type":"object"}`)},
+				DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+				Execute: func(context.Context, string, map[string]any, agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+					result := agent.AgentToolResult[map[string]any]{Content: []ai.ToolResultContent{ai.TextContent{Type: ai.ContentTypeText, Text: "42"}}}
+					if test.terminate {
+						result.Terminate = ai.Some(true)
+					}
+					return result, nil
+				},
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			toolCall, err := ai.FauxToolCall("lookup", map[string]any{}, ai.FauxToolCallOptions{ID: ai.Some("call-52")})
+			if err != nil {
+				t.Fatal(err)
+			}
+			firstResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(toolCall), ai.FauxAssistantMessageOptions{StopReason: ai.Some(ai.StopReasonToolUse)})
+			if err != nil {
+				t.Fatal(err)
+			}
+			forbiddenResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantText("should not run"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			core.SetResponses([]ai.FauxResponseStep{firstResponse, forbiddenResponse})
+			model, _ := core.GetModel()
+			created, err := agent.NewAgent(agent.AgentOptions{
+				InitialState:   &agent.AgentInitialState{Model: model, Tools: []agent.ErasedAgentTool{tool}},
+				StreamFunction: agent.StreamFunction(core.StreamSimple),
+				ShouldStopAfterTurn: func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error) {
+					return test.shouldStop, nil
+				},
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if err := created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("look it up"), Timestamp: 1}); err != nil {
+				t.Fatalf("Prompt() error = %v", err)
+			}
+			if core.State.CallCount != 1 || core.GetPendingResponseCount() != 1 {
+				t.Fatalf("Faux calls = %d, pending = %d; continuation should be stopped", core.State.CallCount, core.GetPendingResponseCount())
+			}
+			if roles := messageRolesFromAgent(created.State().Messages); !reflect.DeepEqual(roles, []ai.MessageRole{
+				ai.MessageRoleUser, ai.MessageRoleAssistant, ai.MessageRoleToolResult,
+			}) {
+				t.Fatalf("transcript roles = %v", roles)
+			}
+		})
+	}
+}
+
+func waitForSignal(t *testing.T, signal <-chan struct{}, name string) {
+	t.Helper()
+	select {
+	case <-signal:
+	case <-time.After(time.Second):
+		t.Fatalf("timed out waiting for %s", name)
+	}
+}
+
+func messageRoles(messages []ai.Message) []ai.MessageRole {
+	roles := make([]ai.MessageRole, len(messages))
+	for i, message := range messages {
+		roles[i] = message.MessageRole()
+	}
+	return roles
+}
+
+func messageRolesFromAgent(messages []agent.AgentMessage) []ai.MessageRole {
+	roles := make([]ai.MessageRole, len(messages))
+	for i, message := range messages {
+		roles[i] = message.MessageRole()
+	}
+	return roles
+}
+
 func TestAgentRunsOneTerminatingToolThroughTheAuthoritativeArgumentPipeline(t *testing.T) {
 	type parameters struct {
 		Count   float64
@@ -392,7 +699,6 @@ func TestAgentRunsAfterToolCallForExecutionResults(t *testing.T) {
 			t.Fatal(err)
 		}
 		created := newSingleToolAgentWithOptions(t, "finish", map[string]any{}, []agent.ErasedAgentTool{tool}, func(options *agent.AgentOptions) {
-			options.ShouldStopAfterTurn = nil
 			options.AfterToolCall = func(context.Context, agent.AfterToolCallContext) (*agent.AfterToolCallResult, error) {
 				return &agent.AfterToolCallResult{
 					Content: ai.Null[[]ai.ToolResultContent](), Details: ai.Null[ai.JSONValue](), IsError: ai.Null[bool](),
@@ -401,8 +707,8 @@ func TestAgentRunsAfterToolCallForExecutionResults(t *testing.T) {
 			}
 		})
 		err = created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("go"), Timestamp: 1})
-		if !errors.Is(err, agent.ErrNotImplemented) {
-			t.Fatalf("Prompt() error = %v, want continuation boundary after null terminate override", err)
+		if err != nil {
+			t.Fatalf("Prompt() error = %v", err)
 		}
 		result := created.State().Messages[2].(ai.ToolResultMessage)
 		if result.IsError || len(result.Content) != 0 || !result.Details.IsNull() || !result.Usage.IsNull() {
