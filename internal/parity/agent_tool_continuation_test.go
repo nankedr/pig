@@ -257,11 +257,14 @@ func projectAgentContinuationMessage(message interface{ MessageRole() ai.Message
 		if err != nil {
 			return nil, err
 		}
-		details, _ := message.Details.Value()
-		return map[string]any{
+		projected := map[string]any{
 			"role": string(message.Role), "toolCallId": message.ToolCallID, "toolName": message.ToolName,
-			"content": content, "details": details, "isError": message.IsError,
-		}, nil
+			"content": content, "isError": message.IsError,
+		}
+		if details, ok := message.Details.Value(); ok {
+			projected["details"] = details
+		}
+		return projected, nil
 	default:
 		return nil, fmt.Errorf("out-of-scope Agent continuation message %T", message)
 	}
@@ -300,7 +303,10 @@ func projectAgentContinuationToolResult(result agent.ErasedAgentToolResult) (map
 	if err != nil {
 		return nil, err
 	}
-	projected := map[string]any{"content": content, "details": result.Details}
+	projected := map[string]any{"content": content}
+	if result.Details != nil {
+		projected["details"] = result.Details
+	}
 	if terminate, ok := result.Terminate.Value(); ok {
 		projected["terminate"] = terminate
 	}

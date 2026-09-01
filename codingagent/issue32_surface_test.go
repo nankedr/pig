@@ -28,6 +28,7 @@ const (
 	issue32GoPackage           = "github.com/nankedr/pig/codingagent"
 	issue32TUIPackage          = "github.com/nankedr/pig/tui"
 	issue32ModuleCatalogID     = "module-codingagent"
+	issue32ReadToolCatalogID   = "contract:codingagent/read-tool"
 	issue32CompactionCatalogID = "contract:codingagent/compaction"
 	issue32TranscriptCatalogID = "contract:codingagent/transcript-projection"
 	issue32V3JSONLCatalogID    = "contract:session/v3-jsonl"
@@ -480,8 +481,8 @@ func TestIssue32CatalogPromotionWritesCompleteClaimSpecificEvidence(t *testing.T
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(entries) != 8 {
-		t.Fatalf("written catalog entry count = %d, want 8", len(entries))
+	if len(entries) != 9 {
+		t.Fatalf("written catalog entry count = %d, want 9", len(entries))
 	}
 	byID := make(map[string]catalog.Entry, len(entries))
 	for _, entry := range entries {
@@ -508,8 +509,8 @@ func TestIssue32CatalogPromotionWritesCompleteClaimSpecificEvidence(t *testing.T
 	wantModule := staleModule
 	wantModule.Status = catalog.StatusPartial
 	wantModule.Evidence = issue32ModuleEvidence(t)
-	wantModule.Partial = &catalog.Partial{Supported: []string{"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings", "Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects"}, Unsupported: []string{"runtime session, persistence, settings, resources, packages, tools, model/auth and product modes remain explicit Capability Stubs until their roadmap milestones", "surface tests prove API coverage and target resolution, not runtime parity"}}
-	wantModule.Notes = "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The production legacy AgentSession and v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
+	wantModule.Partial = issue32ModulePartial()
+	wantModule.Notes = issue32ModuleNotes()
 	if !reflect.DeepEqual(entry, wantModule) {
 		t.Errorf("module-codingagent was not replaced field-for-field\n got: %+v\nwant: %+v", entry, wantModule)
 	}
@@ -1437,6 +1438,8 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 
 func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
+	case reference == issue32ReferencePrefix+"core/tools/read.ts#createReadTool":
+		return issue32ReadToolCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"client/transcript.ts#"):
 		return issue32TranscriptCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/compaction/"):
@@ -1641,6 +1644,23 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 	repository := "https://github.com/badlogic/pi-mono"
 	entries := []catalog.Entry{
 		{
+			SchemaVersion: catalog.SchemaVersion, ID: issue32ReadToolCatalogID,
+			Upstream: catalog.Upstream{Module: "coding-agent", Repository: repository, Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/tools/read.ts#createReadTool"},
+			Mapping:  catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".CreateReadTool", Kind: "contract"},
+			Status:   catalog.StatusPartial, Milestone: "M1", Classification: "public-api",
+			Partial: &catalog.Partial{
+				Supported: []string{
+					"focused Go tests verify pinned-source path normalization, host-user permissions, number-valued offset and limit pagination, truncation, failure ToolResults, and cancellation",
+					"a locked Pi source/dist Oracle verifies the short real-file Agent ToolCall-to-ToolResult-to-Faux continuation slice",
+				},
+				Unsupported: []string{
+					"image payload execution remains an explicit M12 Capability Stub",
+					"CreateReadToolDefinition remains the explicit M7 Extension ABI Capability Stub",
+				},
+			},
+			Notes: "Issue #54 implements the public M1 text read Tool through real host files and verifies its Agent continuation against locked Pi source and built dist. Image execution remains deferred to M12, and the extension-facing read Tool definition remains deferred to M7.",
+		},
+		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32CompactionCatalogID,
 			Upstream: catalog.Upstream{Module: "coding-agent", Repository: repository, Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/compaction"},
 			Mapping:  catalog.Mapping{Module: "codingagent", Target: issue32GoPackage, Kind: "contract"},
@@ -1699,6 +1719,46 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	t.Helper()
 	var descriptors []issue32ModuleEvidenceDescriptor
 	switch catalogID {
+	case issue32ReadToolCatalogID:
+		const (
+			inputHash       = "sha256:f4f006f254b90ce868c7f6440fca8c5cef7595f18a1e404fc80200abd4d5117d"
+			observationHash = "sha256:473491ffaf0329fcfb81ca79f5342daae8cc0b6961181377ded2c9602118ba23"
+		)
+		descriptors = []issue32ModuleEvidenceDescriptor{
+			{
+				InputPath: "parity/oracle/fixtures/codingagent-read-continuation.json", PinnedInputHash: inputHash,
+				Evidence: catalog.Evidence{
+					Kind: catalog.MatrixEvidenceOracle, Ref: "parity/oracle/fixtures/codingagent-read-continuation.json", Baseline: issue32BaselineCommit,
+					CaseID:          "go-sdk/codingagent/read-tool-continuation",
+					ExecutionMethod: "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --read <locked-pi-checkout>; source modules with built-dist differential",
+					Expected:        "locked Pi createReadTool reads the real sentinel and runAgentLoop passes its ToolResult into the deterministic continuation observation " + observationHash,
+					Actual:          "PASS; locked source and built dist produced identical read continuation observation " + observationHash + " without network side effects",
+					Platform:        "any", CatalogID: catalogID,
+				},
+			},
+			{
+				InputPath: "parity/oracle/fixtures/codingagent-read-continuation.json", PinnedInputHash: inputHash,
+				Evidence: catalog.Evidence{
+					Kind: catalog.MatrixEvidenceGoTest, Ref: "internal/parity/codingagent_read_continuation_test.go#TestCodingAgentReadContinuationParity", Baseline: issue32BaselineCommit,
+					CaseID:          "go-sdk/codingagent/read-tool-continuation",
+					ExecutionMethod: "go test ./internal/parity -run '^TestCodingAgentReadContinuationParity$' -count=1",
+					Expected:        "Pig public CreateReadTool events, ToolResult, Provider continuation context, transcript and real sentinel file match Oracle observation " + observationHash,
+					Actual:          "PASS; Pig read continuation observation " + observationHash + " matched the locked Pi fixture with no normalizations",
+					Platform:        "any", CatalogID: catalogID,
+				},
+			},
+			{
+				InputPath: "codingagent/read_tool_test.go",
+				Evidence: catalog.Evidence{
+					Kind: "go-test", Ref: "codingagent/read_tool_test.go#TestReadToolResolvesHostPathsWithoutWorkspaceContainment", Baseline: issue32BaselineCommit,
+					CaseID:          "issue54-codingagent-read-text-behavior",
+					ExecutionMethod: "go test ./codingagent -run '^TestReadTool' -count=1",
+					Expected:        "focused Go tests cover pinned-source path normalization, host path permissions, numeric pagination, deterministic truncation, compatible failure and cancellation ToolResults, and explicit image deferral",
+					Actual:          "PASS; focused Go assertions covered path normalization and fallbacks, relative/absolute/parent/symlink access, numeric offset/limit boundaries, line/byte/long-line truncation details, failures, real cancellation, image deferral and Faux continuation",
+					Platform:        "any", CatalogID: catalogID,
+				},
+			},
+		}
 	case issue32CompactionCatalogID:
 		descriptors = []issue32ModuleEvidenceDescriptor{{
 			InputPath: "codingagent/compaction_review_test.go",
@@ -1735,7 +1795,11 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		t.Fatalf("unknown behavior owner %q", catalogID)
 	}
 	for index := range descriptors {
-		descriptors[index].Evidence.InputHash = issue32FileHash(t, descriptors[index].InputPath)
+		inputHash := issue32FileHash(t, descriptors[index].InputPath)
+		if descriptors[index].PinnedInputHash != "" {
+			inputHash = descriptors[index].PinnedInputHash
+		}
+		descriptors[index].Evidence.InputHash = inputHash
 	}
 	return descriptors
 }
@@ -1755,14 +1819,15 @@ func issue32ValidateEvidenceDescriptors(t *testing.T, catalogID string, descript
 	}
 	want := make(map[string]issue32ModuleEvidenceDescriptor, len(descriptors))
 	for _, descriptor := range descriptors {
-		want[descriptor.Evidence.CaseID] = descriptor
+		want[descriptor.Evidence.Kind+"\x00"+descriptor.Evidence.CaseID] = descriptor
 	}
 	seen := map[string]bool{}
 	for _, item := range evidence {
 		if item.Kind == "" || item.Ref == "" || item.Baseline == "" || item.CaseID == "" || item.InputHash == "" || item.ExecutionMethod == "" || item.Expected == "" || item.Actual == "" || item.Platform == "" || item.CatalogID == "" {
 			t.Errorf("%s evidence %q has an incomplete replay record: %+v", catalogID, item.CaseID, item)
 		}
-		descriptor, ok := want[item.CaseID]
+		key := item.Kind + "\x00" + item.CaseID
+		descriptor, ok := want[key]
 		if !ok {
 			t.Errorf("%s has unexpected evidence case %q", catalogID, item.CaseID)
 			continue
@@ -1770,14 +1835,18 @@ func issue32ValidateEvidenceDescriptors(t *testing.T, catalogID string, descript
 		if item != descriptor.Evidence {
 			t.Errorf("%s evidence %q = %+v, want %+v", catalogID, item.CaseID, item, descriptor.Evidence)
 		}
-		if seen[item.CaseID] {
-			t.Errorf("%s has duplicate evidence case %q", catalogID, item.CaseID)
+		if seen[key] {
+			t.Errorf("%s has duplicate evidence kind/case %q/%q", catalogID, item.Kind, item.CaseID)
 		}
-		seen[item.CaseID] = true
+		seen[key] = true
 		if item.Baseline != issue32BaselineCommit || item.CatalogID != catalogID {
 			t.Errorf("%s evidence %q binding = baseline %q catalog %q", catalogID, item.CaseID, item.Baseline, item.CatalogID)
 		}
-		if wantHash := issue32FileHash(t, descriptor.InputPath); item.InputHash != wantHash {
+		wantHash := issue32FileHash(t, descriptor.InputPath)
+		if descriptor.PinnedInputHash != "" {
+			wantHash = descriptor.PinnedInputHash
+		}
+		if item.InputHash != wantHash {
 			t.Errorf("%s evidence %q input hash = %q, want %q", catalogID, item.CaseID, item.InputHash, wantHash)
 		}
 	}
@@ -1822,9 +1891,9 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 				Ref:             "codingagent/sdk_test.go#TestSettingsResourcePackageAndTrustStubsDoNotTouchHostState",
 				Baseline:        issue32BaselineCommit,
 				CaseID:          "issue32-codingagent-capability-stub-side-effects",
-				ExecutionMethod: "go test ./codingagent -run '^(TestCreateAgentSessionAssemblyStubsAreSideEffectFree|TestModelRuntimeStubsDoNotReadCredentialsModelsOrNetwork|TestSettingsResourcePackageAndTrustStubsDoNotTouchHostState|TestDefaultToolFactoryIsAnInertCapabilityStub|TestRemoteSessionStubsDoNotCreateTransportOrLeaseState|TestAmbientStateCapabilityStubsCannotImportHostIO)$' -count=1",
-				Expected:        "the covered assembly, model, settings, resource, package, trust, Tool, and remote-session Capability Stubs return ErrNotImplemented without reading credentials or host state, starting network transports, mutating sentinel files or client state, or importing host-I/O packages into ambient-state scaffolds",
-				Actual:          "PASS; all focused SDK capability-stub checks returned ErrNotImplemented and observed no credential, model-store, filesystem, transport, client-state, or forbidden host-I/O activity",
+				ExecutionMethod: "go test ./codingagent -run '^(TestCreateAgentSessionAssemblyStubsAreSideEffectFree|TestModelRuntimeStubsDoNotReadCredentialsModelsOrNetwork|TestSettingsResourcePackageAndTrustStubsDoNotTouchHostState|TestDefaultReadToolFactoryConstructionIsSideEffectFree|TestRemoteSessionStubsDoNotCreateTransportOrLeaseState|TestAmbientStateCapabilityStubsCannotImportHostIO)$' -count=1",
+				Expected:        "the covered assembly, model, settings, resource, package, trust, and remote-session stubs remain inert while constructing the live read Tool performs no host I/O; no path starts transports or mutates sentinel files or client state",
+				Actual:          "PASS; focused SDK stub checks remained inert, the read Tool factory constructed metadata without reading a file, and no credential, model-store, filesystem, transport, client-state, or forbidden ambient-state I/O occurred",
 				Platform:        "any",
 				CatalogID:       issue32ModuleCatalogID,
 			},
@@ -1911,8 +1980,8 @@ func issue32WriteCatalog(t *testing.T, root string, expected []catalog.Entry) {
 		if e.ID == issue32ModuleCatalogID {
 			e.Status = catalog.StatusPartial
 			e.Evidence = issue32ModuleEvidence(t)
-			e.Partial = &catalog.Partial{Supported: []string{"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings", "Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects"}, Unsupported: []string{"runtime session, persistence, settings, resources, packages, tools, model/auth and product modes remain explicit Capability Stubs until their roadmap milestones", "surface tests prove API coverage and target resolution, not runtime parity"}}
-			e.Notes = "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The production legacy AgentSession and v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
+			e.Partial = issue32ModulePartial()
+			e.Notes = issue32ModuleNotes()
 		}
 		kept = append(kept, e)
 	}
@@ -1936,6 +2005,23 @@ func issue32WriteCatalog(t *testing.T, root string, expected []catalog.Entry) {
 	if err := os.WriteFile(path, data, 0o644); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func issue32ModulePartial() *catalog.Partial {
+	return &catalog.Partial{
+		Supported: []string{
+			"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings",
+			"Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects",
+		},
+		Unsupported: []string{
+			"runtime session, persistence, settings, resources, packages, remaining tools, model/auth and product modes remain explicit Capability Stubs until their roadmap milestones",
+			"surface tests prove API coverage and target resolution, not runtime parity",
+		},
+	}
+}
+
+func issue32ModuleNotes() string {
+	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool; the remaining deferred operations stay Capability Stubs. The production legacy AgentSession and v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
 }
 
 var issue32NameExceptions = map[string]string{
@@ -2218,6 +2304,9 @@ var issue32MemberProjectionExceptions = map[string]issue32MemberProjection{
 }
 
 var issue32MemberTargetExceptions = map[string]string{
+	// Optional TypeScript interface members use a companion Go interface so
+	// implementations of the required operations remain narrow.
+	"ReadOperations.detectImageMimeType": "ReadImageOperations.DetectImageMimeType",
 	// Keep the Go spelling of the English word Idle instead of treating its
 	// leading letters as the identifier initialism ID.
 	"AgentSession.isIdle":                        "AgentSession.IsIdle",

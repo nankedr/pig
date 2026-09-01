@@ -167,12 +167,14 @@ func TestInteractiveComponentInvalidationIsAnExplicitCapabilityStub(t *testing.T
 	assertCodingAgentNotImplemented(t, component.Invalidate(), "Component.Invalidate")
 }
 
-func TestDefaultToolFactoryIsAnInertCapabilityStub(t *testing.T) {
+func TestDefaultReadToolFactoryConstructionIsSideEffectFree(t *testing.T) {
 	env := newSDKSentinelEnvironment(t)
 	tool, err := codingagent.CreateReadTool(env.cwd, codingagent.ReadToolOptions{})
-	assertCodingAgentNotImplemented(t, err, "CreateReadTool")
-	if !reflect.DeepEqual(tool, agent.ErasedAgentTool{}) {
-		t.Fatalf("CreateReadTool result = %#v, want zero value", tool)
+	if err != nil {
+		t.Fatalf("CreateReadTool() error = %v", err)
+	}
+	if tool.Name != "read" || tool.Label != "read" || len(tool.Parameters) == 0 {
+		t.Fatalf("CreateReadTool result = %#v, want configured read Tool", tool)
 	}
 	env.assertUnchanged(t)
 }

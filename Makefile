@@ -33,6 +33,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/openai-completions-tool-result.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check --require-dist
 	node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --batch --check --require-dist --out parity/oracle/fixtures/agent-tool-batch.json "$(abspath $(PIG_PI_ORACLE_CHECKOUT))"
+	node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --read --check --require-dist --out parity/oracle/fixtures/codingagent-read-continuation.json "$(abspath $(PIG_PI_ORACLE_CHECKOUT))"
 
 m0-source-drift: m0-node-preflight
 	@test -n "$(PIG_PI_SOURCE_CHECKOUT)" || (echo "PIG_PI_SOURCE_CHECKOUT must name a clean locked Pi checkout" >&2; exit 2)

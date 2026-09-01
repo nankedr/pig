@@ -101,6 +101,8 @@ Listener 按注册顺序串行等待。它们不是 fire-and-forget 回调，也
 
 工具 Execute settle 后立即关闭 update admission：此后到达的 update 被忽略。已经被接受的 update 必须全部按注册顺序 dispatch 并等待完成，然后才能发布最终 `tool_execution_end` 和 ToolResult；因此 final 永远不会越过已接受 update。实现必须能处理 update listener 与 Execute 完成并发发生的竞态。
 
+若 context 在 Execute 期间取消，且 Execute 返回该 cancellation cause（或包裹后的等价错误），Agent 仍按固定 Pi 语义生成文本为 `Operation aborted` 的错误 ToolResult，完成该工具的 end、消息与 turn 生命周期，再向 Go 调用方返回原始 cancellation cause。若 Execute 返回与 cancellation cause 无关的错误，则维持既有 Go 语义并直接传播 cause；preflight 或 hook 阶段的 context 取消也仍直接传播，不虚构尚未执行或尚未完成的 ToolResult。
+
 工具、被阻止的 `beforeToolCall` 或 `afterToolCall` 覆盖结果都可设置 `terminate: true`。只有 batch 中每一个最终结果都为 `terminate: true` 时才停止自动 follow-up；混合 batch 继续。它只影响下一次模型调用，不撤销已经运行的工具。
 
 ## 7. Session、客户端请求与资源上限

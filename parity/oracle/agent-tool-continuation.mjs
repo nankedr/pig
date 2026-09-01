@@ -3,7 +3,8 @@
 
 import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -19,11 +20,32 @@ function parseArgs(argv) {
 		if (args[index] === "--check") result.check = true;
 		else if (args[index] === "--require-dist") result.requireDist = true;
 		else if (args[index] === "--batch") result.batch = true;
+		else if (args[index] === "--read") result.read = true;
 		else if (args[index] === "--out") result.out = args[++index];
 		else if (result.piRoot === defaultPiRoot) result.piRoot = args[index];
 		else throw new Error(`unexpected argument: ${args[index]}`);
 	}
 	return result;
+}
+
+function readDeclaration() {
+	return {
+		schema_version: "1.0.0",
+		id: "go-sdk/codingagent/read-tool-continuation",
+		catalog_id: "contract:codingagent/read-tool",
+		surface: "go-sdk",
+		input: {
+			entrypoint: "createReadTool",
+			network: "forbidden",
+			provider: { api: "faux:read-continuation", id: "faux-read-continuation", model_id: "faux-1" },
+			prompt: { role: "user", content: "read the sentinel", timestamp: 1 },
+			file: { path: "sentinel.txt", content: "issue-54-real-read-sentinel" },
+			tool_call_id: "read-sentinel",
+			final_text: "The file contains issue-54-real-read-sentinel.",
+			token_size: { min: 100, max: 100 },
+		},
+		observe: ["events", "outcome", "side_effects"],
+	};
 }
 
 function loadLock() {
@@ -256,6 +278,67 @@ async function captureModule(agentModule, fauxModule, caseDeclaration) {
 	};
 }
 
+async function captureReadModule(agentModule, fauxModule, readModule, caseDeclaration) {
+	const agent = await import(pathToFileURL(agentModule).href);
+	const ai = await import(pathToFileURL(fauxModule).href);
+	const codingAgent = await import(pathToFileURL(readModule).href);
+	const input = caseDeclaration.input;
+	const providerContexts = [];
+	const events = [];
+	const cwd = mkdtempSync(join(tmpdir(), "pig-read-oracle-"));
+	try {
+		writeFileSync(join(cwd, input.file.path), input.file.content);
+		const core = ai.createFauxCore({
+			api: input.provider.api,
+			provider: input.provider.id,
+			models: [{ id: input.provider.model_id }],
+			tokenSize: input.token_size,
+		});
+		const toolResponse = ai.fauxAssistantMessage(
+			ai.fauxToolCall("read", { path: input.file.path }, { id: input.tool_call_id }),
+			{ stopReason: "toolUse", timestamp: 2 },
+		);
+		const finalResponse = ai.fauxAssistantMessage(input.final_text, { timestamp: 4 });
+		core.setResponses([
+			(context) => {
+				providerContexts.push(context.messages.map(projectMessage));
+				return toolResponse;
+			},
+			(context) => {
+				providerContexts.push(context.messages.map(projectMessage));
+				const result = context.messages.at(-1);
+				if (result?.role !== "toolResult" || result.content?.[0]?.text !== input.file.content) {
+					throw new Error("read ToolResult did not contain the real sentinel file");
+				}
+				return finalResponse;
+			},
+		]);
+		const messages = await agent.runAgentLoop(
+			[structuredClone(input.prompt)],
+			{ systemPrompt: "", messages: [], tools: [codingAgent.createReadTool(cwd)] },
+			{
+				model: core.getModel(),
+				convertToLlm: (values) => values.filter((message) => ["user", "assistant", "toolResult"].includes(message.role)),
+			},
+			(event) => events.push(projectEvent(event)),
+			undefined,
+			core.streamSimple,
+		);
+		return {
+			events,
+			outcome: {
+				messages: messages.map(projectMessage),
+				providerContexts,
+				file: { path: input.file.path, content: readFileSync(join(cwd, input.file.path), "utf8") },
+				state: { callCount: core.state.callCount, pendingResponseCount: core.getPendingResponseCount() },
+			},
+			side_effects: [],
+		};
+	} finally {
+		rmSync(cwd, { recursive: true, force: true });
+	}
+}
+
 function batchDeclaration() {
 	return {
 		schema_version: "1.0.0",
@@ -354,23 +437,30 @@ async function captureBatchModule(agentModule, fauxModule, caseDeclaration) {
 	};
 }
 
-async function capture(piRoot, requireDist, batch) {
-	const caseDeclaration = batch ? batchDeclaration() : declaration();
+async function capture(piRoot, requireDist, batch, read) {
+	if (batch && read) throw new Error("--batch and --read are mutually exclusive");
+	const caseDeclaration = read ? readDeclaration() : batch ? batchDeclaration() : declaration();
 	const sourceAgent = join(piRoot, "packages", "agent", "src", "agent-loop.ts");
 	const sourceFaux = join(piRoot, "packages", "ai", "src", "providers", "faux.ts");
+	const sourceRead = join(piRoot, "packages", "coding-agent", "src", "core", "tools", "read.ts");
 	const captureSelectedModule = batch ? captureBatchModule : captureModule;
-	const observation = await captureSelectedModule(sourceAgent, sourceFaux, caseDeclaration);
+	const observation = read
+		? await captureReadModule(sourceAgent, sourceFaux, sourceRead, caseDeclaration)
+		: await captureSelectedModule(sourceAgent, sourceFaux, caseDeclaration);
 	const distAgent = join(piRoot, "packages", "agent", "dist", "agent-loop.js");
 	const distFaux = join(piRoot, "packages", "ai", "dist", "providers", "faux.js");
-	const hasDist = existsSync(distAgent) && existsSync(distFaux);
+	const distRead = join(piRoot, "packages", "coding-agent", "dist", "core", "tools", "read.js");
+	const hasDist = existsSync(distAgent) && existsSync(distFaux) && (!read || existsSync(distRead));
 	if (requireDist && !hasDist) throw new Error("prepared Pi dist is required but Agent/Faux dist is absent");
 	if (hasDist) {
-		const distObservation = await captureSelectedModule(distAgent, distFaux, caseDeclaration);
+		const distObservation = read
+			? await captureReadModule(distAgent, distFaux, distRead, caseDeclaration)
+			: await captureSelectedModule(distAgent, distFaux, caseDeclaration);
 		if (JSON.stringify(canonical(observation)) !== JSON.stringify(canonical(distObservation))) {
 			throw new Error("Pi built Agent/Faux modules differ from locked source modules");
 		}
 	}
-	return { caseDeclaration, observation, sourceAgent, sourceFaux };
+	return { caseDeclaration, observation, sourceAgent, sourceFaux, sourceRead: read ? sourceRead : undefined };
 }
 
 async function withForbiddenFetch(run) {
@@ -389,8 +479,8 @@ async function withForbiddenFetch(run) {
 	}
 }
 
-async function buildFixture(piRoot, lock, requireDist, batch) {
-	const captured = await withForbiddenFetch(() => capture(piRoot, requireDist, batch));
+async function buildFixture(piRoot, lock, requireDist, batch, read) {
+	const captured = await withForbiddenFetch(() => capture(piRoot, requireDist, batch, read));
 	return {
 		schema_version: "1.0.0",
 		deterministic: true,
@@ -399,7 +489,7 @@ async function buildFixture(piRoot, lock, requireDist, batch) {
 		upstream: {
 			repository: lock.upstream.repository,
 			commit: lock.upstream.commit,
-			reference: "packages/agent/src/agent-loop.ts#runAgentLoop",
+			reference: read ? "packages/coding-agent/src/core/tools/read.ts#createReadTool" : "packages/agent/src/agent-loop.ts#runAgentLoop",
 		},
 		case: captured.caseDeclaration,
 		observation: {
@@ -413,15 +503,20 @@ async function buildFixture(piRoot, lock, requireDist, batch) {
 			outcome: captured.observation.outcome,
 			side_effects: captured.observation.side_effects,
 		}),
-		execution_method: batch
+		execution_method: read
+			? "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --read <locked-pi-checkout>; source modules with built-dist differential"
+			: batch
 			? "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --batch <locked-pi-checkout>; source modules with built-dist differential"
 			: "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs <locked-pi-checkout>; source modules with built-dist differential",
 		platform: "any",
 		environment: {
 			node: process.version,
-			oracle_entry: "packages/agent/src/agent-loop.ts + packages/ai/src/providers/faux.ts",
+				oracle_entry: read
+					? "packages/coding-agent/src/core/tools/read.ts + packages/agent/src/agent-loop.ts + packages/ai/src/providers/faux.ts"
+					: "packages/agent/src/agent-loop.ts + packages/ai/src/providers/faux.ts",
 			agent_source_sha256: fileDigest(captured.sourceAgent),
 			faux_source_sha256: fileDigest(captured.sourceFaux),
+				...(captured.sourceRead ? { read_source_sha256: fileDigest(captured.sourceRead) } : {}),
 		},
 	};
 }
@@ -430,7 +525,7 @@ async function main() {
 	const args = parseArgs(process.argv);
 	const lock = loadLock();
 	assertLockedCheckout(args.piRoot, lock.upstream.commit);
-	const fixture = await buildFixture(args.piRoot, lock, args.requireDist, args.batch);
+	const fixture = await buildFixture(args.piRoot, lock, args.requireDist, args.batch, args.read);
 	if (args.check) {
 		const recorded = JSON.parse(readFileSync(args.out, "utf8"));
 		fixture.environment.node = recorded.environment.node;
