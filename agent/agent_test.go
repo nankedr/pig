@@ -205,6 +205,37 @@ func TestAgentPromptAndContinueKeepM2QueuesOutOfRuntime(t *testing.T) {
 	}
 }
 
+func TestAgentPrepareNextTurnRemainsExplicitCapabilityStub(t *testing.T) {
+	callbackCalled := false
+	streamCalled := false
+	listenerCalled := false
+	created, err := agent.NewAgent(agent.AgentOptions{
+		PrepareNextTurn: func(context.Context) (*agent.AgentLoopTurnUpdate, error) {
+			callbackCalled = true
+			return nil, nil
+		},
+		StreamFunction: func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+			streamCalled = true
+			return nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	created.Subscribe(func(context.Context, agent.AgentEvent) error {
+		listenerCalled = true
+		return nil
+	})
+	err = created.Prompt(context.Background(), userMessage("prompt"))
+	if !errors.Is(err, agent.ErrNotImplemented) {
+		t.Fatalf("Prompt() error = %v, want ErrNotImplemented", err)
+	}
+	state := created.State()
+	if callbackCalled || streamCalled || listenerCalled || created.Busy() || state.IsStreaming || len(state.Messages) != 0 {
+		t.Fatalf("PrepareNextTurn stub side effects: callback=%t stream=%t listener=%t state=%#v", callbackCalled, streamCalled, listenerCalled, state)
+	}
+}
+
 func newFauxAgent(t *testing.T, options ai.RegisterFauxProviderOptions, responses ...ai.FauxResponseStep) *agent.Agent {
 	t.Helper()
 	core, err := ai.CreateFauxCore(options)

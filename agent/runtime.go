@@ -205,6 +205,9 @@ func RunAgentLoop(ctx context.Context, prompts []AgentMessage, agentContext Agen
 	if err != nil {
 		return nil, err
 	}
+	if err := validateToolFreeAgentLoop(ctx, config, emit, streamFunction); err != nil {
+		return nil, err
+	}
 	currentContext.Messages = append(currentContext.Messages, cloneAgentMessages(ownedPrompts)...)
 	newMessages := cloneAgentMessages(ownedPrompts)
 	if err := emitAgentEvent(ctx, emit, AgentStartEvent{Type: AgentEventTypeAgentStart}); err != nil {
@@ -232,6 +235,9 @@ func RunAgentLoopContinue(ctx context.Context, agentContext AgentContext, config
 	if currentContext.Messages[len(currentContext.Messages)-1].MessageRole() == ai.MessageRoleAssistant {
 		return nil, fmt.Errorf("cannot continue from message role: assistant")
 	}
+	if err := validateToolFreeAgentLoop(ctx, config, emit, streamFunction); err != nil {
+		return nil, err
+	}
 	if err := emitAgentEvent(ctx, emit, AgentStartEvent{Type: AgentEventTypeAgentStart}); err != nil {
 		return nil, err
 	}
@@ -242,15 +248,6 @@ func RunAgentLoopContinue(ctx context.Context, agentContext AgentContext, config
 }
 
 func runToolFreeTurn(ctx context.Context, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) ([]AgentMessage, error) {
-	if ctx == nil {
-		return nil, fmt.Errorf("Agent loop context must not be nil")
-	}
-	if emit == nil {
-		return nil, fmt.Errorf("Agent event sink must not be nil")
-	}
-	if streamFunction == nil {
-		return nil, newNotImplemented("Agent.DefaultStreamFunction")
-	}
 	messages := cloneAgentMessages(agentContext.Messages)
 	var err error
 	if config.TransformContext != nil {
@@ -324,6 +321,22 @@ func runToolFreeTurn(ctx context.Context, agentContext AgentContext, newMessages
 		return nil, err
 	}
 	return finishToolFreeTurn(ctx, emit, agentContext, newMessages, config, message, started)
+}
+
+func validateToolFreeAgentLoop(ctx context.Context, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) error {
+	if ctx == nil {
+		return fmt.Errorf("Agent loop context must not be nil")
+	}
+	if emit == nil {
+		return fmt.Errorf("Agent event sink must not be nil")
+	}
+	if streamFunction == nil {
+		return newNotImplemented("Agent.DefaultStreamFunction")
+	}
+	if config.PrepareNextTurn != nil {
+		return newNotImplemented("Agent.PrepareNextTurn")
+	}
+	return nil
 }
 
 func finishToolFreeTurn(ctx context.Context, emit AgentEventSink, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, message ai.AssistantMessage, started bool) ([]AgentMessage, error) {

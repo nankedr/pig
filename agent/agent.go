@@ -719,6 +719,9 @@ func (a *Agent) startRun(ctx context.Context) (context.Context, AgentContext, Ag
 	if a.activeContext != nil {
 		return nil, AgentContext{}, AgentLoopConfig{}, nil, fmt.Errorf("Agent is already processing")
 	}
+	if a.prepareNextTurn != nil || a.prepareNextTurnWithContext != nil {
+		return nil, AgentContext{}, AgentLoopConfig{}, nil, newNotImplemented("Agent.PrepareNextTurn")
+	}
 	runContext, cancel := context.WithCancelCause(ctx)
 	a.activeContext = runContext
 	a.activeCancel = cancel
@@ -755,14 +758,6 @@ func (a *Agent) startRun(ctx context.Context) (context.Context, AgentContext, Ag
 		ToolExecution:       a.toolExecution,
 		GetSteeringMessages: nil,
 		GetFollowUpMessages: nil,
-	}
-	if a.prepareNextTurnWithContext != nil {
-		config.PrepareNextTurn = a.prepareNextTurnWithContext
-	} else if a.prepareNextTurn != nil {
-		prepareNextTurn := a.prepareNextTurn
-		config.PrepareNextTurn = func(ctx context.Context, _ PrepareNextTurnContext) (*AgentLoopTurnUpdate, error) {
-			return prepareNextTurn(ctx)
-		}
 	}
 	agentContext := AgentContext{
 		SystemPrompt: a.state.SystemPrompt,

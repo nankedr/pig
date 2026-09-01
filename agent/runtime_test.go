@@ -136,6 +136,35 @@ func TestRunAgentLoopCallsShouldStopAfterSuccessfulTurn(t *testing.T) {
 	}
 }
 
+func TestRunAgentLoopKeepsPrepareNextTurnAsExplicitCapabilityStub(t *testing.T) {
+	callbackCalled := false
+	streamCalled := false
+	var events []agent.AgentEvent
+	_, err := agent.RunAgentLoop(
+		context.Background(),
+		[]agent.AgentMessage{userMessage("prompt")},
+		agent.AgentContext{},
+		agent.AgentLoopConfig{PrepareNextTurn: func(context.Context, agent.PrepareNextTurnContext) (*agent.AgentLoopTurnUpdate, error) {
+			callbackCalled = true
+			return nil, nil
+		}},
+		func(_ context.Context, event agent.AgentEvent) error {
+			events = append(events, event)
+			return nil
+		},
+		func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+			streamCalled = true
+			return nil
+		},
+	)
+	if !errors.Is(err, agent.ErrNotImplemented) {
+		t.Fatalf("RunAgentLoop() error = %v, want ErrNotImplemented", err)
+	}
+	if callbackCalled || streamCalled || len(events) != 0 {
+		t.Fatalf("PrepareNextTurn stub side effects: callback=%t stream=%t events=%d", callbackCalled, streamCalled, len(events))
+	}
+}
+
 func TestRunAgentLoopKeepsToolExecutionAsExplicitCapabilityStub(t *testing.T) {
 	toolCall, err := ai.FauxToolCall("echo", map[string]any{"text": "hello"})
 	if err != nil {
@@ -347,6 +376,47 @@ func TestAgentLoopPublishesEventsAndRepeatableResult(t *testing.T) {
 		t.Fatalf("repeat Result() = (%#v, %v), want %#v", second, err, first)
 	}
 	if len(first) != 2 || events[0] != agent.AgentEventTypeAgentStart || events[len(events)-1] != agent.AgentEventTypeAgentEnd {
+		t.Fatalf("events = %v, result = %#v", events, first)
+	}
+}
+
+func TestAgentLoopContinuePublishesEventsAndRepeatableResult(t *testing.T) {
+	response, err := ai.FauxAssistantMessage(ai.FauxAssistantText("done"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{response})
+	model, _ := core.GetModel()
+	stream := agent.AgentLoopContinue(
+		context.Background(),
+		agent.AgentContext{Messages: []agent.AgentMessage{userMessage("prompt")}},
+		agent.AgentLoopConfig{Model: model},
+		agent.StreamFunction(core.StreamSimple),
+	)
+	var events []agent.AgentEventType
+	for {
+		event, ok, err := stream.Next(context.Background())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !ok {
+			break
+		}
+		events = append(events, event.AgentEventType())
+	}
+	first, err := stream.Result(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := stream.Result(context.Background())
+	if err != nil || !reflect.DeepEqual(first, second) {
+		t.Fatalf("repeat Result() = (%#v, %v), want %#v", second, err, first)
+	}
+	if len(first) != 1 || first[0].MessageRole() != ai.MessageRoleAssistant || events[0] != agent.AgentEventTypeAgentStart || events[len(events)-1] != agent.AgentEventTypeAgentEnd {
 		t.Fatalf("events = %v, result = %#v", events, first)
 	}
 }
