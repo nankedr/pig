@@ -55,3 +55,23 @@ Independently fetched catalog-service responses are not covered by the Pi or
 Pig MIT licenses. Without an endpoint-specific redistribution license, Pig
 records only irreversible provenance and grants no rights in third-party
 service data or trademarks.
+
+## jsonschema
+
+- Source: https://github.com/santhosh-tekuri/jsonschema
+- Version: 6.0.3
+- License: Apache-2.0
+
+Pig uses jsonschema to compile and validate authoritative Tool parameter
+schemas. The retained license text is in
+`THIRD_PARTY_LICENSES/jsonschema-v6-Apache-2.0.txt`.
+
+## golang.org/x/text
+
+- Source: https://go.googlesource.com/text
+- Version: 0.14.0
+- License: BSD-3-Clause
+
+Pig receives x/text transitively through jsonschema. The retained license and
+patent grant are in `THIRD_PARTY_LICENSES/golang-x-text-BSD-3-Clause.txt` and
+`THIRD_PARTY_LICENSES/golang-x-text-PATENTS.txt`.

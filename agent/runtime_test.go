@@ -7,6 +7,7 @@ import (
 	"errors"
 	"reflect"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/nankedr/pig/agent"
@@ -196,6 +197,9 @@ func TestRunAgentLoopKeepsToolExecutionAsExplicitCapabilityStub(t *testing.T) {
 	)
 	if !errors.Is(err, agent.ErrNotImplemented) {
 		t.Fatalf("RunAgentLoop() error = %v, want ErrNotImplemented", err)
+	}
+	if !strings.Contains(err.Error(), "Agent.ToolContinuation") {
+		t.Fatalf("RunAgentLoop() error = %v, want ToolContinuation boundary", err)
 	}
 	if slices.Contains(events, agent.AgentEventTypeAgentEnd) {
 		t.Fatalf("Tool capability stub published agent_end: %v", events)

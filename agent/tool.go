@@ -45,7 +45,7 @@ type AgentToolResult[TDetails any] struct {
 // ErasedAgentToolResult is the heterogeneous runtime form of a Tool result.
 type ErasedAgentToolResult = AgentToolResult[ai.JSONValue]
 
-// AgentToolUpdateCallback publishes one partial Tool result. The future Tool
+// AgentToolUpdateCallback publishes one partial Tool result. The Tool
 // dispatcher admits callbacks only while Execute is active and treats all
 // admitted updates as a barrier before the final result event.
 type AgentToolUpdateCallback[TDetails any] func(AgentToolResult[TDetails])
@@ -56,7 +56,7 @@ type PrepareArgumentsFunc func(ai.JSONValue) (ai.JSONValue, error)
 
 // AgentTool is the strongly typed Tool authoring contract. The raw JSON Schema
 // in Tool.Parameters remains authoritative; TParameters is decoded only after
-// the future dispatcher has prepared, coerced, and validated the value.
+// the dispatcher has prepared, coerced, and validated the value.
 type AgentTool[TParameters, TDetails any] struct {
 	ai.Tool
 	Label            string
@@ -97,6 +97,9 @@ func EraseAgentTool[TParameters, TDetails any](tool AgentTool[TParameters, TDeta
 	}
 	if _, err := json.Marshal(tool.Tool); err != nil {
 		return ErasedAgentTool{}, fmt.Errorf("invalid Agent Tool %q: %w", tool.Name, err)
+	}
+	if _, _, err := compileAgentToolSchema(tool.Name, tool.Parameters); err != nil {
+		return ErasedAgentTool{}, err
 	}
 	if tool.Execute != nil && tool.DecodeValidated == nil {
 		return ErasedAgentTool{}, fmt.Errorf("Agent Tool %q with Execute requires DecodeValidated", tool.Name)

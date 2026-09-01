@@ -655,7 +655,7 @@ func (a *Agent) Reset() error {
 	return nil
 }
 
-// Prompt starts one Tool-free legacy Agent run with the supplied messages.
+// Prompt starts one legacy Agent run with the supplied messages.
 func (a *Agent) Prompt(ctx context.Context, messages ...AgentMessage) error {
 	owned, err := cloneAgentMessagesForOwnership(messages)
 	if err != nil {
@@ -667,7 +667,7 @@ func (a *Agent) Prompt(ctx context.Context, messages ...AgentMessage) error {
 	})
 }
 
-// PromptText starts one Tool-free run from text and optional images.
+// PromptText starts one run from text and optional images.
 func (a *Agent) PromptText(ctx context.Context, text string, images ...ai.ImageContent) error {
 	content := make([]ai.UserContent, 0, len(images)+1)
 	content = append(content, ai.TextContent{Type: ai.ContentTypeText, Text: text})
@@ -797,6 +797,14 @@ func (a *Agent) processEvent(ctx context.Context, event AgentEvent) error {
 	case MessageEndEvent:
 		a.state.StreamingMessage = nil
 		a.state.Messages = append(a.state.Messages, cloneAgentMessage(event.Message))
+	case ToolExecutionStartEvent:
+		pending := clonePendingToolCalls(a.state.PendingToolCalls)
+		pending[event.ToolCallID] = struct{}{}
+		a.state.PendingToolCalls = pending
+	case ToolExecutionEndEvent:
+		pending := clonePendingToolCalls(a.state.PendingToolCalls)
+		delete(pending, event.ToolCallID)
+		a.state.PendingToolCalls = pending
 	case TurnEndEvent:
 		if assistant, ok := agentAssistantMessage(event.Message); ok {
 			if errorMessage, ok := assistant.ErrorMessage.Value(); ok {

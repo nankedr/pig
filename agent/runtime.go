@@ -205,7 +205,7 @@ func RunAgentLoop(ctx context.Context, prompts []AgentMessage, agentContext Agen
 	if err != nil {
 		return nil, err
 	}
-	if err := validateToolFreeAgentLoop(ctx, config, emit, streamFunction); err != nil {
+	if err := validateAgentLoop(ctx, config, emit, streamFunction); err != nil {
 		return nil, err
 	}
 	currentContext.Messages = append(currentContext.Messages, cloneAgentMessages(ownedPrompts)...)
@@ -221,7 +221,7 @@ func RunAgentLoop(ctx context.Context, prompts []AgentMessage, agentContext Agen
 			return nil, err
 		}
 	}
-	return runToolFreeTurn(ctx, currentContext, newMessages, config, emit, streamFunction)
+	return runAgentTurn(ctx, currentContext, newMessages, config, emit, streamFunction)
 }
 
 func RunAgentLoopContinue(ctx context.Context, agentContext AgentContext, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) ([]AgentMessage, error) {
@@ -235,7 +235,7 @@ func RunAgentLoopContinue(ctx context.Context, agentContext AgentContext, config
 	if currentContext.Messages[len(currentContext.Messages)-1].MessageRole() == ai.MessageRoleAssistant {
 		return nil, fmt.Errorf("cannot continue from message role: assistant")
 	}
-	if err := validateToolFreeAgentLoop(ctx, config, emit, streamFunction); err != nil {
+	if err := validateAgentLoop(ctx, config, emit, streamFunction); err != nil {
 		return nil, err
 	}
 	if err := emitAgentEvent(ctx, emit, AgentStartEvent{Type: AgentEventTypeAgentStart}); err != nil {
@@ -244,10 +244,10 @@ func RunAgentLoopContinue(ctx context.Context, agentContext AgentContext, config
 	if err := emitAgentEvent(ctx, emit, TurnStartEvent{Type: AgentEventTypeTurnStart}); err != nil {
 		return nil, err
 	}
-	return runToolFreeTurn(ctx, currentContext, []AgentMessage{}, config, emit, streamFunction)
+	return runAgentTurn(ctx, currentContext, []AgentMessage{}, config, emit, streamFunction)
 }
 
-func runToolFreeTurn(ctx context.Context, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) ([]AgentMessage, error) {
+func runAgentTurn(ctx context.Context, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) ([]AgentMessage, error) {
 	messages := cloneAgentMessages(agentContext.Messages)
 	var err error
 	if config.TransformContext != nil {
@@ -305,7 +305,7 @@ func runToolFreeTurn(ctx context.Context, agentContext AgentContext, newMessages
 			if err != nil {
 				return nil, err
 			}
-			return finishToolFreeTurn(ctx, emit, agentContext, newMessages, config, message, started)
+			return finishAgentTurn(ctx, emit, agentContext, newMessages, config, message, started)
 		default:
 			if hasPartial {
 				if err := emitAgentEvent(ctx, emit, MessageUpdateEvent{
@@ -320,10 +320,10 @@ func runToolFreeTurn(ctx context.Context, agentContext AgentContext, newMessages
 	if err != nil {
 		return nil, err
 	}
-	return finishToolFreeTurn(ctx, emit, agentContext, newMessages, config, message, started)
+	return finishAgentTurn(ctx, emit, agentContext, newMessages, config, message, started)
 }
 
-func validateToolFreeAgentLoop(ctx context.Context, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) error {
+func validateAgentLoop(ctx context.Context, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) error {
 	if ctx == nil {
 		return fmt.Errorf("Agent loop context must not be nil")
 	}
@@ -339,7 +339,7 @@ func validateToolFreeAgentLoop(ctx context.Context, config AgentLoopConfig, emit
 	return nil
 }
 
-func finishToolFreeTurn(ctx context.Context, emit AgentEventSink, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, message ai.AssistantMessage, started bool) ([]AgentMessage, error) {
+func finishAgentTurn(ctx context.Context, emit AgentEventSink, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, message ai.AssistantMessage, started bool) ([]AgentMessage, error) {
 	message = ai.CloneAssistantMessage(message)
 	if !started {
 		if err := emitAgentEvent(ctx, emit, MessageStartEvent{Type: AgentEventTypeMessageStart, Message: message}); err != nil {
@@ -350,17 +350,27 @@ func finishToolFreeTurn(ctx context.Context, emit AgentEventSink, agentContext A
 		return nil, err
 	}
 	newMessages = append(newMessages, message)
-	for _, content := range message.Content {
-		switch content.(type) {
-		case ai.ToolCall, *ai.ToolCall:
-			return cloneAgentMessages(newMessages), newNotImplemented("Agent.ToolExecution")
+	agentContext.Messages = append(agentContext.Messages, ai.CloneAssistantMessage(message))
+	if message.StopReason == ai.StopReasonError || message.StopReason == ai.StopReasonAborted {
+		if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: []ai.ToolResultMessage{}}); err != nil {
+			return nil, err
 		}
+		if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: newMessages}); err != nil {
+			return nil, err
+		}
+		return cloneAgentMessages(newMessages), nil
+	}
+	toolCalls := assistantToolCalls(message)
+	if len(toolCalls) > 1 {
+		return cloneAgentMessages(newMessages), newNotImplemented("Agent.MultiToolExecution")
+	}
+	if len(toolCalls) == 1 {
+		return finishSingleToolTurn(ctx, emit, agentContext, newMessages, config, message, toolCalls[0])
 	}
 	if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: []ai.ToolResultMessage{}}); err != nil {
 		return nil, err
 	}
 	if message.StopReason != ai.StopReasonError && message.StopReason != ai.StopReasonAborted && config.ShouldStopAfterTurn != nil {
-		agentContext.Messages = append(agentContext.Messages, ai.CloneAssistantMessage(message))
 		callbackContext, err := cloneAgentContext(agentContext)
 		if err != nil {
 			return nil, err
@@ -425,7 +435,17 @@ func cloneAgentEvent(event AgentEvent) AgentEvent {
 		return event
 	case TurnEndEvent:
 		event.Message = cloneAgentMessage(event.Message)
-		event.ToolResults = append([]ai.ToolResultMessage(nil), event.ToolResults...)
+		event.ToolResults = cloneToolResultMessages(event.ToolResults)
+		return event
+	case ToolExecutionStartEvent:
+		event.Arguments = cloneAgentJSONValue(event.Arguments)
+		return event
+	case ToolExecutionUpdateEvent:
+		event.Arguments = cloneAgentJSONValue(event.Arguments)
+		event.PartialResult = cloneErasedAgentToolResult(event.PartialResult)
+		return event
+	case ToolExecutionEndEvent:
+		event.Result = cloneErasedAgentToolResult(event.Result)
 		return event
 	default:
 		return event
