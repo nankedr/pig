@@ -121,7 +121,10 @@ func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext
 			isError:  true,
 		}
 	} else {
-		prepared, immediate := prepareSingleAgentToolCall(ctx, agentContext, message, config, toolCall)
+		prepared, immediate, err := prepareSingleAgentToolCall(ctx, agentContext, message, config, toolCall)
+		if err != nil {
+			return nil, err
+		}
 		if immediate != nil {
 			finalized = *immediate
 		} else {
@@ -129,7 +132,10 @@ func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext
 			if err != nil {
 				return nil, err
 			}
-			finalized = finalizeSingleAgentToolCall(ctx, agentContext, message, config, prepared, executed)
+			finalized, err = finalizeSingleAgentToolCall(ctx, agentContext, message, config, prepared, executed)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -158,6 +164,9 @@ func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext
 		shouldStop, err = config.ShouldStopAfterTurn(ctx, ShouldStopAfterTurnContext{
 			Message: ai.CloneAssistantMessage(message), ToolResults: cloneToolResultMessages(toolResults), Context: callbackContext, NewMessages: cloneAgentMessages(newMessages),
 		})
+		if cause := context.Cause(ctx); cause != nil {
+			return nil, cause
+		}
 		if err != nil {
 			return nil, err
 		}
@@ -172,33 +181,42 @@ func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext
 	return cloneAgentMessages(newMessages), nil
 }
 
-func prepareSingleAgentToolCall(ctx context.Context, agentContext AgentContext, assistantMessage ai.AssistantMessage, config AgentLoopConfig, toolCall AgentToolCall) (preparedAgentToolCall, *finalizedAgentToolCall) {
+func prepareSingleAgentToolCall(ctx context.Context, agentContext AgentContext, assistantMessage ai.AssistantMessage, config AgentLoopConfig, toolCall AgentToolCall) (preparedAgentToolCall, *finalizedAgentToolCall, error) {
+	if cause := context.Cause(ctx); cause != nil {
+		return preparedAgentToolCall{}, nil, cause
+	}
 	tool, ok := findAgentTool(agentContext.Tools, toolCall.Name)
 	if !ok {
-		return preparedAgentToolCall{}, immediateAgentToolError(toolCall, fmt.Sprintf("Tool %s not found", toolCall.Name))
+		return preparedAgentToolCall{}, immediateAgentToolError(toolCall, fmt.Sprintf("Tool %s not found", toolCall.Name)), nil
 	}
 	arguments := cloneAgentJSONValue(toolCall.Arguments)
 	preparedArguments, err := tool.prepareArguments(arguments)
+	if cause := context.Cause(ctx); cause != nil {
+		return preparedAgentToolCall{}, nil, cause
+	}
 	if err != nil {
-		return preparedAgentToolCall{}, immediateAgentToolError(toolCall, err.Error())
+		return preparedAgentToolCall{}, immediateAgentToolError(toolCall, err.Error()), nil
 	}
 	validated, err := validateAndSealAgentToolArguments(tool, preparedArguments)
+	if cause := context.Cause(ctx); cause != nil {
+		return preparedAgentToolCall{}, nil, cause
+	}
 	if err != nil {
-		return preparedAgentToolCall{}, immediateAgentToolError(toolCall, err.Error())
+		return preparedAgentToolCall{}, immediateAgentToolError(toolCall, err.Error()), nil
 	}
 	if config.BeforeToolCall != nil {
 		callbackContext, err := cloneAgentContext(agentContext)
 		if err != nil {
-			return preparedAgentToolCall{}, immediateAgentToolError(toolCall, err.Error())
+			return preparedAgentToolCall{}, immediateAgentToolError(toolCall, err.Error()), nil
 		}
 		before, err := config.BeforeToolCall(ctx, BeforeToolCallContext{
 			AssistantMessage: ai.CloneAssistantMessage(assistantMessage), ToolCall: cloneAgentToolCall(toolCall), Args: cloneAgentJSONValue(validated.value), Context: callbackContext,
 		})
-		if err != nil {
-			return preparedAgentToolCall{}, immediateAgentToolError(toolCall, err.Error())
+		if cause := context.Cause(ctx); cause != nil {
+			return preparedAgentToolCall{}, nil, cause
 		}
-		if err := context.Cause(ctx); err != nil {
-			return preparedAgentToolCall{}, immediateAgentToolError(toolCall, "Operation aborted")
+		if err != nil {
+			return preparedAgentToolCall{}, immediateAgentToolError(toolCall, err.Error()), nil
 		}
 		if before != nil && before.Block {
 			reason := before.Reason
@@ -209,19 +227,23 @@ func prepareSingleAgentToolCall(ctx context.Context, agentContext AgentContext, 
 			if before.Terminate {
 				immediate.result.Terminate = ai.Some(true)
 			}
-			return preparedAgentToolCall{}, immediate
+			return preparedAgentToolCall{}, immediate, nil
 		}
 	}
-	if err := context.Cause(ctx); err != nil {
-		return preparedAgentToolCall{}, immediateAgentToolError(toolCall, "Operation aborted")
+	if cause := context.Cause(ctx); cause != nil {
+		return preparedAgentToolCall{}, nil, cause
 	}
-	return preparedAgentToolCall{toolCall: toolCall, tool: tool, args: validated}, nil
+	return preparedAgentToolCall{toolCall: toolCall, tool: tool, args: validated}, nil, nil
 }
 
 func executeSingleAgentToolCall(ctx context.Context, emit AgentEventSink, prepared preparedAgentToolCall) (finalizedAgentToolCall, error) {
 	dispatcher := newAgentToolUpdateDispatcher(ctx, emit, prepared.toolCall)
 	result, err := prepared.tool.executeValidated(ctx, prepared.toolCall.ID, prepared.args, dispatcher.admit)
-	if updateErr := dispatcher.closeAndWait(); updateErr != nil {
+	updateErr := dispatcher.closeAndWait()
+	if cause := context.Cause(ctx); cause != nil {
+		return finalizedAgentToolCall{}, cause
+	}
+	if updateErr != nil {
 		return finalizedAgentToolCall{}, updateErr
 	}
 	if err != nil {
@@ -230,40 +252,49 @@ func executeSingleAgentToolCall(ctx context.Context, emit AgentEventSink, prepar
 	return finalizedAgentToolCall{toolCall: prepared.toolCall, result: result}, nil
 }
 
-func finalizeSingleAgentToolCall(ctx context.Context, agentContext AgentContext, assistantMessage ai.AssistantMessage, config AgentLoopConfig, prepared preparedAgentToolCall, executed finalizedAgentToolCall) finalizedAgentToolCall {
+func finalizeSingleAgentToolCall(ctx context.Context, agentContext AgentContext, assistantMessage ai.AssistantMessage, config AgentLoopConfig, prepared preparedAgentToolCall, executed finalizedAgentToolCall) (finalizedAgentToolCall, error) {
+	if cause := context.Cause(ctx); cause != nil {
+		return finalizedAgentToolCall{}, cause
+	}
 	if config.AfterToolCall == nil {
-		return executed
+		return executed, nil
 	}
 	callbackContext, err := cloneAgentContext(agentContext)
 	if err != nil {
-		return *immediateAgentToolError(prepared.toolCall, err.Error())
+		return *immediateAgentToolError(prepared.toolCall, err.Error()), nil
 	}
 	override, err := config.AfterToolCall(ctx, AfterToolCallContext{
 		AssistantMessage: ai.CloneAssistantMessage(assistantMessage), ToolCall: cloneAgentToolCall(prepared.toolCall), Args: cloneAgentJSONValue(prepared.args.value),
 		Result: cloneErasedAgentToolResult(executed.result), IsError: executed.isError, Context: callbackContext,
 	})
+	if cause := context.Cause(ctx); cause != nil {
+		return finalizedAgentToolCall{}, cause
+	}
 	if err != nil {
-		return *immediateAgentToolError(prepared.toolCall, err.Error())
+		return *immediateAgentToolError(prepared.toolCall, err.Error()), nil
 	}
 	if override == nil {
-		return executed
+		return executed, nil
 	}
-	if value, ok := override.Content.Value(); ok {
+	if override.Content.IsSet() {
+		value, _ := override.Content.Value()
 		executed.result.Content = cloneToolResultContent(value)
 	}
-	if value, ok := override.Details.Value(); ok {
+	if override.Details.IsSet() {
+		value, _ := override.Details.Value()
 		executed.result.Details = cloneAgentJSONValue(value)
 	}
-	if value, ok := override.IsError.Value(); ok {
+	if override.IsError.IsSet() {
+		value, _ := override.IsError.Value()
 		executed.isError = value
 	}
-	if value, ok := override.Usage.Value(); ok {
-		executed.result.Usage = ai.Some(value)
+	if override.Usage.IsSet() {
+		executed.result.Usage = override.Usage
 	}
-	if value, ok := override.Terminate.Value(); ok {
-		executed.result.Terminate = ai.Some(value)
+	if override.Terminate.IsSet() {
+		executed.result.Terminate = override.Terminate
 	}
-	return executed
+	return executed, nil
 }
 
 func findAgentTool(tools []ErasedAgentTool, name string) (ErasedAgentTool, bool) {
@@ -295,9 +326,13 @@ func createAgentToolResultMessage(finalized finalizedAgentToolCall) ai.ToolResul
 	if names, ok := finalized.result.AddedToolNames.Value(); ok && len(names) != 0 {
 		addedToolNames = ai.Some(append([]string(nil), names...))
 	}
+	details := ai.Some(cloneAgentJSONValue(finalized.result.Details))
+	if finalized.result.Details == nil {
+		details = ai.Null[ai.JSONValue]()
+	}
 	return ai.ToolResultMessage{
 		Role: ai.MessageRoleToolResult, ToolCallID: finalized.toolCall.ID, ToolName: finalized.toolCall.Name,
-		Content: content, Details: ai.Some(cloneAgentJSONValue(finalized.result.Details)), Usage: finalized.result.Usage,
+		Content: content, Details: details, Usage: finalized.result.Usage,
 		AddedToolNames: addedToolNames, IsError: finalized.isError, Timestamp: time.Now().UnixMilli(),
 	}
 }

@@ -376,7 +376,7 @@ func TestAgentRunsAfterToolCallForExecutionResults(t *testing.T) {
 		}
 	})
 
-	t.Run("null overrides retain executed fields", func(t *testing.T) {
+	t.Run("explicit null overrides replace executed fields", func(t *testing.T) {
 		usage := ai.Usage{Output: 3, TotalTokens: 3}
 		tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
 			Tool:            ai.Tool{Name: "finish", Description: "Finish", Parameters: json.RawMessage(`{"type":"object"}`)},
@@ -400,16 +400,142 @@ func TestAgentRunsAfterToolCallForExecutionResults(t *testing.T) {
 				}, nil
 			}
 		})
-		if err := created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("go"), Timestamp: 1}); err != nil {
-			t.Fatalf("Prompt() error = %v", err)
+		err = created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("go"), Timestamp: 1})
+		if !errors.Is(err, agent.ErrNotImplemented) {
+			t.Fatalf("Prompt() error = %v, want continuation boundary after null terminate override", err)
 		}
 		result := created.State().Messages[2].(ai.ToolResultMessage)
-		details, detailsOK := result.Details.Value()
-		gotUsage, usageOK := result.Usage.Value()
-		if result.IsError || result.Content[0].(ai.TextContent).Text != "original" || !detailsOK || !reflect.DeepEqual(details, map[string]any{"source": "execute"}) || !usageOK || !reflect.DeepEqual(gotUsage, usage) {
+		if result.IsError || len(result.Content) != 0 || !result.Details.IsNull() || !result.Usage.IsNull() {
 			t.Fatalf("null-overridden ToolResult = %#v", result)
 		}
 	})
+
+	t.Run("explicit null clears the error flag", func(t *testing.T) {
+		tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+			Tool:            ai.Tool{Name: "finish", Description: "Finish", Parameters: json.RawMessage(`{"type":"object"}`)},
+			DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+			Execute: func(context.Context, string, map[string]any, agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+				return agent.AgentToolResult[map[string]any]{}, errors.New("host failed")
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		created := newSingleToolAgentWithOptions(t, "finish", map[string]any{}, []agent.ErasedAgentTool{tool}, func(options *agent.AgentOptions) {
+			options.AfterToolCall = func(context.Context, agent.AfterToolCallContext) (*agent.AfterToolCallResult, error) {
+				return &agent.AfterToolCallResult{IsError: ai.Null[bool](), Terminate: ai.Some(true)}, nil
+			}
+		})
+		if err := created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("go"), Timestamp: 1}); err != nil {
+			t.Fatalf("Prompt() error = %v", err)
+		}
+		if result := created.State().Messages[2].(ai.ToolResultMessage); result.IsError {
+			t.Fatalf("null-overridden IsError = true in %#v", result)
+		}
+	})
+}
+
+func TestAgentPropagatesToolPhaseCancellationCause(t *testing.T) {
+	tests := []struct {
+		name  string
+		stage string
+	}{
+		{name: "argument preparation", stage: "prepare"},
+		{name: "before hook", stage: "before"},
+		{name: "Execute", stage: "execute"},
+		{name: "after hook", stage: "after"},
+		{name: "should-stop hook", stage: "should-stop"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			cause := errors.New("stop requested during " + test.stage)
+			ctx, cancel := context.WithCancelCause(context.Background())
+			tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+				Tool: ai.Tool{Name: "finish", Description: "Finish", Parameters: json.RawMessage(`{"type":"object"}`)},
+				PrepareArguments: func(value ai.JSONValue) (ai.JSONValue, error) {
+					if test.stage == "prepare" {
+						cancel(cause)
+						return value, errors.New("ordinary preparation error")
+					}
+					return value, nil
+				},
+				DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+				Execute: func(context.Context, string, map[string]any, agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+					if test.stage == "execute" {
+						cancel(cause)
+						return agent.AgentToolResult[map[string]any]{}, errors.New("ordinary Execute error")
+					}
+					return agent.AgentToolResult[map[string]any]{Terminate: ai.Some(true)}, nil
+				},
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			created := newSingleToolAgentWithOptions(t, "finish", map[string]any{}, []agent.ErasedAgentTool{tool}, func(options *agent.AgentOptions) {
+				if test.stage == "before" {
+					options.BeforeToolCall = func(context.Context, agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error) {
+						cancel(cause)
+						return nil, errors.New("ordinary before-hook error")
+					}
+				}
+				if test.stage == "after" {
+					options.AfterToolCall = func(context.Context, agent.AfterToolCallContext) (*agent.AfterToolCallResult, error) {
+						cancel(cause)
+						return nil, errors.New("ordinary after-hook error")
+					}
+				}
+				if test.stage == "should-stop" {
+					options.ShouldStopAfterTurn = func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error) {
+						cancel(cause)
+						return false, errors.New("ordinary should-stop error")
+					}
+				}
+			})
+			err = created.Prompt(ctx, ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("go"), Timestamp: 1})
+			if !errors.Is(err, cause) {
+				t.Fatalf("Prompt() error = %v, want cancellation cause %v", err, cause)
+			}
+			wantMessages := 2
+			if test.stage == "should-stop" {
+				wantMessages = 3
+			}
+			if messages := created.State().Messages; len(messages) != wantMessages {
+				t.Fatalf("messages after cancellation = %#v, want %d", messages, wantMessages)
+			}
+		})
+	}
+}
+
+func TestAgentPropagatesToolFreeShouldStopCancellationCause(t *testing.T) {
+	cause := errors.New("stop requested during tool-free should-stop")
+	ctx, cancel := context.WithCancelCause(context.Background())
+	response, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(ai.TextContent{Type: ai.ContentTypeText, Text: "done"}), ai.FauxAssistantMessageOptions{
+		StopReason: ai.Some(ai.StopReasonStop), Timestamp: ai.Some(int64(2)),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{response})
+	model, _ := core.GetModel()
+	created, err := agent.NewAgent(agent.AgentOptions{
+		InitialState:   &agent.AgentInitialState{Model: model},
+		StreamFunction: agent.StreamFunction(core.StreamSimple),
+		ShouldStopAfterTurn: func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error) {
+			cancel(cause)
+			return false, errors.New("ordinary should-stop error")
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = created.Prompt(ctx, ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("go"), Timestamp: 1})
+	if !errors.Is(err, cause) {
+		t.Fatalf("Prompt() error = %v, want cancellation cause %v", err, cause)
+	}
 }
 
 func TestAgentRejectsLengthTruncatedToolCallsWithoutHostSideEffects(t *testing.T) {
@@ -578,19 +704,28 @@ func TestAgentAppliesPiCompatibleNestedAndUnionCoercion(t *testing.T) {
 		Values   []int
 		Nullable any
 		Choice   any
+		Spaced   float64
+		Hex      int
+		Binary   int
+		Octal    int
 	}
 	var received parameters
 	tool, err := agent.EraseAgentTool(agent.AgentTool[parameters, map[string]any]{
 		Tool: ai.Tool{Name: "coerce", Description: "Coerce", Parameters: json.RawMessage(`{
-			"type":"object","required":["values","nullable","choice"],"properties":{
+			"type":"object","required":["values","nullable","choice","spaced","hex","binary","octal"],"properties":{
 				"values":{"type":"array","items":{"type":"integer","minimum":1}},
 				"nullable":{"type":["array","null"],"items":{"type":"string"}},
-				"choice":{"anyOf":[{"type":"number"},{"type":"null"}]}
+				"choice":{"anyOf":[{"type":"number"},{"type":"null"}]},
+				"spaced":{"type":"number"},"hex":{"type":"integer"},
+				"binary":{"type":"integer"},"octal":{"type":"integer"}
 			}}`)},
 		DecodeValidated: func(value ai.JSONValue) parameters {
 			arguments := value.(map[string]any)
 			values := arguments["values"].([]any)
-			return parameters{Values: []int{int(values[0].(float64)), int(values[1].(float64))}, Nullable: arguments["nullable"], Choice: arguments["choice"]}
+			return parameters{
+				Values: []int{int(values[0].(float64)), int(values[1].(float64))}, Nullable: arguments["nullable"], Choice: arguments["choice"],
+				Spaced: arguments["spaced"].(float64), Hex: int(arguments["hex"].(float64)), Binary: int(arguments["binary"].(float64)), Octal: int(arguments["octal"].(float64)),
+			}
 		},
 		Execute: func(_ context.Context, _ string, params parameters, _ agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
 			received = params
@@ -602,11 +737,12 @@ func TestAgentAppliesPiCompatibleNestedAndUnionCoercion(t *testing.T) {
 	}
 	created := newSingleToolAgent(t, "coerce", map[string]any{
 		"values": []any{"1", "2"}, "nullable": nil, "choice": "3.5",
+		"spaced": " 42 ", "hex": "0x10", "binary": "0b11", "octal": "0o10",
 	}, []agent.ErasedAgentTool{tool}, nil)
 	if err := created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("go"), Timestamp: 1}); err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(received.Values, []int{1, 2}) || received.Nullable != nil || received.Choice != float64(3.5) {
+	if !reflect.DeepEqual(received.Values, []int{1, 2}) || received.Nullable != nil || received.Choice != float64(3.5) || received.Spaced != 42 || received.Hex != 16 || received.Binary != 3 || received.Octal != 8 {
 		t.Fatalf("coerced parameters = %#v", received)
 	}
 }

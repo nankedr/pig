@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"math/big"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/nankedr/pig/ai"
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
+
+var agentJavaScriptDecimalNumber = regexp.MustCompile(`^[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?$`)
 
 func validateAndSealAgentToolArguments(tool ErasedAgentTool, value ai.JSONValue) (validatedAgentToolArguments, error) {
 	schemaDocument, compiled, err := compileAgentToolSchema(tool.Name, tool.Parameters)
@@ -203,15 +207,42 @@ func coerceAgentNumber(value any, integer bool) (any, bool) {
 		}
 		return float64(0), true
 	case string:
-		if strings.TrimSpace(value) == "" {
+		parsed, ok := parseAgentJavaScriptNumber(value)
+		if !ok || (integer && math.Trunc(parsed) != parsed) {
 			return value, false
 		}
-		parsed, err := strconv.ParseFloat(value, 64)
-		if err == nil && (!integer || math.Trunc(parsed) == parsed) {
-			return parsed, true
-		}
+		return parsed, true
 	}
 	return value, false
+}
+
+func parseAgentJavaScriptNumber(value string) (float64, bool) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return 0, false
+	}
+	base := 0
+	switch {
+	case strings.HasPrefix(value, "0x") || strings.HasPrefix(value, "0X"):
+		base = 16
+	case strings.HasPrefix(value, "0b") || strings.HasPrefix(value, "0B"):
+		base = 2
+	case strings.HasPrefix(value, "0o") || strings.HasPrefix(value, "0O"):
+		base = 8
+	}
+	if base != 0 {
+		integer, ok := new(big.Int).SetString(value[2:], base)
+		if !ok {
+			return 0, false
+		}
+		parsed, _ := new(big.Float).SetInt(integer).Float64()
+		return parsed, !math.IsInf(parsed, 0)
+	}
+	if !agentJavaScriptDecimalNumber.MatchString(value) {
+		return 0, false
+	}
+	parsed, err := strconv.ParseFloat(value, 64)
+	return parsed, err == nil && !math.IsInf(parsed, 0) && !math.IsNaN(parsed)
 }
 
 func agentSchemaTypes(raw any) []string {

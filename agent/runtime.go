@@ -49,7 +49,7 @@ type AfterToolCallContext struct {
 }
 
 // AfterToolCallResult uses Optional fields because omission retains the
-// executed value while explicit zero or empty values replace it.
+// executed value while explicit null, zero, or empty values replace it.
 type AfterToolCallResult struct {
 	Content   ai.Optional[[]ai.ToolResultContent]
 	Details   ai.Optional[ai.JSONValue]
@@ -375,12 +375,16 @@ func finishAgentTurn(ctx context.Context, emit AgentEventSink, agentContext Agen
 		if err != nil {
 			return nil, err
 		}
-		if _, err := config.ShouldStopAfterTurn(ctx, ShouldStopAfterTurnContext{
+		_, err = config.ShouldStopAfterTurn(ctx, ShouldStopAfterTurnContext{
 			Message:     ai.CloneAssistantMessage(message),
 			ToolResults: []ai.ToolResultMessage{},
 			Context:     callbackContext,
 			NewMessages: cloneAgentMessages(newMessages),
-		}); err != nil {
+		})
+		if cause := context.Cause(ctx); cause != nil {
+			return nil, cause
+		}
+		if err != nil {
 			return nil, err
 		}
 	}
