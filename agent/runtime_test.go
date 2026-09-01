@@ -94,6 +94,48 @@ func TestRunAgentLoopCompletesToolFreeTextTurnThroughContextBoundary(t *testing.
 	}
 }
 
+func TestRunAgentLoopCallsShouldStopAfterSuccessfulTurn(t *testing.T) {
+	response, err := ai.FauxAssistantMessage(ai.FauxAssistantText("done"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{response})
+	model, _ := core.GetModel()
+	var timeline []string
+	config := agent.AgentLoopConfig{
+		Model: model,
+		ShouldStopAfterTurn: func(_ context.Context, turn agent.ShouldStopAfterTurnContext) (bool, error) {
+			timeline = append(timeline, "should_stop")
+			if len(turn.Context.Messages) != 2 || len(turn.NewMessages) != 2 || turn.Message.StopReason != ai.StopReasonStop {
+				t.Fatalf("turn context = %#v", turn)
+			}
+			return false, nil
+		},
+	}
+	_, err = agent.RunAgentLoop(
+		context.Background(),
+		[]agent.AgentMessage{userMessage("prompt")},
+		agent.AgentContext{},
+		config,
+		func(_ context.Context, event agent.AgentEvent) error {
+			timeline = append(timeline, string(event.AgentEventType()))
+			return nil
+		},
+		agent.StreamFunction(core.StreamSimple),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []string{"turn_end", "should_stop", "agent_end"}
+	if !slices.Equal(timeline[len(timeline)-len(want):], want) {
+		t.Fatalf("timeline tail = %v, want %v", timeline, want)
+	}
+}
+
 func TestRunAgentLoopKeepsToolExecutionAsExplicitCapabilityStub(t *testing.T) {
 	toolCall, err := ai.FauxToolCall("echo", map[string]any{"text": "hello"})
 	if err != nil {

@@ -73,8 +73,7 @@ type AgentLoopTurnUpdate struct {
 	ThinkingLevel *ThinkingLevel
 }
 
-// AgentLoopConfig describes every callback used by the low-level loop. The
-// M0 callables below remain explicit capability stubs.
+// AgentLoopConfig describes callbacks and options used by the low-level loop.
 type AgentLoopConfig struct {
 	ai.SimpleStreamOptions
 	Model               ai.Model
@@ -91,7 +90,7 @@ type AgentLoopConfig struct {
 }
 
 // AgentEventStream is a consumer-only event stream. Producers remain private
-// to the future Agent runtime.
+// to the Agent loop runtime.
 type AgentEventStream struct {
 	mu        sync.Mutex
 	queue     []AgentEvent
@@ -99,10 +98,6 @@ type AgentEventStream struct {
 	result    []AgentMessage
 	resultErr error
 	changed   chan struct{}
-}
-
-func failedAgentEventStream(operation string) *AgentEventStream {
-	return &AgentEventStream{done: true, resultErr: newNotImplemented(operation), changed: make(chan struct{})}
 }
 
 func newAgentEventStream() *AgentEventStream {
@@ -313,7 +308,7 @@ func runToolFreeTurn(ctx context.Context, agentContext AgentContext, newMessages
 			if err != nil {
 				return nil, err
 			}
-			return finishToolFreeTurn(ctx, emit, newMessages, message, started)
+			return finishToolFreeTurn(ctx, emit, agentContext, newMessages, config, message, started)
 		default:
 			if hasPartial {
 				if err := emitAgentEvent(ctx, emit, MessageUpdateEvent{
@@ -328,10 +323,10 @@ func runToolFreeTurn(ctx context.Context, agentContext AgentContext, newMessages
 	if err != nil {
 		return nil, err
 	}
-	return finishToolFreeTurn(ctx, emit, newMessages, message, started)
+	return finishToolFreeTurn(ctx, emit, agentContext, newMessages, config, message, started)
 }
 
-func finishToolFreeTurn(ctx context.Context, emit AgentEventSink, newMessages []AgentMessage, message ai.AssistantMessage, started bool) ([]AgentMessage, error) {
+func finishToolFreeTurn(ctx context.Context, emit AgentEventSink, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, message ai.AssistantMessage, started bool) ([]AgentMessage, error) {
 	message = ai.CloneAssistantMessage(message)
 	if !started {
 		if err := emitAgentEvent(ctx, emit, MessageStartEvent{Type: AgentEventTypeMessageStart, Message: message}); err != nil {
@@ -350,6 +345,21 @@ func finishToolFreeTurn(ctx context.Context, emit AgentEventSink, newMessages []
 	}
 	if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: []ai.ToolResultMessage{}}); err != nil {
 		return nil, err
+	}
+	if message.StopReason != ai.StopReasonError && message.StopReason != ai.StopReasonAborted && config.ShouldStopAfterTurn != nil {
+		agentContext.Messages = append(agentContext.Messages, ai.CloneAssistantMessage(message))
+		callbackContext, err := cloneAgentContext(agentContext)
+		if err != nil {
+			return nil, err
+		}
+		if _, err := config.ShouldStopAfterTurn(ctx, ShouldStopAfterTurnContext{
+			Message:     ai.CloneAssistantMessage(message),
+			ToolResults: []ai.ToolResultMessage{},
+			Context:     callbackContext,
+			NewMessages: cloneAgentMessages(newMessages),
+		}); err != nil {
+			return nil, err
+		}
 	}
 	if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: newMessages}); err != nil {
 		return nil, err
