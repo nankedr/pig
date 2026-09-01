@@ -300,7 +300,11 @@ func projectAgentContinuationToolResult(result agent.ErasedAgentToolResult) (map
 	if err != nil {
 		return nil, err
 	}
-	return map[string]any{"content": content, "details": result.Details}, nil
+	projected := map[string]any{"content": content, "details": result.Details}
+	if terminate, ok := result.Terminate.Value(); ok {
+		projected["terminate"] = terminate
+	}
+	return projected, nil
 }
 
 func assertAgentContinuationCatalogEvidence(t *testing.T, root string, locked parity.Baseline, fixture parity.Fixture, result parity.Result) {

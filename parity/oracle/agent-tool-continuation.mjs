@@ -18,6 +18,7 @@ function parseArgs(argv) {
 	for (let index = 0; index < args.length; index++) {
 		if (args[index] === "--check") result.check = true;
 		else if (args[index] === "--require-dist") result.requireDist = true;
+		else if (args[index] === "--batch") result.batch = true;
 		else if (args[index] === "--out") result.out = args[++index];
 		else if (result.piRoot === defaultPiRoot) result.piRoot = args[index];
 		else throw new Error(`unexpected argument: ${args[index]}`);
@@ -164,7 +165,9 @@ function projectMessage(message) {
 }
 
 function projectResult(result) {
-	return { content: (result.content ?? []).map(projectContent), details: canonical(result.details) };
+	const projected = { content: (result.content ?? []).map(projectContent), details: canonical(result.details) };
+	if (result.terminate !== undefined) projected.terminate = result.terminate;
+	return projected;
 }
 
 function projectEvent(event) {
@@ -253,17 +256,116 @@ async function captureModule(agentModule, fauxModule, caseDeclaration) {
 	};
 }
 
-async function capture(piRoot, requireDist) {
-	const caseDeclaration = declaration();
+function batchDeclaration() {
+	return {
+		schema_version: "1.0.0",
+		id: "go-sdk/agent/multi-tool-batch",
+		catalog_id: "contract:agent/runtime",
+		surface: "go-sdk",
+		input: {
+			entrypoint: "runAgentLoop",
+			network: "forbidden",
+			provider: { api: "faux:agent-tool-batch", id: "faux-agent-tool-batch", model_id: "faux-1" },
+			prompt: { role: "user", content: "run both", timestamp: 1 },
+			tool: {
+				name: "work",
+				calls: [
+					{ id: "call-1", arguments: { value: "first" } },
+					{ id: "call-2", arguments: { value: "second" } },
+				],
+			},
+			token_size: { min: 100, max: 100 },
+		},
+		observe: ["events", "outcome", "side_effects"],
+	};
+}
+
+async function captureBatchModule(agentModule, fauxModule, caseDeclaration) {
+	const agent = await import(pathToFileURL(agentModule).href);
+	const ai = await import(pathToFileURL(fauxModule).href);
+	const input = caseDeclaration.input;
+	const providerContexts = [];
+	const preflights = [];
+	const executions = [];
+	const events = [];
+	let releaseFirst;
+	const firstReleased = new Promise((resolve) => {
+		releaseFirst = resolve;
+	});
+	const core = ai.createFauxCore({
+		api: input.provider.api,
+		provider: input.provider.id,
+		models: [{ id: input.provider.model_id }],
+		tokenSize: input.token_size,
+	});
+	const response = ai.fauxAssistantMessage(
+		input.tool.calls.map((call) => ai.fauxToolCall(input.tool.name, call.arguments, { id: call.id })),
+		{ stopReason: "toolUse", timestamp: 2 },
+	);
+	core.setResponses([
+		(context) => {
+			providerContexts.push(context.messages.map(projectMessage));
+			return response;
+		},
+	]);
+	const tool = {
+		name: input.tool.name,
+		label: "Work",
+		description: "Run deterministic controlled work",
+		parameters: { type: "object", required: ["value"], properties: { value: { type: "string" } } },
+		async execute(toolCallId, args) {
+			executions.push(toolCallId);
+			if (toolCallId === "call-1") await firstReleased;
+			return {
+				content: [{ type: "text", text: args.value }],
+				details: { value: args.value },
+				terminate: true,
+			};
+		},
+	};
+	const messages = await agent.runAgentLoop(
+		[structuredClone(input.prompt)],
+		{ systemPrompt: "", messages: [], tools: [tool] },
+		{
+			model: core.getModel(),
+			convertToLlm: (values) => values.filter((message) => ["user", "assistant", "toolResult"].includes(message.role)),
+			toolExecution: "parallel",
+			beforeToolCall: ({ toolCall }) => {
+				preflights.push(toolCall.id);
+			},
+		},
+		(event) => {
+			events.push(projectEvent(event));
+			if (event.type === "tool_execution_end" && event.toolCallId === "call-2") releaseFirst();
+		},
+		undefined,
+		core.streamSimple,
+	);
+	return {
+		events,
+		outcome: {
+			messages: messages.map(projectMessage),
+			providerContexts,
+			preflights,
+			executionCount: executions.length,
+			state: { callCount: core.state.callCount, pendingResponseCount: core.getPendingResponseCount() },
+		},
+		side_effects: [],
+	};
+}
+
+async function capture(piRoot, requireDist, batch) {
+	const caseDeclaration = batch ? batchDeclaration() : declaration();
 	const sourceAgent = join(piRoot, "packages", "agent", "src", "agent-loop.ts");
 	const sourceFaux = join(piRoot, "packages", "ai", "src", "providers", "faux.ts");
-	const observation = await captureModule(sourceAgent, sourceFaux, caseDeclaration);
+	const captureSelectedModule = batch ? captureBatchModule : captureModule;
+	const observation = await captureSelectedModule(sourceAgent, sourceFaux, caseDeclaration);
 	const distAgent = join(piRoot, "packages", "agent", "dist", "agent-loop.js");
 	const distFaux = join(piRoot, "packages", "ai", "dist", "providers", "faux.js");
 	const hasDist = existsSync(distAgent) && existsSync(distFaux);
 	if (requireDist && !hasDist) throw new Error("prepared Pi dist is required but Agent/Faux dist is absent");
 	if (hasDist) {
-		const distObservation = await captureModule(distAgent, distFaux, caseDeclaration);
+		const distObservation = await captureSelectedModule(distAgent, distFaux, caseDeclaration);
 		if (JSON.stringify(canonical(observation)) !== JSON.stringify(canonical(distObservation))) {
 			throw new Error("Pi built Agent/Faux modules differ from locked source modules");
 		}
@@ -287,8 +389,8 @@ async function withForbiddenFetch(run) {
 	}
 }
 
-async function buildFixture(piRoot, lock, requireDist) {
-	const captured = await withForbiddenFetch(() => capture(piRoot, requireDist));
+async function buildFixture(piRoot, lock, requireDist, batch) {
+	const captured = await withForbiddenFetch(() => capture(piRoot, requireDist, batch));
 	return {
 		schema_version: "1.0.0",
 		deterministic: true,
@@ -311,7 +413,9 @@ async function buildFixture(piRoot, lock, requireDist) {
 			outcome: captured.observation.outcome,
 			side_effects: captured.observation.side_effects,
 		}),
-		execution_method: "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs <locked-pi-checkout>; source modules with built-dist differential",
+		execution_method: batch
+			? "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --batch <locked-pi-checkout>; source modules with built-dist differential"
+			: "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs <locked-pi-checkout>; source modules with built-dist differential",
 		platform: "any",
 		environment: {
 			node: process.version,
@@ -326,7 +430,7 @@ async function main() {
 	const args = parseArgs(process.argv);
 	const lock = loadLock();
 	assertLockedCheckout(args.piRoot, lock.upstream.commit);
-	const fixture = await buildFixture(args.piRoot, lock, args.requireDist);
+	const fixture = await buildFixture(args.piRoot, lock, args.requireDist, args.batch);
 	if (args.check) {
 		const recorded = JSON.parse(readFileSync(args.out, "utf8"));
 		fixture.environment.node = recorded.environment.node;

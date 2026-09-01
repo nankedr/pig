@@ -4,8 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
+	"runtime"
+	"slices"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -1053,6 +1057,543 @@ func TestAgentAppliesPiCompatibleNestedAndUnionCoercion(t *testing.T) {
 	}
 }
 
+func TestAgentParallelToolBatchPreflightsBeforeExecutionAndCollatesInSourceOrder(t *testing.T) {
+	var mu sync.Mutex
+	preflightOrder := make([]string, 0, 2)
+	executionSawAllPreflights := true
+	firstStarted := make(chan struct{})
+	releaseFirst := make(chan struct{})
+
+	tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+		Tool: ai.Tool{
+			Name: "work", Description: "Run controlled work",
+			Parameters: json.RawMessage(`{"type":"object","required":["name"],"properties":{"name":{"type":"string"}}}`),
+		},
+		DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+		Execute: func(_ context.Context, callID string, _ map[string]any, _ agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+			mu.Lock()
+			executionSawAllPreflights = executionSawAllPreflights && len(preflightOrder) == 2
+			mu.Unlock()
+			if callID == "call-1" {
+				close(firstStarted)
+				<-releaseFirst
+			} else {
+				<-firstStarted
+			}
+			return agent.AgentToolResult[map[string]any]{
+				Content: []ai.ToolResultContent{ai.TextContent{Type: ai.ContentTypeText, Text: callID}},
+				Details: map[string]any{"call": callID}, Terminate: ai.Some(true),
+			}, nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	created := newToolBatchAgent(t, []agent.AgentToolCall{
+		{Type: ai.ContentTypeToolCall, ID: "call-1", Name: "work", Arguments: map[string]any{"name": "first"}},
+		{Type: ai.ContentTypeToolCall, ID: "call-2", Name: "work", Arguments: map[string]any{"name": "second"}},
+	}, []agent.ErasedAgentTool{tool}, func(options *agent.AgentOptions) {
+		options.BeforeToolCall = func(_ context.Context, input agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error) {
+			mu.Lock()
+			preflightOrder = append(preflightOrder, input.ToolCall.ID)
+			mu.Unlock()
+			return nil, nil
+		}
+	})
+	var completionOrder, resultOrder []string
+	var pendingAtSecondStart, pendingAfterSecondEnd, pendingAfterFirstEnd []string
+	created.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+		mu.Lock()
+		defer mu.Unlock()
+		switch event := event.(type) {
+		case agent.ToolExecutionStartEvent:
+			if event.ToolCallID == "call-2" {
+				pendingAtSecondStart = sortedPendingToolCallIDs(created.State().PendingToolCalls)
+			}
+		case agent.ToolExecutionEndEvent:
+			completionOrder = append(completionOrder, event.ToolCallID)
+			if event.ToolCallID == "call-2" {
+				pendingAfterSecondEnd = sortedPendingToolCallIDs(created.State().PendingToolCalls)
+				close(releaseFirst)
+			} else {
+				pendingAfterFirstEnd = sortedPendingToolCallIDs(created.State().PendingToolCalls)
+			}
+		case agent.MessageEndEvent:
+			if result, ok := event.Message.(ai.ToolResultMessage); ok {
+				resultOrder = append(resultOrder, result.ToolCallID)
+			}
+		}
+		return nil
+	})
+
+	if err := created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("run both"), Timestamp: 1}); err != nil {
+		t.Fatalf("Prompt() error = %v", err)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if !executionSawAllPreflights || !reflect.DeepEqual(preflightOrder, []string{"call-1", "call-2"}) {
+		t.Fatalf("preflight order = %v, executionSawAllPreflights = %t", preflightOrder, executionSawAllPreflights)
+	}
+	if !reflect.DeepEqual(completionOrder, []string{"call-2", "call-1"}) {
+		t.Fatalf("tool_execution_end order = %v, want completion order", completionOrder)
+	}
+	if !reflect.DeepEqual(resultOrder, []string{"call-1", "call-2"}) {
+		t.Fatalf("ToolResult event order = %v, want source order", resultOrder)
+	}
+	if !reflect.DeepEqual(pendingAtSecondStart, []string{"call-1", "call-2"}) || !reflect.DeepEqual(pendingAfterSecondEnd, []string{"call-1"}) || len(pendingAfterFirstEnd) != 0 {
+		t.Fatalf("pending snapshots = at second start %v, after second end %v, after first end %v", pendingAtSecondStart, pendingAfterSecondEnd, pendingAfterFirstEnd)
+	}
+	state := created.State()
+	if len(state.Messages) != 4 || state.Messages[2].(ai.ToolResultMessage).ToolCallID != "call-1" || state.Messages[3].(ai.ToolResultMessage).ToolCallID != "call-2" {
+		t.Fatalf("transcript = %#v, want source-ordered ToolResults", state.Messages)
+	}
+}
+
+func TestAgentSequentialToolForcesWholeBatchSerialAfterPreflightBarrier(t *testing.T) {
+	for _, test := range []struct {
+		name      string
+		batchMode agent.ToolExecutionMode
+		toolMode  agent.ToolExecutionMode
+	}{
+		{name: "Tool override", batchMode: agent.ToolExecutionParallel, toolMode: agent.ToolExecutionSequential},
+		{name: "global override", batchMode: agent.ToolExecutionSequential, toolMode: agent.ToolExecutionParallel},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			var mu sync.Mutex
+			preflightOrder := make([]string, 0, 2)
+			executionOrder := make([]string, 0, 2)
+			executionSawAllPreflights := true
+			tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+				Tool: ai.Tool{
+					Name: "serial", Description: "Run serial work",
+					Parameters: json.RawMessage(`{"type":"object","required":["name"],"properties":{"name":{"type":"string"}}}`),
+				},
+				DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+				Execute: func(_ context.Context, callID string, _ map[string]any, _ agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+					mu.Lock()
+					executionSawAllPreflights = executionSawAllPreflights && len(preflightOrder) == 2
+					executionOrder = append(executionOrder, callID)
+					mu.Unlock()
+					return agent.AgentToolResult[map[string]any]{Terminate: ai.Some(true)}, nil
+				},
+				ExecutionMode: test.toolMode,
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			created := newToolBatchAgent(t, []agent.AgentToolCall{
+				{Type: ai.ContentTypeToolCall, ID: "call-1", Name: "serial", Arguments: map[string]any{"name": "first"}},
+				{Type: ai.ContentTypeToolCall, ID: "call-2", Name: "serial", Arguments: map[string]any{"name": "second"}},
+			}, []agent.ErasedAgentTool{tool}, func(options *agent.AgentOptions) {
+				options.ToolExecution = test.batchMode
+				options.BeforeToolCall = func(_ context.Context, input agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error) {
+					mu.Lock()
+					preflightOrder = append(preflightOrder, input.ToolCall.ID)
+					mu.Unlock()
+					return nil, nil
+				}
+			})
+			if err := created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("run both"), Timestamp: 1}); err != nil {
+				t.Fatalf("Prompt() error = %v", err)
+			}
+			mu.Lock()
+			defer mu.Unlock()
+			if !executionSawAllPreflights {
+				t.Fatalf("execution began before all preflights: preflight %v, execution %v", preflightOrder, executionOrder)
+			}
+			if !reflect.DeepEqual(preflightOrder, []string{"call-1", "call-2"}) || !reflect.DeepEqual(executionOrder, []string{"call-1", "call-2"}) {
+				t.Fatalf("preflight order = %v, execution order = %v", preflightOrder, executionOrder)
+			}
+		})
+	}
+}
+
+func TestAgentParallelToolBatchStartsEveryCallWithoutWorkerLimit(t *testing.T) {
+	const callCount = 64
+	allStarted := make(chan struct{})
+	release := make(chan struct{})
+	var started atomic.Int64
+	tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+		Tool:            ai.Tool{Name: "work", Description: "Run controlled work", Parameters: json.RawMessage(`{"type":"object"}`)},
+		DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+		Execute: func(context.Context, string, map[string]any, agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+			if started.Add(1) == callCount {
+				close(allStarted)
+			}
+			<-release
+			return agent.AgentToolResult[map[string]any]{Terminate: ai.Some(true)}, nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	calls := make([]agent.AgentToolCall, callCount)
+	for i := range calls {
+		calls[i] = agent.AgentToolCall{Type: ai.ContentTypeToolCall, ID: fmt.Sprintf("call-%02d", i), Name: "work", Arguments: map[string]any{}}
+	}
+	created := newToolBatchAgent(t, calls, []agent.ErasedAgentTool{tool}, nil)
+	done := make(chan error, 1)
+	go func() {
+		done <- created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("run all"), Timestamp: 1})
+	}()
+	select {
+	case <-allStarted:
+	case <-time.After(5 * time.Second):
+		close(release)
+		t.Fatalf("started %d of %d calls before release; parallel batch appears worker-limited", started.Load(), callCount)
+	}
+	close(release)
+	if err := <-done; err != nil {
+		t.Fatalf("Prompt() error = %v", err)
+	}
+}
+
+func TestAgentToolBatchTerminatesOnlyWhenEveryFinalResultTerminates(t *testing.T) {
+	tests := []struct {
+		name              string
+		terminates        []bool
+		wantProviderCalls int
+		wantRoles         []ai.MessageRole
+	}{
+		{name: "all terminating", terminates: []bool{true, true}, wantProviderCalls: 1, wantRoles: []ai.MessageRole{ai.MessageRoleUser, ai.MessageRoleAssistant, ai.MessageRoleToolResult, ai.MessageRoleToolResult}},
+		{name: "mixed", terminates: []bool{true, false}, wantProviderCalls: 2, wantRoles: []ai.MessageRole{ai.MessageRoleUser, ai.MessageRoleAssistant, ai.MessageRoleToolResult, ai.MessageRoleToolResult, ai.MessageRoleAssistant}},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+				Tool: ai.Tool{
+					Name: "work", Description: "Run work",
+					Parameters: json.RawMessage(`{"type":"object","required":["terminate"],"properties":{"terminate":{"type":"boolean"}}}`),
+				},
+				DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+				Execute: func(_ context.Context, _ string, params map[string]any, _ agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+					return agent.AgentToolResult[map[string]any]{Terminate: ai.Some(params["terminate"].(bool))}, nil
+				},
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			calls := make([]ai.AssistantContent, len(test.terminates))
+			for i, terminate := range test.terminates {
+				calls[i] = agent.AgentToolCall{Type: ai.ContentTypeToolCall, ID: fmt.Sprintf("call-%d", i+1), Name: "work", Arguments: map[string]any{"terminate": terminate}}
+			}
+			batchResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(calls...), ai.FauxAssistantMessageOptions{StopReason: ai.Some(ai.StopReasonToolUse)})
+			if err != nil {
+				t.Fatal(err)
+			}
+			finalResponse, err := ai.FauxAssistantMessage(ai.FauxAssistantText("continued"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			core.SetResponses([]ai.FauxResponseStep{batchResponse, finalResponse})
+			model, _ := core.GetModel()
+			created, err := agent.NewAgent(agent.AgentOptions{
+				InitialState:   &agent.AgentInitialState{Model: model, Tools: []agent.ErasedAgentTool{tool}},
+				StreamFunction: agent.StreamFunction(core.StreamSimple),
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("run both"), Timestamp: 1}); err != nil {
+				t.Fatalf("Prompt() error = %v", err)
+			}
+			if core.State.CallCount != test.wantProviderCalls {
+				t.Fatalf("Provider call count = %d, want %d", core.State.CallCount, test.wantProviderCalls)
+			}
+			if roles := messageRolesFromAgent(created.State().Messages); !reflect.DeepEqual(roles, test.wantRoles) {
+				t.Fatalf("transcript roles = %v, want %v", roles, test.wantRoles)
+			}
+		})
+	}
+}
+
+func TestAgentParallelToolBatchCancellationFinalizesAndJoinsEveryStartedCall(t *testing.T) {
+	baselineGoroutines := runtime.NumGoroutine()
+	cause := errors.New("cancel the batch")
+	ctx, cancel := context.WithCancelCause(context.Background())
+	defer cancel(nil)
+	bothStarted := make(chan struct{})
+	cancellationTriggered := make(chan struct{})
+	releaseCanceledCall := make(chan struct{})
+	secondExited := make(chan struct{})
+	var started atomic.Int64
+	tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+		Tool:            ai.Tool{Name: "work", Description: "Run controlled work", Parameters: json.RawMessage(`{"type":"object"}`)},
+		DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+		Execute: func(runContext context.Context, callID string, _ map[string]any, _ agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+			if started.Add(1) == 2 {
+				close(bothStarted)
+			}
+			<-bothStarted
+			if callID == "call-1" {
+				<-cancellationTriggered
+				return agent.AgentToolResult[map[string]any]{
+					Content:   []ai.ToolResultContent{ai.TextContent{Type: ai.ContentTypeText, Text: "finished"}},
+					Terminate: ai.Some(true),
+				}, nil
+			}
+			cancel(cause)
+			close(cancellationTriggered)
+			<-runContext.Done()
+			<-releaseCanceledCall
+			close(secondExited)
+			return agent.AgentToolResult[map[string]any]{}, context.Cause(runContext)
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	created := newToolBatchAgent(t, []agent.AgentToolCall{
+		{Type: ai.ContentTypeToolCall, ID: "call-1", Name: "work", Arguments: map[string]any{}},
+		{Type: ai.ContentTypeToolCall, ID: "call-2", Name: "work", Arguments: map[string]any{}},
+	}, []agent.ErasedAgentTool{tool}, nil)
+	var mu sync.Mutex
+	var endOrder, resultOrder []string
+	var turnEnds, agentEnds, canceledListenerCalls int
+	created.Subscribe(func(runContext context.Context, event agent.AgentEvent) error {
+		mu.Lock()
+		defer mu.Unlock()
+		switch event := event.(type) {
+		case agent.ToolExecutionEndEvent:
+			endOrder = append(endOrder, event.ToolCallID)
+			if event.ToolCallID == "call-1" {
+				close(releaseCanceledCall)
+			}
+		case agent.MessageEndEvent:
+			if result, ok := event.Message.(ai.ToolResultMessage); ok {
+				resultOrder = append(resultOrder, result.ToolCallID)
+			}
+		case agent.TurnEndEvent:
+			turnEnds++
+		case agent.AgentEndEvent:
+			agentEnds++
+		}
+		if cancellation := context.Cause(runContext); cancellation != nil {
+			canceledListenerCalls++
+			return cancellation
+		}
+		return nil
+	})
+
+	err = created.Prompt(ctx, ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("run both"), Timestamp: 1})
+	if !errors.Is(err, cause) {
+		t.Fatalf("Prompt() error = %v, want cancellation cause %v", err, cause)
+	}
+	select {
+	case <-secondExited:
+	default:
+		t.Fatal("Prompt settled before the canceled Tool worker exited")
+	}
+	mu.Lock()
+	if !reflect.DeepEqual(endOrder, []string{"call-1", "call-2"}) || !reflect.DeepEqual(resultOrder, []string{"call-1", "call-2"}) || turnEnds != 1 || agentEnds != 1 || canceledListenerCalls == 0 {
+		t.Fatalf("end order = %v, result order = %v, turn ends = %d, agent ends = %d, canceled listener calls = %d", endOrder, resultOrder, turnEnds, agentEnds, canceledListenerCalls)
+	}
+	eventCount := len(endOrder) + len(resultOrder) + turnEnds + agentEnds
+	mu.Unlock()
+	state := created.State()
+	if created.Busy() || len(state.PendingToolCalls) != 0 || len(state.Messages) != 4 {
+		t.Fatalf("settled state = busy %t, pending %v, messages %#v", created.Busy(), state.PendingToolCalls, state.Messages)
+	}
+	canceledResult := state.Messages[3].(ai.ToolResultMessage)
+	completedResult := state.Messages[2].(ai.ToolResultMessage)
+	if completedResult.IsError || len(completedResult.Content) != 1 || completedResult.Content[0].(ai.TextContent).Text != "finished" {
+		t.Fatalf("completed ToolResult was overwritten by cancellation: %#v", completedResult)
+	}
+	if !canceledResult.IsError || len(canceledResult.Content) != 1 || canceledResult.Content[0].(ai.TextContent).Text != "Operation aborted" {
+		t.Fatalf("canceled ToolResult = %#v", canceledResult)
+	}
+	time.Sleep(20 * time.Millisecond)
+	mu.Lock()
+	if got := len(endOrder) + len(resultOrder) + turnEnds + agentEnds; got != eventCount {
+		mu.Unlock()
+		t.Fatalf("late final events after Prompt settled: before %d, after %d", eventCount, got)
+	}
+	mu.Unlock()
+	assertGoroutineCountReturnsToBaseline(t, baselineGoroutines)
+}
+
+func assertGoroutineCountReturnsToBaseline(t *testing.T, baseline int) {
+	t.Helper()
+	deadline := time.Now().Add(time.Second)
+	for runtime.NumGoroutine() > baseline && time.Now().Before(deadline) {
+		runtime.Gosched()
+		time.Sleep(time.Millisecond)
+	}
+	if got := runtime.NumGoroutine(); got > baseline {
+		stack := make([]byte, 1<<20)
+		n := runtime.Stack(stack, true)
+		t.Fatalf("goroutines after canceled batch = %d, baseline = %d; active stacks:\n%s", got, baseline, stack[:n])
+	}
+}
+
+func TestAgentToolBatchCancellationDuringPreflightSkipsExecutionAndFinalizesEveryCall(t *testing.T) {
+	for _, mode := range []agent.ToolExecutionMode{agent.ToolExecutionParallel, agent.ToolExecutionSequential} {
+		t.Run(string(mode), func(t *testing.T) {
+			cause := errors.New("cancel during preflight")
+			ctx, cancel := context.WithCancelCause(context.Background())
+			defer cancel(nil)
+			var executions atomic.Int64
+			tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+				Tool:            ai.Tool{Name: "work", Description: "Run work", Parameters: json.RawMessage(`{"type":"object"}`)},
+				DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+				Execute: func(context.Context, string, map[string]any, agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+					executions.Add(1)
+					return agent.AgentToolResult[map[string]any]{}, nil
+				},
+			})
+			if err != nil {
+				t.Fatal(err)
+			}
+			created := newToolBatchAgent(t, []agent.AgentToolCall{
+				{Type: ai.ContentTypeToolCall, ID: "call-1", Name: "work", Arguments: map[string]any{}},
+				{Type: ai.ContentTypeToolCall, ID: "call-2", Name: "work", Arguments: map[string]any{}},
+			}, []agent.ErasedAgentTool{tool}, func(options *agent.AgentOptions) {
+				options.ToolExecution = mode
+				options.BeforeToolCall = func(_ context.Context, input agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error) {
+					if input.ToolCall.ID == "call-2" {
+						cancel(cause)
+					}
+					return nil, nil
+				}
+			})
+			var endIDs []string
+			created.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+				if event, ok := event.(agent.ToolExecutionEndEvent); ok {
+					endIDs = append(endIDs, event.ToolCallID)
+				}
+				return nil
+			})
+			err = created.Prompt(ctx, ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("run both"), Timestamp: 1})
+			if !errors.Is(err, cause) {
+				t.Fatalf("Prompt() error = %v, want %v", err, cause)
+			}
+			if executions.Load() != 0 || !reflect.DeepEqual(endIDs, []string{"call-1", "call-2"}) {
+				t.Fatalf("executions = %d, end IDs = %v", executions.Load(), endIDs)
+			}
+			state := created.State()
+			if len(state.Messages) != 4 {
+				t.Fatalf("transcript = %#v, want two cancellation ToolResults", state.Messages)
+			}
+			for _, message := range state.Messages[2:] {
+				result := message.(ai.ToolResultMessage)
+				if !result.IsError || result.Content[0].(ai.TextContent).Text != "Operation aborted" {
+					t.Fatalf("cancellation ToolResult = %#v", result)
+				}
+			}
+		})
+	}
+}
+
+func TestAgentParallelToolBatchDrainsAcceptedUpdatesBeforeFinalEvents(t *testing.T) {
+	listenerStarted := make(chan struct{})
+	releaseListener := make(chan struct{})
+	allExecutionsSettled := make(chan struct{})
+	var settled atomic.Int64
+	tool, err := agent.EraseAgentTool(agent.AgentTool[map[string]any, map[string]any]{
+		Tool:            ai.Tool{Name: "work", Description: "Run work", Parameters: json.RawMessage(`{"type":"object"}`)},
+		DecodeValidated: func(value ai.JSONValue) map[string]any { return value.(map[string]any) },
+		Execute: func(_ context.Context, callID string, _ map[string]any, update agent.AgentToolUpdateCallback[map[string]any]) (agent.AgentToolResult[map[string]any], error) {
+			update(agent.AgentToolResult[map[string]any]{Details: map[string]any{"call": callID}})
+			if settled.Add(1) == 2 {
+				close(allExecutionsSettled)
+			}
+			return agent.AgentToolResult[map[string]any]{Terminate: ai.Some(true)}, nil
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	created := newToolBatchAgent(t, []agent.AgentToolCall{
+		{Type: ai.ContentTypeToolCall, ID: "call-1", Name: "work", Arguments: map[string]any{}},
+		{Type: ai.ContentTypeToolCall, ID: "call-2", Name: "work", Arguments: map[string]any{}},
+	}, []agent.ErasedAgentTool{tool}, nil)
+	var mu sync.Mutex
+	var eventOrder []string
+	var updateListeners atomic.Int64
+	created.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+		var label string
+		switch event := event.(type) {
+		case agent.ToolExecutionUpdateEvent:
+			label = "update:" + event.ToolCallID
+		case agent.ToolExecutionEndEvent:
+			label = "end:" + event.ToolCallID
+		case agent.MessageStartEvent:
+			if result, ok := event.Message.(ai.ToolResultMessage); ok {
+				label = "result:" + result.ToolCallID
+			}
+		}
+		if label != "" {
+			mu.Lock()
+			eventOrder = append(eventOrder, label)
+			mu.Unlock()
+		}
+		if _, ok := event.(agent.ToolExecutionUpdateEvent); ok && updateListeners.Add(1) == 1 {
+			close(listenerStarted)
+			<-releaseListener
+		}
+		return nil
+	})
+	done := make(chan error, 1)
+	go func() {
+		done <- created.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("run both"), Timestamp: 1})
+	}()
+	select {
+	case <-listenerStarted:
+	case <-time.After(time.Second):
+		t.Fatal("update listener did not start")
+	}
+	select {
+	case <-allExecutionsSettled:
+	case <-time.After(time.Second):
+		t.Fatal("parallel Execute calls did not settle while the update listener was blocked")
+	}
+	mu.Lock()
+	for _, event := range eventOrder {
+		if strings.HasPrefix(event, "end:") || strings.HasPrefix(event, "result:") {
+			mu.Unlock()
+			t.Fatalf("final event %q overtook an accepted update listener: %v", event, eventOrder)
+		}
+	}
+	mu.Unlock()
+	close(releaseListener)
+	if err := <-done; err != nil {
+		t.Fatalf("Prompt() error = %v", err)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	for _, callID := range []string{"call-1", "call-2"} {
+		if indexOfString(eventOrder, "update:"+callID) >= indexOfString(eventOrder, "end:"+callID) {
+			t.Fatalf("events = %v, update for %s must precede its final event", eventOrder, callID)
+		}
+	}
+	firstResult := indexOfString(eventOrder, "result:call-1")
+	if firstResult < indexOfString(eventOrder, "end:call-1") || firstResult < indexOfString(eventOrder, "end:call-2") {
+		t.Fatalf("events = %v, ToolResults must wait for all final events", eventOrder)
+	}
+}
+
+func indexOfString(values []string, target string) int {
+	for i, value := range values {
+		if value == target {
+			return i
+		}
+	}
+	return -1
+}
+
+func sortedPendingToolCallIDs(pending map[string]struct{}) []string {
+	ids := make([]string, 0, len(pending))
+	for id := range pending {
+		ids = append(ids, id)
+	}
+	slices.Sort(ids)
+	return ids
+}
+
 func newSingleToolAgent(
 	t *testing.T,
 	toolName string,
@@ -1063,6 +1604,38 @@ func newSingleToolAgent(
 	return newSingleToolAgentWithOptions(t, toolName, arguments, tools, func(options *agent.AgentOptions) {
 		options.BeforeToolCall = before
 	})
+}
+
+func newToolBatchAgent(t *testing.T, calls []agent.AgentToolCall, tools []agent.ErasedAgentTool, configure func(*agent.AgentOptions)) *agent.Agent {
+	t.Helper()
+	blocks := make([]ai.AssistantContent, len(calls))
+	for i := range calls {
+		blocks[i] = calls[i]
+	}
+	response, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(blocks...), ai.FauxAssistantMessageOptions{
+		StopReason: ai.Some(ai.StopReasonToolUse), Timestamp: ai.Some(int64(2)),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{response})
+	model, _ := core.GetModel()
+	options := agent.AgentOptions{
+		InitialState: &agent.AgentInitialState{Model: model, Tools: tools}, StreamFunction: agent.StreamFunction(core.StreamSimple),
+		ShouldStopAfterTurn: func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error) { return true, nil },
+	}
+	if configure != nil {
+		configure(&options)
+	}
+	created, err := agent.NewAgent(options)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return created
 }
 
 func newSingleToolAgentWithOptions(

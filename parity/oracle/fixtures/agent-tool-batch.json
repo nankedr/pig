@@ -1,0 +1,468 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/agent/src/agent-loop.ts#runAgentLoop"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/agent/multi-tool-batch",
+    "catalog_id": "contract:agent/runtime",
+    "surface": "go-sdk",
+    "input": {
+      "entrypoint": "runAgentLoop",
+      "network": "forbidden",
+      "provider": {
+        "api": "faux:agent-tool-batch",
+        "id": "faux-agent-tool-batch",
+        "model_id": "faux-1"
+      },
+      "prompt": {
+        "role": "user",
+        "content": "run both",
+        "timestamp": 1
+      },
+      "tool": {
+        "name": "work",
+        "calls": [
+          {
+            "id": "call-1",
+            "arguments": {
+              "value": "first"
+            }
+          },
+          {
+            "id": "call-2",
+            "arguments": {
+              "value": "second"
+            }
+          }
+        ]
+      },
+      "token_size": {
+        "min": 100,
+        "max": 100
+      }
+    },
+    "observe": [
+      "events",
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "events": [
+      {
+        "type": "agent_start"
+      },
+      {
+        "type": "turn_start"
+      },
+      {
+        "type": "message_start",
+        "message": {
+          "role": "user",
+          "content": "run both"
+        }
+      },
+      {
+        "type": "message_end",
+        "message": {
+          "role": "user",
+          "content": "run both"
+        }
+      },
+      {
+        "type": "message_start",
+        "message": {
+          "role": "assistant",
+          "content": [],
+          "stopReason": "pending"
+        }
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_start"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_delta"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_end"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_start"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_delta"
+      },
+      {
+        "type": "message_update",
+        "assistantEventType": "toolcall_end"
+      },
+      {
+        "type": "message_end",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "toolCall",
+              "id": "call-1",
+              "name": "work",
+              "arguments": {
+                "value": "first"
+              }
+            },
+            {
+              "type": "toolCall",
+              "id": "call-2",
+              "name": "work",
+              "arguments": {
+                "value": "second"
+              }
+            }
+          ],
+          "stopReason": "toolUse"
+        }
+      },
+      {
+        "type": "tool_execution_start",
+        "toolCallId": "call-1",
+        "toolName": "work",
+        "args": {
+          "value": "first"
+        }
+      },
+      {
+        "type": "tool_execution_start",
+        "toolCallId": "call-2",
+        "toolName": "work",
+        "args": {
+          "value": "second"
+        }
+      },
+      {
+        "type": "tool_execution_end",
+        "toolCallId": "call-2",
+        "toolName": "work",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "second"
+            }
+          ],
+          "details": {
+            "value": "second"
+          },
+          "terminate": true
+        },
+        "isError": false
+      },
+      {
+        "type": "tool_execution_end",
+        "toolCallId": "call-1",
+        "toolName": "work",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "first"
+            }
+          ],
+          "details": {
+            "value": "first"
+          },
+          "terminate": true
+        },
+        "isError": false
+      },
+      {
+        "type": "message_start",
+        "message": {
+          "role": "toolResult",
+          "toolCallId": "call-1",
+          "toolName": "work",
+          "content": [
+            {
+              "type": "text",
+              "text": "first"
+            }
+          ],
+          "details": {
+            "value": "first"
+          },
+          "isError": false
+        }
+      },
+      {
+        "type": "message_end",
+        "message": {
+          "role": "toolResult",
+          "toolCallId": "call-1",
+          "toolName": "work",
+          "content": [
+            {
+              "type": "text",
+              "text": "first"
+            }
+          ],
+          "details": {
+            "value": "first"
+          },
+          "isError": false
+        }
+      },
+      {
+        "type": "message_start",
+        "message": {
+          "role": "toolResult",
+          "toolCallId": "call-2",
+          "toolName": "work",
+          "content": [
+            {
+              "type": "text",
+              "text": "second"
+            }
+          ],
+          "details": {
+            "value": "second"
+          },
+          "isError": false
+        }
+      },
+      {
+        "type": "message_end",
+        "message": {
+          "role": "toolResult",
+          "toolCallId": "call-2",
+          "toolName": "work",
+          "content": [
+            {
+              "type": "text",
+              "text": "second"
+            }
+          ],
+          "details": {
+            "value": "second"
+          },
+          "isError": false
+        }
+      },
+      {
+        "type": "turn_end",
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "toolCall",
+              "id": "call-1",
+              "name": "work",
+              "arguments": {
+                "value": "first"
+              }
+            },
+            {
+              "type": "toolCall",
+              "id": "call-2",
+              "name": "work",
+              "arguments": {
+                "value": "second"
+              }
+            }
+          ],
+          "stopReason": "toolUse"
+        },
+        "toolResults": [
+          {
+            "role": "toolResult",
+            "toolCallId": "call-1",
+            "toolName": "work",
+            "content": [
+              {
+                "type": "text",
+                "text": "first"
+              }
+            ],
+            "details": {
+              "value": "first"
+            },
+            "isError": false
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call-2",
+            "toolName": "work",
+            "content": [
+              {
+                "type": "text",
+                "text": "second"
+              }
+            ],
+            "details": {
+              "value": "second"
+            },
+            "isError": false
+          }
+        ]
+      },
+      {
+        "type": "agent_end",
+        "messages": [
+          {
+            "role": "user",
+            "content": "run both"
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call-1",
+                "name": "work",
+                "arguments": {
+                  "value": "first"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call-2",
+                "name": "work",
+                "arguments": {
+                  "value": "second"
+                }
+              }
+            ],
+            "stopReason": "toolUse"
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call-1",
+            "toolName": "work",
+            "content": [
+              {
+                "type": "text",
+                "text": "first"
+              }
+            ],
+            "details": {
+              "value": "first"
+            },
+            "isError": false
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call-2",
+            "toolName": "work",
+            "content": [
+              {
+                "type": "text",
+                "text": "second"
+              }
+            ],
+            "details": {
+              "value": "second"
+            },
+            "isError": false
+          }
+        ]
+      }
+    ],
+    "outcome": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "run both"
+        },
+        {
+          "role": "assistant",
+          "content": [
+            {
+              "type": "toolCall",
+              "id": "call-1",
+              "name": "work",
+              "arguments": {
+                "value": "first"
+              }
+            },
+            {
+              "type": "toolCall",
+              "id": "call-2",
+              "name": "work",
+              "arguments": {
+                "value": "second"
+              }
+            }
+          ],
+          "stopReason": "toolUse"
+        },
+        {
+          "role": "toolResult",
+          "toolCallId": "call-1",
+          "toolName": "work",
+          "content": [
+            {
+              "type": "text",
+              "text": "first"
+            }
+          ],
+          "details": {
+            "value": "first"
+          },
+          "isError": false
+        },
+        {
+          "role": "toolResult",
+          "toolCallId": "call-2",
+          "toolName": "work",
+          "content": [
+            {
+              "type": "text",
+              "text": "second"
+            }
+          ],
+          "details": {
+            "value": "second"
+          },
+          "isError": false
+        }
+      ],
+      "providerContexts": [
+        [
+          {
+            "role": "user",
+            "content": "run both"
+          }
+        ]
+      ],
+      "preflights": [
+        "call-1",
+        "call-2"
+      ],
+      "executionCount": 2,
+      "state": {
+        "callCount": 1,
+        "pendingResponseCount": 0
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:3237f74c9349fbcf02737586220c7ca855f45f17f021dd0a54ec526964a718de",
+  "observation_hash": "sha256:84c6051694c567d7902fd61bf8d74376a4db4cfdd86170f229de097e77fbc0f0",
+  "execution_method": "node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --batch <locked-pi-checkout>; source modules with built-dist differential",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/agent/src/agent-loop.ts + packages/ai/src/providers/faux.ts",
+    "agent_source_sha256": "sha256:9bc5704c40ee78f4f07ab3fea20ff3aecce45f54c697e6f4ccc6718052a918aa",
+    "faux_source_sha256": "sha256:d819e22fcfba388d043246d34d770f2e2614f351de47f102c69f310c21fc6c65"
+  }
+}

@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -20,6 +21,20 @@ type finalizedAgentToolCall struct {
 	result   ErasedAgentToolResult
 	isError  bool
 }
+
+type indexedFinalizedAgentToolCall struct {
+	index     int
+	finalized finalizedAgentToolCall
+	err       error
+}
+
+type preparedAgentToolBatchEntry struct {
+	toolCall  AgentToolCall
+	prepared  preparedAgentToolCall
+	immediate *finalizedAgentToolCall
+}
+
+const agentToolCancellationMessage = "Operation aborted"
 
 type agentToolUpdateDispatcher struct {
 	mu      sync.Mutex
@@ -106,56 +121,41 @@ func assistantToolCalls(message ai.AssistantMessage) []AgentToolCall {
 	return calls
 }
 
-func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, message ai.AssistantMessage, toolCall AgentToolCall) (agentTurnCompletion, error) {
-	if err := emitAgentEvent(ctx, emit, ToolExecutionStartEvent{
-		Type: AgentEventTypeToolExecutionStart, ToolCallID: toolCall.ID, ToolName: toolCall.Name, Arguments: toolCall.Arguments,
-	}); err != nil {
+func finishToolTurn(ctx context.Context, emit AgentEventSink, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, message ai.AssistantMessage, toolCalls []AgentToolCall) (agentTurnCompletion, error) {
+	emit = tolerateAgentToolBatchCancellation(ctx, emit, len(toolCalls))
+	var (
+		finalized []finalizedAgentToolCall
+		err       error
+	)
+	if message.StopReason == ai.StopReasonLength {
+		finalized, err = failTruncatedAgentToolCalls(ctx, emit, toolCalls)
+	} else {
+		finalized, err = executeAgentToolBatch(ctx, emit, agentContext, message, config, toolCalls)
+	}
+	if err != nil {
 		return agentTurnCompletion{}, err
 	}
 
-	var finalized finalizedAgentToolCall
-	if message.StopReason == ai.StopReasonLength {
-		finalized = finalizedAgentToolCall{
-			toolCall: toolCall,
-			result:   errorAgentToolResult(fmt.Sprintf("Tool call %q was not executed: the response hit the output token limit, so its arguments may be truncated. Re-issue the tool call with complete arguments.", toolCall.Name)),
-			isError:  true,
-		}
-	} else {
-		prepared, immediate, err := prepareSingleAgentToolCall(ctx, agentContext, message, config, toolCall)
-		if err != nil {
+	toolResults := make([]ai.ToolResultMessage, 0, len(finalized))
+	for _, call := range finalized {
+		toolResult := createAgentToolResultMessage(call)
+		if err := emitMessageLifecycle(ctx, emit, toolResult); err != nil {
 			return agentTurnCompletion{}, err
 		}
-		if immediate != nil {
-			finalized = *immediate
-		} else {
-			executed, err := executeSingleAgentToolCall(ctx, emit, prepared)
-			if err != nil {
-				return agentTurnCompletion{}, err
-			}
-			finalized, err = finalizeSingleAgentToolCall(ctx, agentContext, message, config, prepared, executed)
-			if err != nil {
-				return agentTurnCompletion{}, err
-			}
-		}
+		agentContext.Messages = append(agentContext.Messages, cloneToolResultMessage(toolResult))
+		newMessages = append(newMessages, cloneToolResultMessage(toolResult))
+		toolResults = append(toolResults, toolResult)
 	}
-
-	if err := emitAgentEvent(ctx, emit, ToolExecutionEndEvent{
-		Type: AgentEventTypeToolExecutionEnd, ToolCallID: toolCall.ID, ToolName: toolCall.Name,
-		Result: finalized.result, IsError: finalized.isError,
-	}); err != nil {
-		return agentTurnCompletion{}, err
-	}
-	toolResult := createAgentToolResultMessage(finalized)
-	if err := emitMessageLifecycle(ctx, emit, toolResult); err != nil {
-		return agentTurnCompletion{}, err
-	}
-	agentContext.Messages = append(agentContext.Messages, cloneToolResultMessage(toolResult))
-	newMessages = append(newMessages, cloneToolResultMessage(toolResult))
-	toolResults := []ai.ToolResultMessage{toolResult}
 	if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: toolResults}); err != nil {
 		return agentTurnCompletion{}, err
 	}
 	completed := agentTurnCompletion{agentContext: agentContext, newMessages: newMessages}
+	if cause := context.Cause(ctx); cause != nil {
+		if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: newMessages}); err != nil {
+			return agentTurnCompletion{}, err
+		}
+		return completed, cause
+	}
 	shouldStop := false
 	if config.ShouldStopAfterTurn != nil {
 		callbackContext, err := cloneAgentContext(agentContext)
@@ -172,8 +172,7 @@ func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext
 			return agentTurnCompletion{}, err
 		}
 	}
-	terminate, _ := finalized.result.Terminate.Value()
-	if !terminate && !shouldStop {
+	if !shouldTerminateAgentToolBatch(finalized) && !shouldStop {
 		completed.continueRun = true
 		return completed, nil
 	}
@@ -181,6 +180,257 @@ func finishSingleToolTurn(ctx context.Context, emit AgentEventSink, agentContext
 		return agentTurnCompletion{}, err
 	}
 	return completed, nil
+}
+
+func failTruncatedAgentToolCalls(ctx context.Context, emit AgentEventSink, toolCalls []AgentToolCall) ([]finalizedAgentToolCall, error) {
+	finalized := make([]finalizedAgentToolCall, 0, len(toolCalls))
+	for _, toolCall := range toolCalls {
+		if err := emitAgentToolStart(ctx, emit, toolCall); err != nil {
+			return nil, err
+		}
+		call := finalizedAgentToolCall{
+			toolCall: toolCall,
+			result:   errorAgentToolResult(fmt.Sprintf("Tool call %q was not executed: the response hit the output token limit, so its arguments may be truncated. Re-issue the tool call with complete arguments.", toolCall.Name)),
+			isError:  true,
+		}
+		if err := emitAgentToolEnd(ctx, emit, call); err != nil {
+			return nil, err
+		}
+		finalized = append(finalized, call)
+	}
+	return finalized, nil
+}
+
+func executeAgentToolBatch(ctx context.Context, emit AgentEventSink, agentContext AgentContext, message ai.AssistantMessage, config AgentLoopConfig, toolCalls []AgentToolCall) ([]finalizedAgentToolCall, error) {
+	if agentToolBatchIsSequential(agentContext.Tools, toolCalls, config.ToolExecution) {
+		return executeAgentToolCallsSequential(ctx, emit, agentContext, message, config, toolCalls)
+	}
+	return executeAgentToolCallsParallel(ctx, emit, agentContext, message, config, toolCalls)
+}
+
+func executeAgentToolCallsSequential(ctx context.Context, emit AgentEventSink, agentContext AgentContext, message ai.AssistantMessage, config AgentLoopConfig, toolCalls []AgentToolCall) ([]finalizedAgentToolCall, error) {
+	entries, err := prepareAgentToolBatch(ctx, emit, agentContext, message, config, toolCalls)
+	if err != nil {
+		return nil, err
+	}
+	finalized := make([]finalizedAgentToolCall, 0, len(toolCalls))
+	for index, entry := range entries {
+		var call finalizedAgentToolCall
+		if entry.immediate != nil {
+			call = *entry.immediate
+		} else if canceled, ok := canceledAgentToolBatchCall(ctx, entry.toolCall, len(entries)); ok {
+			call = canceled
+		} else {
+			executed, settled, err := executeSingleAgentToolCall(ctx, emit, entry.prepared)
+			if err != nil {
+				call, err = resolveCanceledAgentToolBatchCall(ctx, entry.toolCall, len(entries), executed, settled, err)
+			}
+			if err != nil {
+				return nil, err
+			}
+			if !settled {
+				call = executed
+			} else {
+				call, err = finalizeSingleAgentToolCall(ctx, agentContext, message, config, entry.prepared, executed)
+				call, err = resolveCanceledAgentToolBatchCall(ctx, entry.toolCall, len(entries), call, true, err)
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+		if err := emitAgentToolEnd(ctx, emit, call); err != nil {
+			return nil, err
+		}
+		finalized = append(finalized, call)
+		if _, canceled := canceledAgentToolBatchCall(ctx, entry.toolCall, len(entries)); canceled {
+			for _, remaining := range entries[index+1:] {
+				aborted := canceledAgentToolCall(remaining.toolCall)
+				if err := emitAgentToolEnd(ctx, emit, aborted); err != nil {
+					return nil, err
+				}
+				finalized = append(finalized, aborted)
+			}
+			break
+		}
+	}
+	return finalized, nil
+}
+
+func executeAgentToolCallsParallel(ctx context.Context, emit AgentEventSink, agentContext AgentContext, message ai.AssistantMessage, config AgentLoopConfig, toolCalls []AgentToolCall) ([]finalizedAgentToolCall, error) {
+	finalized := make([]finalizedAgentToolCall, len(toolCalls))
+	entries, err := prepareAgentToolBatch(ctx, emit, agentContext, message, config, toolCalls)
+	if err != nil {
+		return nil, err
+	}
+	for i, entry := range entries {
+		if entry.immediate != nil {
+			finalized[i] = *entry.immediate
+			if err := emitAgentToolEnd(ctx, emit, *entry.immediate); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	var emitMu sync.Mutex
+	orderedEmit := func(ctx context.Context, event AgentEvent) error {
+		emitMu.Lock()
+		defer emitMu.Unlock()
+		return emitAgentEvent(ctx, emit, event)
+	}
+	results := make(chan indexedFinalizedAgentToolCall, len(toolCalls))
+	running := 0
+	for i, entry := range entries {
+		if entry.immediate != nil {
+			continue
+		}
+		running++
+		go func(index int, call preparedAgentToolCall) {
+			var (
+				executed finalizedAgentToolCall
+				settled  bool
+				err      error
+			)
+			if canceled, ok := canceledAgentToolBatchCall(ctx, call.toolCall, len(entries)); ok {
+				executed = canceled
+			} else {
+				executed, settled, err = executeSingleAgentToolCall(ctx, orderedEmit, call)
+				if err != nil {
+					executed, err = resolveCanceledAgentToolBatchCall(ctx, call.toolCall, len(entries), executed, settled, err)
+				}
+			}
+			if err == nil && settled {
+				executed, err = finalizeSingleAgentToolCall(ctx, agentContext, message, config, call, executed)
+				executed, err = resolveCanceledAgentToolBatchCall(ctx, call.toolCall, len(entries), executed, true, err)
+			}
+			if err == nil {
+				err = emitAgentToolEnd(ctx, orderedEmit, executed)
+			}
+			results <- indexedFinalizedAgentToolCall{index: index, finalized: executed, err: err}
+		}(i, entry.prepared)
+	}
+	var errorsBySource = make([]error, len(toolCalls))
+	for range running {
+		result := <-results
+		finalized[result.index] = result.finalized
+		errorsBySource[result.index] = result.err
+	}
+	for _, err := range errorsBySource {
+		if err != nil {
+			return nil, err
+		}
+	}
+	return finalized, nil
+}
+
+func prepareAgentToolBatch(ctx context.Context, emit AgentEventSink, agentContext AgentContext, message ai.AssistantMessage, config AgentLoopConfig, toolCalls []AgentToolCall) ([]preparedAgentToolBatchEntry, error) {
+	entries := make([]preparedAgentToolBatchEntry, len(toolCalls))
+	for i, toolCall := range toolCalls {
+		if err := emitAgentToolStart(ctx, emit, toolCall); err != nil {
+			return nil, err
+		}
+		call, immediate, err := prepareSingleAgentToolCall(ctx, agentContext, message, config, toolCall)
+		if err != nil {
+			if _, canceled := canceledAgentToolBatchCall(ctx, toolCall, len(toolCalls)); canceled {
+				for j := 0; j < i; j++ {
+					if entries[j].immediate == nil {
+						entries[j].immediate = pointerToFinalizedAgentToolCall(canceledAgentToolCall(entries[j].toolCall))
+					}
+				}
+				entries[i] = preparedAgentToolBatchEntry{toolCall: toolCall, immediate: pointerToFinalizedAgentToolCall(canceledAgentToolCall(toolCall))}
+				for j := i + 1; j < len(toolCalls); j++ {
+					if err := emitAgentToolStart(ctx, emit, toolCalls[j]); err != nil {
+						return nil, err
+					}
+					entries[j] = preparedAgentToolBatchEntry{toolCall: toolCalls[j], immediate: pointerToFinalizedAgentToolCall(canceledAgentToolCall(toolCalls[j]))}
+				}
+				return entries, nil
+			}
+			return nil, err
+		}
+		entries[i] = preparedAgentToolBatchEntry{toolCall: toolCall, prepared: call, immediate: immediate}
+	}
+	return entries, nil
+}
+
+func canceledAgentToolCall(toolCall AgentToolCall) finalizedAgentToolCall {
+	return finalizedAgentToolCall{toolCall: toolCall, result: errorAgentToolResult(agentToolCancellationMessage), isError: true}
+}
+
+func canceledAgentToolBatchCall(ctx context.Context, toolCall AgentToolCall, batchSize int) (finalizedAgentToolCall, bool) {
+	if batchSize <= 1 || context.Cause(ctx) == nil {
+		return finalizedAgentToolCall{}, false
+	}
+	return canceledAgentToolCall(toolCall), true
+}
+
+func resolveCanceledAgentToolBatchCall(ctx context.Context, toolCall AgentToolCall, batchSize int, result finalizedAgentToolCall, settled bool, err error) (finalizedAgentToolCall, error) {
+	if err == nil {
+		return result, nil
+	}
+	cause := context.Cause(ctx)
+	if batchSize <= 1 || cause == nil || !errors.Is(err, cause) {
+		return finalizedAgentToolCall{}, err
+	}
+	if settled {
+		return result, nil
+	}
+	return canceledAgentToolCall(toolCall), nil
+}
+
+func tolerateAgentToolBatchCancellation(ctx context.Context, emit AgentEventSink, batchSize int) AgentEventSink {
+	if batchSize <= 1 {
+		return emit
+	}
+	return func(eventContext context.Context, event AgentEvent) error {
+		err := emit(eventContext, event)
+		cause := context.Cause(ctx)
+		if cause != nil && errors.Is(err, cause) {
+			return nil
+		}
+		return err
+	}
+}
+
+func pointerToFinalizedAgentToolCall(call finalizedAgentToolCall) *finalizedAgentToolCall {
+	return &call
+}
+
+func agentToolBatchIsSequential(tools []ErasedAgentTool, toolCalls []AgentToolCall, mode ToolExecutionMode) bool {
+	if mode == ToolExecutionSequential {
+		return true
+	}
+	for _, toolCall := range toolCalls {
+		if tool, ok := findAgentTool(tools, toolCall.Name); ok && tool.ExecutionMode == ToolExecutionSequential {
+			return true
+		}
+	}
+	return false
+}
+
+func shouldTerminateAgentToolBatch(finalized []finalizedAgentToolCall) bool {
+	if len(finalized) == 0 {
+		return false
+	}
+	for _, call := range finalized {
+		terminate, ok := call.result.Terminate.Value()
+		if !ok || !terminate {
+			return false
+		}
+	}
+	return true
+}
+
+func emitAgentToolStart(ctx context.Context, emit AgentEventSink, toolCall AgentToolCall) error {
+	return emitAgentEvent(ctx, emit, ToolExecutionStartEvent{
+		Type: AgentEventTypeToolExecutionStart, ToolCallID: toolCall.ID, ToolName: toolCall.Name, Arguments: toolCall.Arguments,
+	})
+}
+
+func emitAgentToolEnd(ctx context.Context, emit AgentEventSink, finalized finalizedAgentToolCall) error {
+	return emitAgentEvent(ctx, emit, ToolExecutionEndEvent{
+		Type: AgentEventTypeToolExecutionEnd, ToolCallID: finalized.toolCall.ID, ToolName: finalized.toolCall.Name,
+		Result: finalized.result, IsError: finalized.isError,
+	})
 }
 
 func prepareSingleAgentToolCall(ctx context.Context, agentContext AgentContext, assistantMessage ai.AssistantMessage, config AgentLoopConfig, toolCall AgentToolCall) (preparedAgentToolCall, *finalizedAgentToolCall, error) {
@@ -238,25 +488,29 @@ func prepareSingleAgentToolCall(ctx context.Context, agentContext AgentContext, 
 	return preparedAgentToolCall{toolCall: toolCall, tool: tool, args: validated}, nil, nil
 }
 
-func executeSingleAgentToolCall(ctx context.Context, emit AgentEventSink, prepared preparedAgentToolCall) (finalizedAgentToolCall, error) {
+func executeSingleAgentToolCall(ctx context.Context, emit AgentEventSink, prepared preparedAgentToolCall) (finalizedAgentToolCall, bool, error) {
 	dispatcher := newAgentToolUpdateDispatcher(ctx, emit, prepared.toolCall)
 	result, err := prepared.tool.executeValidated(ctx, prepared.toolCall.ID, prepared.args, dispatcher.admit)
 	updateErr := dispatcher.closeAndWait()
-	if cause := context.Cause(ctx); cause != nil {
-		return finalizedAgentToolCall{}, cause
-	}
 	if updateErr != nil {
-		return finalizedAgentToolCall{}, updateErr
+		return finalizedAgentToolCall{}, false, updateErr
 	}
 	if err != nil {
-		return finalizedAgentToolCall{toolCall: prepared.toolCall, result: errorAgentToolResult(err.Error()), isError: true}, nil
+		if cause := context.Cause(ctx); cause != nil && (errors.Is(err, cause) || errors.Is(err, ctx.Err())) {
+			return finalizedAgentToolCall{}, false, cause
+		}
+		return finalizedAgentToolCall{toolCall: prepared.toolCall, result: errorAgentToolResult(err.Error()), isError: true}, true, nil
 	}
-	return finalizedAgentToolCall{toolCall: prepared.toolCall, result: result}, nil
+	executed := finalizedAgentToolCall{toolCall: prepared.toolCall, result: result}
+	if cause := context.Cause(ctx); cause != nil {
+		return executed, true, cause
+	}
+	return executed, true, nil
 }
 
 func finalizeSingleAgentToolCall(ctx context.Context, agentContext AgentContext, assistantMessage ai.AssistantMessage, config AgentLoopConfig, prepared preparedAgentToolCall, executed finalizedAgentToolCall) (finalizedAgentToolCall, error) {
 	if cause := context.Cause(ctx); cause != nil {
-		return finalizedAgentToolCall{}, cause
+		return executed, cause
 	}
 	if config.AfterToolCall == nil {
 		return executed, nil
@@ -269,32 +523,30 @@ func finalizeSingleAgentToolCall(ctx context.Context, agentContext AgentContext,
 		AssistantMessage: ai.CloneAssistantMessage(assistantMessage), ToolCall: cloneAgentToolCall(prepared.toolCall), Args: cloneAgentJSONValue(prepared.args.value),
 		Result: cloneErasedAgentToolResult(executed.result), IsError: executed.isError, Context: callbackContext,
 	})
-	if cause := context.Cause(ctx); cause != nil {
-		return finalizedAgentToolCall{}, cause
-	}
 	if err != nil {
-		return *immediateAgentToolError(prepared.toolCall, err.Error()), nil
+		executed = *immediateAgentToolError(prepared.toolCall, err.Error())
+	} else if override != nil {
+		if override.Content.IsSet() {
+			value, _ := override.Content.Value()
+			executed.result.Content = cloneToolResultContent(value)
+		}
+		if override.Details.IsSet() {
+			value, _ := override.Details.Value()
+			executed.result.Details = cloneAgentJSONValue(value)
+		}
+		if override.IsError.IsSet() {
+			value, _ := override.IsError.Value()
+			executed.isError = value
+		}
+		if override.Usage.IsSet() {
+			executed.result.Usage = override.Usage
+		}
+		if override.Terminate.IsSet() {
+			executed.result.Terminate = override.Terminate
+		}
 	}
-	if override == nil {
-		return executed, nil
-	}
-	if override.Content.IsSet() {
-		value, _ := override.Content.Value()
-		executed.result.Content = cloneToolResultContent(value)
-	}
-	if override.Details.IsSet() {
-		value, _ := override.Details.Value()
-		executed.result.Details = cloneAgentJSONValue(value)
-	}
-	if override.IsError.IsSet() {
-		value, _ := override.IsError.Value()
-		executed.isError = value
-	}
-	if override.Usage.IsSet() {
-		executed.result.Usage = override.Usage
-	}
-	if override.Terminate.IsSet() {
-		executed.result.Terminate = override.Terminate
+	if cause := context.Cause(ctx); cause != nil {
+		return executed, cause
 	}
 	return executed, nil
 }

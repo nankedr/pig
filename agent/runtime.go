@@ -389,11 +389,8 @@ func finishAgentTurn(ctx context.Context, emit AgentEventSink, agentContext Agen
 		return completed, nil
 	}
 	toolCalls := assistantToolCalls(message)
-	if len(toolCalls) > 1 {
-		return completed, newNotImplemented("Agent.MultiToolExecution")
-	}
-	if len(toolCalls) == 1 {
-		return finishSingleToolTurn(ctx, emit, agentContext, newMessages, config, message, toolCalls[0])
+	if len(toolCalls) != 0 {
+		return finishToolTurn(ctx, emit, agentContext, newMessages, config, message, toolCalls)
 	}
 	if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: []ai.ToolResultMessage{}}); err != nil {
 		return agentTurnCompletion{}, err
