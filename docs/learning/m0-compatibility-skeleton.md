@@ -52,4 +52,4 @@ Oracle checkout 必须 HEAD 精确匹配、tracked clean，并预先具备所需
 
 ## 下一步
 
-M1 是当前 Milestone Frontier。它会实现 faux 与 DeepSeek/OpenAI Chat Completions 核心路径，并在首个端到端可运行切片后冻结相应接口；M0 的 `inventoried`、`scaffolded` 和 `partial` 不能解释成已经具备这些行为。
+M1 已通过冻结门禁并发布 v0.1.0，实现了 faux 与 DeepSeek/OpenAI Chat Completions 核心路径，并在首个端到端可运行切片后冻结了相应接口；当前 Milestone Frontier 是 M2。M0 的 `inventoried`、`scaffolded` 和 `partial` 不能解释成已经具备这些行为。

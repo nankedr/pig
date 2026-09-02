@@ -2,7 +2,7 @@
 
 Pig V1 使用双来源对等基线：Code Baseline 是 Pi `936aff00918de1187f085f123c2812d8f2d67745`，Catalog Baseline 是 Pi v0.84.1 官方 source tar（commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model）。两者相差 40 个 commit，因此这不是 fixed-run parity；详见 ADR-0014。主学习路线一次只推进一个里程碑前沿；并行支线必须重新集成到持续可运行的 `pig`。
 
-当前 Milestone Frontier：**M1**。
+当前 Milestone Frontier：**M2**。M1 已通过冻结门禁并发布 v0.1.0，冻结了本阶段首次触达的 AI Stream、Provider、Chat Completions 核心、Agent Loop、Tool 与 Headless Coding Agent 契约；逐符号完成度仍以 Parity Catalog 为准，M2 分支保持 `partial`。
 
 | 阶段 | 可验收产物 |
 | --- | --- |

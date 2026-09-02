@@ -2,7 +2,7 @@
 
 Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学习与证据”组织。阅读代码或设计任务前，先确认固定 Parity Baseline 和当前 Milestone Frontier。
 
-当前 Milestone Frontier：**M1**。M0 冻结门禁与边界说明见 [M0 兼容骨架](learning/m0-compatibility-skeleton.md)；首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)。
+当前 Milestone Frontier：**M2**。M1 已通过冻结门禁并发布 v0.1.0，首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)；M0 冻结门禁与边界说明见 [M0 兼容骨架](learning/m0-compatibility-skeleton.md)。
 
 ## 首次阅读
 
