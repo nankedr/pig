@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/codingagent"
 )
 
@@ -22,6 +23,21 @@ func TestSDKCustomToolsUseToolDefinitions(t *testing.T) {
 		}
 		if field.Type != want {
 			t.Errorf("%s.CustomTools type = %s, want %s", tc.name, field.Type, want)
+		}
+	}
+}
+
+func TestSDKInMemorySessionInjectionFields(t *testing.T) {
+	typeOf := reflect.TypeOf(codingagent.CreateAgentSessionOptions{})
+	want := map[string]reflect.Type{
+		"Provider":       reflect.TypeOf((*codingagent.AgentSessionProvider)(nil)).Elem(),
+		"StreamFunction": reflect.TypeOf((agent.StreamFunction)(nil)),
+		"AgentTools":     reflect.TypeOf([]agent.ErasedAgentTool(nil)),
+	}
+	for name, wantType := range want {
+		field, ok := typeOf.FieldByName(name)
+		if !ok || field.Type != wantType {
+			t.Errorf("CreateAgentSessionOptions.%s = %v, want %v", name, field.Type, wantType)
 		}
 	}
 }

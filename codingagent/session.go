@@ -3,8 +3,10 @@ package codingagent
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
@@ -431,6 +433,7 @@ type AgentSessionConfig struct {
 }
 
 type AgentSession struct {
+	mu                                      sync.RWMutex
 	agent                                   *agent.Agent
 	sessionManager                          *SessionManager
 	settingsManager                         *SettingsManager
@@ -442,10 +445,23 @@ type AgentSession struct {
 	activeToolNames                         []string
 	autoCompactionEnabled, autoRetryEnabled bool
 	retryAttempt                            int
+	listeners                               map[uint64]AgentSessionEventListener
+	listenerOrder                           []uint64
+	nextListener                            uint64
+	active, disposed                        bool
+	idle                                    chan struct{}
+	activeCancel                            context.CancelCauseFunc
+	unsubscribeAgent                        agent.Unsubscribe
 }
 
 func NewAgentSession(config AgentSessionConfig) *AgentSession {
-	return &AgentSession{agent: config.Agent, sessionManager: config.SessionManager, settingsManager: config.SettingsManager, resourceLoader: config.ResourceLoader, modelRuntime: config.ModelRuntime, extensionRunner: config.ExtensionRunnerRef, sessionStartEvent: config.SessionStartEvent, scopedModels: cloneScopedModels(config.ScopedModels), activeToolNames: append([]string(nil), config.InitialActiveToolNames...)}
+	idle := make(chan struct{})
+	close(idle)
+	s := &AgentSession{agent: config.Agent, sessionManager: config.SessionManager, settingsManager: config.SettingsManager, resourceLoader: config.ResourceLoader, modelRuntime: config.ModelRuntime, extensionRunner: config.ExtensionRunnerRef, sessionStartEvent: config.SessionStartEvent, scopedModels: cloneScopedModels(config.ScopedModels), activeToolNames: append([]string(nil), config.InitialActiveToolNames...), listeners: make(map[uint64]AgentSessionEventListener), idle: idle}
+	if s.agent != nil {
+		s.unsubscribeAgent = s.agent.Subscribe(s.handleAgentEvent)
+	}
+	return s
 }
 func (s *AgentSession) Agent() *agent.Agent               { return s.agent }
 func (s *AgentSession) SessionManager() *SessionManager   { return s.sessionManager }
@@ -466,8 +482,12 @@ func (s *AgentSession) Messages() []agent.AgentMessage     { return s.State().Me
 func (s *AgentSession) Model() ai.Model                    { return s.State().Model }
 func (s *AgentSession) ThinkingLevel() agent.ThinkingLevel { return s.State().ThinkingLevel }
 func (s *AgentSession) SystemPrompt() string               { return s.State().SystemPrompt }
-func (s *AgentSession) IsStreaming() bool                  { return s.agent != nil && s.agent.Busy() }
-func (s *AgentSession) IsIdle() bool                       { return !s.IsStreaming() }
+func (s *AgentSession) IsStreaming() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.active
+}
+func (s *AgentSession) IsIdle() bool { return !s.IsStreaming() }
 func (*AgentSession) IsCompacting() (bool, error) {
 	return false, notImplemented("AgentSession.IsCompacting")
 }
@@ -536,15 +556,234 @@ func (*AgentSession) GetFollowUpMessages() ([]string, error) {
 }
 func (s *AgentSession) ClearQueue() error { return notImplemented("AgentSession.ClearQueue") }
 func (s *AgentSession) WaitForIdle(ctx context.Context) error {
-	return notImplemented("AgentSession.WaitForIdle")
+	s.mu.RLock()
+	idle := s.idle
+	s.mu.RUnlock()
+	if idle == nil {
+		return nil
+	}
+	select {
+	case <-idle:
+		return nil
+	default:
+	}
+	if ctx == nil {
+		return fmt.Errorf("wait for idle context must not be nil")
+	}
+	select {
+	case <-idle:
+		return nil
+	case <-ctx.Done():
+		return context.Cause(ctx)
+	}
 }
-func (s *AgentSession) Abort() error   { return notImplemented("AgentSession.Abort") }
-func (s *AgentSession) Dispose() error { return notImplemented("AgentSession.Dispose") }
-func (s *AgentSession) Subscribe(AgentSessionEventListener) (AgentSessionUnsubscribe, error) {
-	return nil, notImplemented("AgentSession.Subscribe")
+func (s *AgentSession) Abort() error {
+	s.mu.RLock()
+	cancel := s.activeCancel
+	s.mu.RUnlock()
+	if cancel != nil {
+		cancel(context.Canceled)
+	}
+	if s.agent != nil {
+		s.agent.Abort()
+	}
+	return nil
 }
-func (s *AgentSession) Prompt(context.Context, string, ...PromptOptions) error {
-	return notImplemented("AgentSession.Prompt")
+func (s *AgentSession) Dispose() error {
+	s.mu.Lock()
+	if s.disposed {
+		s.mu.Unlock()
+		return nil
+	}
+	s.disposed = true
+	cancel := s.activeCancel
+	unsubscribe := agent.Unsubscribe(nil)
+	if !s.active {
+		unsubscribe = s.unsubscribeAgent
+		s.unsubscribeAgent = nil
+	}
+	s.listeners = make(map[uint64]AgentSessionEventListener)
+	s.listenerOrder = nil
+	s.mu.Unlock()
+	if cancel != nil {
+		cancel(context.Canceled)
+	}
+	if s.agent != nil {
+		s.agent.Abort()
+	}
+	if unsubscribe != nil {
+		unsubscribe()
+	}
+	return nil
+}
+func (s *AgentSession) Subscribe(listener AgentSessionEventListener) (AgentSessionUnsubscribe, error) {
+	if listener == nil {
+		return func() {}, nil
+	}
+	s.mu.Lock()
+	if s.disposed {
+		s.mu.Unlock()
+		return nil, fmt.Errorf("AgentSession is disposed")
+	}
+	id := s.nextListener
+	s.nextListener++
+	s.listeners[id] = listener
+	s.listenerOrder = append(s.listenerOrder, id)
+	s.mu.Unlock()
+	var once sync.Once
+	return func() {
+		once.Do(func() {
+			s.mu.Lock()
+			delete(s.listeners, id)
+			s.mu.Unlock()
+		})
+	}, nil
+}
+func (s *AgentSession) Prompt(ctx context.Context, text string, options ...PromptOptions) error {
+	if ctx == nil {
+		return fmt.Errorf("AgentSession Prompt context must not be nil")
+	}
+	if len(options) > 0 {
+		option := options[0]
+		switch {
+		case option.ExpandPromptTemplates != nil:
+			return notImplemented("AgentSession.Prompt.ExpandPromptTemplates")
+		case len(option.Images) != 0:
+			return notImplemented("AgentSession.Prompt.Images")
+		case option.PreflightResult != nil:
+			return notImplemented("AgentSession.Prompt.PreflightResult")
+		case option.Source != "":
+			return notImplemented("AgentSession.Prompt.Source")
+		case option.StreamingBehavior != "":
+			return notImplemented("AgentSession.Prompt.StreamingBehavior")
+		}
+	}
+	runContext, cancel := context.WithCancelCause(ctx)
+	s.mu.Lock()
+	if s.disposed {
+		s.mu.Unlock()
+		cancel(nil)
+		return fmt.Errorf("AgentSession is disposed")
+	}
+	if s.active {
+		s.mu.Unlock()
+		cancel(nil)
+		return fmt.Errorf("AgentSession is already processing")
+	}
+	if s.agent == nil {
+		s.mu.Unlock()
+		cancel(nil)
+		return fmt.Errorf("AgentSession has no Agent")
+	}
+	s.active = true
+	s.idle = make(chan struct{})
+	s.activeCancel = cancel
+	s.mu.Unlock()
+	defer func() {
+		s.mu.Lock()
+		s.active = false
+		s.activeCancel = nil
+		close(s.idle)
+		var unsubscribe agent.Unsubscribe
+		if s.disposed {
+			unsubscribe = s.unsubscribeAgent
+			s.unsubscribeAgent = nil
+		}
+		s.mu.Unlock()
+		if unsubscribe != nil {
+			unsubscribe()
+		}
+		cancel(nil)
+	}()
+	defer func() {
+		s.emit(AgentSessionAgentSettledEvent{Type: AgentSessionEventTypeAgentSettled})
+	}()
+
+	return s.agent.PromptText(runContext, text)
+}
+
+func (s *AgentSession) handleAgentEvent(_ context.Context, event agent.AgentEvent) error {
+	if err := s.emitAgentEvent(event); err != nil {
+		return err
+	}
+
+	if ended, ok := event.(agent.MessageEndEvent); ok && s.sessionManager != nil {
+		switch ended.Message.MessageRole() {
+		case ai.MessageRoleUser, ai.MessageRoleAssistant, ai.MessageRoleToolResult:
+			if _, err := s.sessionManager.AppendMessage(ended.Message); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (s *AgentSession) emitAgentEvent(event agent.AgentEvent) error {
+	s.mu.RLock()
+	listeners := make([]AgentSessionEventListener, 0, len(s.listeners))
+	for _, id := range s.listenerOrder {
+		if listener, ok := s.listeners[id]; ok {
+			listeners = append(listeners, listener)
+		}
+	}
+	s.mu.RUnlock()
+	for _, listener := range listeners {
+		encoded, err := agent.MarshalAgentEvent(event)
+		if err != nil {
+			return err
+		}
+		cloned, err := agent.UnmarshalAgentEvent(encoded)
+		if err != nil {
+			return err
+		}
+		bridged, err := bridgeAgentSessionEvent(cloned)
+		if err != nil {
+			return err
+		}
+		listener(bridged)
+	}
+	return nil
+}
+
+func (s *AgentSession) emit(event AgentSessionEvent) {
+	s.mu.RLock()
+	listeners := make([]AgentSessionEventListener, 0, len(s.listeners))
+	for _, id := range s.listenerOrder {
+		if listener, ok := s.listeners[id]; ok {
+			listeners = append(listeners, listener)
+		}
+	}
+	s.mu.RUnlock()
+	for _, listener := range listeners {
+		listener(event)
+	}
+}
+
+func bridgeAgentSessionEvent(event agent.AgentEvent) (AgentSessionEvent, error) {
+	switch event := event.(type) {
+	case agent.AgentStartEvent:
+		return AgentSessionAgentStartEvent{AgentStartEvent: event}, nil
+	case agent.AgentEndEvent:
+		return AgentSessionAgentEndEvent{AgentEndEvent: event}, nil
+	case agent.TurnStartEvent:
+		return AgentSessionTurnStartEvent{TurnStartEvent: event}, nil
+	case agent.TurnEndEvent:
+		return AgentSessionTurnEndEvent{TurnEndEvent: event}, nil
+	case agent.MessageStartEvent:
+		return AgentSessionMessageStartEvent{MessageStartEvent: event}, nil
+	case agent.MessageUpdateEvent:
+		return AgentSessionMessageUpdateEvent{MessageUpdateEvent: event}, nil
+	case agent.MessageEndEvent:
+		return AgentSessionMessageEndEvent{MessageEndEvent: event}, nil
+	case agent.ToolExecutionStartEvent:
+		return AgentSessionToolExecutionStartEvent{ToolExecutionStartEvent: event}, nil
+	case agent.ToolExecutionUpdateEvent:
+		return AgentSessionToolExecutionUpdateEvent{ToolExecutionUpdateEvent: event}, nil
+	case agent.ToolExecutionEndEvent:
+		return AgentSessionToolExecutionEndEvent{ToolExecutionEndEvent: event}, nil
+	default:
+		return nil, fmt.Errorf("unsupported Agent event %T", event)
+	}
 }
 func (s *AgentSession) Steer(string) error    { return notImplemented("AgentSession.Steer") }
 func (s *AgentSession) FollowUp(string) error { return notImplemented("AgentSession.FollowUp") }

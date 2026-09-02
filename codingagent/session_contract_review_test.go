@@ -168,7 +168,6 @@ func TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects(t *testing.T
 		name string
 		call func() (string, error)
 	}{
-		{"append message", func() (string, error) { return manager.AppendMessage(ai.UserMessage{}) }},
 		{"append thinking", func() (string, error) { return manager.AppendThinkingLevelChange("high") }},
 		{"append model", func() (string, error) { return manager.AppendModelChange("provider", "model") }},
 		{"append compaction", func() (string, error) { return manager.AppendCompaction("summary", "entry", 1) }},
@@ -198,5 +197,30 @@ func TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects(t *testing.T
 	}
 	if !reflect.DeepEqual(manager.GetHeader(), beforeHeader) || !reflect.DeepEqual(manager.GetEntries(), beforeEntries) || manager.GetLeafID() != nil {
 		t.Fatal("unsupported SessionManager operations changed in-memory state")
+	}
+}
+
+func TestSessionManagerAppendMessageBuildsInMemoryOwnedChain(t *testing.T) {
+	manager := codingagent.NewInMemorySessionManager("/project", codingagent.NewSessionOptions{ID: "session-1"})
+	first := ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("first"), Timestamp: 1}
+	firstID, err := manager.AppendMessage(first)
+	if err != nil || firstID == "" {
+		t.Fatalf("first AppendMessage() = (%q, %v), want non-empty ID", firstID, err)
+	}
+	secondID, err := manager.AppendMessage(ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("second"), Timestamp: 2})
+	if err != nil || secondID == "" || secondID == firstID {
+		t.Fatalf("second AppendMessage() = (%q, %v), want distinct ID", secondID, err)
+	}
+
+	entries := manager.GetEntries()
+	if len(entries) != 2 || entries[0].ParentID != nil || entries[1].ParentID == nil || *entries[1].ParentID != firstID {
+		t.Fatalf("entries = %#v, want a two-message parent chain", entries)
+	}
+	if leaf := manager.GetLeafID(); leaf == nil || *leaf != secondID {
+		t.Fatalf("leaf = %v, want %q", leaf, secondID)
+	}
+	first.Content = ai.UserText("caller mutation")
+	if text, ok := entries[0].Message.(ai.UserMessage).Content.Text(); !ok || text != "first" {
+		t.Fatalf("stored first message = %q, want owned copy", text)
 	}
 }

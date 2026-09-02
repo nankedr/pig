@@ -11,6 +11,7 @@ m0-offline:
 	go vet ./...
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build ./...
 	go run ./examples/m0-contracts
+	go run ./examples/sdk-agent-session
 
 m0-node-preflight:
 	@node --experimental-strip-types -e "" >/dev/null 2>&1 || (echo "freeze checks require Node >=22.6.0 with --experimental-strip-types" >&2; exit 2)

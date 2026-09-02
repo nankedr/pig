@@ -28,6 +28,7 @@ const (
 	issue32GoPackage           = "github.com/nankedr/pig/codingagent"
 	issue32TUIPackage          = "github.com/nankedr/pig/tui"
 	issue32ModuleCatalogID     = "module-codingagent"
+	issue32AgentSessionID      = "contract:codingagent/agent-session"
 	issue32ReadToolCatalogID   = "contract:codingagent/read-tool"
 	issue32CompactionCatalogID = "contract:codingagent/compaction"
 	issue32TranscriptCatalogID = "contract:codingagent/transcript-projection"
@@ -481,8 +482,8 @@ func TestIssue32CatalogPromotionWritesCompleteClaimSpecificEvidence(t *testing.T
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(entries) != 9 {
-		t.Fatalf("written catalog entry count = %d, want 9", len(entries))
+	if len(entries) != 10 {
+		t.Fatalf("written catalog entry count = %d, want 10", len(entries))
 	}
 	byID := make(map[string]catalog.Entry, len(entries))
 	for _, entry := range entries {
@@ -1438,6 +1439,10 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 
 func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/agent-session.ts#"),
+		strings.HasPrefix(reference, issue32ReferencePrefix+"core/sdk.ts#createAgentSession"),
+		strings.HasPrefix(reference, issue32ReferencePrefix+"core/sdk.ts#CreateAgentSessionOptions"):
+		return issue32AgentSessionID
 	case reference == issue32ReferencePrefix+"core/tools/read.ts#createReadTool":
 		return issue32ReadToolCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"client/transcript.ts#"):
@@ -1644,6 +1649,23 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 	repository := "https://github.com/badlogic/pi-mono"
 	entries := []catalog.Entry{
 		{
+			SchemaVersion: catalog.SchemaVersion, ID: issue32AgentSessionID,
+			Upstream: catalog.Upstream{Module: "coding-agent", Repository: repository, Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/sdk.ts#createAgentSession"},
+			Mapping:  catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".CreateAgentSession", Kind: "contract"},
+			Status:   catalog.StatusPartial, Milestone: "M1", Classification: "public-api",
+			Partial: &catalog.Partial{
+				Supported: []string{
+					"callers can inject a model, narrow Provider or StreamFunction, and executable Agent Tools into a pure in-memory AgentSession",
+					"text and read Tool continuation, AgentSession event bridging, in-memory transcript append, cancellation, settlement, disposal, header identity, and nil SessionFile are implemented",
+				},
+				Unsupported: []string{
+					"ambient model, credential, settings, trust, resource, package, and persisted-session assembly remain explicit Capability Stubs",
+					"queues, extension ToolDefinition execution, branches, compaction, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
+				},
+			},
+			Notes: "Issue #55 delivers the narrow M1 Go SDK AgentSession slice without activating M3 persistence or M7 extension execution. Session event listeners are ordered barriers, agent_settled follows transcript updates, and creation plus execution perform no ambient disk writes.",
+		},
+		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32ReadToolCatalogID,
 			Upstream: catalog.Upstream{Module: "coding-agent", Repository: repository, Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/tools/read.ts#createReadTool"},
 			Mapping:  catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".CreateReadTool", Kind: "contract"},
@@ -1692,10 +1714,10 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Partial: &catalog.Partial{
 				Supported: []string{
 					"newline-delimited session records preserve every syntactically valid raw JSON value while projecting recognized v3 headers, message discriminators, and session entries",
-					"branch lookup, latest-compaction context reconstruction, model and thinking-level recovery, defensive snapshots, and side-effect-free in-memory v3 sessions are implemented",
+					"branch lookup, latest-compaction context reconstruction, model and thinking-level recovery, defensive snapshots, and side-effect-free in-memory v3 sessions with owned message append are implemented",
 				},
 				Unsupported: []string{
-					"filesystem-backed create, open, continue, fork, session-file assignment, append, branch mutation, and persistence remain explicit Capability Stubs",
+					"filesystem-backed create, open, continue, fork, session-file assignment, append persistence, branch mutation, and persistence remain explicit Capability Stubs",
 					"tree and child traversal plus end-to-end resume and fork persistence semantics remain explicit Capability Stubs",
 				},
 			},
@@ -1719,6 +1741,18 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	t.Helper()
 	var descriptors []issue32ModuleEvidenceDescriptor
 	switch catalogID {
+	case issue32AgentSessionID:
+		descriptors = []issue32ModuleEvidenceDescriptor{{
+			InputPath: "codingagent/agent_session_runtime_test.go",
+			Evidence: catalog.Evidence{
+				Kind: "go-test", Ref: "codingagent/agent_session_runtime_test.go#TestCreateAgentSessionRunsTextRoundAndSettlesAfterTranscriptUpdate", Baseline: issue32BaselineCommit,
+				CaseID:          "issue55-codingagent-in-memory-agent-session",
+				ExecutionMethod: "go test -race ./codingagent -run '^(TestCreateAgentSessionRunsTextRoundAndSettlesAfterTranscriptUpdate|TestCreateAgentSessionRunsReadContinuationWithInjectedProviderAndTool|TestAgentSessionAbortRequestsCancellationAndWaitForIdleObservesSettledTranscript|TestAgentSessionAbortIsSafeFromSynchronousListeners|TestAgentSessionDisposeCancelsWithoutDroppingActiveTranscript|TestAgentSessionUnsupportedPromptOptionsAreExactInertStubs|TestCreateAgentSessionNoToolsModesMatchPublicSelectionContract|TestSessionManagerAppendMessageBuildsInMemoryOwnedChain|TestSDKInMemorySessionInjectionFields|TestAgentSessionExactOperationStubsAreInert)$' -count=1",
+				Expected:        "the public Go SDK constructs a side-effect-free in-memory session from injected model, Provider or stream, and Tool dependencies; bridges ordered events; publishes agent_settled after transcript updates; and settles abort and disposal without activating later capabilities",
+				Actual:          "PASS; text and real read continuation completed through CreateAgentSession, transcript and identity remained in memory, cancellation settled deterministically under the race detector, and later operations retained structured stubs",
+				Platform:        "any", CatalogID: catalogID,
+			},
+		}}
 	case issue32ReadToolCatalogID:
 		const (
 			inputHash       = "sha256:f4f006f254b90ce868c7f6440fca8c5cef7595f18a1e404fc80200abd4d5117d"
@@ -1784,7 +1818,7 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = []issue32ModuleEvidenceDescriptor{
 			{InputPath: "codingagent/session_parse_final_review_test.go", Evidence: catalog.Evidence{Kind: "go-test", Ref: "codingagent/session_parse_final_review_test.go#TestParseSessionEntriesPreservesEverySyntacticallyValidRecord", Baseline: issue32BaselineCommit, CaseID: "issue32-codingagent-v3-jsonl-forward-compatible-read", ExecutionMethod: "go test ./codingagent -run '^(TestParseSessionEntriesPreservesEverySyntacticallyValidRecord|TestParseSessionEntriesNormalizesMissingAndNullBuiltInMessageContent|TestSessionManagerGetBranchDistinguishesOmittedAndInvalidLeafIDs|TestSessionManagerTreeOperationsAreExplicitCapabilityStubs)$' -count=1", Expected: "the v3 read path retains syntactically valid raw JSON, projects known records, distinguishes branch selection states, and reports unimplemented tree operations explicitly", Actual: "PASS; valid records remained lossless, known message content normalized, branch reads selected the intended path, and tree operations returned structured ErrNotImplemented", Platform: "any", CatalogID: catalogID}},
 			{InputPath: "codingagent/session_test.go", Evidence: catalog.Evidence{Kind: "go-test", Ref: "codingagent/session_test.go#TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings", Baseline: issue32BaselineCommit, CaseID: "issue32-codingagent-v3-jsonl-context-projection", ExecutionMethod: "go test ./codingagent -run '^(TestParseSessionEntriesDecodesV3MessageDiscriminators|TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings|TestSessionCarriersDefensivelyCopyNestedMutableValues)$' -count=1", Expected: "recognized v3 messages decode into typed carriers and context projection uses the latest compaction while retaining full-path model and thinking settings with defensive ownership", Actual: "PASS; v3 messages decoded, latest-compaction context and settings were reconstructed, and mutable carrier values did not alias inputs or getters", Platform: "any", CatalogID: catalogID}},
-			{InputPath: "codingagent/session_contract_review_test.go", Evidence: catalog.Evidence{Kind: "go-test", Ref: "codingagent/session_contract_review_test.go#TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers", Baseline: issue32BaselineCommit, CaseID: "issue32-codingagent-v3-jsonl-in-memory-boundary", ExecutionMethod: "go test ./codingagent -run '^(TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers|TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects)$' -count=1", Expected: "in-memory managers create complete distinct v3 headers without persistence, and persistence or mutation methods return structured ErrNotImplemented without IDs or state changes", Actual: "PASS; in-memory headers were complete and unique while all covered filesystem-backed mutation operations remained inert Capability Stubs", Platform: "any", CatalogID: catalogID}},
+			{InputPath: "codingagent/session_contract_review_test.go", Evidence: catalog.Evidence{Kind: "go-test", Ref: "codingagent/session_contract_review_test.go#TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers", Baseline: issue32BaselineCommit, CaseID: "issue32-codingagent-v3-jsonl-in-memory-boundary", ExecutionMethod: "go test ./codingagent -run '^(TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers|TestSessionManagerAppendMessageBuildsInMemoryOwnedChain|TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects)$' -count=1", Expected: "in-memory managers create complete distinct v3 headers and owned message chains without persistence, while filesystem-backed or later mutation methods return structured ErrNotImplemented without side effects", Actual: "PASS; in-memory headers and message parent chains were complete and defensively owned while all covered filesystem-backed or later mutation operations remained inert Capability Stubs", Platform: "any", CatalogID: catalogID}},
 		}
 	case issue32MigrationCatalogID:
 		descriptors = []issue32ModuleEvidenceDescriptor{{
@@ -1905,9 +1939,23 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 				Ref:             "codingagent/session_test.go#TestAgentSessionComposesLegacyAgentAndV3Session",
 				Baseline:        issue32BaselineCommit,
 				CaseID:          "issue32-codingagent-production-v3-session",
-				ExecutionMethod: "go test ./codingagent -run '^(TestParseSessionEntriesDecodesV3MessageDiscriminators|TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings|TestMigrateSessionEntriesMigratesV1ToV3InPlace|TestMigrateSessionEntriesRenamesV2HookMessageRole|TestAgentSessionComposesLegacyAgentAndV3Session|TestAgentSessionPromptStubLeavesCompositionStateUnchanged|TestAgentSessionUnsupportedLifecycleAndQueueMethodsHaveNoSideEffects)$' -count=1",
-				Expected:        "production AgentSession composes the legacy agent.Agent with the v3 SessionManager, preserves v3 parsing and migration semantics, and leaves composition state unchanged when unsupported session operations return ErrNotImplemented",
-				Actual:          "PASS; focused production-session tests decoded and migrated v3 entries, retained the legacy Agent and v3 SessionManager, and observed no mutation from unsupported prompt, lifecycle, or queue operations",
+				ExecutionMethod: "go test ./codingagent -run '^(TestParseSessionEntriesDecodesV3MessageDiscriminators|TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings|TestMigrateSessionEntriesMigratesV1ToV3InPlace|TestMigrateSessionEntriesRenamesV2HookMessageRole|TestAgentSessionComposesLegacyAgentAndV3Session|TestAgentSessionPromptPropagatesUnconfiguredAgentErrorAndSettles|TestAgentSessionLifecycleAndUnsupportedQueueMethodsHaveNoQueueSideEffects)$' -count=1",
+				Expected:        "production AgentSession composes the legacy agent.Agent with the v3 SessionManager, preserves v3 parsing and migration semantics, settles failed prompts, and leaves unsupported queue operations inert",
+				Actual:          "PASS; focused production-session tests decoded and migrated v3 entries, retained the legacy Agent and v3 SessionManager, settled failed prompts, and observed no queue mutation from lifecycle or unsupported operations",
+				Platform:        "any",
+				CatalogID:       issue32ModuleCatalogID,
+			},
+		},
+		{
+			InputPath: "codingagent/agent_session_runtime_test.go",
+			Evidence: catalog.Evidence{
+				Kind:            "go-test",
+				Ref:             "codingagent/agent_session_runtime_test.go#TestCreateAgentSessionRunsTextRoundAndSettlesAfterTranscriptUpdate",
+				Baseline:        issue32BaselineCommit,
+				CaseID:          "issue55-codingagent-in-memory-agent-session",
+				ExecutionMethod: "go test -race ./codingagent -run '^(TestCreateAgentSessionRunsTextRoundAndSettlesAfterTranscriptUpdate|TestCreateAgentSessionRunsReadContinuationWithInjectedProviderAndTool|TestAgentSessionAbortRequestsCancellationAndWaitForIdleObservesSettledTranscript|TestAgentSessionAbortIsSafeFromSynchronousListeners|TestAgentSessionDisposeCancelsWithoutDroppingActiveTranscript|TestAgentSessionUnsupportedPromptOptionsAreExactInertStubs|TestCreateAgentSessionNoToolsModesMatchPublicSelectionContract)$' -count=1",
+				Expected:        "the public SDK runs text and read continuation with explicit dependencies, ordered lifecycle events, post-transcript settlement, cancellation, and no ambient disk writes",
+				Actual:          "PASS; injected sessions completed text and read rounds, settled after transcript updates, aborted deterministically, and left the sentinel filesystem unchanged under the race detector",
 				Platform:        "any",
 				CatalogID:       issue32ModuleCatalogID,
 			},
@@ -2011,17 +2059,18 @@ func issue32ModulePartial() *catalog.Partial {
 	return &catalog.Partial{
 		Supported: []string{
 			"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings",
+			"the public Go SDK runs an injected in-memory AgentSession for text and read Tool continuation with deterministic lifecycle events",
 			"Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects",
 		},
 		Unsupported: []string{
-			"runtime session, persistence, settings, resources, packages, remaining tools, model/auth and product modes remain explicit Capability Stubs until their roadmap milestones",
+			"persisted sessions, settings, resources, packages, remaining tools, ambient model/auth assembly, and product modes remain explicit Capability Stubs until their roadmap milestones",
 			"surface tests prove API coverage and target resolution, not runtime parity",
 		},
 	}
 }
 
 func issue32ModuleNotes() string {
-	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool; the remaining deferred operations stay Capability Stubs. The production legacy AgentSession and v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
+	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, and issue #55 adds the injected in-memory legacy AgentSession under contract:codingagent/agent-session; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
 }
 
 var issue32NameExceptions = map[string]string{

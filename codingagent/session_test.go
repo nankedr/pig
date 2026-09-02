@@ -228,7 +228,7 @@ func TestAgentSessionComposesLegacyAgentAndV3Session(t *testing.T) {
 	}
 }
 
-func TestAgentSessionPromptStubLeavesCompositionStateUnchanged(t *testing.T) {
+func TestAgentSessionPromptPropagatesUnconfiguredAgentErrorAndSettles(t *testing.T) {
 	legacy, err := agent.NewAgent(agent.AgentOptions{})
 	if err != nil {
 		t.Fatalf("NewAgent: %v", err)
@@ -239,30 +239,30 @@ func TestAgentSessionPromptStubLeavesCompositionStateUnchanged(t *testing.T) {
 		SessionManager:         v3,
 		InitialActiveToolNames: []string{"read", "bash"},
 	})
-	beforeAgent := legacy.State()
-	beforeEntries := v3.GetEntries()
-	beforeTools := session.GetActiveToolNames()
+	var events []codingagent.AgentSessionEventType
+	_, err = session.Subscribe(func(event codingagent.AgentSessionEvent) {
+		events = append(events, event.AgentSessionEventType())
+	})
+	if err != nil {
+		t.Fatalf("Subscribe: %v", err)
+	}
 
 	err = session.Prompt(context.Background(), "must not run")
-	if !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("Prompt error = %v, want ErrNotImplemented", err)
+	if !errors.Is(err, agent.ErrNotImplemented) {
+		t.Fatalf("Prompt error = %v, want Agent ErrNotImplemented", err)
 	}
-	var target *codingagent.NotImplementedError
-	if !errors.As(err, &target) || target.Module != "codingagent" || target.Operation != "AgentSession.Prompt" {
-		t.Fatalf("Prompt error = %#v, want codingagent.AgentSession.Prompt", target)
+	if !reflect.DeepEqual(events, []codingagent.AgentSessionEventType{codingagent.AgentSessionEventTypeAgentSettled}) {
+		t.Fatalf("events = %v, want agent_settled after failed preflight", events)
 	}
-	if got := legacy.State(); !reflect.DeepEqual(got, beforeAgent) {
-		t.Fatalf("Prompt changed legacy Agent state: got %#v, want %#v", got, beforeAgent)
+	if !session.IsIdle() {
+		t.Fatal("session remained active after Prompt failure")
 	}
-	if got := v3.GetEntries(); !reflect.DeepEqual(got, beforeEntries) {
-		t.Fatalf("Prompt changed v3 entries: got %#v, want %#v", got, beforeEntries)
-	}
-	if got := session.GetActiveToolNames(); !reflect.DeepEqual(got, beforeTools) {
-		t.Fatalf("Prompt changed active Tools: got %v, want %v", got, beforeTools)
+	if got := v3.GetEntries(); len(got) != 0 {
+		t.Fatalf("failed Prompt appended v3 entries: %#v", got)
 	}
 }
 
-func TestAgentSessionUnsupportedLifecycleAndQueueMethodsHaveNoSideEffects(t *testing.T) {
+func TestAgentSessionLifecycleAndUnsupportedQueueMethodsHaveNoQueueSideEffects(t *testing.T) {
 	legacy, err := agent.NewAgent(agent.AgentOptions{})
 	if err != nil {
 		t.Fatalf("NewAgent: %v", err)
@@ -274,18 +274,14 @@ func TestAgentSessionUnsupportedLifecycleAndQueueMethodsHaveNoSideEffects(t *tes
 	session := codingagent.NewAgentSession(codingagent.AgentSessionConfig{Agent: legacy})
 	before := legacy.State()
 
-	for name, call := range map[string]func() error{
-		"ClearQueue": func() error { return session.ClearQueue() },
-		"Abort":      func() error { return session.Abort() },
-		"Dispose":    func() error { return session.Dispose() },
-		"WaitForIdle": func() error {
-			return session.WaitForIdle(context.Background())
-		},
-	} {
-		err := call()
-		if !errors.Is(err, codingagent.ErrNotImplemented) {
-			t.Errorf("%s() error = %v, want ErrNotImplemented", name, err)
-		}
+	if err := session.ClearQueue(); !errors.Is(err, codingagent.ErrNotImplemented) {
+		t.Errorf("ClearQueue() error = %v, want ErrNotImplemented", err)
+	}
+	if err := session.Abort(); err != nil {
+		t.Errorf("Abort() error = %v", err)
+	}
+	if err := session.WaitForIdle(context.Background()); err != nil {
+		t.Errorf("WaitForIdle() error = %v", err)
 	}
 	if count, err := session.PendingMessageCount(); !errors.Is(err, codingagent.ErrNotImplemented) || count != 0 {
 		t.Errorf("PendingMessageCount() = (%d, %v), want (0, ErrNotImplemented)", count, err)
@@ -295,7 +291,10 @@ func TestAgentSessionUnsupportedLifecycleAndQueueMethodsHaveNoSideEffects(t *tes
 		t.Fatalf("unsupported session methods mutated legacy state: got %#v, want %#v", got, before)
 	}
 	if !legacy.HasQueuedMessages() {
-		t.Fatal("unsupported session methods drained the legacy queue")
+		t.Fatal("session lifecycle methods drained the legacy queue")
+	}
+	if err := session.Dispose(); err != nil {
+		t.Errorf("Dispose() error = %v", err)
 	}
 }
 

@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9643
+- Total entries: 9644
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5251 |
 | scaffolded | 4124 |
-| partial | 165 |
+| partial | 166 |
 | implemented | 3 |
 | verified | 98 |
 | deferred | 2 |
@@ -8022,6 +8022,7 @@
 | contract:cli/pig/args | partial | M3 | contract | github.com/nankedr/pig/codingagent.RunCLI | coding-agent |
 | contract:cli/pig/exit-codes | partial | M3 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | contract:cli/pig/experimental | partial | M0 | contract | github.com/nankedr/pig/codingagent.runExperimentalCLI | coding-agent |
+| contract:codingagent/agent-session | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateAgentSession | coding-agent |
 | contract:codingagent/compaction | partial | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
