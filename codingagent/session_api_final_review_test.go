@@ -87,11 +87,12 @@ func TestCreateReplacedSessionContextReturnsStructuredStub(t *testing.T) {
 	}
 }
 
-func TestAgentSessionRuntimeCallbacksAreNotInvokedEagerly(t *testing.T) {
+func TestAgentSessionRuntimeCreatesInitialSessionOnlyWhenRequested(t *testing.T) {
 	factoryCalls := 0
+	session := codingagent.NewAgentSession(codingagent.AgentSessionConfig{})
 	factory := func(context.Context, codingagent.CreateAgentSessionRuntimeOptions) (codingagent.CreateAgentSessionRuntimeResult, error) {
 		factoryCalls++
-		return codingagent.CreateAgentSessionRuntimeResult{}, nil
+		return codingagent.CreateAgentSessionRuntimeResult{CreateAgentSessionResult: codingagent.CreateAgentSessionResult{Session: session}}, nil
 	}
 	runtime := codingagent.NewAgentSessionRuntime(nil, codingagent.AgentSessionServices{}, factory, nil, nil)
 
@@ -107,11 +108,14 @@ func TestAgentSessionRuntimeCallbacksAreNotInvokedEagerly(t *testing.T) {
 	}
 
 	created, err := codingagent.CreateAgentSessionRuntime(context.Background(), factory, codingagent.CreateAgentSessionRuntimeOptions{})
-	if created != nil || !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("CreateAgentSessionRuntime() = (%v, %v), want nil and ErrNotImplemented", created, err)
+	if err != nil || created == nil || created.Session() != session {
+		t.Fatalf("CreateAgentSessionRuntime() = (%v, %v), want runtime with factory Session", created, err)
 	}
-	if factoryCalls != 0 {
-		t.Fatalf("CreateAgentSessionRuntime stub called factory %d times, want zero", factoryCalls)
+	if factoryCalls != 1 {
+		t.Fatalf("CreateAgentSessionRuntime called factory %d times, want one", factoryCalls)
+	}
+	if err := created.Dispose(context.Background()); err != nil {
+		t.Fatalf("Dispose() error = %v", err)
 	}
 }
 

@@ -1,4 +1,4 @@
-pig - AI coding assistant with read, bash, edit, write tools
+pig - AI coding assistant
 
 Usage:
   pig [options] [@files...] [messages...]
@@ -14,13 +14,13 @@ Commands:
   pig <command> --help          Show help for install/remove/uninstall/update/list/config/auth
 
 Options:
-  --provider <name>              Provider name (default: google)
-  --model <pattern>              Model pattern or ID (supports "provider/id" and optional ":<thinking>")
-  --api-key <key>                API key (defaults to env vars)
+  --provider <name>              Provider name (Headless text currently requires deepseek)
+  --model <id>                   Exact model ID (required for Headless text)
+  --api-key <key>                Explicit API key (overrides DEEPSEEK_API_KEY)
   --system-prompt <text>         System prompt (default: coding assistant prompt)
   --append-system-prompt <text>  Append text or file contents to the system prompt (can be used multiple times)
-  --mode <mode>                  Output mode: text (default), json, or rpc
-  --print, -p                    Non-interactive mode: process prompt and exit
+  --mode <mode>                  Output mode: text (default), json, or rpc; see availability below
+  --print, -p                    Run the Headless text mode, process prompts, and exit
   --continue, -c                 Continue previous session
   --resume, -r                   Select a session to resume
   --session <path|id>            Use specific session file or partial UUID
@@ -58,10 +58,17 @@ Options:
   --version, -v                  Show version number
 
 Modes:
-  interactive  text mode with terminal stdin and stdout
-  print        --print or non-terminal stdin/stdout
-  json         --mode json; newline-delimited events, not an RPC input
-  rpc          --mode rpc; trusted local bidirectional JSONL subprocess interface
+  interactive  text mode with terminal stdin and stdout; not implemented
+  print        --print or non-terminal stdin/stdout; implemented with an in-memory Session
+  json         --mode json; not implemented (reserved for newline-delimited events)
+  rpc          --mode rpc; not implemented (reserved for a local JSONL subprocess interface)
+
+Current Headless Text Availability:
+  Requires --provider deepseek and an exact --model ID. Credentials come from
+  --api-key or DEEPSEEK_API_KEY. The read Tool is available; other built-in
+  Tools, persisted Sessions, resources, extensions, JSON, and RPC remain
+  explicit Capability Stubs. Successful output contains only final Assistant
+  text. SIGINT cancels the run and exits 130.
 
 Extension flags:
   Unknown long flags are reserved for the Extension Surface. Until the extension
@@ -74,60 +81,18 @@ Examples:
   # Print an OAuth bearer token for an external client (refreshes if expired)
   pig auth print-bearer-token --provider openai-codex
 
-  # Interactive mode
-  pig
+  # Run Headless text with the standard DeepSeek environment credential
+  export DEEPSEEK_API_KEY=...
+  pig --provider deepseek --model deepseek-v4-flash -p "Explain this package"
 
-  # Interactive mode with initial prompt
-  pig "List all .ts files in src/"
+  # Supply the prompt on stdin (non-terminal I/O selects Headless text)
+  printf 'Summarize go.mod' | pig --provider deepseek --model deepseek-v4-flash
 
-  # Include files in initial message
-  pig @prompt.md @image.png "What color is the sky?"
+  # Allow only the implemented read Tool
+  pig --provider deepseek --model deepseek-v4-flash --tools read -p "Read go.mod"
 
-  # Non-interactive mode (process and exit)
-  pig -p "List all .ts files in src/"
-
-  # Multiple messages (interactive)
-  pig "Read package.json" "What dependencies do we have?"
-
-  # Continue previous session
-  pig --continue "What did we discuss?"
-
-  # Start a named session
-  pig --name "Refactor auth module"
-
-  # Use different model
-  pig --provider openai --model gpt-4o-mini "Help me refactor this code"
-
-  # Use model with provider prefix (no --provider needed)
-  pig --model openai/gpt-4o "Help me refactor this code"
-
-  # Use model with thinking level shorthand
-  pig --model sonnet:high "Solve this complex problem"
-
-  # Limit model cycling to specific models
-  pig --models claude-sonnet,claude-haiku,gpt-4o
-
-  # Limit to a specific provider with glob pattern
-  pig --models "github-copilot/*"
-
-  # Cycle models with fixed thinking levels
-  pig --models sonnet:high,haiku:low
-
-  # Start with a specific thinking level
-  pig --thinking high "Solve this complex problem"
-
-  # Read-only mode (no file modifications possible)
-  pig --tools read,grep,find,ls -p "Review the code in src/"
-
-  # Disable one tool while keeping the rest available
-  pig --exclude-tools ask_question
-
-  # Export a session file to HTML
-  pig --export ~/.pig/agent/sessions/--path--/session.jsonl
-  pig --export session.jsonl output.html
-
-  # Emit a JSON event stream
-  pig --mode json "Explain the package"
+  # Disable Tools for a text-only request
+  pig --provider deepseek --model deepseek-v4-flash --no-tools -p "Say hello"
 
 Environment Variables:
   ANTHROPIC_AUTH_TOKEN             - Anthropic bearer auth token
@@ -175,19 +140,21 @@ Environment Variables:
   PIG_CODING_AGENT_DIR             - Config directory (default: ~/.pig/agent)
   PIG_CODING_AGENT_SESSION_DIR     - Session storage directory (overridden by --session-dir)
   PIG_PACKAGE_DIR                  - Override package directory (for Nix/Guix store paths)
+  PIG_DEEPSEEK_BASE_URL            - DeepSeek endpoint override for deterministic local verification
   PIG_OFFLINE                      - Disable startup and control-plane network operations when set to 1/true/yes
   PIG_TELEMETRY                    - Override install telemetry when set to 1/true/yes or 0/false/no
   PIG_SHARE_VIEWER_URL             - Base URL for /share command
 
 Built-in Tool Names:
-  read   - Read file contents
-  bash   - Execute bash commands
-  edit   - Edit files with find/replace
-  write  - Write files (creates/overwrites)
-  grep   - Search file contents (read-only, off by default)
-  find   - Find files by glob pattern (read-only, off by default)
-  ls     - List directory contents (read-only, off by default)
+  read   - Read file contents (implemented)
+  bash   - Execute bash commands (not implemented)
+  edit   - Edit files with find/replace (not implemented)
+  write  - Write files (creates/overwrites; not implemented)
+  grep   - Search file contents (not implemented)
+  find   - Find files by glob pattern (not implemented)
+  ls     - List directory contents (not implemented)
 
 Exit Status:
-  0  Static help or version completed successfully
-  1  Invalid arguments or an unavailable capability
+  0    Static help/version or a Headless text run completed successfully
+  1    Invalid arguments, Provider failure, or an unavailable capability
+  130  Headless text was interrupted with SIGINT

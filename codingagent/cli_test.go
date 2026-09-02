@@ -209,7 +209,7 @@ func TestRunCLIRootHelpInventoriesTheCompleteStaticContract(t *testing.T) {
 		}
 	}
 	for _, option := range []string{
-		"--provider <name>", "--model <pattern>", "--api-key <key>",
+		"--provider <name>", "--model <id>", "--api-key <key>",
 		"--system-prompt <text>", "--append-system-prompt <text>",
 		"--mode <mode>", "--print, -p", "--continue, -c", "--resume, -r",
 		"--session <path|id>", "--session-id <id>", "--fork <path|id>",
@@ -469,7 +469,7 @@ func TestCLIContractDeclaresModesAndExitSemantics(t *testing.T) {
 	if got := codingagent.StaticCLIContract().Modes; !reflect.DeepEqual(got, wantModes) {
 		t.Fatalf("StaticCLIContract().Modes = %#v, want %#v", got, wantModes)
 	}
-	if got, want := codingagent.StaticCLIContract().ExitStatus, "0 for static help/version; 1 for argument errors and unavailable capabilities"; got != want {
+	if got, want := codingagent.StaticCLIContract().ExitStatus, "0 for static help/version or successful Headless text; 1 for argument, Provider, and unavailable-capability errors; 130 for interrupted Headless text"; got != want {
 		t.Fatalf("StaticCLIContract().ExitStatus = %q, want %q", got, want)
 	}
 }

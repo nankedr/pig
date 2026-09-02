@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9644
+- Total entries: 9645
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5251 |
-| scaffolded | 4124 |
-| partial | 166 |
-| implemented | 3 |
+| scaffolded | 4120 |
+| partial | 169 |
+| implemented | 5 |
 | verified | 98 |
 | deferred | 2 |
 
@@ -6245,7 +6245,6 @@
 | member:codingagent/src/client/transcript.ts#TranscriptState.toolCallBuffers | scaffolded | M9 | contract | github.com/nankedr/pig/codingagent.TranscriptState.ToolCallBuffers | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.cwd | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.CWD | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.diagnostics | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Diagnostics | coding-agent |
-| member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.fork | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Fork | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.importFromJsonl | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.ImportFromJSONL | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.modelFallbackMessage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.ModelFallbackMessage | coding-agent |
@@ -7665,7 +7664,6 @@
 | symbol:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.AgentSessionRuntime | coding-agent |
 | symbol:codingagent/src/core/agent-session-runtime.ts#CreateAgentSessionRuntimeFactory | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntimeFactory | coding-agent |
 | symbol:codingagent/src/core/agent-session-runtime.ts#CreateAgentSessionRuntimeResult | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntimeResult | coding-agent |
-| symbol:codingagent/src/core/agent-session-runtime.ts#createAgentSessionRuntime | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntime | coding-agent |
 | symbol:codingagent/src/core/agent-session-services.ts#AgentSessionRuntimeDiagnostic | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.AgentSessionRuntimeDiagnostic | coding-agent |
 | symbol:codingagent/src/core/agent-session-services.ts#AgentSessionServices | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.AgentSessionServices | coding-agent |
 | symbol:codingagent/src/core/agent-session-services.ts#CreateAgentSessionFromServicesOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionFromServicesOptions | coding-agent |
@@ -7950,7 +7948,6 @@
 | symbol:codingagent/src/core/trust-manager.ts#ProjectTrustUpdate | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.ProjectTrustUpdate | coding-agent |
 | symbol:codingagent/src/core/trust-manager.ts#hasTrustRequiringProjectResources | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.HasTrustRequiringProjectResources | coding-agent |
 | symbol:codingagent/src/main.ts#MainOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.MainOptions | coding-agent |
-| symbol:codingagent/src/main.ts#main | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/armin.ts#ArminComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ArminComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.AssistantMessageComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.BashExecutionComponent | coding-agent |
@@ -7999,7 +7996,6 @@
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#initTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InitTheme | coding-agent |
 | symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.JSONAgentSessionEvent | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#PrintModeOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.PrintModeOptions | coding-agent |
-| symbol:codingagent/src/modes/print-mode.ts#runPrintMode | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.ModelInfo | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#RpcClient | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#RpcClientOptions | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.RPCClientOptions | coding-agent |
@@ -8024,11 +8020,16 @@
 | contract:cli/pig/experimental | partial | M0 | contract | github.com/nankedr/pig/codingagent.runExperimentalCLI | coding-agent |
 | contract:codingagent/agent-session | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateAgentSession | coding-agent |
 | contract:codingagent/compaction | partial | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
+| symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
+| symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:session/migration | implemented | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
+| symbol:codingagent/src/core/agent-session-runtime.ts#createAgentSessionRuntime | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntime | coding-agent |
 | contract:cli/pig/auth-help | verified | M0 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | deferred-extension-runtime | deferred | M7 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | deferred-pig-server | deferred | M0 | contract | github.com/nankedr/pig/codingagent | server |

@@ -10,20 +10,7 @@ import (
 )
 
 func TestProcessReportsStdoutWriteFailure(t *testing.T) {
-	_, file, _, ok := runtime.Caller(0)
-	if !ok {
-		t.Fatal("locate test source")
-	}
-	packageDir := filepath.Dir(file)
-	binary := filepath.Join(t.TempDir(), "pig")
-	if runtime.GOOS == "windows" {
-		binary += ".exe"
-	}
-	build := exec.Command("go", "build", "-o", binary, ".")
-	build.Dir = packageDir
-	if output, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("build pig: %v\n%s", err, output)
-	}
+	binary := buildPigBinary(t)
 
 	for _, arguments := range [][]string{{"--help"}, {"--version"}} {
 		t.Run(arguments[0], func(t *testing.T) {
@@ -54,4 +41,22 @@ func TestProcessReportsStdoutWriteFailure(t *testing.T) {
 			}
 		})
 	}
+}
+
+func buildPigBinary(t *testing.T) string {
+	t.Helper()
+	_, file, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("locate test source")
+	}
+	binary := filepath.Join(t.TempDir(), "pig")
+	if runtime.GOOS == "windows" {
+		binary += ".exe"
+	}
+	build := exec.Command("go", "build", "-o", binary, ".")
+	build.Dir = filepath.Dir(file)
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("build pig: %v\n%s", err, output)
+	}
+	return binary
 }

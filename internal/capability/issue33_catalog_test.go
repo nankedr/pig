@@ -191,6 +191,8 @@ func issue33EvidenceInputPaths(caseID string) []string {
 		return []string{"codingagent/cli_golden_test.go", "codingagent/testdata/pig_experimental_routing.golden.txt"}
 	case "issue33-extension-runtime-boundary":
 		return []string{"codingagent/extensions_abi_final_review_test.go"}
+	case "issue56-pig-process-headless-text", "issue56-pig-headless-exit-status":
+		return []string{"cmd/pig/headless_process_test.go"}
 	default:
 		return nil
 	}

@@ -14,6 +14,10 @@ func main() {
 	defer stop()
 	if err := codingagent.Main(ctx, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		exitCode := 1
+		if failure, ok := err.(interface{ ExitCode() int }); ok {
+			exitCode = failure.ExitCode()
+		}
+		os.Exit(exitCode)
 	}
 }

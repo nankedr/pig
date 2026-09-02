@@ -26,8 +26,8 @@ func TestCommandStubsHaveNoSideEffects(t *testing.T) {
 		arguments  []string
 		wantStderr string
 	}{
-		{name: "pig print mode", path: "./cmd/pig", wantStderr: "codingagent.mode.print.text: not implemented\n"},
-		{name: "pig invalid thinking warning", path: "./cmd/pig", arguments: []string{"--thinking", "invalid"}, wantStderr: "Warning: Invalid thinking level \"invalid\". Valid values: off, minimal, low, medium, high, xhigh, max\ncodingagent.mode.print.text: not implemented\n"},
+		{name: "pig print mode requires explicit provider", path: "./cmd/pig", wantStderr: "Error: Headless text mode requires --provider <provider>\n"},
+		{name: "pig invalid thinking warning", path: "./cmd/pig", arguments: []string{"--thinking", "invalid"}, wantStderr: "Warning: Invalid thinking level \"invalid\". Valid values: off, minimal, low, medium, high, xhigh, max\nError: Headless text mode requires --provider <provider>\n"},
 		{name: "pig package command", path: "./cmd/pig", arguments: []string{"install", "npm:example"}, wantStderr: "codingagent.command.install: not implemented\n"},
 		{name: "pig extension discovery", path: "./cmd/pig", arguments: []string{"--extension", "extension.ts"}, wantStderr: "codingagent.extension.discovery: not implemented\n"},
 		{name: "pig extension flag", path: "./cmd/pig", arguments: []string{"--review=deep"}, wantStderr: "codingagent.extension.flag.review: not implemented\n"},
@@ -318,7 +318,7 @@ func TestPigRedirectedCharacterDeviceSelectsPrintMode(t *testing.T) {
 	if exit, ok := err.(*exec.ExitError); !ok || exit.ExitCode() != 1 {
 		t.Fatalf("run error = %v, want exit 1", err)
 	}
-	if got, want := stderr.String(), "codingagent.mode.print.text: not implemented\n"; got != want {
+	if got, want := stderr.String(), "Error: Headless text mode requires --provider <provider>\n"; got != want {
 		t.Fatalf("stderr = %q, want %q", got, want)
 	}
 }

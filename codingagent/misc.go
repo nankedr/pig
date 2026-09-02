@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/nankedr/pig/agent"
+	"github.com/nankedr/pig/ai"
 	"github.com/nankedr/pig/tui"
 )
 
@@ -360,7 +362,112 @@ func Main(ctx context.Context, arguments []string, _ ...MainOptions) error {
 			return errors.New("Error: Failed to write stdout.")
 		}
 	}
+	if isNotImplementedOperation(err, "mode.print.text") {
+		return runHeadlessMain(ctx, arguments)
+	}
 	return err
+}
+
+func runHeadlessMain(ctx context.Context, arguments []string) error {
+	parsed := ParseArgs(arguments)
+	if operation := unsupportedHeadlessOperation(parsed); operation != "" {
+		return notImplemented(operation)
+	}
+	if parsed.Provider == nil || strings.TrimSpace(*parsed.Provider) == "" {
+		return &CLIArgumentError{Message: "Headless text mode requires --provider <provider>"}
+	}
+	if parsed.Model == nil || strings.TrimSpace(*parsed.Model) == "" {
+		return &CLIArgumentError{Message: "Headless text mode requires --model <model>"}
+	}
+	cwd, cwdErr := os.Getwd()
+	if cwdErr != nil {
+		return fmt.Errorf("resolve working directory: %w", cwdErr)
+	}
+
+	messages := append([]string(nil), parsed.Messages...)
+	var initialMessage *string
+	stdin, stdinErr := readHeadlessStdin()
+	if stdinErr != nil {
+		return fmt.Errorf("read stdin: %w", stdinErr)
+	}
+	if stdin != "" || len(messages) != 0 {
+		initial := stdin
+		if len(messages) != 0 {
+			initial += messages[0]
+			messages = messages[1:]
+		}
+		initialMessage = &initial
+	}
+	if initialMessage == nil {
+		return &CLIArgumentError{Message: "Headless text mode requires a prompt"}
+	}
+
+	environment := ai.ProviderEnv{"DEEPSEEK_API_KEY": os.Getenv("DEEPSEEK_API_KEY")}
+	var baseURL *string
+	if value := os.Getenv("PIG_DEEPSEEK_BASE_URL"); value != "" {
+		baseURL = &value
+	}
+	noTools := NoToolsMode("")
+	if parsed.NoTools {
+		noTools = NoToolsAll
+	} else if parsed.NoBuiltinTools {
+		noTools = NoToolsBuiltin
+	}
+	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
+		CWD:          cwd,
+		Provider:     ai.ProviderID(*parsed.Provider),
+		Model:        *parsed.Model,
+		APIKey:       parsed.APIKey,
+		Environment:  environment,
+		BaseURL:      baseURL,
+		Thinking:     parsed.Thinking,
+		Tools:        parsed.Tools,
+		ExcludeTools: parsed.ExcludeTools,
+		NoTools:      noTools,
+		SystemPrompt: parsed.SystemPrompt,
+	})
+	if err != nil {
+		return err
+	}
+	_, err = RunPrintMode(ctx, runtime, PrintModeOptions{
+		InitialMessage: initialMessage,
+		Messages:       messages,
+		Mode:           ModeText,
+	})
+	return err
+}
+
+func unsupportedHeadlessOperation(parsed Args) string {
+	switch {
+	case len(parsed.FileArgs) != 0:
+		return "headless.file-arguments"
+	case parsed.Continue || parsed.Resume || parsed.Session != nil || parsed.SessionID != nil || parsed.Fork != nil || parsed.SessionDir != nil || parsed.Name != nil:
+		return "headless.session-persistence"
+	case len(parsed.AppendSystemPrompt) != 0:
+		return "headless.append-system-prompt"
+	case len(parsed.Models) != 0:
+		return "headless.model-scope"
+	case len(parsed.Extensions) != 0 || len(parsed.Skills) != 0 || len(parsed.PromptTemplates) != 0 || len(parsed.Themes) != 0:
+		return "headless.resources"
+	default:
+		return ""
+	}
+}
+
+func readHeadlessStdin() (string, error) {
+	if isTerminalFile(os.Stdin) {
+		return "", nil
+	}
+	contents, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(contents)), nil
+}
+
+func isNotImplementedOperation(err error, operation string) bool {
+	var unavailable *NotImplementedError
+	return errors.As(err, &unavailable) && unavailable.Module == "codingagent" && unavailable.Operation == operation
 }
 
 // Package and user configuration paths are ambient filesystem capabilities.

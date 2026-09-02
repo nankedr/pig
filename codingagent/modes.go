@@ -3,7 +3,9 @@ package codingagent
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"os"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
@@ -159,10 +161,42 @@ type PrintModeOptions struct {
 	Mode           Mode
 }
 
-// RunPrintMode is deferred until the product runtime can emit a complete text
-// or JSON event stream. It does not subscribe, write output, or invoke runtime.
-func RunPrintMode(context.Context, *AgentSessionRuntime, PrintModeOptions) (int, error) {
-	return 0, notImplemented("RunPrintMode")
+// RunPrintMode runs the shared Headless lifecycle. M1 implements final-text
+// output; the JSON event stream remains the explicit mode.json Capability Stub.
+func RunPrintMode(ctx context.Context, runtime *AgentSessionRuntime, options PrintModeOptions) (int, error) {
+	if options.Mode == ModeJSON {
+		return 1, notImplemented("mode.json")
+	}
+	if options.Mode != "" && options.Mode != ModeText {
+		return 1, &CLIArgumentError{Message: fmt.Sprintf("Invalid print mode %q", options.Mode)}
+	}
+	if runtime == nil || runtime.Session() == nil {
+		return 1, fmt.Errorf("Print mode requires an AgentSession runtime")
+	}
+	if len(options.InitialImages) != 0 {
+		return 1, notImplemented("mode.print.images")
+	}
+	defer runtime.Dispose(context.WithoutCancel(ctx))
+
+	outcome, err := RunHeadless(ctx, runtime, HeadlessRunOptions{
+		InitialMessage: options.InitialMessage,
+		Messages:       options.Messages,
+	})
+	if err != nil {
+		return 1, err
+	}
+	if outcome.FinalMessage == nil {
+		return 1, &HeadlessOutcomeError{Outcome: outcome}
+	}
+	if outcome.FinalMessage.StopReason == ai.StopReasonError || outcome.Canceled {
+		return 1, &HeadlessOutcomeError{Outcome: outcome}
+	}
+	for _, text := range outcome.Text {
+		if _, err := fmt.Fprintln(os.Stdout, text); err != nil {
+			return 1, errors.New("Error: Failed to write stdout.")
+		}
+	}
+	return 0, nil
 }
 
 // RPCCommand is the open JSONL command envelope used by the trusted local

@@ -1,6 +1,9 @@
 package codingagent
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 type CreateAgentSessionRuntimeOptions struct {
 	CWD, AgentDir       string
@@ -80,10 +83,35 @@ func (r *AgentSessionRuntime) ImportFromJSONL(context.Context, string, ...string
 	return SessionReplacementResult{}, notImplemented("AgentSessionRuntime.ImportFromJSONL")
 }
 func (r *AgentSessionRuntime) Dispose(context.Context) error {
-	return notImplemented("AgentSessionRuntime.Dispose")
+	if r == nil || r.session == nil {
+		return nil
+	}
+	return r.session.Dispose()
 }
-func CreateAgentSessionRuntime(context.Context, CreateAgentSessionRuntimeFactory, CreateAgentSessionRuntimeOptions) (*AgentSessionRuntime, error) {
-	return nil, notImplemented("CreateAgentSessionRuntime")
+func CreateAgentSessionRuntime(ctx context.Context, factory CreateAgentSessionRuntimeFactory, options CreateAgentSessionRuntimeOptions) (*AgentSessionRuntime, error) {
+	if ctx == nil {
+		return nil, fmt.Errorf("CreateAgentSessionRuntime context must not be nil")
+	}
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	if factory == nil {
+		return nil, fmt.Errorf("CreateAgentSessionRuntime factory must not be nil")
+	}
+	result, err := factory(ctx, options)
+	if err != nil {
+		return nil, err
+	}
+	if result.Session == nil {
+		return nil, fmt.Errorf("CreateAgentSessionRuntime factory returned a nil Session")
+	}
+	return NewAgentSessionRuntime(
+		result.Session,
+		result.Services,
+		factory,
+		result.Diagnostics,
+		result.ModelFallbackMessage,
+	), nil
 }
 func cloneServices(s AgentSessionServices) AgentSessionServices {
 	s.Diagnostics = cloneRuntimeDiagnostics(s.Diagnostics)

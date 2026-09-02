@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1856, catalog.StatusInventoried: 744}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1852, catalog.StatusInventoried: 744, catalog.StatusPartial: 2, catalog.StatusImplemented: 2}); !reflect.DeepEqual(gotByStatus, want) {
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
 	if *updateIssue32Catalog {
@@ -1374,7 +1374,9 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 		}
 		target := issue32SymbolTarget(symbol)
 		behaviorOwner := issue32BehaviorOwnerForReference(symbol.Upstream.Reference)
-		entries = append(entries, catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: symbol.ID, Upstream: catalog.Upstream(symbol.Upstream), Mapping: catalog.Mapping{Module: "codingagent", Target: target, Kind: "symbol"}, Status: catalog.StatusScaffolded, Milestone: milestone, Classification: "public-api", Notes: fmt.Sprintf("Issue #32 concrete Coding Agent SDK symbol mapping authority. Both root and ./client exports map to the canonical Go codingagent package; behavioral status remains on %s.", behaviorOwner)})
+		symbolEntry := catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: symbol.ID, Upstream: catalog.Upstream(symbol.Upstream), Mapping: catalog.Mapping{Module: "codingagent", Target: target, Kind: "symbol"}, Status: catalog.StatusScaffolded, Milestone: milestone, Classification: "public-api", Notes: fmt.Sprintf("Issue #32 concrete Coding Agent SDK symbol mapping authority. Both root and ./client exports map to the canonical Go codingagent package; behavioral status remains on %s.", behaviorOwner)}
+		issue32PromoteIssue56RuntimeEntry(&symbolEntry)
+		entries = append(entries, symbolEntry)
 		for _, member := range symbol.Members {
 			id := "member:" + strings.TrimPrefix(symbol.ID, "symbol:") + "." + member
 			memberTarget, reason := issue32MemberTarget(symbol, target, member)
@@ -1394,6 +1396,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 			} else {
 				e.Evidence = []catalog.Evidence{{Kind: "go-test", Ref: issue32MemberTestRef, Baseline: issue32BaselineCommit, CaseID: id, InputHash: issue32SurfaceHash, ExecutionMethod: issue32MemberTestRun, Expected: fmt.Sprintf("the pinned Pi %s.%s member maps to the declared scaffolded Go contract target", symbol.Name, member), Actual: fmt.Sprintf("PASS; %s resolved to %s", id, memberTarget), Platform: "any", CatalogID: id}}
 			}
+			issue32PromoteIssue56RuntimeEntry(&e)
 			entries = append(entries, e)
 		}
 		for _, member := range symbol.StaticMembers {
@@ -1435,6 +1438,75 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 	}
 	sort.Slice(entries, func(i, j int) bool { return entries[i].ID < entries[j].ID })
 	return entries, nil
+}
+
+func issue32PromoteIssue56RuntimeEntry(entry *catalog.Entry) {
+	const (
+		headlessProcessHash = "sha256:2cedddcefd22f357f67018fb7b972e35cfc1cbc4296d55923144ad81ead8667d"
+		runtimeTestHash     = "sha256:d4cf309c1b8e8a4f68a3478c6e73ebdeb931842cfe4a47c65aa21c559e0bc6fe"
+	)
+	evidence := func(ref, caseID, inputHash, run, expected, actual, platform string) []catalog.Evidence {
+		return []catalog.Evidence{{
+			Kind: "go-test", Ref: ref, Baseline: issue32BaselineCommit, CaseID: caseID, InputHash: inputHash,
+			ExecutionMethod: run, Expected: expected, Actual: actual, Platform: platform, CatalogID: entry.ID,
+		}}
+	}
+	switch entry.ID {
+	case "symbol:codingagent/src/main.ts#main":
+		entry.Status = catalog.StatusPartial
+		entry.Evidence = evidence(
+			"cmd/pig/headless_process_test.go#TestPigProcessRunsHeadlessTextWithExplicitDeepSeekInputs",
+			"issue56-codingagent-main-headless-text", headlessProcessHash,
+			"go test ./cmd/pig -run '^TestPigProcess' -count=1",
+			"the real pig process assembles explicit DeepSeek inputs and an in-memory Session while later product modes remain exact Capability Stubs",
+			"PASS; explicit and ambient credentials reached a local DeepSeek endpoint, final text used stdout only, stable failures used stderr, and SIGINT exited 130",
+			"darwin/linux",
+		)
+		entry.Partial = &catalog.Partial{
+			Supported:   []string{"Headless text dispatch accepts explicit Provider, exact model, API key or DEEPSEEK_API_KEY, prompt arguments or stdin, and an in-memory Session"},
+			Unsupported: []string{"interactive, JSON, RPC, persistence, resource, extension, and broader Provider assembly remain exact Capability Stubs"},
+		}
+		entry.Notes = "Issue #56 promotes the pinned main entrypoint for the real Headless text product path without activating later state, resource, extension, interactive, JSON, or RPC capabilities."
+	case "symbol:codingagent/src/modes/print-mode.ts#runPrintMode":
+		entry.Status = catalog.StatusPartial
+		entry.Evidence = evidence(
+			"cmd/pig/headless_process_test.go#TestPigProcessRunsHeadlessTextWithExplicitDeepSeekInputs",
+			"issue56-run-print-mode-headless-text", headlessProcessHash,
+			"go test ./cmd/pig -run '^TestPigProcess' -count=1",
+			"print mode runs the shared Headless lifecycle, writes only final Assistant text on success, and distinguishes Provider errors and interruption",
+			"PASS; the process emitted only final text, retained deterministic failure diagnostics, and propagated SIGINT as exit 130",
+			"darwin/linux",
+		)
+		entry.Partial = &catalog.Partial{
+			Supported:   []string{"text presentation over the shared in-memory Headless runner, including multiple prompts, terminal Provider outcomes, cleanup, and cancellation"},
+			Unsupported: []string{"JSON event presentation and image inputs remain explicit or documented unavailable capabilities"},
+		}
+		entry.Notes = "Issue #56 implements the text branch of runPrintMode over the shared Headless lifecycle; issue #57 owns the still-explicit JSON Capability Stub."
+	case "symbol:codingagent/src/core/agent-session-runtime.ts#createAgentSessionRuntime":
+		entry.Status = catalog.StatusImplemented
+		entry.Evidence = evidence(
+			"codingagent/session_api_final_review_test.go#TestAgentSessionRuntimeCreatesInitialSessionOnlyWhenRequested",
+			"issue56-create-agent-session-runtime", runtimeTestHash,
+			"go test ./codingagent -run '^TestAgentSessionRuntimeCreatesInitialSessionOnlyWhenRequested$' -count=1",
+			"the runtime factory is invoked once on explicit creation and its Session and services become the runtime's initial owned state",
+			"PASS; construction remained inert until requested, then called the factory once and returned its usable Session",
+			"any",
+		)
+		entry.Partial = nil
+		entry.Notes = "Issue #56 implements initial AgentSessionRuntime creation through the supplied factory; replacement operations keep their independently cataloged Capability Stubs."
+	case "member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose":
+		entry.Status = catalog.StatusImplemented
+		entry.Evidence = evidence(
+			"codingagent/session_api_final_review_test.go#TestAgentSessionRuntimeCreatesInitialSessionOnlyWhenRequested",
+			"issue56-agent-session-runtime-dispose", runtimeTestHash,
+			"go test ./codingagent -run '^TestAgentSessionRuntimeCreatesInitialSessionOnlyWhenRequested$' -count=1",
+			"disposing the runtime disposes its owned AgentSession and a nil runtime Session is safe",
+			"PASS; the created runtime disposed its factory Session successfully",
+			"any",
+		)
+		entry.Partial = nil
+		entry.Notes = "Issue #56 implements AgentSessionRuntime disposal as ownership-preserving delegation to the current AgentSession."
+	}
 }
 
 func issue32BehaviorOwnerForReference(reference string) string {
@@ -1900,7 +1972,7 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 				ExecutionMethod: "go test ./codingagent -run '^(TestIssue32MappingsMatchLockedCodingAgentSurface|TestIssue32ExportSubpathsUseCanonicalGoPackage|TestIssue32MemberMappingsMatchLockedCodingAgentSurface|TestIssue32ScaffoldedMemberTargetsResolve|TestIssue32InheritedTUIMemberProjectionsResolve|TestIssue32ScaffoldedStaticMemberTargetsResolve)$' -count=1",
 				Expected:        "all 376 pinned Coding Agent symbols, 2,172 extracted instance/type members, and 14 extracted static members across root and ./client map to resolvable codingagent declarations or explicit inherited lower-layer TUI carriers",
 				Actual:          "PASS; all 376 pinned symbols, 2,172 extracted instance/type members, and 14 extracted static members mapped to resolvable codingagent declarations or explicit inherited lower-layer TUI carriers",
-				Platform:        "any",
+				Platform:        "darwin/linux",
 				CatalogID:       issue32ModuleCatalogID,
 			},
 		},
@@ -1957,6 +2029,20 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 				Expected:        "the public SDK runs text and read continuation with explicit dependencies, ordered lifecycle events, post-transcript settlement, cancellation, and no ambient disk writes",
 				Actual:          "PASS; injected sessions completed text and read rounds, settled after transcript updates, aborted deterministically, and left the sentinel filesystem unchanged under the race detector",
 				Platform:        "any",
+				CatalogID:       issue32ModuleCatalogID,
+			},
+		},
+		{
+			InputPath: "cmd/pig/headless_process_test.go",
+			Evidence: catalog.Evidence{
+				Kind:            "go-test",
+				Ref:             "cmd/pig/headless_process_test.go#TestPigProcessRunsHeadlessTextWithExplicitDeepSeekInputs",
+				Baseline:        issue32BaselineCommit,
+				CaseID:          "issue56-codingagent-headless-text-product-path",
+				ExecutionMethod: "go test ./cmd/pig -run '^TestPigProcess' -count=1",
+				Expected:        "the real pig process assembles explicit DeepSeek model and credential inputs into a pure in-memory AgentSession, emits final text only, preserves stable failures, and propagates SIGINT",
+				Actual:          "PASS; local DeepSeek text used explicit and ambient credentials, stdout contained only the final Assistant text, failures stayed stable, and SIGINT exited 130",
+				Platform:        "darwin/linux",
 				CatalogID:       issue32ModuleCatalogID,
 			},
 		},
@@ -2060,17 +2146,18 @@ func issue32ModulePartial() *catalog.Partial {
 		Supported: []string{
 			"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings",
 			"the public Go SDK runs an injected in-memory AgentSession for text and read Tool continuation with deterministic lifecycle events",
+			"the real pig process runs Headless text with explicit DeepSeek model and credentials, final-text stdout, stable errors, and SIGINT exit 130",
 			"Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects",
 		},
 		Unsupported: []string{
-			"persisted sessions, settings, resources, packages, remaining tools, ambient model/auth assembly, and product modes remain explicit Capability Stubs until their roadmap milestones",
+			"persisted sessions, settings, resources, packages, remaining tools, ambient model/auth assembly, interactive mode, JSON mode, and RPC remain explicit Capability Stubs until their roadmap milestones",
 			"surface tests prove API coverage and target resolution, not runtime parity",
 		},
 	}
 }
 
 func issue32ModuleNotes() string {
-	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, and issue #55 adds the injected in-memory legacy AgentSession under contract:codingagent/agent-session; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
+	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, issue #55 adds the injected in-memory legacy AgentSession under contract:codingagent/agent-session, and issue #56 adds the real Headless text product path; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
 }
 
 var issue32NameExceptions = map[string]string{
