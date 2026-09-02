@@ -13,6 +13,7 @@ m0-offline:
 	go run ./examples/m0-contracts
 	go run ./examples/sdk-agent-session
 	go run ./examples/headless-text
+	go run ./examples/headless-json
 
 m0-node-preflight:
 	@node --experimental-strip-types -e "" >/dev/null 2>&1 || (echo "freeze checks require Node >=22.6.0 with --experimental-strip-types" >&2; exit 2)

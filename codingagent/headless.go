@@ -54,10 +54,10 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return nil, err
 	}
 	if options.Provider == "" {
-		return nil, &CLIArgumentError{Message: "Headless text mode requires --provider <provider>"}
+		return nil, &CLIArgumentError{Message: "Headless mode requires --provider <provider>"}
 	}
 	if options.Model == "" {
-		return nil, &CLIArgumentError{Message: "Headless text mode requires --model <model>"}
+		return nil, &CLIArgumentError{Message: "Headless mode requires --model <model>"}
 	}
 
 	models := ai.BuiltinModels(ai.CreateModelsOptions{AuthContext: headlessAuthContext(options.Environment)})

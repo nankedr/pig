@@ -469,7 +469,7 @@ func TestCLIContractDeclaresModesAndExitSemantics(t *testing.T) {
 	if got := codingagent.StaticCLIContract().Modes; !reflect.DeepEqual(got, wantModes) {
 		t.Fatalf("StaticCLIContract().Modes = %#v, want %#v", got, wantModes)
 	}
-	if got, want := codingagent.StaticCLIContract().ExitStatus, "0 for static help/version or successful Headless text; 1 for argument, Provider, and unavailable-capability errors; 130 for interrupted Headless text"; got != want {
+	if got, want := codingagent.StaticCLIContract().ExitStatus, "0 for static help/version, successful Headless runs, or JSON-encoded Provider failures; 1 for argument, text-mode Provider, and unavailable-capability errors; 130 for interrupted Headless runs"; got != want {
 		t.Fatalf("StaticCLIContract().ExitStatus = %q, want %q", got, want)
 	}
 }

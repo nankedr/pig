@@ -362,7 +362,7 @@ func Main(ctx context.Context, arguments []string, _ ...MainOptions) error {
 			return errors.New("Error: Failed to write stdout.")
 		}
 	}
-	if isNotImplementedOperation(err, "mode.print.text") {
+	if isNotImplementedOperation(err, "mode.print.text") || isNotImplementedOperation(err, "mode.json") {
 		return runHeadlessMain(ctx, arguments)
 	}
 	return err
@@ -374,10 +374,10 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		return notImplemented(operation)
 	}
 	if parsed.Provider == nil || strings.TrimSpace(*parsed.Provider) == "" {
-		return &CLIArgumentError{Message: "Headless text mode requires --provider <provider>"}
+		return &CLIArgumentError{Message: "Headless mode requires --provider <provider>"}
 	}
 	if parsed.Model == nil || strings.TrimSpace(*parsed.Model) == "" {
-		return &CLIArgumentError{Message: "Headless text mode requires --model <model>"}
+		return &CLIArgumentError{Message: "Headless mode requires --model <model>"}
 	}
 	cwd, cwdErr := os.Getwd()
 	if cwdErr != nil {
@@ -399,7 +399,7 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		initialMessage = &initial
 	}
 	if initialMessage == nil {
-		return &CLIArgumentError{Message: "Headless text mode requires a prompt"}
+		return &CLIArgumentError{Message: "Headless mode requires a prompt"}
 	}
 
 	environment := ai.ProviderEnv{"DEEPSEEK_API_KEY": os.Getenv("DEEPSEEK_API_KEY")}
@@ -432,7 +432,7 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	_, err = RunPrintMode(ctx, runtime, PrintModeOptions{
 		InitialMessage: initialMessage,
 		Messages:       messages,
-		Mode:           ModeText,
+		Mode:           parsed.Mode,
 	})
 	return err
 }

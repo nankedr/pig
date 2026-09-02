@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
+	"sync"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
@@ -161,13 +163,10 @@ type PrintModeOptions struct {
 	Mode           Mode
 }
 
-// RunPrintMode runs the shared Headless lifecycle. M1 implements final-text
-// output; the JSON event stream remains the explicit mode.json Capability Stub.
+// RunPrintMode runs the shared Headless lifecycle and presents either final
+// Assistant text or a session-first stream of JSON events.
 func RunPrintMode(ctx context.Context, runtime *AgentSessionRuntime, options PrintModeOptions) (int, error) {
-	if options.Mode == ModeJSON {
-		return 1, notImplemented("mode.json")
-	}
-	if options.Mode != "" && options.Mode != ModeText {
+	if options.Mode != "" && options.Mode != ModeText && options.Mode != ModeJSON {
 		return 1, &CLIArgumentError{Message: fmt.Sprintf("Invalid print mode %q", options.Mode)}
 	}
 	if runtime == nil || runtime.Session() == nil {
@@ -177,6 +176,10 @@ func RunPrintMode(ctx context.Context, runtime *AgentSessionRuntime, options Pri
 		return 1, notImplemented("mode.print.images")
 	}
 	defer runtime.Dispose(context.WithoutCancel(ctx))
+
+	if options.Mode == ModeJSON {
+		return runJSONPrintMode(ctx, runtime, options)
+	}
 
 	outcome, err := RunHeadless(ctx, runtime, HeadlessRunOptions{
 		InitialMessage: options.InitialMessage,
@@ -195,6 +198,78 @@ func RunPrintMode(ctx context.Context, runtime *AgentSessionRuntime, options Pri
 		if _, err := fmt.Fprintln(os.Stdout, text); err != nil {
 			return 1, errors.New("Error: Failed to write stdout.")
 		}
+	}
+	return 0, nil
+}
+
+type jsonLineWriter struct {
+	mu     sync.Mutex
+	output io.Writer
+	err    error
+}
+
+func (w *jsonLineWriter) Write(value any) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.err != nil {
+		return
+	}
+	encoded, err := json.Marshal(value)
+	if err != nil {
+		w.err = fmt.Errorf("encode JSONL record: %w", err)
+		return
+	}
+	encoded = append(encoded, '\n')
+	written, err := w.output.Write(encoded)
+	if err == nil && written != len(encoded) {
+		err = io.ErrShortWrite
+	}
+	if err != nil {
+		w.err = errors.New("Error: Failed to write stdout.")
+	}
+}
+
+func (w *jsonLineWriter) Err() error {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	return w.err
+}
+
+func runJSONPrintMode(ctx context.Context, runtime *AgentSessionRuntime, options PrintModeOptions) (int, error) {
+	writer := &jsonLineWriter{output: os.Stdout}
+	manager := runtime.Session().SessionManager()
+	if manager == nil || manager.GetHeader() == nil {
+		return 1, errors.New("JSON mode requires a Session header")
+	}
+	writer.Write(manager.GetHeader())
+	if err := writer.Err(); err != nil {
+		return 1, err
+	}
+
+	outcome, err := RunHeadless(ctx, runtime, HeadlessRunOptions{
+		InitialMessage: options.InitialMessage,
+		Messages:       options.Messages,
+		OnEvent: func(event AgentSessionEvent) {
+			projected, projectionErr := projectJSONAgentSessionEvent(event)
+			if projectionErr != nil {
+				writer.mu.Lock()
+				if writer.err == nil {
+					writer.err = projectionErr
+				}
+				writer.mu.Unlock()
+				return
+			}
+			writer.Write(projected)
+		},
+	})
+	if err != nil {
+		return 1, err
+	}
+	if err := writer.Err(); err != nil {
+		return 1, err
+	}
+	if outcome.Canceled {
+		return 1, &HeadlessOutcomeError{Outcome: outcome}
 	}
 	return 0, nil
 }

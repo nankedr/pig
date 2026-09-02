@@ -60,7 +60,7 @@ func TestMainPreservesDeferredMainOptions(t *testing.T) {
 		t.Fatalf("Main(nil, options) stdout = %q, want empty", stdout)
 	}
 	var argumentError *codingagent.CLIArgumentError
-	if !errors.As(err, &argumentError) || argumentError.Message != "Headless text mode requires --provider <provider>" {
+	if !errors.As(err, &argumentError) || argumentError.Message != "Headless mode requires --provider <provider>" {
 		t.Fatalf("Main(nil, options) error = %#v, want missing-provider argument error", err)
 	}
 }
@@ -88,7 +88,7 @@ func TestMainReportsWarningsBeforeReturningAModeStub(t *testing.T) {
 		t.Fatalf("Main(--thinking invalid) stderr = %q, want %q", stderr, wantStderr)
 	}
 	var argumentError *codingagent.CLIArgumentError
-	if !errors.As(err, &argumentError) || argumentError.Message != "Headless text mode requires --provider <provider>" {
+	if !errors.As(err, &argumentError) || argumentError.Message != "Headless mode requires --provider <provider>" {
 		t.Fatalf("Main(--thinking invalid) error = %#v, want missing-provider argument error", err)
 	}
 }

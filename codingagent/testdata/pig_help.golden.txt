@@ -14,8 +14,8 @@ Commands:
   pig <command> --help          Show help for install/remove/uninstall/update/list/config/auth
 
 Options:
-  --provider <name>              Provider name (Headless text currently requires deepseek)
-  --model <id>                   Exact model ID (required for Headless text)
+  --provider <name>              Provider name (Headless modes currently require deepseek)
+  --model <id>                   Exact model ID (required for Headless modes)
   --api-key <key>                Explicit API key (overrides DEEPSEEK_API_KEY)
   --system-prompt <text>         System prompt (default: coding assistant prompt)
   --append-system-prompt <text>  Append text or file contents to the system prompt (can be used multiple times)
@@ -60,15 +60,16 @@ Options:
 Modes:
   interactive  text mode with terminal stdin and stdout; not implemented
   print        --print or non-terminal stdin/stdout; implemented with an in-memory Session
-  json         --mode json; not implemented (reserved for newline-delimited events)
+  json         --mode json; one-way session-first newline-delimited JSON events
   rpc          --mode rpc; not implemented (reserved for a local JSONL subprocess interface)
 
-Current Headless Text Availability:
+Current Headless Availability:
   Requires --provider deepseek and an exact --model ID. Credentials come from
   --api-key or DEEPSEEK_API_KEY. The read Tool is available; other built-in
-  Tools, persisted Sessions, resources, extensions, JSON, and RPC remain
-  explicit Capability Stubs. Successful output contains only final Assistant
-  text. SIGINT cancels the run and exits 130.
+  Tools, persisted Sessions, resources, extensions, and RPC remain explicit
+  Capability Stubs. Text output contains only final Assistant text. JSON output
+  writes a v3 Session header followed by AgentSessionEvent records, one value per
+  line; stdin is prompt input, not RPC commands. SIGINT exits 130.
 
 Extension flags:
   Unknown long flags are reserved for the Extension Surface. Until the extension
@@ -87,6 +88,9 @@ Examples:
 
   # Supply the prompt on stdin (non-terminal I/O selects Headless text)
   printf 'Summarize go.mod' | pig --provider deepseek --model deepseek-v4-flash
+
+  # Stream a v3 Session header followed by AgentSessionEvent JSONL
+  pig --provider deepseek --model deepseek-v4-flash --mode json "Explain this package"
 
   # Allow only the implemented read Tool
   pig --provider deepseek --model deepseek-v4-flash --tools read -p "Read go.mod"
@@ -155,6 +159,6 @@ Built-in Tool Names:
   ls     - List directory contents (not implemented)
 
 Exit Status:
-  0    Static help/version or a Headless text run completed successfully
-  1    Invalid arguments, Provider failure, or an unavailable capability
-  130  Headless text was interrupted with SIGINT
+  0    Static success, successful Headless run, or JSON-encoded Provider failure
+  1    Invalid arguments, text-mode Provider failure, or unavailable capability
+  130  A Headless run was interrupted with SIGINT

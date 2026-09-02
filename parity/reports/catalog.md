@@ -12,9 +12,9 @@
 | Status | Count |
 | --- | --- |
 | inventoried | 5251 |
-| scaffolded | 4120 |
+| scaffolded | 4119 |
 | partial | 169 |
-| implemented | 5 |
+| implemented | 6 |
 | verified | 98 |
 | deferred | 2 |
 
@@ -7994,7 +7994,6 @@
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#getSettingsListTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetSettingsListTheme | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#highlightCode | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.HighlightCode | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#initTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InitTheme | coding-agent |
-| symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.JSONAgentSessionEvent | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#PrintModeOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.PrintModeOptions | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.ModelInfo | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#RpcClient | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
@@ -8030,6 +8029,7 @@
 | contract:session/migration | implemented | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
 | symbol:codingagent/src/core/agent-session-runtime.ts#createAgentSessionRuntime | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntime | coding-agent |
+| symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.JSONAgentSessionEvent | coding-agent |
 | contract:cli/pig/auth-help | verified | M0 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | deferred-extension-runtime | deferred | M7 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | deferred-pig-server | deferred | M0 | contract | github.com/nankedr/pig/codingagent | server |

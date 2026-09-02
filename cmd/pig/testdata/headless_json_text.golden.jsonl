@@ -1,0 +1,13 @@
+{"cwd":"CWD","id":"SESSION_ID","timestamp":"TIMESTAMP","type":"session","version":3}
+{"type":"agent_start"}
+{"type":"turn_start"}
+{"message":{"content":[{"text":"say hello","type":"text"}],"role":"user","timestamp":"TIMESTAMP"},"type":"message_start"}
+{"message":{"content":[{"text":"say hello","type":"text"}],"role":"user","timestamp":"TIMESTAMP"},"type":"message_end"}
+{"message":{"api":"openai-completions","content":[],"model":"deepseek-v4-flash","provider":"deepseek","role":"assistant","stopReason":"pending","timestamp":"TIMESTAMP","usage":{"cacheRead":0,"cacheWrite":0,"cost":{"cacheRead":0,"cacheWrite":0,"input":0,"output":0,"total":0},"input":0,"output":0,"totalTokens":0}},"type":"message_start"}
+{"assistantMessageEvent":{"contentIndex":0,"type":"text_start"},"type":"message_update"}
+{"assistantMessageEvent":{"contentIndex":0,"delta":"hello json","type":"text_delta"},"type":"message_update"}
+{"assistantMessageEvent":{"content":"hello json","contentIndex":0,"type":"text_end"},"type":"message_update"}
+{"message":{"api":"openai-completions","content":[{"text":"hello json","type":"text"}],"model":"deepseek-v4-flash","provider":"deepseek","rawStopReason":"stop","responseId":"chatcmpl-json","role":"assistant","stopReason":"stop","timestamp":"TIMESTAMP","usage":{"cacheRead":0,"cacheWrite":0,"cost":{"cacheRead":0,"cacheWrite":0,"input":2.8e-7,"output":8.4e-7,"total":0.00000112},"input":2,"output":3,"totalTokens":5}},"type":"message_end"}
+{"message":{"api":"openai-completions","content":[{"text":"hello json","type":"text"}],"model":"deepseek-v4-flash","provider":"deepseek","rawStopReason":"stop","responseId":"chatcmpl-json","role":"assistant","stopReason":"stop","timestamp":"TIMESTAMP","usage":{"cacheRead":0,"cacheWrite":0,"cost":{"cacheRead":0,"cacheWrite":0,"input":2.8e-7,"output":8.4e-7,"total":0.00000112},"input":2,"output":3,"totalTokens":5}},"toolResults":[],"type":"turn_end"}
+{"messages":[{"content":[{"text":"say hello","type":"text"}],"role":"user","timestamp":"TIMESTAMP"},{"api":"openai-completions","content":[{"text":"hello json","type":"text"}],"model":"deepseek-v4-flash","provider":"deepseek","rawStopReason":"stop","responseId":"chatcmpl-json","role":"assistant","stopReason":"stop","timestamp":"TIMESTAMP","usage":{"cacheRead":0,"cacheWrite":0,"cost":{"cacheRead":0,"cacheWrite":0,"input":2.8e-7,"output":8.4e-7,"total":0.00000112},"input":2,"output":3,"totalTokens":5}}],"type":"agent_end","willRetry":false}
+{"type":"agent_settled"}

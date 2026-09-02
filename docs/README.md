@@ -2,7 +2,7 @@
 
 Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学习与证据”组织。阅读代码或设计任务前，先确认固定 Parity Baseline 和当前 Milestone Frontier。
 
-当前 Milestone Frontier：**M1**。M0 冻结门禁与边界说明见 [M0 兼容骨架](learning/m0-compatibility-skeleton.md)；首个产品级执行路径见 [M1 Headless text](learning/m1-headless-text.md)。
+当前 Milestone Frontier：**M1**。M0 冻结门禁与边界说明见 [M0 兼容骨架](learning/m0-compatibility-skeleton.md)；首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)。
 
 ## 首次阅读
 
@@ -56,7 +56,7 @@ Markdown 报告、Issue 勾选、测试数量或文档中的阶段描述都不�
 - `docs/learning/`：Agent 原理、执行链、状态机、失败场景和实验；
 - `docs/mappings/typescript-to-go/`：Pi 文件、symbol、测试到 Pig 实现的导航。
 
-M0 入口：[兼容骨架](learning/m0-compatibility-skeleton.md)与 [TypeScript 到 Go 导航](mappings/typescript-to-go/m0.md)。M1 Headless text 入口：[执行链与运行说明](learning/m1-headless-text.md)和 [TypeScript 到 Go 导航](mappings/typescript-to-go/m1-headless-text.md)。
+M0 入口：[兼容骨架](learning/m0-compatibility-skeleton.md)与 [TypeScript 到 Go 导航](mappings/typescript-to-go/m0.md)。M1 Headless text/JSON 入口：[执行链与运行说明](learning/m1-headless-text.md)和 [TypeScript 到 Go 导航](mappings/typescript-to-go/m1-headless-text.md)。
 
 学习材料解释“为什么”和“如何运行”，mapping 帮助对照源码；二者都不记录权威完成度。每个 Runnable Milestone 必须同步代码、Go SDK、示例、Parity Catalog、学习材料和 mapping。
 

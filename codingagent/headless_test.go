@@ -58,6 +58,21 @@ func TestPrintModeRejectsImageInputInsteadOfSilentlyDroppingIt(t *testing.T) {
 	}
 }
 
+func TestJSONPrintModeRequiresSessionHeader(t *testing.T) {
+	runtime := codingagent.NewAgentSessionRuntime(
+		codingagent.NewAgentSession(codingagent.AgentSessionConfig{}),
+		codingagent.AgentSessionServices{}, nil, nil, nil,
+	)
+	prompt := "hello"
+	code, err := codingagent.RunPrintMode(context.Background(), runtime, codingagent.PrintModeOptions{
+		InitialMessage: &prompt,
+		Mode:           codingagent.ModeJSON,
+	})
+	if code != 1 || err == nil || err.Error() != "JSON mode requires a Session header" {
+		t.Fatalf("RunPrintMode() = (%d, %v), want (1, missing Session header)", code, err)
+	}
+}
+
 func TestHeadlessRunnerPreservesPartialCancellationOutcome(t *testing.T) {
 	rate := 100.0
 	minTokenSize := 1
