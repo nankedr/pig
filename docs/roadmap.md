@@ -32,7 +32,7 @@ M1 必须在冻结首批接口前完整验证本阶段触达的核心契约：
 - 本地 OpenAI Chat Completions 假服务覆盖请求、SSE 分片、partial JSON、可重试与不可重试错误、取消和超时。
 - Tool 参数严格经过 `raw JSON -> prepareArguments -> coercion/validation -> typed decode -> Execute`。
 - 文本到 Tool、ToolResult、继续生成的完整闭环可运行；并行/串行顺序、listener barrier 与 Tool update barrier 有确定性测试。
-- DeepSeek 真实冒烟覆盖基础流式回复和一次 Tool continuation；普通 PR 不需要真实密钥。
+- DeepSeek 真实冒烟覆盖基础流式回复和一次 Tool continuation；普通 PR 不需要真实密钥。普通 PR 缺 `DEEPSEEK_API_KEY` 时 `make m1-live-smoke` 明确 skip；`make m1-freeze`（含 `PIG_REQUIRE_LIVE=1`）缺密钥时必须失败。
 - `read` 对真实文本文件完整可用；另有仅用于确定性测试的 Tool。
 - 内存 AgentSession 的 text/json 两种 Headless 路径端到端可运行，其他未实现路径返回结构化 `ErrNotImplemented`。
 - Pi Oracle 语义差分、`go test -race` 和本机 darwin-arm64 编译通过；不包含 browser、WebAssembly 或其他平台门禁。

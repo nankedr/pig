@@ -150,6 +150,8 @@ Oracle 流程：
 
 一条有效证据至少记录：适用的 Code/Catalog Baseline、case ID、输入/fixture hash、执行方式、期望语义、实际结果、适用平台和对应 Catalog entry。人工证据还要说明无法自动化的原因和复现步骤。
 
+DeepSeek live smoke 属于不可逆 `smoke` 证据：因为真实响应不确定且不得留存，只记录执行方式（含门禁开关）、期望语义、通过/失败结论和平台，不携带 fixture 输入 hash，也不把 live 输出当作 Oracle fixture。`codingagent/live_smoke_test.go#TestDeepSeekLiveHeadlessReadContinuation` 就是这样一条挂在 `contract:codingagent/headless` 上的 smoke 证据。
+
 每个 Runnable Milestone 必须同时满足：
 
 - 新能力端到端可运行，之前能力无回退；

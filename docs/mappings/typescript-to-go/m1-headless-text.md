@@ -12,5 +12,6 @@
 | `packages/coding-agent/src/core/sdk.ts#createAgentSession` | `codingagent.CreateAgentSession` | 注入 Provider/stream、Tool 与内存 v3 SessionManager | `codingagent/agent_session_runtime_test.go` |
 | `packages/coding-agent/src/core/tools/read.ts#createReadTool` | `codingagent.CreateReadTool` | 真实文件读取与 ToolResult continuation | `codingagent/headless_test.go`、`internal/parity/codingagent_read_continuation_test.go` |
 | `packages/ai/src/providers/register-builtins.ts` 与 DeepSeek catalog | `ai.BuiltinModels`、`ai.Models.StreamSimple` | 固定模型目录、标准 `DEEPSEEK_API_KEY` 与 Chat Completions stream | `cmd/pig/headless_process_test.go` |
+| `packages/coding-agent`（真实 DeepSeek 冒烟） | `codingagent.DecideLiveSmoke`、`codingagent.CreateHeadlessSession`、`codingagent.RunHeadless` | 受门禁保护的真实 DeepSeek 文本流与两请求 read Tool continuation | `codingagent/live_smoke_test.go` |
 
 Pig 把可复用生命周期放在 `RunHeadless`，把 stdout 策略放在 `RunPrintMode`。这是 Go 侧的产品组合 seam，不把 Headless 误建模成第二套 Agent loop。JSON presenter 在订阅 Session 后复用同一生命周期，先输出内存 Session header，再逐行输出投影后的 `AgentSessionEvent`；它不接受 stdin command，也不替代 M4 RPC。

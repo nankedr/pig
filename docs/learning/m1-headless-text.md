@@ -77,6 +77,19 @@ go run ./cmd/pig \
 
 指定其他 Tool 会返回对应的结构化 `ErrNotImplemented`。RPC、session persistence、`@file`、skills、prompt templates、themes 和 extensions 仍是精确 Capability Stub；禁用尚未装配的资源发现开关不会激活这些子系统。`PIG_DEEPSEEK_BASE_URL` 只用于把 DeepSeek 请求指向确定性的本地验证端点，不替代正式 Provider 配置。
 
+## DeepSeek 真实 live smoke
+
+`TestDeepSeekLiveHeadlessReadContinuation` 通过公开 Headless 产品路径跑通真实 DeepSeek：先做一次低 token 文本流，再完成真实两请求 read Tool continuation（读取带随机 sentinel 的文件并在最终文本中回显）。它不直接调用私有 Adapter、手工注入 ToolCall 或伪造第二次回复。
+
+门禁由 `DecideLiveSmoke` 决定：普通 PR 缺少 `DEEPSEEK_API_KEY` 时明确 skip；`PIG_REQUIRE_LIVE=1` 的 Freeze/release job 缺密钥时必须失败。
+
+```sh
+export DEEPSEEK_API_KEY=<受限 token>
+make m1-live-smoke
+```
+
+`make m1-freeze` 在 M0 冻结之上追加这条 live smoke。测试只使用受限 token，密钥、Authorization、请求、响应和文件内容都不写入日志、fixture 或证据；失败信息只报告阶段和 stopReason，不打印模型输出或 sentinel。
+
 ## 完全离线示例
 
 仓库的文本示例通过 Faux Provider 发起一次真实 `read` Tool continuation，不需要密钥或网络：

@@ -1,4 +1,4 @@
-.PHONY: m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze
+.PHONY: m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze m1-live-smoke m1-freeze
 
 PI_CODE_COMMIT := 936aff00918de1187f085f123c2812d8f2d67745
 PI_TYPESCRIPT_VERSION := 5.9.3
@@ -52,3 +52,8 @@ m0-source-drift: m0-node-preflight
 		cmp parity/baseline/catalog/image/models.json "$$tmp/image-models.json"
 
 m0-freeze: m0-gate m0-oracle m0-source-drift
+
+m1-live-smoke:
+	PIG_REQUIRE_LIVE=1 go test ./codingagent -run '^TestDeepSeekLiveHeadlessReadContinuation$$' -count=1
+
+m1-freeze: m0-freeze m1-live-smoke
