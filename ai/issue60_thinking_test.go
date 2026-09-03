@@ -436,8 +436,10 @@ func TestFauxStreamsThinkingAndPreservesItsReplayMetadata(t *testing.T) {
 	thinking := ai.FauxThinking("consider")
 	thinking.ThinkingSignature = ai.Some("reasoning_content")
 	thinking.Redacted = ai.Some(true)
+	text := ai.FauxText("answer")
+	text.TextSignature = ai.Some(`{"v":1,"id":"answer"}`)
 	message, err := ai.FauxAssistantMessage(
-		ai.FauxAssistantBlocks(thinking, ai.FauxText("answer")),
+		ai.FauxAssistantBlocks(thinking, text),
 		ai.FauxAssistantMessageOptions{Timestamp: ai.Some[int64](1)},
 	)
 	if err != nil {
@@ -503,8 +505,11 @@ func TestFauxStreamsThinkingAndPreservesItsReplayMetadata(t *testing.T) {
 func TestFauxThinkingCancellationRetainsStreamedPartialContent(t *testing.T) {
 	one := 1
 	rate := float64(100)
+	thinking := ai.FauxThinking("abcdefghijklmnop")
+	thinking.ThinkingSignature = ai.Some("reasoning_content")
+	thinking.Redacted = ai.Some(true)
 	message, _ := ai.FauxAssistantMessage(
-		ai.FauxAssistantBlocks(ai.FauxThinking("abcdefghijklmnop")),
+		ai.FauxAssistantBlocks(thinking),
 		ai.FauxAssistantMessageOptions{Timestamp: ai.Some[int64](1)},
 	)
 	handle, err := ai.NewFauxProvider(ai.RegisterFauxProviderOptions{
@@ -536,8 +541,66 @@ func TestFauxThinkingCancellationRetainsStreamedPartialContent(t *testing.T) {
 	if err != nil || result.StopReason != ai.StopReasonAborted {
 		t.Fatalf("Result() = (%#v, %v), want aborted", result, err)
 	}
-	if len(result.Content) != 1 || result.Content[0].(ai.ThinkingContent).Thinking != "abcd" {
+	if len(result.Content) != 1 {
 		t.Fatalf("aborted content = %#v, want first thinking chunk", result.Content)
+	}
+	partial := result.Content[0].(ai.ThinkingContent)
+	if partial.Thinking != "abcd" || partial.ThinkingSignature != thinking.ThinkingSignature || partial.Redacted != thinking.Redacted {
+		t.Fatalf("aborted thinking = %#v, want first chunk with metadata from %#v", partial, thinking)
+	}
+}
+
+func TestFauxToolCancellationRetainsMetadata(t *testing.T) {
+	one := 1
+	rate := float64(100)
+	toolCall, err := ai.FauxToolCall("read", map[string]any{"path": "abcdefghijklmnop"})
+	if err != nil {
+		t.Fatalf("FauxToolCall() error = %v", err)
+	}
+	toolCall.ThoughtSignature = ai.Some(`{"type":"reasoning.encrypted","id":"call","data":"secret"}`)
+	toolCall.Namespace = ai.Some("workspace")
+	message, err := ai.FauxAssistantMessage(
+		ai.FauxAssistantBlocks(toolCall),
+		ai.FauxAssistantMessageOptions{Timestamp: ai.Some[int64](1)},
+	)
+	if err != nil {
+		t.Fatalf("FauxAssistantMessage() error = %v", err)
+	}
+	handle, err := ai.NewFauxProvider(ai.RegisterFauxProviderOptions{
+		API: "faux:tool-cancel", Provider: "faux-tool-cancel",
+		Models:    []ai.FauxModelDefinition{{ID: "tool-cancel-model"}},
+		TokenSize: &ai.FauxTokenSize{Min: &one, Max: &one}, TokensPerSecond: &rate,
+	})
+	if err != nil {
+		t.Fatalf("NewFauxProvider() error = %v", err)
+	}
+	handle.SetResponses([]ai.FauxResponseStep{message})
+	model, _ := handle.GetModel()
+	ctx, cancel := context.WithCancel(context.Background())
+	stream := handle.Provider.Stream(ctx, model, ai.Context{}, ai.StreamOptions{})
+	for {
+		event, ok, nextErr := stream.Next(context.Background())
+		if nextErr != nil || !ok {
+			t.Fatalf("Next() before cancellation = (%#v, %t, %v)", event, ok, nextErr)
+		}
+		if event.AssistantMessageEventType() == ai.AssistantMessageEventTypeToolCallDelta {
+			cancel()
+			break
+		}
+	}
+
+	wait, stopWaiting := context.WithTimeout(context.Background(), time.Second)
+	defer stopWaiting()
+	result, err := stream.Result(wait)
+	if err != nil || result.StopReason != ai.StopReasonAborted {
+		t.Fatalf("Result() = (%#v, %v), want aborted", result, err)
+	}
+	if len(result.Content) != 1 {
+		t.Fatalf("aborted content = %#v, want partial tool call", result.Content)
+	}
+	partial := result.Content[0].(ai.ToolCall)
+	if partial.ThoughtSignature != toolCall.ThoughtSignature || partial.Namespace != toolCall.Namespace {
+		t.Fatalf("aborted tool call = %#v, want metadata from %#v", partial, toolCall)
 	}
 }
 

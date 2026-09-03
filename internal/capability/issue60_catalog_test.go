@@ -95,6 +95,7 @@ func issue60PromoteCatalog(t *testing.T, root string, source []catalog.Entry) []
 
 		switch entry.ID {
 		case "contract:ai/faux-provider":
+			entry.Evidence = issue60UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "ai/adapter_surface_test.go", Baseline: issue56BaselineCommit})
 			entry.Evidence = issue60UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "ai/issue60_thinking_test.go#TestFauxStreamsThinkingAndPreservesItsReplayMetadata", Baseline: issue56BaselineCommit})
 			entry.Partial = &catalog.Partial{
 				Supported: []string{
@@ -109,6 +110,7 @@ func issue60PromoteCatalog(t *testing.T, root string, source []catalog.Entry) []
 			}
 			entry.Notes = "Issues #43 and #60 implement the M1 core and M2.1 thinking stream slices. The broad Faux contract remains partial for deferred handles and non-core simulation details."
 		case "contract:ai/content":
+			entry.Evidence = issue60UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "ai/content_test.go", Baseline: issue56BaselineCommit})
 			entry.Evidence = issue60UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "ai/issue60_thinking_test.go#TestOpenAICompletionsThinkingAndSignatureParity", Baseline: issue56BaselineCommit})
 			entry.Partial = &catalog.Partial{
 				Supported: []string{
@@ -120,6 +122,7 @@ func issue60PromoteCatalog(t *testing.T, root string, source []catalog.Entry) []
 			entry.Notes = "Issue #25 establishes the immutable content values; issue #60 executes the M2.1 OpenAI Chat Completions thinking/signature conversion slice."
 		case "contract:ai/model":
 			entry.Status = catalog.StatusPartial
+			entry.Evidence = issue60UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "ai/contracts_test.go", Baseline: issue56BaselineCommit})
 			entry.Evidence = issue60UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "ai/issue60_surface_test.go#TestIssue60LockedGoAPISnapshot", Baseline: issue56BaselineCommit})
 			entry.Partial = &catalog.Partial{
 				Supported:   []string{"compile-usable Model, Usage, cost, compat and image value shapes", "reasoning capability and thinking-level mappings execute through the M2.1 OpenAI Chat Completions request path"},
@@ -127,6 +130,7 @@ func issue60PromoteCatalog(t *testing.T, root string, source []catalog.Entry) []
 			}
 			entry.Notes = "Issue #25 declares the model value contract; issue #60 freezes and executes its reasoning and thinking-level fields without claiming the wider model catalog."
 		case "contract:ai/options":
+			entry.Evidence = issue60UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "ai/contracts_test.go", Baseline: issue56BaselineCommit})
 			entry.Evidence = issue60UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "ai/issue60_thinking_test.go#TestOpenAICompletionsThinkingAndSignatureParity", Baseline: issue56BaselineCommit})
 			entry.Partial = &catalog.Partial{
 				Supported:   []string{"shared request, stream, simple-stream and deferred option shapes", "header deletion and explicit-zero semantics", "reasoning effort, thinking budgets and M2.1 thinking-format controls execute through OpenAI Chat Completions"},
@@ -200,7 +204,9 @@ func issue60GoEvidence(catalogID, inputHash, assertion string) catalog.Evidence 
 func issue60UpsertEvidence(existing []catalog.Evidence, replacement catalog.Evidence) []catalog.Evidence {
 	result := append([]catalog.Evidence(nil), existing...)
 	for index := range result {
-		if result[index].Kind == replacement.Kind && result[index].CaseID == replacement.CaseID {
+		sameCase := replacement.CaseID != "" && result[index].CaseID == replacement.CaseID
+		sameCompactRef := replacement.CaseID == "" && result[index].CaseID == "" && result[index].Ref == replacement.Ref
+		if result[index].Kind == replacement.Kind && (sameCase || sameCompactRef) {
 			result[index] = replacement
 			return result
 		}

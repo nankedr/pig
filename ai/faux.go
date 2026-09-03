@@ -356,7 +356,9 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 			return
 		}
 		if text, ok := fauxTextContent(content); ok {
-			partial.Content = append(partial.Content, TextContent{Type: ContentTypeText})
+			partial.Content = append(partial.Content, TextContent{
+				Type: ContentTypeText, TextSignature: text.TextSignature,
+			})
 			stream.Push(AssistantMessageTextStartEvent{Type: AssistantMessageEventTypeTextStart, ContentIndex: i, Partial: partial})
 			for _, chunk := range splitFauxText(text.Text, r.minTokenSize) {
 				if !r.waitChunk(ctx, chunk) {
@@ -376,7 +378,9 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 			continue
 		}
 		if thinking, ok := fauxThinkingContent(content); ok {
-			partial.Content = append(partial.Content, ThinkingContent{Type: ContentTypeThinking})
+			partial.Content = append(partial.Content, ThinkingContent{
+				Type: ContentTypeThinking, ThinkingSignature: thinking.ThinkingSignature, Redacted: thinking.Redacted,
+			})
 			stream.Push(AssistantMessageThinkingStartEvent{
 				Type: AssistantMessageEventTypeThinkingStart, ContentIndex: i, Partial: partial,
 			})
@@ -400,6 +404,7 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 		toolCall, _ := fauxToolCallContent(content)
 		partial.Content = append(partial.Content, ToolCall{
 			Type: ContentTypeToolCall, ID: toolCall.ID, Name: toolCall.Name, Arguments: map[string]any{},
+			ThoughtSignature: toolCall.ThoughtSignature, Namespace: toolCall.Namespace,
 		})
 		stream.Push(AssistantMessageToolCallStartEvent{
 			Type: AssistantMessageEventTypeToolCallStart, ContentIndex: i, Partial: partial,
