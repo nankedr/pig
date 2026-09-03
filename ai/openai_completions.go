@@ -28,8 +28,13 @@ var (
 )
 
 type openAICompletionsCompat struct {
-	supportsUsageInStreaming bool
-	supportsFinishReason     bool
+	supportsReasoningEffort                     bool
+	supportsUsageInStreaming                    bool
+	supportsFinishReason                        bool
+	requiresThinkingAsText                      bool
+	requiresReasoningContentOnAssistantMessages bool
+	thinkingFormat                              ThinkingFormat
+	supportsThinkingTokenBudget                 bool
 }
 
 type openAICompletionChunk struct {
@@ -46,8 +51,12 @@ type openAICompletionChoice struct {
 }
 
 type openAICompletionDelta struct {
-	Content   *string                        `json:"content"`
-	ToolCalls []openAIStreamingToolCallDelta `json:"tool_calls"`
+	Content          *string                        `json:"content"`
+	ReasoningContent *string                        `json:"reasoning_content"`
+	Reasoning        *string                        `json:"reasoning"`
+	ReasoningText    *string                        `json:"reasoning_text"`
+	ReasoningDetails json.RawMessage                `json:"reasoning_details"`
+	ToolCalls        []openAIStreamingToolCallDelta `json:"tool_calls"`
 }
 
 type openAIStreamingToolCallDelta struct {
@@ -78,11 +87,14 @@ type openAICompletionUsage struct {
 		CachedTokens     *int64 `json:"cached_tokens"`
 		CacheWriteTokens int64  `json:"cache_write_tokens"`
 	} `json:"prompt_tokens_details"`
+	CompletionTokensDetails *struct {
+		ReasoningTokens *int64 `json:"reasoning_tokens"`
+	} `json:"completion_tokens_details"`
 }
 
 func StreamOpenAICompletions(ctx context.Context, model Model, input Context, options OpenAICompletionsOptions) *AssistantMessageEventStream {
 	ctx = nonNilContext(ctx)
-	if err := validateOpenAICompletionsM1(model, input, options); err != nil {
+	if err := validateOpenAICompletions(model, input, options); err != nil {
 		return failedProviderStream(err)
 	}
 	stream := NewAssistantMessageEventStream()
@@ -91,9 +103,6 @@ func StreamOpenAICompletions(ctx context.Context, model Model, input Context, op
 }
 
 func StreamSimpleOpenAICompletions(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
-	if options.Reasoning != nil || options.ThinkingBudgets != nil {
-		return failedProviderStream(newNotImplemented("OpenAICompletions.StreamSimple.Reasoning"))
-	}
 	streamOptions := options.StreamOptions
 	maxTokens := model.MaxTokens
 	if streamOptions.MaxTokens != nil {
@@ -101,13 +110,20 @@ func StreamSimpleOpenAICompletions(ctx context.Context, model Model, input Conte
 	}
 	maxTokens = clampOpenAIMaxTokens(model, input, maxTokens)
 	streamOptions.MaxTokens = &maxTokens
-	return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: streamOptions})
+	var reasoningEffort *OpenAIReasoningEffort
+	if options.Reasoning != nil {
+		level := ClampThinkingLevel(model, ModelThinkingLevel(*options.Reasoning))
+		if level != ModelThinkingLevelOff {
+			effort := OpenAIReasoningEffort(level)
+			reasoningEffort = &effort
+		}
+	}
+	return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{
+		StreamOptions: streamOptions, ReasoningEffort: reasoningEffort, ThinkingBudgets: options.ThinkingBudgets,
+	})
 }
 
 func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAICompletionsCompat, _ ...ConvertOpenAICompletionsMessagesOptions) ([]json.RawMessage, error) {
-	if model.Reasoning && model.Provider != ProviderIDDeepSeek {
-		return nil, newNotImplemented("OpenAICompletions.Reasoning")
-	}
 	if err := validateOpenAICompletionsCompat(compat); err != nil {
 		return nil, err
 	}
@@ -142,14 +158,14 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 				return nil, err
 			}
 		case AssistantMessage:
-			if err := appendOpenAIAssistantMessage(&messages, model, value, toolCallIDs); err != nil {
+			if err := appendOpenAIAssistantMessage(&messages, model, compat, value, toolCallIDs); err != nil {
 				return nil, err
 			}
 		case *AssistantMessage:
 			if value == nil {
 				return nil, fmt.Errorf("nil assistant message")
 			}
-			if err := appendOpenAIAssistantMessage(&messages, model, *value, toolCallIDs); err != nil {
+			if err := appendOpenAIAssistantMessage(&messages, model, compat, *value, toolCallIDs); err != nil {
 				return nil, err
 			}
 		case ToolResultMessage:
@@ -203,19 +219,22 @@ func appendOpenAIUserMessage(messages *[]json.RawMessage, message UserMessage) e
 	return err
 }
 
-func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, message AssistantMessage, toolCallIDs map[string]string) error {
+func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, compat OpenAICompletionsCompat, message AssistantMessage, toolCallIDs map[string]string) error {
 	if message.StopReason == StopReasonError || message.StopReason == StopReasonAborted {
 		return nil
 	}
-	var text strings.Builder
+	sameModel := message.Provider == model.Provider && message.API == model.API && message.Model == model.ID
+	var textParts []string
+	var thinking []ThinkingContent
 	var toolCalls []map[string]any
+	var reasoningDetails []any
 	appendToolCall := func(call ToolCall) error {
 		arguments, err := json.Marshal(call.Arguments)
 		if err != nil {
 			return err
 		}
 		id := call.ID
-		if message.Provider != model.Provider || message.API != model.API || message.Model != model.ID {
+		if !sameModel {
 			id = normalizeOpenAIToolCallID(model, id)
 			if id != call.ID {
 				toolCallIDs[call.ID] = id
@@ -225,20 +244,32 @@ func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, mess
 			"id": id, "type": "function",
 			"function": map[string]any{"name": call.Name, "arguments": string(arguments)},
 		})
+		if sameModel {
+			if signature, ok := call.ThoughtSignature.Value(); ok {
+				var detail any
+				if json.Unmarshal([]byte(signature), &detail) == nil && truthyJSONValue(detail) {
+					reasoningDetails = append(reasoningDetails, detail)
+				}
+			}
+		}
 		return nil
 	}
 	for _, block := range message.Content {
 		switch value := block.(type) {
 		case TextContent:
 			if strings.TrimSpace(value.Text) != "" {
-				text.WriteString(sanitizeOpenAIText(value.Text))
+				textParts = append(textParts, sanitizeOpenAIText(value.Text))
 			}
 		case *TextContent:
 			if value != nil && strings.TrimSpace(value.Text) != "" {
-				text.WriteString(sanitizeOpenAIText(value.Text))
+				textParts = append(textParts, sanitizeOpenAIText(value.Text))
 			}
-		case ThinkingContent, *ThinkingContent:
-			return newNotImplemented("OpenAICompletions.ConvertMessages.Thinking")
+		case ThinkingContent:
+			appendOpenAIThinking(&thinking, &textParts, value, sameModel)
+		case *ThinkingContent:
+			if value != nil {
+				appendOpenAIThinking(&thinking, &textParts, *value, sameModel)
+			}
 		case ToolCall:
 			if err := appendToolCall(value); err != nil {
 				return err
@@ -253,21 +284,83 @@ func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, mess
 			return fmt.Errorf("unsupported assistant content %T", block)
 		}
 	}
-	if text.Len() == 0 && len(toolCalls) == 0 {
+	if len(textParts) == 0 && len(thinking) == 0 && len(toolCalls) == 0 {
 		return nil
 	}
 	converted := map[string]any{"role": "assistant", "content": nil}
-	if text.Len() > 0 {
-		converted["content"] = text.String()
+	requiresThinkingAsText, _ := compat.RequiresThinkingAsText.Value()
+	if requiresThinkingAsText && len(thinking) > 0 {
+		parts := make([]map[string]any, 0, len(textParts)+1)
+		thinkingText := make([]string, len(thinking))
+		for i, block := range thinking {
+			thinkingText[i] = sanitizeOpenAIText(block.Thinking)
+		}
+		parts = append(parts, map[string]any{"type": "text", "text": strings.Join(thinkingText, "\n\n")})
+		for _, text := range textParts {
+			parts = append(parts, map[string]any{"type": "text", "text": text})
+		}
+		converted["content"] = parts
+	} else {
+		if len(textParts) > 0 {
+			converted["content"] = strings.Join(textParts, "")
+		}
+		if len(thinking) > 0 {
+			if signature, ok := thinking[0].ThinkingSignature.Value(); ok && signature != "" {
+				if model.Provider == ProviderIDOpenCodeGo && signature == "reasoning" {
+					signature = "reasoning_content"
+				}
+				values := make([]string, len(thinking))
+				for i, block := range thinking {
+					values[i] = sanitizeOpenAIText(block.Thinking)
+				}
+				converted[signature] = strings.Join(values, "\n")
+			}
+		}
 	}
 	if len(toolCalls) > 0 {
 		converted["tool_calls"] = toolCalls
+	}
+	if len(reasoningDetails) > 0 {
+		converted["reasoning_details"] = reasoningDetails
+	}
+	if required, _ := compat.RequiresReasoningContentOnAssistantMessages.Value(); required && model.Reasoning {
+		if _, ok := converted["reasoning_content"]; !ok {
+			converted["reasoning_content"] = ""
+		}
 	}
 	raw, err := json.Marshal(converted)
 	if err == nil {
 		*messages = append(*messages, raw)
 	}
 	return err
+}
+
+func appendOpenAIThinking(thinking *[]ThinkingContent, textParts *[]string, block ThinkingContent, sameModel bool) {
+	if !sameModel {
+		if redacted, _ := block.Redacted.Value(); redacted || strings.TrimSpace(block.Thinking) == "" {
+			return
+		}
+		*textParts = append(*textParts, sanitizeOpenAIText(block.Thinking))
+		return
+	}
+	if strings.TrimSpace(block.Thinking) != "" {
+		*thinking = append(*thinking, block)
+	}
+}
+
+func truthyJSONValue(value any) bool {
+	switch value := value.(type) {
+	case nil:
+		return false
+	case bool:
+		return value
+	case float64:
+		return value != 0 && !math.IsNaN(value)
+	case string:
+		return value != ""
+	default:
+		return true
+	}
 }
 
 func appendOpenAIToolResultMessage(messages *[]json.RawMessage, message ToolResultMessage, toolCallIDs map[string]string) error {
@@ -407,6 +500,7 @@ func executeOpenAICompletions(ctx context.Context, stream *AssistantMessageEvent
 	if options.Temperature != nil {
 		payload["temperature"] = *options.Temperature
 	}
+	applyOpenAIReasoningOptions(payload, model, compat, options)
 	if len(input.Tools) > 0 {
 		tools, err := convertOpenAIFunctionTools(input.Tools)
 		if err != nil {
@@ -435,6 +529,141 @@ func executeOpenAICompletions(ctx context.Context, stream *AssistantMessageEvent
 		return err
 	}
 	return sendOpenAICompletions(ctx, stream, model, options, apiKey, compat, encoded, output)
+}
+
+func applyOpenAIReasoningOptions(payload map[string]any, model Model, compat openAICompletionsCompat, options OpenAICompletionsOptions) {
+	effort, enabled := mappedOpenAIReasoningEffort(model, options.ReasoningEffort)
+	switch compat.thinkingFormat {
+	case "zai":
+		if model.Reasoning {
+			thinking := map[string]any{"type": "disabled"}
+			if enabled {
+				thinking = map[string]any{"type": "enabled", "clear_thinking": false}
+			}
+			payload["thinking"] = thinking
+			if enabled && compat.supportsReasoningEffort {
+				payload["reasoning_effort"] = effort
+			}
+		}
+	case "qwen":
+		if model.Reasoning {
+			payload["enable_thinking"] = enabled
+			if enabled && compat.supportsReasoningEffort {
+				payload["reasoning_effort"] = effort
+			}
+		}
+	case "deepseek":
+		if model.Reasoning {
+			if enabled {
+				payload["thinking"] = map[string]any{"type": "enabled"}
+			} else if !openAIThinkingOffIsNull(model) {
+				payload["thinking"] = map[string]any{"type": "disabled"}
+			}
+			if enabled && compat.supportsReasoningEffort {
+				payload["reasoning_effort"] = effort
+			}
+		}
+	case "openrouter":
+		if model.Reasoning {
+			if enabled {
+				payload["reasoning"] = map[string]any{"effort": effort}
+			} else if !openAIThinkingOffIsNull(model) {
+				payload["reasoning"] = map[string]any{"effort": openAIThinkingOffValue(model, "none")}
+			}
+		}
+	case "ant-ling":
+		if model.Reasoning && enabled {
+			if mapped, ok := openAIThinkingLevelValue(model, ModelThinkingLevel(*options.ReasoningEffort)); ok {
+				payload["reasoning"] = map[string]any{"effort": mapped}
+			}
+		}
+	case "together":
+		if model.Reasoning {
+			payload["reasoning"] = map[string]any{"enabled": enabled}
+			if enabled && compat.supportsReasoningEffort {
+				payload["reasoning_effort"] = effort
+			}
+		}
+	case "string-thinking":
+		if model.Reasoning {
+			if enabled {
+				payload["thinking"] = effort
+			} else if !openAIThinkingOffIsNull(model) {
+				payload["thinking"] = openAIThinkingOffValue(model, "none")
+			}
+		}
+	default:
+		if model.Reasoning && compat.supportsReasoningEffort {
+			if enabled {
+				payload["reasoning_effort"] = effort
+			} else if off, ok := openAIThinkingLevelValue(model, ModelThinkingLevelOff); ok {
+				payload["reasoning_effort"] = off
+			}
+		}
+	}
+	if compat.supportsThinkingTokenBudget && enabled && model.Reasoning {
+		level := ModelThinkingLevel(*options.ReasoningEffort)
+		if level == ModelThinkingLevelXHigh || level == ModelThinkingLevelMax {
+			level = ModelThinkingLevelHigh
+		}
+		budget := openAIThinkingBudget(options.ThinkingBudgets, level)
+		ceiling := model.MaxTokens
+		if options.MaxTokens != nil {
+			ceiling = *options.MaxTokens
+		}
+		budget = min(budget, max(int64(0), ceiling-1024))
+		if budget > 0 {
+			payload["thinking_token_budget"] = budget
+		}
+	}
+}
+
+func mappedOpenAIReasoningEffort(model Model, requested *OpenAIReasoningEffort) (string, bool) {
+	if requested == nil {
+		return "", false
+	}
+	if mapped, ok := openAIThinkingLevelValue(model, ModelThinkingLevel(*requested)); ok {
+		return mapped, true
+	}
+	return string(*requested), true
+}
+
+func openAIThinkingLevelValue(model Model, level ModelThinkingLevel) (string, bool) {
+	value, present := model.ThinkingLevelMap[level]
+	if !present || value.IsNull() {
+		return "", false
+	}
+	return value.Value()
+}
+
+func openAIThinkingOffIsNull(model Model) bool {
+	value, present := model.ThinkingLevelMap[ModelThinkingLevelOff]
+	return present && value.IsNull()
+}
+
+func openAIThinkingOffValue(model Model, fallback string) string {
+	if value, ok := openAIThinkingLevelValue(model, ModelThinkingLevelOff); ok {
+		return value
+	}
+	return fallback
+}
+
+func openAIThinkingBudget(budgets *ThinkingBudgets, level ModelThinkingLevel) int64 {
+	defaults := map[ModelThinkingLevel]int64{
+		ModelThinkingLevelMinimal: 1024, ModelThinkingLevelLow: 2048,
+		ModelThinkingLevelMedium: 8192, ModelThinkingLevelHigh: 16384,
+	}
+	if budgets == nil {
+		return defaults[level]
+	}
+	configured := map[ModelThinkingLevel]*int64{
+		ModelThinkingLevelMinimal: budgets.Minimal, ModelThinkingLevelLow: budgets.Low,
+		ModelThinkingLevelMedium: budgets.Medium, ModelThinkingLevelHigh: budgets.High,
+	}
+	if value := configured[level]; value != nil {
+		return *value
+	}
+	return defaults[level]
 }
 
 func convertOpenAIFunctionTools(tools []Tool) ([]any, error) {
@@ -485,8 +714,10 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	hasFinishReason := false
 	sawFrame := false
 	textIndex := -1
+	thinkingIndex := -1
 	toolCallsByIndex := map[int]*openAIToolCallState{}
 	toolCallsByID := map[string]*openAIToolCallState{}
+	pendingReasoningDetails := map[string]string{}
 	var toolCalls []*openAIToolCallState
 	err = consumeOpenAISSE(body, func(data string) (bool, error) {
 		sawFrame = true
@@ -543,12 +774,35 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 			})
 		}
 		if choice.Delta != nil {
+			if field, delta := openAIReasoningDelta(choice.Delta); delta != "" {
+				if model.Provider == ProviderIDOpenCodeGo && field == "reasoning" {
+					field = "reasoning_content"
+				}
+				if thinkingIndex == -1 {
+					thinkingIndex = len(output.Content)
+					output.Content = append(output.Content, ThinkingContent{
+						Type: ContentTypeThinking, Thinking: delta, ThinkingSignature: Some(field),
+					})
+					stream.Push(AssistantMessageThinkingStartEvent{
+						Type: AssistantMessageEventTypeThinkingStart, ContentIndex: thinkingIndex, Partial: *output,
+					})
+				} else {
+					block := output.Content[thinkingIndex].(ThinkingContent)
+					block.Thinking += delta
+					output.Content[thinkingIndex] = block
+				}
+				stream.Push(AssistantMessageThinkingDeltaEvent{
+					Type: AssistantMessageEventTypeThinkingDelta, ContentIndex: thinkingIndex, Delta: delta, Partial: *output,
+				})
+			}
 			for _, delta := range choice.Delta.ToolCalls {
 				state, created := applyOpenAIToolCallDelta(stream, output, delta, toolCallsByIndex, toolCallsByID)
 				if created {
 					toolCalls = append(toolCalls, state)
 				}
+				applyOpenAIPendingReasoningDetail(output, state, pendingReasoningDetails)
 			}
+			applyOpenAIReasoningDetails(output, choice.Delta.ReasoningDetails, toolCallsByID, pendingReasoningDetails)
 		}
 		return false, nil
 	})
@@ -556,10 +810,7 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 		cause := context.Cause(ctx)
 		output.StopReason = StopReasonAborted
 		output.ErrorMessage = Some(openAIErrorMessage(cause))
-		if textIndex != -1 {
-			text := output.Content[textIndex].(TextContent).Text
-			stream.Push(AssistantMessageTextEndEvent{Type: AssistantMessageEventTypeTextEnd, ContentIndex: textIndex, Content: text, Partial: *output})
-		}
+		finishOpenAIContent(stream, output)
 		return cause
 	}
 	if err != nil {
@@ -567,10 +818,6 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	}
 	if !sawFrame {
 		return errors.Join(ErrOpenAISSEProtocol, ErrOpenAISSEEmpty)
-	}
-	if textIndex != -1 {
-		text := output.Content[textIndex].(TextContent).Text
-		stream.Push(AssistantMessageTextEndEvent{Type: AssistantMessageEventTypeTextEnd, ContentIndex: textIndex, Content: text, Partial: *output})
 	}
 	finalArguments := make([]map[string]any, len(toolCalls))
 	for i, state := range toolCalls {
@@ -583,10 +830,8 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	for i, state := range toolCalls {
 		state.call.Arguments = finalArguments[i]
 		output.Content[state.contentIndex] = state.call
-		stream.Push(AssistantMessageToolCallEndEvent{
-			Type: AssistantMessageEventTypeToolCallEnd, ContentIndex: state.contentIndex, ToolCall: state.call, Partial: *output,
-		})
 	}
+	finishOpenAIContent(stream, output)
 	if !hasFinishReason && !compat.supportsFinishReason {
 		output.StopReason = StopReasonStop
 		if len(toolCalls) > 0 {
@@ -604,6 +849,19 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	}
 	stream.Push(AssistantMessageDoneEvent{Type: AssistantMessageEventTypeDone, Reason: output.StopReason, Message: *output})
 	return nil
+}
+
+func finishOpenAIContent(stream *AssistantMessageEventStream, output *AssistantMessage) {
+	for index, content := range output.Content {
+		switch block := content.(type) {
+		case TextContent:
+			stream.Push(AssistantMessageTextEndEvent{Type: AssistantMessageEventTypeTextEnd, ContentIndex: index, Content: block.Text, Partial: *output})
+		case ThinkingContent:
+			stream.Push(AssistantMessageThinkingEndEvent{Type: AssistantMessageEventTypeThinkingEnd, ContentIndex: index, Content: block.Thinking, Partial: *output})
+		case ToolCall:
+			stream.Push(AssistantMessageToolCallEndEvent{Type: AssistantMessageEventTypeToolCallEnd, ContentIndex: index, ToolCall: block, Partial: *output})
+		}
+	}
 }
 
 func applyOpenAIToolCallDelta(
@@ -662,6 +920,70 @@ func applyOpenAIToolCallDelta(
 		Type: AssistantMessageEventTypeToolCallDelta, ContentIndex: state.contentIndex, Delta: fragment, Partial: *output,
 	})
 	return state, created
+}
+
+func openAIReasoningDelta(delta *openAICompletionDelta) (string, string) {
+	for _, field := range []struct {
+		name  string
+		value *string
+	}{
+		{name: "reasoning_content", value: delta.ReasoningContent},
+		{name: "reasoning", value: delta.Reasoning},
+		{name: "reasoning_text", value: delta.ReasoningText},
+	} {
+		if field.value != nil && *field.value != "" {
+			return field.name, *field.value
+		}
+	}
+	return "", ""
+}
+
+func applyOpenAIReasoningDetails(
+	output *AssistantMessage,
+	raw json.RawMessage,
+	toolCallsByID map[string]*openAIToolCallState,
+	pending map[string]string,
+) {
+	if len(raw) == 0 || raw[0] != '[' {
+		return
+	}
+	var details []json.RawMessage
+	if json.Unmarshal(raw, &details) != nil {
+		return
+	}
+	for _, detail := range details {
+		var fields struct {
+			Type string `json:"type"`
+			ID   string `json:"id"`
+			Data string `json:"data"`
+		}
+		if json.Unmarshal(detail, &fields) != nil || fields.Type != "reasoning.encrypted" || fields.ID == "" || fields.Data == "" {
+			continue
+		}
+		var serialized bytes.Buffer
+		if json.Compact(&serialized, detail) != nil {
+			continue
+		}
+		if state := toolCallsByID[fields.ID]; state != nil {
+			state.call.ThoughtSignature = Some(serialized.String())
+			output.Content[state.contentIndex] = state.call
+		} else {
+			pending[fields.ID] = serialized.String()
+		}
+	}
+}
+
+func applyOpenAIPendingReasoningDetail(output *AssistantMessage, state *openAIToolCallState, pending map[string]string) {
+	if state.call.ID == "" {
+		return
+	}
+	signature, ok := pending[state.call.ID]
+	if !ok {
+		return
+	}
+	state.call.ThoughtSignature = Some(signature)
+	output.Content[state.contentIndex] = state.call
+	delete(pending, state.call.ID)
 }
 
 type openAIProviderError struct {
@@ -949,6 +1271,9 @@ func mapOpenAIUsage(raw openAICompletionUsage, model Model) Usage {
 		Input: input, Output: raw.CompletionTokens, CacheRead: cacheRead, CacheWrite: cacheWrite,
 		TotalTokens: input + raw.CompletionTokens + cacheRead + cacheWrite,
 	}
+	if raw.CompletionTokensDetails != nil && raw.CompletionTokensDetails.ReasoningTokens != nil {
+		usage.Reasoning = Some(*raw.CompletionTokensDetails.ReasoningTokens)
+	}
 	CalculateCost(model, &usage)
 	return usage
 }
@@ -976,8 +1301,12 @@ func resolveOpenAICompletionsCompat(model Model) (openAICompletionsCompat, error
 		if err := json.Unmarshal(raw, &fields); err != nil {
 			return openAICompletionsCompat{}, err
 		}
-		supported := make(map[string]json.RawMessage, 2)
-		for _, name := range []string{"supportsUsageInStreaming", "supportsFinishReason"} {
+		supported := make(map[string]json.RawMessage, 7)
+		for _, name := range []string{
+			"supportsReasoningEffort", "supportsUsageInStreaming", "supportsFinishReason",
+			"requiresThinkingAsText", "requiresReasoningContentOnAssistantMessages", "thinkingFormat",
+			"supportsThinkingTokenBudget",
+		} {
 			if value, present := fields[name]; present {
 				supported[name] = value
 				delete(fields, name)
@@ -1015,7 +1344,10 @@ func resolveOpenAICompletionsCompat(model Model) (openAICompletionsCompat, error
 	if err := validateOpenAICompletionsCompat(compat); err != nil {
 		return openAICompletionsCompat{}, err
 	}
-	resolved := openAICompletionsCompat{supportsUsageInStreaming: true, supportsFinishReason: true}
+	resolved := detectOpenAICompletionsCompat(model)
+	if err := applyOpenAICompatBool(&resolved.supportsReasoningEffort, compat.SupportsReasoningEffort, "supportsReasoningEffort"); err != nil {
+		return openAICompletionsCompat{}, err
+	}
 	if value, ok := compat.SupportsUsageInStreaming.Value(); ok {
 		resolved.supportsUsageInStreaming = value
 	} else if compat.SupportsUsageInStreaming.IsNull() {
@@ -1026,19 +1358,87 @@ func resolveOpenAICompletionsCompat(model Model) (openAICompletionsCompat, error
 	} else if compat.SupportsFinishReason.IsNull() {
 		return openAICompletionsCompat{}, fmt.Errorf("supportsFinishReason cannot be null")
 	}
+	if err := applyOpenAICompatBool(&resolved.requiresThinkingAsText, compat.RequiresThinkingAsText, "requiresThinkingAsText"); err != nil {
+		return openAICompletionsCompat{}, err
+	}
+	if err := applyOpenAICompatBool(&resolved.requiresReasoningContentOnAssistantMessages, compat.RequiresReasoningContentOnAssistantMessages, "requiresReasoningContentOnAssistantMessages"); err != nil {
+		return openAICompletionsCompat{}, err
+	}
+	if value, ok := compat.ThinkingFormat.Value(); ok {
+		resolved.thinkingFormat = value
+	} else if compat.ThinkingFormat.IsNull() {
+		return openAICompletionsCompat{}, fmt.Errorf("thinkingFormat cannot be null")
+	}
+	if err := applyOpenAICompatBool(&resolved.supportsThinkingTokenBudget, compat.SupportsThinkingTokenBudget, "supportsThinkingTokenBudget"); err != nil {
+		return openAICompletionsCompat{}, err
+	}
 	return resolved, nil
+}
+
+func applyOpenAICompatBool(target *bool, value Optional[bool], name string) error {
+	if resolved, ok := value.Value(); ok {
+		*target = resolved
+	} else if value.IsNull() {
+		return fmt.Errorf("%s cannot be null", name)
+	}
+	return nil
+}
+
+func detectOpenAICompletionsCompat(model Model) openAICompletionsCompat {
+	baseURL := model.BaseURL
+	isZAI := model.Provider == ProviderIDZAI || model.Provider == ProviderIDZAICodingCN ||
+		strings.Contains(baseURL, "api.z.ai") || strings.Contains(baseURL, "open.bigmodel.cn")
+	isTogether := model.Provider == ProviderIDTogether || strings.Contains(baseURL, "api.together.ai") || strings.Contains(baseURL, "api.together.xyz")
+	isMoonshot := model.Provider == ProviderIDMoonshotAI || model.Provider == ProviderIDMoonshotAICN || strings.Contains(baseURL, "api.moonshot.")
+	isOpenRouter := model.Provider == ProviderIDOpenRouter || strings.Contains(baseURL, "openrouter.ai")
+	isCloudflareGateway := model.Provider == ProviderIDCloudflareAIGateway || strings.Contains(baseURL, "gateway.ai.cloudflare.com")
+	isNVIDIA := model.Provider == ProviderIDNVIDIA || strings.Contains(baseURL, "integrate.api.nvidia.com")
+	isAntLing := model.Provider == ProviderIDAntLing || strings.Contains(baseURL, "api.ant-ling.com")
+	isGrok := model.Provider == ProviderIDXAI || strings.Contains(baseURL, "api.x.ai")
+	isDeepSeek := model.Provider == ProviderIDDeepSeek || strings.Contains(baseURL, "deepseek.com")
+	format := ThinkingFormat("openai")
+	switch {
+	case isDeepSeek:
+		format = "deepseek"
+	case isZAI:
+		format = "zai"
+	case isTogether:
+		format = "together"
+	case isAntLing:
+		format = "ant-ling"
+	case isOpenRouter:
+		format = "openrouter"
+	}
+	return openAICompletionsCompat{
+		supportsReasoningEffort:                     !isGrok && !isZAI && !isMoonshot && !isTogether && !isCloudflareGateway && !isNVIDIA && !isAntLing,
+		supportsUsageInStreaming:                    true,
+		supportsFinishReason:                        true,
+		requiresReasoningContentOnAssistantMessages: isDeepSeek,
+		thinkingFormat:                              format,
+	}
 }
 
 func openAICompatPublic(compat openAICompletionsCompat) OpenAICompletionsCompat {
 	return OpenAICompletionsCompat{
-		SupportsUsageInStreaming: Some(compat.supportsUsageInStreaming),
-		SupportsFinishReason:     Some(compat.supportsFinishReason),
+		SupportsReasoningEffort:                     Some(compat.supportsReasoningEffort),
+		SupportsUsageInStreaming:                    Some(compat.supportsUsageInStreaming),
+		SupportsFinishReason:                        Some(compat.supportsFinishReason),
+		RequiresThinkingAsText:                      Some(compat.requiresThinkingAsText),
+		RequiresReasoningContentOnAssistantMessages: Some(compat.requiresReasoningContentOnAssistantMessages),
+		ThinkingFormat:                              Some(compat.thinkingFormat),
+		SupportsThinkingTokenBudget:                 Some(compat.supportsThinkingTokenBudget),
 	}
 }
 
 func validateOpenAICompletionsCompat(compat OpenAICompletionsCompat) error {
 	if compat.ChatTemplateKwargs != nil || compat.ChatTemplateArgs != nil {
 		return newNotImplemented("OpenAICompletions.Compat.ChatTemplate")
+	}
+	if format, ok := compat.ThinkingFormat.Value(); ok {
+		switch format {
+		case "chat-template", "qwen-chat-template", "baseten":
+			return newNotImplemented("OpenAICompletions.Compat.ThinkingFormat." + string(format))
+		}
 	}
 	raw, err := json.Marshal(compat)
 	if err != nil {
@@ -1050,50 +1450,26 @@ func validateOpenAICompletionsCompat(compat OpenAICompletionsCompat) error {
 	}
 	delete(fields, "supportsUsageInStreaming")
 	delete(fields, "supportsFinishReason")
+	delete(fields, "supportsReasoningEffort")
+	delete(fields, "requiresThinkingAsText")
+	delete(fields, "requiresReasoningContentOnAssistantMessages")
+	delete(fields, "thinkingFormat")
+	delete(fields, "supportsThinkingTokenBudget")
 	if names := sortedStringKeys(fields); len(names) > 0 {
 		return newNotImplemented("OpenAICompletions.Compat." + names[0])
 	}
 	return nil
 }
 
-func validateOpenAICompletionsM1(model Model, input Context, options OpenAICompletionsOptions) error {
+func validateOpenAICompletions(model Model, input Context, options OpenAICompletionsOptions) error {
 	if model.API != APIOpenAICompletions {
 		return fmt.Errorf("%w: model API %q is not %q", ErrEventStreamInvariant, model.API, APIOpenAICompletions)
-	}
-	if (model.Reasoning && model.Provider != ProviderIDDeepSeek) || options.ReasoningEffort != nil || options.ThinkingBudgets != nil {
-		return newNotImplemented("OpenAICompletions.Reasoning")
 	}
 	if model.SamplingParams != nil || options.SamplingParams != nil || options.CacheRetention != nil || options.SessionID != nil || options.Env != nil {
 		return newNotImplemented("OpenAICompletions.AdvancedOptions")
 	}
-	if openAIRequiresProviderCompat(model) {
-		return newNotImplemented("OpenAICompletions.Compat.ProviderDetection")
-	}
 	_, err := resolveOpenAICompletionsCompat(model)
 	return err
-}
-
-func openAIRequiresProviderCompat(model Model) bool {
-	if model.Provider == ProviderIDDeepSeek {
-		return false
-	}
-	baseURL := model.BaseURL
-	switch model.Provider {
-	case ProviderIDAntLing, ProviderIDCerebras, ProviderIDCloudflareAIGateway, ProviderIDCloudflareWorkersAI,
-		ProviderIDMoonshotAI, ProviderIDMoonshotAICN, ProviderIDNVIDIA, ProviderIDOpenCode,
-		ProviderIDOpenRouter, ProviderIDTogether, ProviderIDXAI, ProviderIDZAI, ProviderIDZAICodingCN:
-		return true
-	}
-	for _, fragment := range []string{
-		"api.ant-ling.com", "api.cloudflare.com", "api.moonshot.", "api.together.", "api.x.ai", "api.z.ai",
-		"cerebras.ai", "chutes.ai", "deepseek.com", "gateway.ai.cloudflare.com", "integrate.api.nvidia.com",
-		"opencode.ai", "open.bigmodel.cn", "openrouter.ai",
-	} {
-		if strings.Contains(baseURL, fragment) {
-			return true
-		}
-	}
-	return false
 }
 
 func clampOpenAIMaxTokens(model Model, input Context, maxTokens int64) int64 {

@@ -14,6 +14,7 @@ m0-offline:
 	go run ./examples/sdk-agent-session
 	go run ./examples/headless-text
 	go run ./examples/headless-json
+	go run ./examples/thinking-signatures
 
 m0-node-preflight:
 	@node --experimental-strip-types -e "" >/dev/null 2>&1 || (echo "freeze checks require Node >=22.6.0 with --experimental-strip-types" >&2; exit 2)
@@ -34,6 +35,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/openai-completions-retry.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-tools.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-tool-result.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/openai-completions-thinking.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check --require-dist
 	node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --batch --check --require-dist --out parity/oracle/fixtures/agent-tool-batch.json "$(abspath $(PIG_PI_ORACLE_CHECKOUT))"
 	node --experimental-strip-types parity/oracle/agent-tool-continuation.mjs --read --check --require-dist --out parity/oracle/fixtures/codingagent-read-continuation.json "$(abspath $(PIG_PI_ORACLE_CHECKOUT))"

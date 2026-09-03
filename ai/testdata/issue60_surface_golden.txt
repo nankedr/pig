@@ -1,0 +1,163 @@
+type ai.AssistantMessageThinkingDeltaEvent struct
+fields:
+- Type ai.AssistantMessageEventType tag="json:\"type\""
+- ContentIndex int tag="json:\"contentIndex\""
+- Delta string tag="json:\"delta\""
+- Partial ai.AssistantMessage tag="json:\"partial\""
+methods:
+- AssistantMessageEventType func(ai.AssistantMessageThinkingDeltaEvent) ai.AssistantMessageEventType
+
+type ai.AssistantMessageThinkingEndEvent struct
+fields:
+- Type ai.AssistantMessageEventType tag="json:\"type\""
+- ContentIndex int tag="json:\"contentIndex\""
+- Content string tag="json:\"content\""
+- Partial ai.AssistantMessage tag="json:\"partial\""
+methods:
+- AssistantMessageEventType func(ai.AssistantMessageThinkingEndEvent) ai.AssistantMessageEventType
+
+type ai.AssistantMessageThinkingStartEvent struct
+fields:
+- Type ai.AssistantMessageEventType tag="json:\"type\""
+- ContentIndex int tag="json:\"contentIndex\""
+- Partial ai.AssistantMessage tag="json:\"partial\""
+methods:
+- AssistantMessageEventType func(ai.AssistantMessageThinkingStartEvent) ai.AssistantMessageEventType
+
+type ai.FauxModelDefinition struct
+fields:
+- ID string tag=""
+- Name ai.Optional[string] tag=""
+- Reasoning ai.Optional[bool] tag=""
+- Input ai.Optional[[]github.com/nankedr/pig/ai.ModelInput] tag=""
+- Cost ai.Optional[github.com/nankedr/pig/ai.ModelCostRates] tag=""
+- ContextWindow ai.Optional[int] tag=""
+- MaxTokens ai.Optional[int] tag=""
+
+type ai.Model struct
+fields:
+- ID string tag="json:\"id\""
+- Name string tag="json:\"name\""
+- API ai.API tag="json:\"api\""
+- Provider ai.ProviderID tag="json:\"provider\""
+- BaseURL string tag="json:\"baseUrl\""
+- Reasoning bool tag="json:\"reasoning\""
+- ThinkingLevelMap ai.ThinkingLevelMap tag="json:\"thinkingLevelMap,omitempty\""
+- Input []ai.ModelInput tag="json:\"input\""
+- Cost ai.ModelCost tag="json:\"cost\""
+- ContextWindow int64 tag="json:\"contextWindow\""
+- MaxTokens int64 tag="json:\"maxTokens\""
+- SamplingParams map[string]json.RawMessage tag="json:\"samplingParams,omitempty\""
+- Headers map[string]string tag="json:\"headers,omitempty\""
+- Compat ai.Optional[encoding/json.RawMessage] tag="json:\"compat,omitzero\""
+
+type ai.OpenAICompletionsCompat struct
+fields:
+- SupportsStore ai.Optional[bool] tag="json:\"supportsStore,omitzero\""
+- SupportsDeveloperRole ai.Optional[bool] tag="json:\"supportsDeveloperRole,omitzero\""
+- SupportsReasoningEffort ai.Optional[bool] tag="json:\"supportsReasoningEffort,omitzero\""
+- SupportsUsageInStreaming ai.Optional[bool] tag="json:\"supportsUsageInStreaming,omitzero\""
+- SupportsFinishReason ai.Optional[bool] tag="json:\"supportsFinishReason,omitzero\""
+- MaxTokensField ai.Optional[github.com/nankedr/pig/ai.MaxTokensField] tag="json:\"maxTokensField,omitzero\""
+- RequiresToolResultName ai.Optional[bool] tag="json:\"requiresToolResultName,omitzero\""
+- RequiresAssistantAfterToolResult ai.Optional[bool] tag="json:\"requiresAssistantAfterToolResult,omitzero\""
+- RequiresThinkingAsText ai.Optional[bool] tag="json:\"requiresThinkingAsText,omitzero\""
+- RequiresReasoningContentOnAssistantMessages ai.Optional[bool] tag="json:\"requiresReasoningContentOnAssistantMessages,omitzero\""
+- ThinkingFormat ai.Optional[github.com/nankedr/pig/ai.ThinkingFormat] tag="json:\"thinkingFormat,omitzero\""
+- ChatTemplateKwargs map[string]json.RawMessage tag="json:\"chatTemplateKwargs,omitempty\""
+- ChatTemplateArgs map[string]json.RawMessage tag="json:\"chatTemplateArgs,omitempty\""
+- OpenRouterRouting ai.Optional[github.com/nankedr/pig/ai.OpenRouterRouting] tag="json:\"openRouterRouting,omitzero\""
+- VercelGatewayRouting ai.Optional[github.com/nankedr/pig/ai.VercelGatewayRouting] tag="json:\"vercelGatewayRouting,omitzero\""
+- ZAIToolStream ai.Optional[bool] tag="json:\"zaiToolStream,omitzero\""
+- SupportsThinkingTokenBudget ai.Optional[bool] tag="json:\"supportsThinkingTokenBudget,omitzero\""
+- SupportsOpenAIGrammarTools ai.Optional[bool] tag="json:\"supportsOpenAIGrammarTools,omitzero\""
+- SupportsStrictMode ai.Optional[bool] tag="json:\"supportsStrictMode,omitzero\""
+- CacheControlFormat ai.Optional[github.com/nankedr/pig/ai.CacheControlFormat] tag="json:\"cacheControlFormat,omitzero\""
+- SendSessionAffinityHeaders ai.Optional[bool] tag="json:\"sendSessionAffinityHeaders,omitzero\""
+- DeferredToolsMode ai.Optional[github.com/nankedr/pig/ai.DeferredToolsMode] tag="json:\"deferredToolsMode,omitzero\""
+- SessionAffinityFormat ai.Optional[github.com/nankedr/pig/ai.SessionAffinityFormat] tag="json:\"sessionAffinityFormat,omitzero\""
+- SupportsLongCacheRetention ai.Optional[bool] tag="json:\"supportsLongCacheRetention,omitzero\""
+
+type ai.OpenAICompletionsOptions struct
+fields:
+- StreamOptions ai.StreamOptions tag=""
+- ToolChoice ai.OpenAIChatToolChoice tag="json:\"toolChoice,omitempty\""
+- ReasoningEffort *ai.OpenAIReasoningEffort tag="json:\"reasoningEffort,omitempty\""
+- ThinkingBudgets *ai.ThinkingBudgets tag="json:\"thinkingBudgets,omitempty\""
+
+type ai.SimpleStreamOptions struct
+fields:
+- StreamOptions ai.StreamOptions tag=""
+- Reasoning *ai.ThinkingLevel tag="json:\"reasoning,omitempty\""
+- Deferred ai.DeferredOption tag="json:\"-\""
+- ThinkingBudgets *ai.ThinkingBudgets tag="json:\"thinkingBudgets,omitempty\""
+methods:
+- MarshalJSON func(ai.SimpleStreamOptions) ([]uint8, error)
+
+type ai.TextContent struct
+fields:
+- Type ai.ContentType tag="json:\"type\""
+- Text string tag="json:\"text\""
+- TextSignature ai.Optional[string] tag="json:\"textSignature,omitzero\""
+methods:
+- ContentType func(ai.TextContent) ai.ContentType
+
+type ai.TextSignatureV1 struct
+fields:
+- V int tag="json:\"v\""
+- ID string tag="json:\"id\""
+- Phase ai.Optional[github.com/nankedr/pig/ai.TextSignaturePhase] tag="json:\"phase,omitzero\""
+
+type ai.ThinkingBudgets struct
+fields:
+- Minimal *int64 tag="json:\"minimal,omitempty\""
+- Low *int64 tag="json:\"low,omitempty\""
+- Medium *int64 tag="json:\"medium,omitempty\""
+- High *int64 tag="json:\"high,omitempty\""
+
+type ai.ThinkingContent struct
+fields:
+- Type ai.ContentType tag="json:\"type\""
+- Thinking string tag="json:\"thinking\""
+- ThinkingSignature ai.Optional[string] tag="json:\"thinkingSignature,omitzero\""
+- Redacted ai.Optional[bool] tag="json:\"redacted,omitzero\""
+methods:
+- ContentType func(ai.ThinkingContent) ai.ContentType
+
+type ai.ToolCall struct
+fields:
+- Type ai.ContentType tag="json:\"type\""
+- ID string tag="json:\"id\""
+- Name string tag="json:\"name\""
+- Arguments map[string]interface {} tag="json:\"arguments\""
+- ThoughtSignature ai.Optional[string] tag="json:\"thoughtSignature,omitzero\""
+- Namespace ai.Optional[string] tag="json:\"namespace,omitzero\""
+methods:
+- ContentType func(ai.ToolCall) ai.ContentType
+
+type ai.Usage struct
+fields:
+- Input int64 tag="json:\"input\""
+- Output int64 tag="json:\"output\""
+- CacheRead int64 tag="json:\"cacheRead\""
+- CacheWrite int64 tag="json:\"cacheWrite\""
+- CacheWrite1H ai.Optional[int64] tag="json:\"cacheWrite1h,omitzero\""
+- Reasoning ai.Optional[int64] tag="json:\"reasoning,omitzero\""
+- TotalTokens int64 tag="json:\"totalTokens\""
+- Cost ai.UsageCost tag="json:\"cost\""
+
+func ai.ConvertOpenAICompletionsMessages func(ai.Model, ai.Context, ai.OpenAICompletionsCompat, []ai.ConvertOpenAICompletionsMessagesOptions) ([]json.RawMessage, error)
+
+func ai.FauxThinking func(string) ai.ThinkingContent
+
+func ai.StreamOpenAICompletions func(context.Context, ai.Model, ai.Context, ai.OpenAICompletionsOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleOpenAICompletions func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+constants:
+- ContentTypeThinking=thinking
+- AssistantMessageEventTypeThinkingStart=thinking_start
+- AssistantMessageEventTypeThinkingDelta=thinking_delta
+- AssistantMessageEventTypeThinkingEnd=thinking_end
+- TextSignaturePhaseCommentary=commentary
+- TextSignaturePhaseFinalAnswer=final_answer

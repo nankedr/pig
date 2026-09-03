@@ -40,6 +40,18 @@ M1 必须在冻结首批接口前完整验证本阶段触达的核心契约：
 
 M2 只扩展 M1 未触达的 legacy 分支，不重定义上述已冻结契约。M10 补齐不依赖图片体系的 Chat Completions Provider 兼容标志、高级选项和剩余协议分支，M12 再关闭图片相关分支。
 
+## M2.1 thinking/signature 门禁
+
+Issue #60 完成 M2 的第一条可运行切片：
+
+- Faux 离线流发送 thinking start/delta/end，并在 done、取消和 Provider error 终态保留 partial thinking、signature 与 redacted 元数据。
+- OpenAI Chat Completions 覆盖 reasoning level/effort、thinking budget、九种 M2 thinking format、同模型 history replay 与跨模型 thinking-as-text 转换。
+- SSE 覆盖 `reasoning_content`、`reasoning`、`reasoning_text` 优先级，encrypted reasoning detail 的前置/后置 ToolCall 绑定，reasoning usage 与按 content 顺序收尾。
+- 固定 Pi Oracle `openai-completions-thinking.json` 与 Go parity test 对齐请求、转换、事件和终态；API snapshot 冻结首次执行的公开字段和入口。
+- `go run ./examples/thinking-signatures` 提供不需要网络与凭证的 SDK 示例；学习文档和 TypeScript→Go 导航记录边界。
+
+未在 fixture 中穷举全部 absent/null/zero 状态的矩阵行只提升为 `partial`。deferred handles 与 post-M2 thinking formats 仍保持精确 `ErrNotImplemented`，不由本切片提前完成。
+
 M0 的 Chat Completions 能力矩阵必须区分公开 API 与内部 wire 字段，并逐字段、逐 option、逐 compat flag 指明归属 M1、M2、M10 或 M12。M1 范围外的未实现项均为可调用但明确失败的 Capability Stub；固定快照明确规定为 ignore/no-op 的 option 则实现并验证该行为，不能把两者混淆。M2/M10/M12 依次关闭已登记缺口，不改变 M1 已冻结的公共类型与核心语义。
 
 ## 状态与凭证边界

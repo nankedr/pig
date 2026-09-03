@@ -1,0 +1,563 @@
+{
+  "schema_version": "1.0.0",
+  "id": "ai/openai-completions/m2-thinking-signatures",
+  "catalog_ids": [
+    "matrix:ai/openai-completions/compat/open-aicompletions-compat-requires-reasoning-content-on-assistant-messages",
+    "matrix:ai/openai-completions/compat/open-aicompletions-compat-requires-thinking-as-text",
+    "matrix:ai/openai-completions/compat/open-aicompletions-compat-supports-reasoning-effort",
+    "matrix:ai/openai-completions/compat/open-aicompletions-compat-supports-thinking-token-budget",
+    "matrix:ai/openai-completions/compat/open-aicompletions-compat-thinking-format",
+    "matrix:ai/openai-completions/content/assistant-message-content-thinking",
+    "matrix:ai/openai-completions/content/text-content-text-signature",
+    "matrix:ai/openai-completions/content/thinking-content-thinking",
+    "matrix:ai/openai-completions/content/thinking-content-thinking-signature",
+    "matrix:ai/openai-completions/content/thinking-content-type",
+    "matrix:ai/openai-completions/delta/delta-reasoning",
+    "matrix:ai/openai-completions/delta/delta-reasoning-content",
+    "matrix:ai/openai-completions/delta/delta-reasoning-details",
+    "matrix:ai/openai-completions/delta/delta-reasoning-details-attach-after-tool-call",
+    "matrix:ai/openai-completions/delta/delta-reasoning-details-invalid-element",
+    "matrix:ai/openai-completions/delta/delta-reasoning-details-items-data",
+    "matrix:ai/openai-completions/delta/delta-reasoning-details-items-id",
+    "matrix:ai/openai-completions/delta/delta-reasoning-details-items-type",
+    "matrix:ai/openai-completions/delta/delta-reasoning-details-pending-before-tool-call",
+    "matrix:ai/openai-completions/delta/delta-reasoning-details-pending-last-wins",
+    "matrix:ai/openai-completions/delta/delta-reasoning-text",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-delta",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-delta-content-index",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-delta-delta",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-delta-partial",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-delta-type",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-end",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-end-content",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-end-content-index",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-end-partial",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-end-type",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-start",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-start-content-index",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-start-partial",
+    "matrix:ai/openai-completions/event/assistant-message-event-thinking-start-type",
+    "matrix:ai/openai-completions/message/conversion-assistant-reasoning-content-required",
+    "matrix:ai/openai-completions/message/conversion-assistant-reasoning-details-invalid",
+    "matrix:ai/openai-completions/message/conversion-assistant-reasoning-details-valid",
+    "matrix:ai/openai-completions/message/conversion-assistant-thinking-as-text",
+    "matrix:ai/openai-completions/message/conversion-assistant-thinking-signature",
+    "matrix:ai/openai-completions/message/conversion-assistant-thinking-signature-opencode-go",
+    "matrix:ai/openai-completions/message/conversion-history-cross-model-thinking",
+    "matrix:ai/openai-completions/message/conversion-history-cross-model-thought-signature",
+    "matrix:ai/openai-completions/option/open-aicompletions-options-reasoning-effort",
+    "matrix:ai/openai-completions/option/open-aicompletions-options-thinking-budgets",
+    "matrix:ai/openai-completions/option/simple-stream-options-reasoning",
+    "matrix:ai/openai-completions/option/thinking-budgets-high",
+    "matrix:ai/openai-completions/request/model-reasoning",
+    "matrix:ai/openai-completions/request/model-thinking-level-map",
+    "matrix:ai/openai-completions/request/model-thinking-level-map-high",
+    "matrix:ai/openai-completions/request/model-thinking-level-map-medium",
+    "matrix:ai/openai-completions/request/request-enable-thinking",
+    "matrix:ai/openai-completions/request/request-reasoning",
+    "matrix:ai/openai-completions/request/request-reasoning-effort",
+    "matrix:ai/openai-completions/request/request-thinking",
+    "matrix:ai/openai-completions/request/request-thinking-token-budget",
+    "matrix:ai/openai-completions/tool/tool-call-thought-signature",
+    "matrix:ai/openai-completions/usage/usage-completion-tokens-details-reasoning-tokens",
+    "matrix:ai/openai-completions/usage/usage-output-includes-reasoning",
+    "matrix:ai/openai-completions/usage/usage-reasoning"
+  ],
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "upstream": {
+    "module": "ai",
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/api/openai-completions.ts#streamSimple"
+  },
+  "input": {
+    "context": {
+      "messages": [
+        {
+          "content": "No thinking",
+          "role": "user"
+        },
+        {
+          "api": "openai-completions",
+          "content": [
+            {
+              "text": "plain",
+              "type": "text"
+            }
+          ],
+          "model": "reasoning-model",
+          "provider": "opencode-go",
+          "role": "assistant",
+          "stopReason": "stop",
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 0,
+            "output": 0,
+            "totalTokens": 0
+          }
+        },
+        {
+          "content": "Earlier question",
+          "role": "user"
+        },
+        {
+          "api": "openai-completions",
+          "content": [
+            {
+              "thinking": "plan",
+              "thinkingSignature": "reasoning",
+              "type": "thinking"
+            },
+            {
+              "thinking": "check",
+              "thinkingSignature": "reasoning_text",
+              "type": "thinking"
+            },
+            {
+              "text": "answer",
+              "textSignature": "{\"v\":1,\"id\":\"ignored\"}",
+              "type": "text"
+            },
+            {
+              "arguments": {
+                "path": "README.md"
+              },
+              "id": "history-call",
+              "name": "read",
+              "thoughtSignature": "{\"type\":\"reasoning.encrypted\",\"id\":\"history-call\",\"data\":\"history-secret\"}",
+              "type": "toolCall"
+            }
+          ],
+          "model": "reasoning-model",
+          "provider": "opencode-go",
+          "role": "assistant",
+          "stopReason": "toolUse",
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 0,
+            "output": 0,
+            "totalTokens": 0
+          }
+        },
+        {
+          "content": [
+            {
+              "text": "file",
+              "type": "text"
+            }
+          ],
+          "isError": false,
+          "role": "toolResult",
+          "toolCallId": "history-call",
+          "toolName": "read"
+        },
+        {
+          "content": "Continue",
+          "role": "user"
+        }
+      ],
+      "tools": [
+        {
+          "description": "Read a file",
+          "name": "read",
+          "parameters": {
+            "properties": {
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path"
+            ],
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "model": {
+      "api": "openai-completions",
+      "baseUrl": "https://local.invalid/v1",
+      "compat": {
+        "requiresReasoningContentOnAssistantMessages": true,
+        "supportsReasoningEffort": true,
+        "supportsThinkingTokenBudget": true,
+        "thinkingFormat": "openai"
+      },
+      "contextWindow": 32000,
+      "cost": {
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "input": 0,
+        "output": 0
+      },
+      "id": "reasoning-model",
+      "input": [
+        "text"
+      ],
+      "maxTokens": 16384,
+      "name": "Reasoning Model",
+      "provider": "opencode-go",
+      "reasoning": true,
+      "thinkingLevelMap": {
+        "high": "hard",
+        "medium": null
+      }
+    },
+    "options": {
+      "apiKey": "test-key",
+      "maxTokens": 4096,
+      "reasoning": "medium",
+      "thinkingBudgets": {
+        "high": 8192
+      }
+    },
+    "sse": "data: {\"id\":\"chatcmpl-thinking\",\"model\":\"reasoning-model-v2\",\"choices\":[{\"delta\":{\"reasoning_content\":\"first\",\"reasoning\":\"duplicate\",\"reasoning_text\":\"duplicate-text\"}}]}\n\ndata: {\"choices\":[{\"delta\":{\"reasoning\":\" second\"}}]}\n\ndata: {\"choices\":[{\"delta\":{\"reasoning_text\":\" fallback\"}}]}\n\ndata: {\"choices\":[{\"delta\":{\"reasoning_details\":[{\"type\":\"reasoning.encrypted\",\"id\":\"call-1\",\"data\":\"old\"},{\"type\":\"invalid\",\"id\":\"call-1\",\"data\":\"ignored\"}]}}]}\n\ndata: {\"choices\":[{\"delta\":{\"reasoning_details\":[{\"type\":\"reasoning.encrypted\",\"id\":\"call-1\",\"data\":\"secret\"}]}}]}\n\ndata: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":0,\"id\":\"call-1\",\"function\":{\"name\":\"read\",\"arguments\":\"{\\\"path\\\":\\\"README.md\\\"}\"}}]}}]}\n\ndata: {\"choices\":[{\"delta\":{\"tool_calls\":[{\"index\":1,\"id\":\"call-2\",\"function\":{\"name\":\"read\",\"arguments\":\"{}\"}}]}}]}\n\ndata: {\"choices\":[{\"delta\":{\"reasoning_details\":[{\"type\":\"reasoning.encrypted\",\"id\":\"call-2\",\"data\":\"later\"}]}}]}\n\ndata: {\"choices\":[{\"delta\":{\"content\":\"answer\"},\"finish_reason\":\"tool_calls\"}]}\n\ndata: {\"choices\":[],\"usage\":{\"prompt_tokens\":5,\"completion_tokens\":8,\"completion_tokens_details\":{\"reasoning_tokens\":6}}}\n\ndata: [DONE]\n\n"
+  },
+  "input_sha256": "152276f16394ca9f9ea25aa2fcbbad330b09a014e5673d6dafc0214550942588",
+  "actual": {
+    "events": [
+      {
+        "type": "start"
+      },
+      {
+        "contentIndex": 0,
+        "thinkingSignature": "reasoning_content",
+        "type": "thinking_start"
+      },
+      {
+        "contentIndex": 0,
+        "delta": "first",
+        "partialThinking": "first",
+        "thinkingSignature": "reasoning_content",
+        "type": "thinking_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": " second",
+        "partialThinking": "first second",
+        "thinkingSignature": "reasoning_content",
+        "type": "thinking_delta"
+      },
+      {
+        "contentIndex": 0,
+        "delta": " fallback",
+        "partialThinking": "first second fallback",
+        "thinkingSignature": "reasoning_content",
+        "type": "thinking_delta"
+      },
+      {
+        "contentIndex": 1,
+        "type": "toolcall_start"
+      },
+      {
+        "contentIndex": 1,
+        "delta": "{\"path\":\"README.md\"}",
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 2,
+        "type": "toolcall_start"
+      },
+      {
+        "contentIndex": 2,
+        "delta": "{}",
+        "type": "toolcall_delta"
+      },
+      {
+        "contentIndex": 3,
+        "type": "text_start"
+      },
+      {
+        "contentIndex": 3,
+        "delta": "answer",
+        "type": "text_delta"
+      },
+      {
+        "content": "first second fallback",
+        "contentIndex": 0,
+        "partialThinking": "first second fallback",
+        "thinkingSignature": "reasoning_content",
+        "type": "thinking_end"
+      },
+      {
+        "contentIndex": 1,
+        "thoughtSignature": "{\"type\":\"reasoning.encrypted\",\"id\":\"call-1\",\"data\":\"secret\"}",
+        "type": "toolcall_end"
+      },
+      {
+        "contentIndex": 2,
+        "thoughtSignature": "{\"type\":\"reasoning.encrypted\",\"id\":\"call-2\",\"data\":\"later\"}",
+        "type": "toolcall_end"
+      },
+      {
+        "content": "answer",
+        "contentIndex": 3,
+        "type": "text_end"
+      },
+      {
+        "reason": "toolUse",
+        "type": "done"
+      }
+    ],
+    "outcome": {
+      "api": "openai-completions",
+      "content": [
+        {
+          "thinking": "first second fallback",
+          "thinkingSignature": "reasoning_content",
+          "type": "thinking"
+        },
+        {
+          "arguments": {
+            "path": "README.md"
+          },
+          "id": "call-1",
+          "name": "read",
+          "thoughtSignature": "{\"type\":\"reasoning.encrypted\",\"id\":\"call-1\",\"data\":\"secret\"}",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {},
+          "id": "call-2",
+          "name": "read",
+          "thoughtSignature": "{\"type\":\"reasoning.encrypted\",\"id\":\"call-2\",\"data\":\"later\"}",
+          "type": "toolCall"
+        },
+        {
+          "text": "answer",
+          "type": "text"
+        }
+      ],
+      "model": "reasoning-model",
+      "provider": "opencode-go",
+      "rawStopReason": "tool_calls",
+      "responseId": "chatcmpl-thinking",
+      "responseModel": "reasoning-model-v2",
+      "role": "assistant",
+      "stopReason": "toolUse",
+      "usage": {
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "cost": {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "input": 0,
+          "output": 0,
+          "total": 0
+        },
+        "input": 5,
+        "output": 8,
+        "reasoning": 6,
+        "totalTokens": 13
+      }
+    },
+    "request": {
+      "body": {
+        "max_completion_tokens": 4096,
+        "messages": [
+          {
+            "content": "No thinking",
+            "role": "user"
+          },
+          {
+            "content": "plain",
+            "reasoning_content": "",
+            "role": "assistant"
+          },
+          {
+            "content": "Earlier question",
+            "role": "user"
+          },
+          {
+            "content": "answer",
+            "reasoning_content": "plan\ncheck",
+            "reasoning_details": [
+              {
+                "data": "history-secret",
+                "id": "history-call",
+                "type": "reasoning.encrypted"
+              }
+            ],
+            "role": "assistant",
+            "tool_calls": [
+              {
+                "function": {
+                  "arguments": "{\"path\":\"README.md\"}",
+                  "name": "read"
+                },
+                "id": "history-call",
+                "type": "function"
+              }
+            ]
+          },
+          {
+            "content": "file",
+            "role": "tool",
+            "tool_call_id": "history-call"
+          },
+          {
+            "content": "Continue",
+            "role": "user"
+          }
+        ],
+        "model": "reasoning-model",
+        "reasoning_effort": "hard",
+        "store": false,
+        "stream": true,
+        "stream_options": {
+          "include_usage": true
+        },
+        "thinking_token_budget": 3072,
+        "tools": [
+          {
+            "function": {
+              "description": "Read a file",
+              "name": "read",
+              "parameters": {
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ],
+                "type": "object"
+              },
+              "strict": false
+            },
+            "type": "function"
+          }
+        ]
+      }
+    },
+    "request_cases": {
+      "ant-ling": {
+        "reasoning": {
+          "effort": "enabled"
+        }
+      },
+      "deepseek-disabled": {
+        "thinking": {
+          "type": "disabled"
+        }
+      },
+      "deepseek-enabled": {
+        "reasoning_effort": "high",
+        "thinking": {
+          "type": "enabled"
+        }
+      },
+      "openai": {
+        "reasoning_effort": "hard"
+      },
+      "openrouter-off": {
+        "reasoning": {
+          "effort": "disabled"
+        }
+      },
+      "qwen": {
+        "enable_thinking": true,
+        "reasoning_effort": "high"
+      },
+      "string-thinking": {
+        "thinking": "high"
+      },
+      "together": {
+        "reasoning": {
+          "enabled": true
+        },
+        "reasoning_effort": "high"
+      },
+      "zai": {
+        "reasoning_effort": "high",
+        "thinking": {
+          "clear_thinking": false,
+          "type": "enabled"
+        }
+      }
+    },
+    "conversions": {
+      "cross_model": {
+        "content": "visible reasoninganswer",
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{}",
+              "name": "read"
+            },
+            "id": "call",
+            "type": "function"
+          }
+        ]
+      },
+      "thinking_as_text": {
+        "content": [
+          {
+            "text": "plan\n\ncheck",
+            "type": "text"
+          },
+          {
+            "text": "answer",
+            "type": "text"
+          }
+        ],
+        "reasoning_details": [
+          {
+            "data": "ok",
+            "id": "valid",
+            "type": "reasoning.encrypted"
+          }
+        ],
+        "role": "assistant",
+        "tool_calls": [
+          {
+            "function": {
+              "arguments": "{}",
+              "name": "read"
+            },
+            "id": "valid",
+            "type": "function"
+          },
+          {
+            "function": {
+              "arguments": "{}",
+              "name": "read"
+            },
+            "id": "invalid",
+            "type": "function"
+          }
+        ]
+      }
+    }
+  },
+  "hash": {
+    "algorithm": "sha256",
+    "observations_sha256": "86e46598267ca26f49cdfb6247627d7082210999b253333c054bc7e7a35974da"
+  },
+  "exec_method": "node --experimental-strip-types parity/oracle/openai-completions-thinking.mjs",
+  "env": {
+    "node_version": "v24.14.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  }
+}

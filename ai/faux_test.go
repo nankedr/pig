@@ -359,7 +359,7 @@ func TestCompatFauxRegistrationDrivesStreamAndComplete(t *testing.T) {
 	}
 }
 
-func TestFauxM2OptionsFailWithoutConsumingScript(t *testing.T) {
+func TestFauxUnsupportedOptionsFailWithoutConsumingScript(t *testing.T) {
 	message, _ := ai.FauxAssistantMessage(ai.FauxAssistantText("still queued"))
 	handle, err := ai.NewFauxProvider(ai.RegisterFauxProviderOptions{
 		API: "faux:m2", Provider: "faux-m2", Models: []ai.FauxModelDefinition{{ID: "m2-model"}},
@@ -374,29 +374,10 @@ func TestFauxM2OptionsFailWithoutConsumingScript(t *testing.T) {
 		hookCalls++
 		return nil
 	}}
-	reasoning := ai.ThinkingLevelHigh
-	stream := handle.Provider.StreamSimple(context.Background(), model, ai.Context{}, ai.SimpleStreamOptions{
-		Reasoning: &reasoning, StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions},
-	})
-	if event, ok, err := stream.Next(context.Background()); event != nil || ok || err != nil {
-		t.Fatalf("Next() = (%#v, %t, %v), want event-free closed stream", event, ok, err)
-	}
-	_, err = stream.Result(context.Background())
-	if !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("Result() error = %v, want ErrNotImplemented", err)
-	}
-	var notImplemented *ai.NotImplementedError
-	if !errors.As(err, &notImplemented) || notImplemented.Operation != "Faux.Thinking" {
-		t.Fatalf("Result() error = %#v, want Faux.Thinking", err)
-	}
-	if hookCalls != 0 || handle.State.CallCount != 0 || handle.GetPendingResponseCount() != 1 {
-		t.Fatalf("M2 stub side effects: hooks=%d calls=%d pending=%d", hookCalls, handle.State.CallCount, handle.GetPendingResponseCount())
-	}
 	if handle.Provider.SupportsFetchDeferred() || handle.Provider.SupportsCancelDeferred() {
-		t.Fatal("Faux must not advertise deferred support in M1")
+		t.Fatal("Faux must not advertise deferred support")
 	}
 
-	budgets := &ai.ThinkingBudgets{}
 	sessionID := "cache-session"
 	shortCache := ai.CacheRetentionShort
 	longCache := ai.CacheRetentionLong
@@ -405,7 +386,6 @@ func TestFauxM2OptionsFailWithoutConsumingScript(t *testing.T) {
 		options   ai.SimpleStreamOptions
 		operation string
 	}{
-		{name: "thinking budgets", options: ai.SimpleStreamOptions{ThinkingBudgets: budgets}, operation: "Faux.Thinking"},
 		{name: "enabled deferred", options: ai.SimpleStreamOptions{Deferred: ai.DeferredBoolean{Enabled: true}}, operation: "Faux.Deferred"},
 		{name: "deferred window", options: ai.SimpleStreamOptions{Deferred: ai.DeferredWindowOptions{}}, operation: "Faux.Deferred"},
 		{name: "default cache", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions, SessionID: &sessionID}}, operation: "Faux.Cache"},
@@ -424,34 +404,7 @@ func TestFauxM2OptionsFailWithoutConsumingScript(t *testing.T) {
 		})
 	}
 	if hookCalls != 0 || handle.State.CallCount != 0 || handle.GetPendingResponseCount() != 1 {
-		t.Fatalf("M2 option hooks=%d calls=%d pending=%d, want 0/0/1", hookCalls, handle.State.CallCount, handle.GetPendingResponseCount())
-	}
-}
-
-func TestFauxThinkingResponseFailsExplicitly(t *testing.T) {
-	message, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(ai.FauxThinking("not in M1")))
-	if err != nil {
-		t.Fatalf("FauxAssistantMessage() error = %v", err)
-	}
-	handle, err := ai.NewFauxProvider(ai.RegisterFauxProviderOptions{
-		API: "faux:thinking", Provider: "faux-thinking", Models: []ai.FauxModelDefinition{{ID: "thinking-model"}},
-	})
-	if err != nil {
-		t.Fatalf("NewFauxProvider() error = %v", err)
-	}
-	handle.SetResponses([]ai.FauxResponseStep{message})
-	model, _ := handle.GetModel()
-	stream := handle.Provider.Stream(context.Background(), model, ai.Context{}, ai.StreamOptions{})
-	if event, ok, nextErr := stream.Next(context.Background()); event != nil || ok || nextErr != nil {
-		t.Fatalf("Next() = (%#v, %t, %v), want event-free closed stream", event, ok, nextErr)
-	}
-	_, err = stream.Result(context.Background())
-	if !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("Result() error = %v, want ErrNotImplemented", err)
-	}
-	var notImplemented *ai.NotImplementedError
-	if !errors.As(err, &notImplemented) || notImplemented.Operation != "Faux.Thinking" {
-		t.Fatalf("Result() error = %#v, want Faux.Thinking", err)
+		t.Fatalf("unsupported option hooks=%d calls=%d pending=%d, want 0/0/1", hookCalls, handle.State.CallCount, handle.GetPendingResponseCount())
 	}
 }
 

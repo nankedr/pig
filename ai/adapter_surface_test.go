@@ -128,21 +128,30 @@ func TestConvertOpenAICompletionsMessagesHandlesEmptyTextContext(t *testing.T) {
 	}
 }
 
-func TestOpenAICompletionsDeferredReasoningRemainsAnExplicitCapabilityStub(t *testing.T) {
+func TestOpenAICompletionsReasoningUsesRuntimeCapability(t *testing.T) {
 	reasoning := ai.OpenAIReasoningEffortHigh
+	key := "test-key"
+	var payload map[string]any
 	options := ai.OpenAICompletionsOptions{
 		StreamOptions: ai.StreamOptions{
 			ProviderRequestOptions: ai.ProviderRequestOptions{
-				OnPayload: func(context.Context, ai.JSONValue, ai.Model) (ai.PayloadHookResult, error) {
-					t.Fatal("stub must not invoke request hooks")
-					return ai.PayloadHookResult{}, nil
+				APIKey: &key,
+				Fetch: func(_ context.Context, request ai.FetchRequest) (ai.FetchResponse, error) {
+					if err := json.Unmarshal(request.Body, &payload); err != nil {
+						t.Fatalf("decode request: %v", err)
+					}
+					return ai.FetchResponse{Status: 200, Body: []byte(openAITextSSE)}, nil
 				},
 			},
 		},
 		ReasoningEffort: &reasoning,
 	}
-	stream := ai.StreamOpenAICompletions(context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, options)
-	assertOpenAICompletionsStubOutcome(t, stream, "OpenAICompletions.Reasoning")
+	model := openAITextModel("https://example.test/v1")
+	model.Reasoning = true
+	result, err := ai.StreamOpenAICompletions(context.Background(), model, ai.Context{}, options).Result(context.Background())
+	if err != nil || result.StopReason != ai.StopReasonStop || payload["reasoning_effort"] != "high" {
+		t.Fatalf("reasoning runtime = (%#v, %v), payload %#v", result, err, payload)
+	}
 
 	streams := ai.OpenAICompletionsAPI()
 	if streams.Stream == nil || streams.StreamSimple == nil {
@@ -181,14 +190,15 @@ func TestOpenAICompletionsRuntimeAcceptsDocumentedNoOpOptions(t *testing.T) {
 					t.Fatalf("no-op option outcome = (%#v, %v)", result, err)
 				}
 
+				reasoning := ai.ThinkingLevelHigh
 				if testCase.Input.Entrypoint == "streamSimple" {
-					reasoning := ai.ThinkingLevelHigh
 					stream = ai.StreamSimpleOpenAICompletions(context.Background(), model, ai.Context{}, ai.SimpleStreamOptions{StreamOptions: streamOptions, Deferred: deferred, Reasoning: &reasoning})
-					assertOpenAICompletionsStubOutcome(t, stream, "OpenAICompletions.StreamSimple.Reasoning")
 				} else {
-					reasoning := ai.OpenAIReasoningEffortHigh
-					stream = ai.StreamOpenAICompletions(context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{StreamOptions: streamOptions, ReasoningEffort: &reasoning})
-					assertOpenAICompletionsStubOutcome(t, stream, "OpenAICompletions.Reasoning")
+					effort := ai.OpenAIReasoningEffortHigh
+					stream = ai.StreamOpenAICompletions(context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{StreamOptions: streamOptions, ReasoningEffort: &effort})
+				}
+				if result, err := stream.Result(context.Background()); err != nil || result.StopReason != ai.StopReasonStop {
+					t.Fatalf("reasoning option outcome = (%#v, %v)", result, err)
 				}
 				if got := telemetryRecorder.starts.Load(); got != 0 {
 					t.Fatalf("telemetry StartSpan calls = %d, want 0", got)
@@ -262,26 +272,12 @@ func noOpOptionsFromFixture(t *testing.T, option map[string]any, telemetryContex
 func TestOpenAICompletionsFutureMilestoneOptionsRemainExplicitStubs(t *testing.T) {
 	t.Parallel()
 
-	reasoning := ai.OpenAIReasoningEffortHigh
-	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
-		context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.OpenAICompletionsOptions{
-			ReasoningEffort: &reasoning,
-		},
-	), "OpenAICompletions.Reasoning")
-	_, err := ai.ConvertOpenAICompletionsMessages(
-		ai.Model{API: ai.APIOpenAICompletions, Reasoning: true}, ai.Context{}, ai.OpenAICompletionsCompat{},
-	)
-	assertOpenAICompletionsStubError(t, err, "OpenAICompletions.Reasoning")
 	retention := ai.CacheRetentionLong
 	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
 		context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.OpenAICompletionsOptions{
 			StreamOptions: ai.StreamOptions{CacheRetention: &retention},
 		},
 	), "OpenAICompletions.AdvancedOptions")
-	simpleReasoning := ai.ThinkingLevelHigh
-	assertOpenAICompletionsStubOutcome(t, ai.StreamSimpleOpenAICompletions(
-		context.Background(), ai.Model{API: ai.APIOpenAICompletions}, ai.Context{}, ai.SimpleStreamOptions{Reasoning: &simpleReasoning},
-	), "OpenAICompletions.StreamSimple.Reasoning")
 	model := ai.Model{
 		API:    ai.APIOpenAICompletions,
 		Compat: ai.Some(json.RawMessage(`{"supportsStore":false}`)),
@@ -289,11 +285,7 @@ func TestOpenAICompletionsFutureMilestoneOptionsRemainExplicitStubs(t *testing.T
 	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
 		context.Background(), model, ai.Context{}, ai.OpenAICompletionsOptions{},
 	), "OpenAICompletions.Compat.supportsStore")
-	deepSeekReasoning := ai.OpenAIReasoningEffortHigh
-	assertOpenAICompletionsStubOutcome(t, ai.StreamOpenAICompletions(
-		context.Background(), ai.Model{API: ai.APIOpenAICompletions, Provider: ai.ProviderIDDeepSeek, Reasoning: true}, ai.Context{}, ai.OpenAICompletionsOptions{ReasoningEffort: &deepSeekReasoning},
-	), "OpenAICompletions.Reasoning")
-	_, err = ai.ConvertOpenAICompletionsMessages(ai.Model{API: ai.APIOpenAICompletions}, ai.Context{Messages: []ai.Message{
+	_, err := ai.ConvertOpenAICompletionsMessages(ai.Model{API: ai.APIOpenAICompletions}, ai.Context{Messages: []ai.Message{
 		ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserBlocks(ai.ImageContent{Type: ai.ContentTypeImage, Data: "aGk=", MIMEType: "image/png"})},
 	}}, ai.OpenAICompletionsCompat{})
 	assertOpenAICompletionsStubError(t, err, "OpenAICompletions.ConvertMessages.Image")

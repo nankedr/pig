@@ -803,6 +803,7 @@ func TestOpenAICompletionsMatrixTracksVerifiedSlices(t *testing.T) {
 	for id := range openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-retry.json", "ai/openai-completions/m1-transport-retry") {
 		verifiedFixtureIDs[id] = true
 	}
+	thinkingFixtureIDs := openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-thinking.json", "ai/openai-completions/m2-thinking-signatures")
 	toolFixtureIDs := openAICompletionsFixtureCatalogIDs(t, root, "openai-completions-tools.json", "ai/openai-completions/m1-streaming-tools")
 	toolFixturePartialIDs := map[string]bool{
 		"matrix:ai/openai-completions/content/assistant-message-content-tool-call": true,
@@ -864,6 +865,18 @@ func TestOpenAICompletionsMatrixTracksVerifiedSlices(t *testing.T) {
 				}
 			} else if entry.Status != catalog.StatusVerified || len(entry.Evidence) == 0 {
 				t.Errorf("verified tool fixture row %s = status %q, evidence %d", entry.ID, entry.Status, len(entry.Evidence))
+			}
+			continue
+		}
+		if thinkingFixtureIDs[entry.ID] {
+			if entry.Status != catalog.StatusVerified && entry.Status != catalog.StatusPartial {
+				t.Errorf("thinking fixture row %s status = %q, want partial or verified", entry.ID, entry.Status)
+			}
+			if len(entry.Evidence) == 0 {
+				t.Errorf("thinking fixture row %s has no achieved evidence", entry.ID)
+			}
+			if entry.Status == catalog.StatusPartial && entry.Partial == nil {
+				t.Errorf("partial thinking fixture row %s has no supported/unsupported split", entry.ID)
 			}
 			continue
 		}

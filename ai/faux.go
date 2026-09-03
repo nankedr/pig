@@ -375,6 +375,28 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 			})
 			continue
 		}
+		if thinking, ok := fauxThinkingContent(content); ok {
+			partial.Content = append(partial.Content, ThinkingContent{Type: ContentTypeThinking})
+			stream.Push(AssistantMessageThinkingStartEvent{
+				Type: AssistantMessageEventTypeThinkingStart, ContentIndex: i, Partial: partial,
+			})
+			for _, chunk := range splitFauxText(thinking.Thinking, r.minTokenSize) {
+				if !r.waitChunk(ctx, chunk) {
+					r.pushAborted(stream, partial)
+					return
+				}
+				current := partial.Content[i].(ThinkingContent)
+				current.Thinking += chunk
+				partial.Content[i] = current
+				stream.Push(AssistantMessageThinkingDeltaEvent{
+					Type: AssistantMessageEventTypeThinkingDelta, ContentIndex: i, Delta: chunk, Partial: partial,
+				})
+			}
+			stream.Push(AssistantMessageThinkingEndEvent{
+				Type: AssistantMessageEventTypeThinkingEnd, ContentIndex: i, Content: thinking.Thinking, Partial: partial,
+			})
+			continue
+		}
 		toolCall, _ := fauxToolCallContent(content)
 		partial.Content = append(partial.Content, ToolCall{
 			Type: ContentTypeToolCall, ID: toolCall.ID, Name: toolCall.Name, Arguments: map[string]any{},
@@ -473,9 +495,6 @@ func unsupportedFauxOptions(options *SimpleStreamOptions) error {
 			return newNotImplemented("Faux.Deferred")
 		}
 	}
-	if options.Reasoning != nil || options.ThinkingBudgets != nil {
-		return newNotImplemented("Faux.Thinking")
-	}
 	if options.SessionID != nil && *options.SessionID != "" &&
 		(options.CacheRetention == nil || *options.CacheRetention != CacheRetentionNone) {
 		return newNotImplemented("Faux.Cache")
@@ -491,13 +510,16 @@ func validateFauxM1Message(message AssistantMessage) error {
 		if _, ok := fauxTextContent(content); ok {
 			continue
 		}
+		if _, ok := fauxThinkingContent(content); ok {
+			continue
+		}
 		if toolCall, ok := fauxToolCallContent(content); ok {
 			if _, err := json.Marshal(toolCall.Arguments); err != nil {
 				return fmt.Errorf("encode Faux ToolCall arguments: %w", err)
 			}
 			continue
 		}
-		return newNotImplemented("Faux.Thinking")
+		return fmt.Errorf("unsupported Faux content %T", content)
 	}
 	return nil
 }
@@ -524,6 +546,18 @@ func fauxTextContent(content AssistantContent) (TextContent, bool) {
 		}
 	}
 	return TextContent{}, false
+}
+
+func fauxThinkingContent(content AssistantContent) (ThinkingContent, bool) {
+	switch content := content.(type) {
+	case ThinkingContent:
+		return content, true
+	case *ThinkingContent:
+		if content != nil {
+			return *content, true
+		}
+	}
+	return ThinkingContent{}, false
 }
 
 func resolveFauxResponse(
