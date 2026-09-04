@@ -1,0 +1,14 @@
+type ai.ContextUsageEstimate struct
+fields:
+- Tokens int64 tag="json:\"tokens\""
+- UsageTokens int64 tag="json:\"usageTokens\""
+- TrailingTokens int64 tag="json:\"trailingTokens\""
+- LastUsageIndex *int tag="json:\"lastUsageIndex\""
+
+func ai.EstimateContextTokens func(ai.Context) ai.ContextUsageEstimate
+
+func ai.GetOverflowPatterns func() []*regexp.Regexp
+
+func ai.IsContextOverflow func(ai.AssistantMessage, ...int64) bool
+
+func ai.IsRecoverableLength func(ai.AssistantMessage, int64) bool
