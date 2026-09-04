@@ -173,6 +173,7 @@ func (s *EventStream[T, R]) endWithError(err error) {
 // AssistantMessageEventStream is the typed stream of AssistantMessage events
 // and their final AssistantMessage outcome.
 type AssistantMessageEventStream struct {
+	next   chan struct{}
 	stream *EventStream[AssistantMessageEvent, AssistantMessage]
 }
 
@@ -180,6 +181,7 @@ type AssistantMessageEventStream struct {
 // createAssistantMessageEventStream factory to an idiomatic Go constructor.
 func NewAssistantMessageEventStream() *AssistantMessageEventStream {
 	return &AssistantMessageEventStream{
+		next: make(chan struct{}, 1),
 		stream: NewEventStream(
 			func(event AssistantMessageEvent) bool {
 				typeOf, _ := assistantMessageEventVariantType(event)
@@ -205,7 +207,24 @@ func NewAssistantMessageEventStream() *AssistantMessageEventStream {
 
 // Next waits for the next AssistantMessage event.
 func (s *AssistantMessageEventStream) Next(ctx context.Context) (AssistantMessageEvent, bool, error) {
-	return s.stream.Next(ctx)
+	select {
+	case s.next <- struct{}{}:
+	default:
+		select {
+		case s.next <- struct{}{}:
+		case <-ctx.Done():
+			return nil, false, context.Cause(ctx)
+		}
+	}
+	defer func() { <-s.next }()
+	event, ok, err := s.stream.Next(ctx)
+	if lazy, yes := event.(lazyAssistantMessageEvent); yes {
+		event = lazy.build()
+		if err := validateAssistantMessageEvent(event); err != nil {
+			return nil, false, err
+		}
+	}
+	return event, ok, err
 }
 
 // Result waits for the final AssistantMessage outcome.
@@ -225,6 +244,22 @@ func (s *AssistantMessageEventStream) Push(event AssistantMessageEvent) {
 	}
 	s.stream.Push(cloneAssistantMessageEvent(event))
 }
+
+// PushLazy queues a nonterminal event whose immutable snapshot is built by Next.
+// Builders run in FIFO order, one at a time. Publish terminal events with Push
+// so Result can complete without consuming events.
+func (s *AssistantMessageEventStream) PushLazy(build func() AssistantMessageEvent) {
+	if build == nil {
+		s.stream.fail(errors.New("nil lazy event builder"))
+		return
+	}
+	s.stream.Push(lazyAssistantMessageEvent{build: build})
+}
+
+type lazyAssistantMessageEvent struct{ build func() AssistantMessageEvent }
+
+func (lazyAssistantMessageEvent) assistantMessageEvent()                               {}
+func (lazyAssistantMessageEvent) AssistantMessageEventType() AssistantMessageEventType { return "" }
 
 // End closes the stream, optionally with an explicit final AssistantMessage.
 func (s *AssistantMessageEventStream) End(result ...AssistantMessage) {

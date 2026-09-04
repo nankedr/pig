@@ -188,6 +188,7 @@ reference: packages/agent/src/proxy.ts#ProxyStreamOptions
 target: github.com/nankedr/pig/agent.ProxyStreamOptions
 type agent.ProxyStreamOptions struct
 fields:
+- Fetch ai.FetchFunction tag="json:\"-\""
 - AuthToken string tag="json:\"-\""
 - CacheRetention *ai.CacheRetention tag="json:\"cacheRetention,omitempty\""
 - Headers ai.ProviderHeaders tag="json:\"headers,omitempty\""

@@ -32,6 +32,10 @@ func encodeOpenAIArgumentFragment(fragment string) string {
 	return encoded.String()
 }
 
+// ParseStreamingJSONObject reconstructs object arguments from incomplete JSON.
+// Missing or malformed fragments yield the recoverable object, or an empty map.
+func ParseStreamingJSONObject(raw string) map[string]any { return parseOpenAIPartialObject(raw) }
+
 func parseOpenAIPartialObject(raw string) map[string]any {
 	var object map[string]any
 	if json.Unmarshal([]byte(raw), &object) == nil && object != nil {

@@ -12,10 +12,10 @@
   "entry_count": 9650,
   "status_counts": {
     "deferred": 2,
-    "implemented": 36,
+    "implemented": 55,
     "inventoried": 5177,
-    "partial": 217,
-    "scaffolded": 4052,
+    "partial": 216,
+    "scaffolded": 4034,
     "verified": 166
   }
 }

@@ -12,9 +12,9 @@
 | Status | Count |
 | --- | --- |
 | inventoried | 5177 |
-| scaffolded | 4052 |
-| partial | 217 |
-| implemented | 36 |
+| scaffolded | 4034 |
+| partial | 216 |
+| implemented | 55 |
 | verified | 166 |
 | deferred | 2 |
 
@@ -1660,21 +1660,6 @@
 | member:agent/src/harness/utils/truncate.ts#TruncationResult.totalLines | scaffolded | M8 | contract | github.com/nankedr/pig/agent.TruncationResult.TotalLines | agent |
 | member:agent/src/harness/utils/truncate.ts#TruncationResult.truncated | scaffolded | M8 | contract | github.com/nankedr/pig/agent.TruncationResult.Truncated | agent |
 | member:agent/src/harness/utils/truncate.ts#TruncationResult.truncatedBy | scaffolded | M8 | contract | github.com/nankedr/pig/agent.TruncationResult.TruncatedBy | agent |
-| member:agent/src/proxy.ts#ProxyAssistantMessageEvent.type | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyAssistantMessageEvent.ProxyAssistantMessageEventType | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.authToken | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.AuthToken | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.cacheRetention | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.CacheRetention | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.headers | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Headers | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.maxRetryDelayMs | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.MaxRetryDelayMS | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.maxTokens | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.MaxTokens | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.metadata | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Metadata | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.proxyUrl | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.ProxyURL | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.reasoning | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Reasoning | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.samplingParams | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.SamplingParams | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.sessionId | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.SessionID | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.signal | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Signal | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.temperature | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Temperature | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.thinkingBudgets | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.ThinkingBudgets | agent |
-| member:agent/src/proxy.ts#ProxyStreamOptions.transport | scaffolded | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Transport | agent |
 | member:agent/src/types.ts#AfterToolCallContext.args | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.Args | agent |
 | member:agent/src/types.ts#AfterToolCallContext.assistantMessage | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.AssistantMessage | agent |
 | member:agent/src/types.ts#AfterToolCallContext.context | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AfterToolCallContext.Context | agent |
@@ -2027,9 +2012,6 @@
 | symbol:agent/src/harness/utils/truncate.ts#truncateHead | scaffolded | M8 | symbol | github.com/nankedr/pig/agent.TruncateHead | agent |
 | symbol:agent/src/harness/utils/truncate.ts#truncateLine | scaffolded | M8 | symbol | github.com/nankedr/pig/agent.TruncateLine | agent |
 | symbol:agent/src/harness/utils/truncate.ts#truncateTail | scaffolded | M8 | symbol | github.com/nankedr/pig/agent.TruncateTail | agent |
-| symbol:agent/src/proxy.ts#ProxyAssistantMessageEvent | scaffolded | M2 | symbol | github.com/nankedr/pig/agent.ProxyAssistantMessageEvent | agent |
-| symbol:agent/src/proxy.ts#ProxyStreamOptions | scaffolded | M2 | symbol | github.com/nankedr/pig/agent.ProxyStreamOptions | agent |
-| symbol:agent/src/proxy.ts#streamProxy | scaffolded | M2 | symbol | github.com/nankedr/pig/agent.StreamProxy | agent |
 | symbol:agent/src/stream-fn.ts#setDefaultStreamFn | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.SetDefaultStreamFunction | agent |
 | symbol:agent/src/types.ts#AfterToolCallContext | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AfterToolCallContext | agent |
 | symbol:agent/src/types.ts#AfterToolCallResult | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.AfterToolCallResult | agent |
@@ -2054,11 +2036,11 @@
 | symbol:agent/src/types.ts#ToolExecutionMode | scaffolded | M1 | symbol | github.com/nankedr/pig/agent.ToolExecutionMode | agent |
 | contract:agent/events | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/messages | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
-| contract:agent/proxy | partial | M2 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/runtime | partial | M2 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/state-and-queues | partial | M2 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/tools | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/legacy-queues | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Steer / github.com/nankedr/pig/agent.(*Agent).FollowUp / github.com/nankedr/pig/agent.(*Agent).Continue | agent |
+| contract:agent/proxy | implemented | M2 | contract | github.com/nankedr/pig/agent | agent |
 | member:agent/src/agent.ts#Agent.abort | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Abort | agent |
 | member:agent/src/agent.ts#Agent.clearAllQueues | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).ClearAllQueues | agent |
 | member:agent/src/agent.ts#Agent.clearFollowUpQueue | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).ClearFollowUpQueue | agent |
@@ -2074,8 +2056,26 @@
 | member:agent/src/agent.ts#Agent.steeringMode | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).SteeringMode / github.com/nankedr/pig/agent.(*Agent).SetSteeringMode | agent |
 | member:agent/src/agent.ts#Agent.subscribe | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Subscribe | agent |
 | member:agent/src/agent.ts#Agent.waitForIdle | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).WaitForIdle | agent |
+| member:agent/src/proxy.ts#ProxyAssistantMessageEvent.type | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyAssistantMessageEvent.ProxyAssistantMessageEventType | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.authToken | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.AuthToken | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.cacheRetention | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.CacheRetention | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.headers | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Headers | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.maxRetryDelayMs | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.MaxRetryDelayMS | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.maxTokens | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.MaxTokens | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.metadata | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Metadata | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.proxyUrl | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.ProxyURL | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.reasoning | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Reasoning | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.samplingParams | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.SamplingParams | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.sessionId | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.SessionID | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.signal | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Signal | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.temperature | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Temperature | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.thinkingBudgets | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.ThinkingBudgets | agent |
+| member:agent/src/proxy.ts#ProxyStreamOptions.transport | implemented | M2 | contract | github.com/nankedr/pig/agent.ProxyStreamOptions.Transport | agent |
 | member:agent/src/types.ts#AgentLoopConfig.getFollowUpMessages | implemented | M2 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetFollowUpMessages | agent |
 | member:agent/src/types.ts#AgentLoopConfig.getSteeringMessages | implemented | M2 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetSteeringMessages | agent |
+| symbol:agent/src/proxy.ts#ProxyAssistantMessageEvent | implemented | M2 | symbol | github.com/nankedr/pig/agent.ProxyAssistantMessageEvent | agent |
+| symbol:agent/src/proxy.ts#ProxyStreamOptions | implemented | M2 | symbol | github.com/nankedr/pig/agent.ProxyStreamOptions | agent |
+| symbol:agent/src/proxy.ts#streamProxy | implemented | M2 | symbol | github.com/nankedr/pig/agent.StreamProxy | agent |
 
 ### ai
 

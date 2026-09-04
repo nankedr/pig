@@ -12,6 +12,7 @@ import (
 // ProxyStreamOptions contains the serializable simple-stream options plus the
 // local transport credentials used by the legacy proxy adapter.
 type ProxyStreamOptions struct {
+	Fetch           ai.FetchFunction           `json:"-"`
 	AuthToken       string                     `json:"-"`
 	CacheRetention  *ai.CacheRetention         `json:"cacheRetention,omitempty"`
 	Headers         ai.ProviderHeaders         `json:"headers,omitempty"`
@@ -406,20 +407,4 @@ func validateProxyTerminal(event ProxyAssistantMessageEvent) error {
 		}
 	}
 	return nil
-}
-
-// ProxyMessageEventStream is the consumer-only result of StreamProxy.
-type ProxyMessageEventStream struct{ err error }
-
-func (s *ProxyMessageEventStream) Next(context.Context) (ai.AssistantMessageEvent, bool, error) {
-	return nil, false, nil
-}
-
-func (s *ProxyMessageEventStream) Result(context.Context) (ai.AssistantMessage, error) {
-	return ai.AssistantMessage{}, s.err
-}
-
-// StreamProxy is an immediate, network-free M0 Capability Stub.
-func StreamProxy(context.Context, ai.Model, ai.Context, ProxyStreamOptions) *ProxyMessageEventStream {
-	return &ProxyMessageEventStream{err: newNotImplemented("StreamProxy")}
 }

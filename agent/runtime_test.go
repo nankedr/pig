@@ -301,6 +301,7 @@ func TestProxyStreamOptionsExposePinnedFields(t *testing.T) {
 
 	want := []string{
 		"AuthToken",
+		"Fetch",
 		"CacheRetention",
 		"Headers",
 		"MaxRetryDelayMS",
@@ -328,7 +329,6 @@ func TestProxyStreamOptionsExposePinnedFields(t *testing.T) {
 		"Deferred",
 		"APIKey",
 		"Env",
-		"Fetch",
 		"OnPayload",
 		"OnResponse",
 		"TimeoutMS",
@@ -457,25 +457,5 @@ func TestSetDefaultStreamFunctionIsSideEffectFreeStub(t *testing.T) {
 	}
 	if called {
 		t.Fatal("SetDefaultStreamFunction invoked the supplied function")
-	}
-}
-
-func TestStreamProxyStubIsImmediateEventFreeAndDoesNotInvokeFetch(t *testing.T) {
-	t.Parallel()
-	called := false
-	stream := agent.StreamProxy(context.Background(), ai.Model{}, ai.Context{}, agent.ProxyStreamOptions{
-		AuthToken: "token",
-	})
-	if stream == nil {
-		t.Fatal("StreamProxy returned nil stream")
-	}
-	if event, ok, err := stream.Next(context.Background()); event != nil || ok || err != nil {
-		t.Fatalf("Next() = (%T, %t, %v), want (nil, false, nil)", event, ok, err)
-	}
-	if _, err := stream.Result(context.Background()); !errors.Is(err, agent.ErrNotImplemented) {
-		t.Fatalf("Result() error = %v, want ErrNotImplemented", err)
-	}
-	if called {
-		t.Fatal("StreamProxy stub invoked Fetch")
 	}
 }
