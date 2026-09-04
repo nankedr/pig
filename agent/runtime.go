@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -74,9 +75,10 @@ type AgentLoopTurnUpdate struct {
 }
 
 type agentTurnCompletion struct {
-	agentContext AgentContext
-	newMessages  []AgentMessage
-	continueRun  bool
+	agentContext    AgentContext
+	newMessages     []AgentMessage
+	continueRun     bool
+	pendingMessages []AgentMessage
 }
 
 // AgentLoopConfig describes callbacks and options used by the low-level loop.
@@ -254,7 +256,18 @@ func RunAgentLoopContinue(ctx context.Context, agentContext AgentContext, config
 }
 
 func runAgentTurn(ctx context.Context, agentContext AgentContext, newMessages []AgentMessage, config AgentLoopConfig, emit AgentEventSink, streamFunction StreamFunction) ([]AgentMessage, error) {
+	pending, err := pollAgentMessages(ctx, config.GetSteeringMessages)
+	if err != nil {
+		return newMessages, err
+	}
 	for {
+		for _, message := range pending {
+			if err := emitMessageLifecycle(ctx, emit, message); err != nil {
+				return newMessages, err
+			}
+			agentContext.Messages = append(agentContext.Messages, cloneAgentMessage(message))
+			newMessages = append(newMessages, cloneAgentMessage(message))
+		}
 		messages := cloneAgentMessages(agentContext.Messages)
 		var err error
 		if config.TransformContext != nil {
@@ -347,6 +360,7 @@ func runAgentTurn(ctx context.Context, agentContext AgentContext, newMessages []
 		}
 		agentContext = completed.agentContext
 		newMessages = completed.newMessages
+		pending = completed.pendingMessages
 	}
 }
 
@@ -395,26 +409,65 @@ func finishAgentTurn(ctx context.Context, emit AgentEventSink, agentContext Agen
 	if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: []ai.ToolResultMessage{}}); err != nil {
 		return agentTurnCompletion{}, err
 	}
-	if message.StopReason != ai.StopReasonError && message.StopReason != ai.StopReasonAborted && config.ShouldStopAfterTurn != nil {
-		callbackContext, err := cloneAgentContext(agentContext)
+	return continueAgentTurn(ctx, emit, completed, config, message, []ai.ToolResultMessage{})
+}
+
+func pollAgentMessages(ctx context.Context, get func(context.Context) ([]AgentMessage, error)) ([]AgentMessage, error) {
+	if get == nil || context.Cause(ctx) != nil {
+		return nil, nil
+	}
+	messages, err := get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return cloneAgentMessagesForOwnership(messages)
+}
+
+func continueAgentTurn(ctx context.Context, emit AgentEventSink, completed agentTurnCompletion, config AgentLoopConfig, message ai.AssistantMessage, toolResults []ai.ToolResultMessage) (agentTurnCompletion, error) {
+	if cause := context.Cause(ctx); cause != nil {
+		completed.continueRun = false
+		err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: completed.newMessages})
+		return completed, errors.Join(cause, err)
+	}
+	shouldStop := false
+	if config.ShouldStopAfterTurn != nil {
+		callbackContext, err := cloneAgentContext(completed.agentContext)
 		if err != nil {
-			return agentTurnCompletion{}, err
+			return completed, err
 		}
-		_, err = config.ShouldStopAfterTurn(ctx, ShouldStopAfterTurnContext{
-			Message:     ai.CloneAssistantMessage(message),
-			ToolResults: []ai.ToolResultMessage{},
-			Context:     callbackContext,
-			NewMessages: cloneAgentMessages(newMessages),
+		shouldStop, err = config.ShouldStopAfterTurn(ctx, ShouldStopAfterTurnContext{
+			Message: ai.CloneAssistantMessage(message), ToolResults: cloneToolResultMessages(toolResults),
+			Context: callbackContext, NewMessages: cloneAgentMessages(completed.newMessages),
 		})
 		if cause := context.Cause(ctx); cause != nil {
-			return agentTurnCompletion{}, cause
+			completed.continueRun = false
+			endError := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: completed.newMessages})
+			return completed, errors.Join(cause, err, endError)
 		}
 		if err != nil {
-			return agentTurnCompletion{}, err
+			return completed, err
 		}
 	}
-	if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: newMessages}); err != nil {
-		return agentTurnCompletion{}, err
+	if !shouldStop {
+		var err error
+		completed.pendingMessages, err = pollAgentMessages(ctx, config.GetSteeringMessages)
+		if err != nil {
+			return completed, err
+		}
+		if !completed.continueRun && len(completed.pendingMessages) == 0 {
+			completed.pendingMessages, err = pollAgentMessages(ctx, config.GetFollowUpMessages)
+			if err != nil {
+				return completed, err
+			}
+		}
+		completed.continueRun = completed.continueRun || len(completed.pendingMessages) != 0
+		if completed.continueRun {
+			return completed, nil
+		}
+	}
+	completed.continueRun = false
+	if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: completed.newMessages}); err != nil {
+		return completed, err
 	}
 	return completed, nil
 }

@@ -263,14 +263,7 @@ func TestAgentSessionPromptPropagatesUnconfiguredAgentErrorAndSettles(t *testing
 }
 
 func TestAgentSessionLifecycleAndUnsupportedQueueMethodsHaveNoQueueSideEffects(t *testing.T) {
-	legacy, err := agent.NewAgent(agent.AgentOptions{})
-	if err != nil {
-		t.Fatalf("NewAgent: %v", err)
-	}
-	queued := ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("queued"), Timestamp: 1}
-	if err := legacy.Steer(queued); err != nil {
-		t.Fatalf("legacy Steer: %v", err)
-	}
+	legacy := newLegacyAgentWithQueuedSteering(t, agent.AgentInitialState{})
 	session := codingagent.NewAgentSession(codingagent.AgentSessionConfig{Agent: legacy})
 	before := legacy.State()
 
@@ -344,4 +337,35 @@ func TestSessionCarriersDefensivelyCopyNestedMutableValues(t *testing.T) {
 	if level, ok := stored.ThinkingLevelMap["high"].Value(); !ok || level != "high" {
 		t.Fatalf("ScopedModels thinking-level map aliases returned memory: (%q, %t)", level, ok)
 	}
+}
+
+func newLegacyAgentWithQueuedSteering(t *testing.T, initial agent.AgentInitialState) *agent.Agent {
+	t.Helper()
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	reply, err := ai.FauxAssistantMessage(ai.FauxAssistantText("reply"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{reply})
+	legacy, err := agent.NewAgent(agent.AgentOptions{
+		InitialState: &initial, StreamFunction: agent.StreamFunction(core.StreamSimple),
+		ShouldStopAfterTurn: func(context.Context, agent.ShouldStopAfterTurnContext) (bool, error) { return true, nil },
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	unsubscribe := legacy.Subscribe(func(_ context.Context, event agent.AgentEvent) error {
+		if event.AgentEventType() == agent.AgentEventTypeTurnEnd {
+			return legacy.Steer(ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("queued"), Timestamp: 2})
+		}
+		return nil
+	})
+	defer unsubscribe()
+	if err := legacy.Prompt(context.Background(), ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("prompt"), Timestamp: 1}); err != nil {
+		t.Fatal(err)
+	}
+	return legacy
 }

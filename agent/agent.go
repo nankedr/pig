@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 	"sync"
@@ -45,8 +46,7 @@ type AgentState struct {
 	ErrorMessage     *string
 }
 
-// AgentOptions configures a stateful legacy Agent. Runtime callbacks are kept
-// for the M1 loop implementation; the M0 Prompt stubs never invoke them.
+// AgentOptions configures a stateful legacy Agent.
 type AgentOptions struct {
 	InitialState               *AgentInitialState
 	ConvertToLLM               ConvertToLLMFunc
@@ -72,22 +72,22 @@ type AgentOptions struct {
 // Unsubscribe removes a registered Agent listener. Repeated calls are safe.
 type Unsubscribe func()
 
-// Agent owns one transcript and the two pending-message queues used by the
-// legacy loop. Network and Tool execution are deferred Capability Stubs.
+// Agent owns the legacy transcript, pending queues, and run lifecycle.
 type Agent struct {
 	mu sync.RWMutex
 
-	state         AgentState
-	steeringQueue []AgentMessage
-	followUpQueue []AgentMessage
-	steeringMode  QueueMode
-	followUpMode  QueueMode
-	listeners     map[uint64]AgentEventListener
-	listenerOrder []uint64
-	nextListener  uint64
-	activeContext context.Context
-	activeCancel  context.CancelCauseFunc
-	idle          chan struct{}
+	state             AgentState
+	steeringQueue     []AgentMessage
+	followUpQueue     []AgentMessage
+	steeringMode      QueueMode
+	followUpMode      QueueMode
+	listeners         map[uint64]AgentEventListener
+	listenerOrder     []uint64
+	nextListener      uint64
+	activeContext     context.Context
+	activeCancel      context.CancelCauseFunc
+	acceptingMessages bool
+	idle              chan struct{}
 
 	convertToLLM               ConvertToLLMFunc
 	transformContext           TransformContextFunc
@@ -526,8 +526,14 @@ func (a *Agent) Steer(message AgentMessage) error {
 		return err
 	}
 	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.activeContext == nil {
+		return fmt.Errorf("cannot Steer: Agent is idle")
+	}
+	if !a.acceptingMessages || context.Cause(a.activeContext) != nil {
+		return fmt.Errorf("cannot Steer: Agent is settling")
+	}
 	a.steeringQueue = append(a.steeringQueue, cloned)
-	a.mu.Unlock()
 	return nil
 }
 
@@ -537,9 +543,29 @@ func (a *Agent) FollowUp(message AgentMessage) error {
 		return err
 	}
 	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.activeContext == nil {
+		return fmt.Errorf("cannot FollowUp: Agent is idle")
+	}
+	if !a.acceptingMessages || context.Cause(a.activeContext) != nil {
+		return fmt.Errorf("cannot FollowUp: Agent is settling")
+	}
 	a.followUpQueue = append(a.followUpQueue, cloned)
-	a.mu.Unlock()
 	return nil
+}
+
+func drainAgentQueue(queue *[]AgentMessage, mode QueueMode) []AgentMessage {
+	count := len(*queue)
+	if count == 0 {
+		return nil
+	}
+	if mode == QueueOneAtATime {
+		count = 1
+	}
+	messages := append([]AgentMessage(nil), (*queue)[:count]...)
+	clear((*queue)[:count])
+	*queue = (*queue)[count:]
+	return messages
 }
 
 func (a *Agent) ClearSteeringQueue() {
@@ -661,10 +687,7 @@ func (a *Agent) Prompt(ctx context.Context, messages ...AgentMessage) error {
 	if err != nil {
 		return err
 	}
-	return a.run(ctx, func(runContext context.Context, agentContext AgentContext, config AgentLoopConfig, streamFunction StreamFunction) error {
-		_, err := RunAgentLoop(runContext, owned, agentContext, config, a.processEvent, streamFunction)
-		return err
-	})
+	return a.run(ctx, owned, false)
 }
 
 // PromptText starts one run from text and optional images.
@@ -679,52 +702,69 @@ func (a *Agent) PromptText(ctx context.Context, text string, images ...ai.ImageC
 	})
 }
 
-// Continue runs from an existing transcript whose last message is user or
-// ToolResult. Queue consumption remains deferred to M2.
+// Continue resumes the transcript, using pending steering before follow-ups
+// when the last message is an assistant response.
 func (a *Agent) Continue(ctx context.Context) error {
-	a.mu.RLock()
-	messages := cloneAgentMessages(a.state.Messages)
-	busy := a.activeContext != nil
-	a.mu.RUnlock()
-	if busy {
-		return fmt.Errorf("Agent is already processing; wait for completion before continuing")
-	}
-	if len(messages) == 0 {
-		return fmt.Errorf("no messages to continue from")
-	}
-	if messages[len(messages)-1].MessageRole() == ai.MessageRoleAssistant {
-		return fmt.Errorf("cannot continue from message role: assistant")
-	}
-	return a.run(ctx, func(runContext context.Context, agentContext AgentContext, config AgentLoopConfig, streamFunction StreamFunction) error {
-		_, err := RunAgentLoopContinue(runContext, agentContext, config, a.processEvent, streamFunction)
-		return err
-	})
+	return a.run(ctx, nil, true)
 }
 
-func (a *Agent) run(ctx context.Context, execute func(context.Context, AgentContext, AgentLoopConfig, StreamFunction) error) error {
+func (a *Agent) run(ctx context.Context, prompts []AgentMessage, continuing bool) error {
 	if ctx == nil {
 		return fmt.Errorf("Agent run context must not be nil")
 	}
-	runContext, agentContext, config, streamFunction, err := a.startRun(ctx)
+	runContext, agentContext, config, streamFunction, queued, err := a.startRun(ctx, continuing)
 	if err != nil {
 		return err
 	}
 	defer a.finishRun(runContext)
-	return execute(runContext, agentContext, config, streamFunction)
+	if continuing && len(queued) == 0 {
+		_, err = RunAgentLoopContinue(runContext, agentContext, config, a.processEvent, streamFunction)
+	} else {
+		if continuing {
+			prompts = queued
+		}
+		_, err = RunAgentLoop(runContext, prompts, agentContext, config, a.processEvent, streamFunction)
+	}
+	return err
 }
 
-func (a *Agent) startRun(ctx context.Context) (context.Context, AgentContext, AgentLoopConfig, StreamFunction, error) {
+func (a *Agent) startRun(ctx context.Context, continuing bool) (context.Context, AgentContext, AgentLoopConfig, StreamFunction, []AgentMessage, error) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	if a.activeContext != nil {
-		return nil, AgentContext{}, AgentLoopConfig{}, nil, fmt.Errorf("Agent is already processing")
+		return nil, AgentContext{}, AgentLoopConfig{}, nil, nil, fmt.Errorf("Agent is already processing")
+	}
+	if continuing {
+		messages := a.state.Messages
+		if len(messages) == 0 {
+			return nil, AgentContext{}, AgentLoopConfig{}, nil, nil, fmt.Errorf("no messages to continue from")
+		}
+		if messages[len(messages)-1].MessageRole() == ai.MessageRoleAssistant && len(a.steeringQueue) == 0 && len(a.followUpQueue) == 0 {
+			return nil, AgentContext{}, AgentLoopConfig{}, nil, nil, fmt.Errorf("cannot continue from message role: assistant")
+		}
 	}
 	if a.prepareNextTurn != nil || a.prepareNextTurnWithContext != nil {
-		return nil, AgentContext{}, AgentLoopConfig{}, nil, newNotImplemented("Agent.PrepareNextTurn")
+		return nil, AgentContext{}, AgentLoopConfig{}, nil, nil, newNotImplemented("Agent.PrepareNextTurn")
+	}
+	if cause := context.Cause(ctx); cause != nil {
+		return nil, AgentContext{}, AgentLoopConfig{}, nil, nil, cause
+	}
+	if a.streamFunction == nil {
+		return nil, AgentContext{}, AgentLoopConfig{}, nil, nil, newNotImplemented("Agent.DefaultStreamFunction")
+	}
+	var queued []AgentMessage
+	skipInitialSteeringPoll := false
+	if continuing && a.state.Messages[len(a.state.Messages)-1].MessageRole() == ai.MessageRoleAssistant {
+		queued = drainAgentQueue(&a.steeringQueue, a.steeringMode)
+		skipInitialSteeringPoll = len(queued) != 0
+		if len(queued) == 0 {
+			queued = drainAgentQueue(&a.followUpQueue, a.followUpMode)
+		}
 	}
 	runContext, cancel := context.WithCancelCause(ctx)
 	a.activeContext = runContext
 	a.activeCancel = cancel
+	a.acceptingMessages = true
 	a.idle = make(chan struct{})
 	a.state.IsStreaming = true
 	a.state.StreamingMessage = nil
@@ -756,15 +796,40 @@ func (a *Agent) startRun(ctx context.Context) (context.Context, AgentContext, Ag
 		BeforeToolCall:      a.beforeToolCall,
 		AfterToolCall:       a.afterToolCall,
 		ToolExecution:       a.toolExecution,
-		GetSteeringMessages: nil,
-		GetFollowUpMessages: nil,
+		GetSteeringMessages: func(ctx context.Context) ([]AgentMessage, error) {
+			a.mu.Lock()
+			defer a.mu.Unlock()
+			if context.Cause(ctx) != nil {
+				return nil, nil
+			}
+			if skipInitialSteeringPoll {
+				skipInitialSteeringPoll = false
+				return nil, nil
+			}
+			return drainAgentQueue(&a.steeringQueue, a.steeringMode), nil
+		},
+		GetFollowUpMessages: func(ctx context.Context) ([]AgentMessage, error) {
+			a.mu.Lock()
+			defer a.mu.Unlock()
+			if context.Cause(ctx) != nil {
+				return nil, nil
+			}
+			if len(a.steeringQueue) != 0 {
+				return drainAgentQueue(&a.steeringQueue, a.steeringMode), nil
+			}
+			messages := drainAgentQueue(&a.followUpQueue, a.followUpMode)
+			if len(messages) == 0 {
+				a.acceptingMessages = false
+			}
+			return messages, nil
+		},
 	}
 	agentContext := AgentContext{
 		SystemPrompt: a.state.SystemPrompt,
 		Messages:     cloneAgentMessages(a.state.Messages),
 		Tools:        cloneAgentTools(a.state.Tools),
 	}
-	return runContext, agentContext, config, a.streamFunction, nil
+	return runContext, agentContext, config, a.streamFunction, queued, nil
 }
 
 func (a *Agent) finishRun(runContext context.Context) {
@@ -779,6 +844,7 @@ func (a *Agent) finishRun(runContext context.Context) {
 	a.state.PendingToolCalls = make(map[string]struct{})
 	a.activeContext = nil
 	a.activeCancel = nil
+	a.acceptingMessages = false
 	idle := a.idle
 	close(idle)
 	a.mu.Unlock()
@@ -812,6 +878,7 @@ func (a *Agent) processEvent(ctx context.Context, event AgentEvent) error {
 			}
 		}
 	case AgentEndEvent:
+		a.acceptingMessages = false
 		a.state.StreamingMessage = nil
 	}
 	listeners := make([]AgentEventListener, 0, len(a.listeners))
@@ -821,12 +888,16 @@ func (a *Agent) processEvent(ctx context.Context, event AgentEvent) error {
 		}
 	}
 	a.mu.Unlock()
+	var listenerErrors error
 	for _, listener := range listeners {
 		if err := listener(ctx, cloneAgentEvent(event)); err != nil {
-			return err
+			if event.AgentEventType() != AgentEventTypeAgentEnd {
+				return err
+			}
+			listenerErrors = errors.Join(listenerErrors, err)
 		}
 	}
-	return nil
+	return listenerErrors
 }
 
 func agentAssistantMessage(message AgentMessage) (ai.AssistantMessage, bool) {

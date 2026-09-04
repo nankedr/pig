@@ -139,7 +139,7 @@ func TestAgentProviderErrorAndAbortKeepPartialAssistantContent(t *testing.T) {
 	})
 }
 
-func TestAgentPromptAndContinueKeepM2QueuesOutOfRuntime(t *testing.T) {
+func TestAgentPromptAndContinuePreserveCustomTranscript(t *testing.T) {
 	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
 	if err != nil {
 		t.Fatal(err)
@@ -169,12 +169,6 @@ func TestAgentPromptAndContinueKeepM2QueuesOutOfRuntime(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := created.Steer(userMessage("queued steering")); err != nil {
-		t.Fatal(err)
-	}
-	if err := created.FollowUp(userMessage("queued follow-up")); err != nil {
-		t.Fatal(err)
-	}
 	if err := created.Continue(context.Background()); err != nil {
 		t.Fatalf("Continue() error = %v", err)
 	}
@@ -194,14 +188,8 @@ func TestAgentPromptAndContinueKeepM2QueuesOutOfRuntime(t *testing.T) {
 	if !reflect.DeepEqual(gotRoles, wantRoles) {
 		t.Fatalf("transcript roles = %v, want %v", gotRoles, wantRoles)
 	}
-	if !created.HasQueuedMessages() {
-		t.Fatal("M2 steering/follow-up queues were consumed by M1 runtime")
-	}
 	if err := created.Continue(context.Background()); err == nil {
 		t.Fatal("Continue() accepted an assistant transcript tail")
-	}
-	if !created.HasQueuedMessages() {
-		t.Fatal("illegal Continue consumed M2 queues")
 	}
 }
 
@@ -695,78 +683,6 @@ func TestNewAgentRejectsInvalidConfiguration(t *testing.T) {
 	}
 }
 
-func TestAgentQueuesModesAndResetAreLocalStateOperations(t *testing.T) {
-	t.Parallel()
-
-	created, err := agent.NewAgent(agent.AgentOptions{InitialState: &agent.AgentInitialState{
-		SystemPrompt: "system",
-		Model:        ai.Model{ID: "configured"},
-		Tools:        []agent.ErasedAgentTool{erasedTestTool(t, "read", "", nil)},
-		Messages:     []agent.AgentMessage{userMessage("existing")},
-	}})
-	if err != nil {
-		t.Fatalf("NewAgent() error = %v", err)
-	}
-	if err := created.Steer(userMessage("steer")); err != nil {
-		t.Fatalf("Steer() error = %v", err)
-	}
-	if err := created.FollowUp(userMessage("follow")); err != nil {
-		t.Fatalf("FollowUp() error = %v", err)
-	}
-	if !created.HasQueuedMessages() {
-		t.Fatal("queued messages were not reported")
-	}
-	if err := created.SetSteeringMode(agent.QueueAll); err != nil {
-		t.Fatalf("SetSteeringMode() error = %v", err)
-	}
-	if err := created.SetFollowUpMode(agent.QueueAll); err != nil {
-		t.Fatalf("SetFollowUpMode() error = %v", err)
-	}
-	if err := created.SetSteeringMode(agent.QueueMode("invalid")); err == nil || created.SteeringMode() != agent.QueueAll {
-		t.Fatalf("invalid steering mode changed mode to %q; error %v", created.SteeringMode(), err)
-	}
-	if err := created.SetFollowUpMode(agent.QueueMode("invalid")); err == nil || created.FollowUpMode() != agent.QueueAll {
-		t.Fatalf("invalid follow-up mode changed mode to %q; error %v", created.FollowUpMode(), err)
-	}
-	created.ClearSteeringQueue()
-	if !created.HasQueuedMessages() {
-		t.Fatal("ClearSteeringQueue also cleared follow-up messages")
-	}
-	created.ClearFollowUpQueue()
-	if created.HasQueuedMessages() {
-		t.Fatal("ClearFollowUpQueue left a queued message")
-	}
-	if err := created.Steer(userMessage("steer-again")); err != nil {
-		t.Fatalf("Steer() error = %v", err)
-	}
-	if err := created.FollowUp(userMessage("follow-again")); err != nil {
-		t.Fatalf("FollowUp() error = %v", err)
-	}
-	created.ClearAllQueues()
-	if created.HasQueuedMessages() {
-		t.Fatal("ClearAllQueues left a queued message")
-	}
-	if err := created.Steer(nil); err == nil || created.HasQueuedMessages() {
-		t.Fatalf("invalid Steer() = %v, queued = %t", err, created.HasQueuedMessages())
-	}
-	if err := created.FollowUp(nil); err == nil || created.HasQueuedMessages() {
-		t.Fatalf("invalid FollowUp() = %v, queued = %t", err, created.HasQueuedMessages())
-	}
-	if err := created.Steer(userMessage("queued")); err != nil {
-		t.Fatalf("Steer() error = %v", err)
-	}
-	if err := created.Reset(); err != nil {
-		t.Fatalf("Reset() error = %v", err)
-	}
-	state := created.State()
-	if len(state.Messages) != 0 || state.IsStreaming || state.StreamingMessage != nil || len(state.PendingToolCalls) != 0 || state.ErrorMessage != nil || created.HasQueuedMessages() {
-		t.Fatalf("Reset left runtime state: state %#v, queued %t", state, created.HasQueuedMessages())
-	}
-	if state.SystemPrompt != "system" || state.Model.ID != "configured" || len(state.Tools) != 1 || created.SteeringMode() != agent.QueueAll || created.FollowUpMode() != agent.QueueAll {
-		t.Fatalf("Reset changed configuration: state %#v, modes (%q, %q)", state, created.SteeringMode(), created.FollowUpMode())
-	}
-}
-
 func TestAgentRuntimeValidationHasNoSideEffects(t *testing.T) {
 	t.Parallel()
 
@@ -816,8 +732,8 @@ func TestAgentRuntimeValidationHasNoSideEffects(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewAgent() error = %v", err)
 	}
-	if err := created.Steer(userMessage("queued")); err != nil {
-		t.Fatalf("Steer() error = %v", err)
+	if err := created.Steer(userMessage("queued")); err == nil {
+		t.Fatal("idle Steer succeeded")
 	}
 	listenerCalls := atomic.Int64{}
 	unsubscribe := created.Subscribe(func(context.Context, agent.AgentEvent) error {
@@ -845,7 +761,7 @@ func TestAgentRuntimeValidationHasNoSideEffects(t *testing.T) {
 		t.Fatalf("invalid runtime calls invoked listeners %d times", got)
 	}
 	after := created.State()
-	if !reflect.DeepEqual(after.Model, before.Model) || !reflect.DeepEqual(after.Messages, before.Messages) || len(after.Tools) != len(before.Tools) || after.IsStreaming != before.IsStreaming || after.StreamingMessage != before.StreamingMessage || !reflect.DeepEqual(after.PendingToolCalls, before.PendingToolCalls) || !reflect.DeepEqual(after.ErrorMessage, before.ErrorMessage) || !created.HasQueuedMessages() {
+	if !reflect.DeepEqual(after.Model, before.Model) || !reflect.DeepEqual(after.Messages, before.Messages) || len(after.Tools) != len(before.Tools) || after.IsStreaming != before.IsStreaming || after.StreamingMessage != before.StreamingMessage || !reflect.DeepEqual(after.PendingToolCalls, before.PendingToolCalls) || !reflect.DeepEqual(after.ErrorMessage, before.ErrorMessage) || created.HasQueuedMessages() {
 		t.Fatalf("invalid runtime calls mutated state or drained queues: before %#v, after %#v, queued %t", before, created.State(), created.HasQueuedMessages())
 	}
 	if created.Busy() {

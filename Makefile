@@ -18,6 +18,7 @@ m0-offline:
 	go run ./examples/deferred-response
 	go run ./examples/deferred-tools
 	go run ./examples/compat-session-resources
+	go run ./examples/legacy-agent-queues
 	go run ./examples/telemetry
 	go run ./examples/message-handoff
 	go run ./examples/context-overflow
@@ -37,6 +38,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/deferred-lifecycle.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/deferred-tools.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/compat-session-resources.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/legacy-agent-queues.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/telemetry.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/message-handoff.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/context-overflow.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9649
+- Total entries: 9650
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5177 |
-| scaffolded | 4069 |
+| scaffolded | 4052 |
 | partial | 217 |
-| implemented | 18 |
+| implemented | 36 |
 | verified | 166 |
 | deferred | 2 |
 
@@ -832,38 +832,23 @@
 | constructor:agent/src/harness/session/memory.ts#InMemorySessionStorage | scaffolded | M8 | contract | github.com/nankedr/pig/agent.NewInMemorySessionStorage | agent |
 | constructor:agent/src/harness/session/session.ts#Session | scaffolded | M8 | contract | github.com/nankedr/pig/agent.NewSession | agent |
 | contract:session/v4-harness | scaffolded | M8 | contract | github.com/nankedr/pig/agent | agent |
-| member:agent/src/agent.ts#Agent.abort | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Abort | agent |
 | member:agent/src/agent.ts#Agent.afterToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).AfterToolCall / github.com/nankedr/pig/agent.(*Agent).SetAfterToolCall | agent |
 | member:agent/src/agent.ts#Agent.beforeToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).BeforeToolCall / github.com/nankedr/pig/agent.(*Agent).SetBeforeToolCall | agent |
-| member:agent/src/agent.ts#Agent.clearAllQueues | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ClearAllQueues | agent |
-| member:agent/src/agent.ts#Agent.clearFollowUpQueue | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ClearFollowUpQueue | agent |
-| member:agent/src/agent.ts#Agent.clearSteeringQueue | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ClearSteeringQueue | agent |
-| member:agent/src/agent.ts#Agent.continue | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Continue | agent |
 | member:agent/src/agent.ts#Agent.convertToLlm | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ConvertToLLM / github.com/nankedr/pig/agent.(*Agent).SetConvertToLLM | agent |
-| member:agent/src/agent.ts#Agent.followUp | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).FollowUp | agent |
-| member:agent/src/agent.ts#Agent.followUpMode | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).FollowUpMode / github.com/nankedr/pig/agent.(*Agent).SetFollowUpMode | agent |
 | member:agent/src/agent.ts#Agent.getApiKey | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).GetAPIKey / github.com/nankedr/pig/agent.(*Agent).SetGetAPIKey | agent |
-| member:agent/src/agent.ts#Agent.hasQueuedMessages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).HasQueuedMessages | agent |
 | member:agent/src/agent.ts#Agent.maxRetryDelayMs | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).MaxRetryDelayMS / github.com/nankedr/pig/agent.(*Agent).SetMaxRetryDelayMS | agent |
 | member:agent/src/agent.ts#Agent.onPayload | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).OnPayload / github.com/nankedr/pig/agent.(*Agent).SetOnPayload | agent |
 | member:agent/src/agent.ts#Agent.onResponse | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).OnResponse / github.com/nankedr/pig/agent.(*Agent).SetOnResponse | agent |
 | member:agent/src/agent.ts#Agent.prepareNextTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).PrepareNextTurn / github.com/nankedr/pig/agent.(*Agent).SetPrepareNextTurn | agent |
 | member:agent/src/agent.ts#Agent.prepareNextTurnWithContext | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).PrepareNextTurnWithContext / github.com/nankedr/pig/agent.(*Agent).SetPrepareNextTurnWithContext | agent |
-| member:agent/src/agent.ts#Agent.prompt | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Prompt / github.com/nankedr/pig/agent.(*Agent).PromptText | agent |
-| member:agent/src/agent.ts#Agent.reset | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Reset | agent |
 | member:agent/src/agent.ts#Agent.sessionId | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).SessionID / github.com/nankedr/pig/agent.(*Agent).SetSessionID | agent |
 | member:agent/src/agent.ts#Agent.shouldStopAfterTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ShouldStopAfterTurn / github.com/nankedr/pig/agent.(*Agent).SetShouldStopAfterTurn | agent |
-| member:agent/src/agent.ts#Agent.signal | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ActiveContext | agent |
 | member:agent/src/agent.ts#Agent.state | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).State | agent |
-| member:agent/src/agent.ts#Agent.steer | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Steer | agent |
-| member:agent/src/agent.ts#Agent.steeringMode | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).SteeringMode / github.com/nankedr/pig/agent.(*Agent).SetSteeringMode | agent |
 | member:agent/src/agent.ts#Agent.streamFunction | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).StreamFunction / github.com/nankedr/pig/agent.(*Agent).SetStreamFunction | agent |
-| member:agent/src/agent.ts#Agent.subscribe | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Subscribe | agent |
 | member:agent/src/agent.ts#Agent.thinkingBudgets | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ThinkingBudgets / github.com/nankedr/pig/agent.(*Agent).SetThinkingBudgets | agent |
 | member:agent/src/agent.ts#Agent.toolExecution | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).ToolExecution / github.com/nankedr/pig/agent.(*Agent).SetToolExecution | agent |
 | member:agent/src/agent.ts#Agent.transformContext | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).TransformContext / github.com/nankedr/pig/agent.(*Agent).SetTransformContext | agent |
 | member:agent/src/agent.ts#Agent.transport | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).Transport / github.com/nankedr/pig/agent.(*Agent).SetTransport | agent |
-| member:agent/src/agent.ts#Agent.waitForIdle | scaffolded | M1 | contract | github.com/nankedr/pig/agent.(*Agent).WaitForIdle | agent |
 | member:agent/src/agent.ts#AgentOptions.afterToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.AfterToolCall | agent |
 | member:agent/src/agent.ts#AgentOptions.beforeToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.BeforeToolCall | agent |
 | member:agent/src/agent.ts#AgentOptions.convertToLlm | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentOptions.ConvertToLLM | agent |
@@ -1709,8 +1694,6 @@
 | member:agent/src/types.ts#AgentLoopConfig.beforeToolCall | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.BeforeToolCall | agent |
 | member:agent/src/types.ts#AgentLoopConfig.convertToLlm | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.ConvertToLLM | agent |
 | member:agent/src/types.ts#AgentLoopConfig.getApiKey | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetAPIKey | agent |
-| member:agent/src/types.ts#AgentLoopConfig.getFollowUpMessages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetFollowUpMessages | agent |
-| member:agent/src/types.ts#AgentLoopConfig.getSteeringMessages | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetSteeringMessages | agent |
 | member:agent/src/types.ts#AgentLoopConfig.model | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.Model | agent |
 | member:agent/src/types.ts#AgentLoopConfig.prepareNextTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.PrepareNextTurn | agent |
 | member:agent/src/types.ts#AgentLoopConfig.shouldStopAfterTurn | scaffolded | M1 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.ShouldStopAfterTurn | agent |
@@ -2072,9 +2055,27 @@
 | contract:agent/events | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/messages | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/proxy | partial | M2 | contract | github.com/nankedr/pig/agent | agent |
-| contract:agent/runtime | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
-| contract:agent/state-and-queues | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
+| contract:agent/runtime | partial | M2 | contract | github.com/nankedr/pig/agent | agent |
+| contract:agent/state-and-queues | partial | M2 | contract | github.com/nankedr/pig/agent | agent |
 | contract:agent/tools | partial | M1 | contract | github.com/nankedr/pig/agent | agent |
+| contract:agent/legacy-queues | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Steer / github.com/nankedr/pig/agent.(*Agent).FollowUp / github.com/nankedr/pig/agent.(*Agent).Continue | agent |
+| member:agent/src/agent.ts#Agent.abort | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Abort | agent |
+| member:agent/src/agent.ts#Agent.clearAllQueues | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).ClearAllQueues | agent |
+| member:agent/src/agent.ts#Agent.clearFollowUpQueue | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).ClearFollowUpQueue | agent |
+| member:agent/src/agent.ts#Agent.clearSteeringQueue | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).ClearSteeringQueue | agent |
+| member:agent/src/agent.ts#Agent.continue | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Continue | agent |
+| member:agent/src/agent.ts#Agent.followUp | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).FollowUp | agent |
+| member:agent/src/agent.ts#Agent.followUpMode | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).FollowUpMode / github.com/nankedr/pig/agent.(*Agent).SetFollowUpMode | agent |
+| member:agent/src/agent.ts#Agent.hasQueuedMessages | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).HasQueuedMessages | agent |
+| member:agent/src/agent.ts#Agent.prompt | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Prompt / github.com/nankedr/pig/agent.(*Agent).PromptText | agent |
+| member:agent/src/agent.ts#Agent.reset | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Reset | agent |
+| member:agent/src/agent.ts#Agent.signal | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).ActiveContext | agent |
+| member:agent/src/agent.ts#Agent.steer | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Steer | agent |
+| member:agent/src/agent.ts#Agent.steeringMode | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).SteeringMode / github.com/nankedr/pig/agent.(*Agent).SetSteeringMode | agent |
+| member:agent/src/agent.ts#Agent.subscribe | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).Subscribe | agent |
+| member:agent/src/agent.ts#Agent.waitForIdle | implemented | M2 | contract | github.com/nankedr/pig/agent.(*Agent).WaitForIdle | agent |
+| member:agent/src/types.ts#AgentLoopConfig.getFollowUpMessages | implemented | M2 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetFollowUpMessages | agent |
+| member:agent/src/types.ts#AgentLoopConfig.getSteeringMessages | implemented | M2 | contract | github.com/nankedr/pig/agent.AgentLoopConfig.GetSteeringMessages | agent |
 
 ### ai
 

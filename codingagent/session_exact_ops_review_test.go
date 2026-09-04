@@ -84,18 +84,12 @@ func TestAgentSessionExactOperationCarriers(t *testing.T) {
 }
 
 func TestAgentSessionExactOperationStubsAreInert(t *testing.T) {
-	legacy, err := agent.NewAgent(agent.AgentOptions{InitialState: &agent.AgentInitialState{
+	legacy := newLegacyAgentWithQueuedSteering(t, agent.AgentInitialState{
 		SystemPrompt:  "system",
 		Model:         ai.Model{ID: "model-1", Name: "Model One", API: ai.API("api"), Provider: ai.ProviderID("provider")},
 		ThinkingLevel: ai.ModelThinkingLevelHigh,
 		Messages:      []agent.AgentMessage{ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("existing"), Timestamp: 1}},
-	}})
-	if err != nil {
-		t.Fatalf("NewAgent: %v", err)
-	}
-	if err := legacy.Steer(ai.UserMessage{Role: ai.MessageRoleUser, Content: ai.UserText("queued"), Timestamp: 2}); err != nil {
-		t.Fatalf("legacy Steer: %v", err)
-	}
+	})
 	manager := codingagent.NewInMemorySessionManager("/project", codingagent.NewSessionOptions{ID: "session-1"})
 	runner := &codingagent.ExtensionRunner{}
 	session := codingagent.NewAgentSession(codingagent.AgentSessionConfig{
