@@ -8,8 +8,8 @@ PI_TYPESCRIPT_VERSION := 5.9.3
 m0-gate: m0-offline
 
 m0-offline:
-	go test ./... -count=1
-	go test -race ./... -count=1
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test ./... -count=1
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./... -count=1
 	go vet ./...
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build ./...
 	go run ./examples/m0-contracts

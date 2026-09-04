@@ -8,7 +8,7 @@ Issue #70 集成 #60–#69 的 Legacy AI、Agent 和 Telemetry 公共链路。CL
 make m2-gate
 ```
 
-该命令依次运行全量 Go 测试、全量 race、vet、CGO-free darwin/arm64 构建、全部已交付示例，以及 20 次带随机测试顺序的 M2 并发回归。普通测试使用已提交 fixture、注入 transport 和本地受控 HTTP 服务，不需要 Pi、Node 或真实凭证。不要给普通门禁注入真实 Provider 密钥；live smoke 无密钥时明确跳过。
+该命令依次运行全量 Go 测试、全量 race、vet、CGO-free darwin/arm64 构建、全部已交付示例，以及 20 次带随机测试顺序的 M2 并发回归。普通测试使用已提交 fixture、注入 transport 和本地受控 HTTP 服务，不需要 Pi、Node 或真实凭证。离线测试子进程会移除 live smoke 与 upstream drift 的 opt-in 环境变量，即使发布进程已加载密钥，也只在专门的 live smoke 步骤访问真实 Provider。
 
 重复回归覆盖 deferred fetch/cancel、Agent 队列、proxy、compat registry、Session Resource cleanup 和并发 Telemetry。proxy 的取消用例要求 Fetch、阻塞 reader 和 producer 全部退出；队列、deferred 和 Tool 用例通过完成通道与 listener barrier 验证运行生命周期，超时视为失败。
 
