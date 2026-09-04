@@ -143,8 +143,22 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 			return nil, err
 		}
 	}
-	toolCallIDs := map[string]string{}
-	for _, message := range input.Messages {
+	transformed, err := TransformMessages(input.Messages, model, func(id string, _ Model, _ AssistantMessage) string {
+		return normalizeOpenAIToolCallID(model, id)
+	})
+	if err != nil {
+		var unsupported *NotImplementedError
+		if errors.As(err, &unsupported) {
+			switch unsupported.Operation {
+			case "TransformMessages.UserImage":
+				return nil, newNotImplemented("OpenAICompletions.ConvertMessages.Image")
+			case "TransformMessages.ToolResultImage":
+				return nil, newNotImplemented("OpenAICompletions.ConvertMessages.ToolResultImage")
+			}
+		}
+		return nil, err
+	}
+	for _, message := range transformed {
 		switch value := message.(type) {
 		case UserMessage:
 			if err := appendOpenAIUserMessage(&messages, value); err != nil {
@@ -158,25 +172,25 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 				return nil, err
 			}
 		case AssistantMessage:
-			if err := appendOpenAIAssistantMessage(&messages, model, compat, value, toolCallIDs); err != nil {
+			if err := appendOpenAIAssistantMessage(&messages, model, compat, value); err != nil {
 				return nil, err
 			}
 		case *AssistantMessage:
 			if value == nil {
 				return nil, fmt.Errorf("nil assistant message")
 			}
-			if err := appendOpenAIAssistantMessage(&messages, model, compat, *value, toolCallIDs); err != nil {
+			if err := appendOpenAIAssistantMessage(&messages, model, compat, *value); err != nil {
 				return nil, err
 			}
 		case ToolResultMessage:
-			if err := appendOpenAIToolResultMessage(&messages, value, toolCallIDs); err != nil {
+			if err := appendOpenAIToolResultMessage(&messages, value); err != nil {
 				return nil, err
 			}
 		case *ToolResultMessage:
 			if value == nil {
 				return nil, fmt.Errorf("nil tool result message")
 			}
-			if err := appendOpenAIToolResultMessage(&messages, *value, toolCallIDs); err != nil {
+			if err := appendOpenAIToolResultMessage(&messages, *value); err != nil {
 				return nil, err
 			}
 		default:
@@ -219,11 +233,7 @@ func appendOpenAIUserMessage(messages *[]json.RawMessage, message UserMessage) e
 	return err
 }
 
-func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, compat OpenAICompletionsCompat, message AssistantMessage, toolCallIDs map[string]string) error {
-	if message.StopReason == StopReasonError || message.StopReason == StopReasonAborted {
-		return nil
-	}
-	sameModel := message.Provider == model.Provider && message.API == model.API && message.Model == model.ID
+func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, compat OpenAICompletionsCompat, message AssistantMessage) error {
 	var textParts []string
 	var thinking []ThinkingContent
 	var toolCalls []map[string]any
@@ -233,23 +243,14 @@ func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, comp
 		if err != nil {
 			return err
 		}
-		id := call.ID
-		if !sameModel {
-			id = normalizeOpenAIToolCallID(model, id)
-			if id != call.ID {
-				toolCallIDs[call.ID] = id
-			}
-		}
 		toolCalls = append(toolCalls, map[string]any{
-			"id": id, "type": "function",
+			"id": call.ID, "type": "function",
 			"function": map[string]any{"name": call.Name, "arguments": string(arguments)},
 		})
-		if sameModel {
-			if signature, ok := call.ThoughtSignature.Value(); ok {
-				var detail any
-				if json.Unmarshal([]byte(signature), &detail) == nil && truthyJSONValue(detail) {
-					reasoningDetails = append(reasoningDetails, detail)
-				}
+		if signature, ok := call.ThoughtSignature.Value(); ok {
+			var detail any
+			if json.Unmarshal([]byte(signature), &detail) == nil && truthyJSONValue(detail) {
+				reasoningDetails = append(reasoningDetails, detail)
 			}
 		}
 		return nil
@@ -265,10 +266,10 @@ func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, comp
 				textParts = append(textParts, sanitizeOpenAIText(value.Text))
 			}
 		case ThinkingContent:
-			appendOpenAIThinking(&thinking, &textParts, value, sameModel)
+			appendOpenAIThinking(&thinking, value)
 		case *ThinkingContent:
 			if value != nil {
-				appendOpenAIThinking(&thinking, &textParts, *value, sameModel)
+				appendOpenAIThinking(&thinking, *value)
 			}
 		case ToolCall:
 			if err := appendToolCall(value); err != nil {
@@ -335,14 +336,7 @@ func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, comp
 	return err
 }
 
-func appendOpenAIThinking(thinking *[]ThinkingContent, textParts *[]string, block ThinkingContent, sameModel bool) {
-	if !sameModel {
-		if redacted, _ := block.Redacted.Value(); redacted || strings.TrimSpace(block.Thinking) == "" {
-			return
-		}
-		*textParts = append(*textParts, sanitizeOpenAIText(block.Thinking))
-		return
-	}
+func appendOpenAIThinking(thinking *[]ThinkingContent, block ThinkingContent) {
 	if strings.TrimSpace(block.Thinking) != "" {
 		*thinking = append(*thinking, block)
 	}
@@ -363,7 +357,7 @@ func truthyJSONValue(value any) bool {
 	}
 }
 
-func appendOpenAIToolResultMessage(messages *[]json.RawMessage, message ToolResultMessage, toolCallIDs map[string]string) error {
+func appendOpenAIToolResultMessage(messages *[]json.RawMessage, message ToolResultMessage) error {
 	if message.AddedToolNames.IsSet() {
 		return newNotImplemented("OpenAICompletions.ConvertMessages.ToolResultAddedToolNames")
 	}
@@ -386,12 +380,8 @@ func appendOpenAIToolResultMessage(messages *[]json.RawMessage, message ToolResu
 	if content == "" {
 		content = "(no tool output)"
 	}
-	id := message.ToolCallID
-	if normalized, ok := toolCallIDs[id]; ok {
-		id = normalized
-	}
 	raw, err := json.Marshal(map[string]any{
-		"role": "tool", "content": sanitizeOpenAIText(content), "tool_call_id": id,
+		"role": "tool", "content": sanitizeOpenAIText(content), "tool_call_id": message.ToolCallID,
 	})
 	if err == nil {
 		*messages = append(*messages, raw)
@@ -421,7 +411,8 @@ func normalizeOpenAIToolCallID(model Model, id string) string {
 		return callID + "_" + hash
 	}
 	if model.Provider == ProviderIDOpenAI && len(id) > 40 {
-		return id[:40]
+		units := utf16.Encode([]rune(id))
+		return string(utf16.Decode(units[:min(40, len(units))]))
 	}
 	return id
 }

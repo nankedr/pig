@@ -37,8 +37,14 @@ func TestOpenAICompletionsReplaysThinkingAndSignatures(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ConvertOpenAICompletionsMessages() error = %v", err)
 	}
-	if len(messages) != 1 {
+	if len(messages) != 3 {
 		t.Fatalf("messages = %#v", messages)
+	}
+	for i, id := range []string{"call-1", "call-2"} {
+		var result map[string]any
+		if err := json.Unmarshal(messages[i+1], &result); err != nil || result["tool_call_id"] != id || result["content"] != "No result provided" {
+			t.Fatalf("synthetic result = %#v, %v", result, err)
+		}
 	}
 	var got map[string]any
 	if err := json.Unmarshal(messages[0], &got); err != nil {

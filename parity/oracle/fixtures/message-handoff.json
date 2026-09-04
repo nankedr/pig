@@ -1,0 +1,3370 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/api/transform-messages.ts#transformMessages"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/ai/message-handoff",
+    "catalog_id": "contract:ai/message-handoff",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "id": "same",
+          "model": {
+            "id": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "thinking",
+                  "thinking": "plan",
+                  "thinkingSignature": "reasoning_content"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "thinkingSignature": "encrypted"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": " \n",
+                  "thinkingSignature": "signed-space"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "redacted": true,
+                  "thinkingSignature": "opaque"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "hidden",
+                  "redacted": true
+                },
+                {
+                  "type": "thinking",
+                  "thinking": " \n"
+                },
+                {
+                  "type": "text",
+                  "text": "answer",
+                  "textSignature": "text-id"
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  },
+                  "thoughtSignature": "tool-signature",
+                  "namespace": "files"
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "different-model",
+          "model": {
+            "id": "other",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "thinking",
+                  "thinking": "plan",
+                  "thinkingSignature": "reasoning_content"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "thinkingSignature": "encrypted"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": " \n",
+                  "thinkingSignature": "signed-space"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "redacted": true,
+                  "thinkingSignature": "opaque"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "hidden",
+                  "redacted": true
+                },
+                {
+                  "type": "thinking",
+                  "thinking": " \n"
+                },
+                {
+                  "type": "text",
+                  "text": "answer",
+                  "textSignature": "text-id"
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  },
+                  "thoughtSignature": "tool-signature",
+                  "namespace": "files"
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "different-api",
+          "model": {
+            "id": "source",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "thinking",
+                  "thinking": "plan",
+                  "thinkingSignature": "reasoning_content"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "thinkingSignature": "encrypted"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": " \n",
+                  "thinkingSignature": "signed-space"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "redacted": true,
+                  "thinkingSignature": "opaque"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "hidden",
+                  "redacted": true
+                },
+                {
+                  "type": "thinking",
+                  "thinking": " \n"
+                },
+                {
+                  "type": "text",
+                  "text": "answer",
+                  "textSignature": "text-id"
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  },
+                  "thoughtSignature": "tool-signature",
+                  "namespace": "files"
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "different-provider",
+          "model": {
+            "id": "source",
+            "api": "openai-responses",
+            "provider": "other",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "thinking",
+                  "thinking": "plan",
+                  "thinkingSignature": "reasoning_content"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "thinkingSignature": "encrypted"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": " \n",
+                  "thinkingSignature": "signed-space"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "redacted": true,
+                  "thinkingSignature": "opaque"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "hidden",
+                  "redacted": true
+                },
+                {
+                  "type": "thinking",
+                  "thinking": " \n"
+                },
+                {
+                  "type": "text",
+                  "text": "answer",
+                  "textSignature": "text-id"
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  },
+                  "thoughtSignature": "tool-signature",
+                  "namespace": "files"
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "no-normalizer",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "none",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "identity-normalizer",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "identity",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "long-anthropic-id",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "orphan-end",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|done",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|missing",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|done",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "orphan-user",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|done",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|missing",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|done",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "user",
+              "content": "continue",
+              "timestamp": 3
+            }
+          ]
+        },
+        {
+          "id": "orphan-assistant",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|done",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|missing",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|done",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "next"
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "stop",
+              "timestamp": 1
+            }
+          ]
+        },
+        {
+          "id": "orphan-error",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|done",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|missing",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|done",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "failed",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "error",
+              "timestamp": 1
+            }
+          ]
+        },
+        {
+          "id": "orphan-aborted",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|done",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|missing",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|done",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "failed",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "aborted",
+              "timestamp": 1
+            }
+          ]
+        },
+        {
+          "id": "all-results",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|one",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|two",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|two",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|one",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "user",
+              "content": "continue",
+              "timestamp": 3
+            }
+          ]
+        },
+        {
+          "id": "result-after-interruption",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|one",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "user",
+              "content": "continue",
+              "timestamp": 3
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|one",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "failed-mapping",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "anthropic",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|failed",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "error",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|failed",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "cancelled",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "aborted",
+              "timestamp": 1
+            },
+            {
+              "role": "user",
+              "content": "continue",
+              "timestamp": 3
+            }
+          ]
+        },
+        {
+          "id": "nil-content",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "none",
+          "messages": [
+            {
+              "role": "user",
+              "content": null,
+              "timestamp": 3
+            },
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": null,
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "stop",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "missing",
+              "toolName": "read",
+              "content": null,
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "user",
+              "timestamp": 4
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "old",
+              "toolName": "read",
+              "isError": false,
+              "timestamp": 5
+            }
+          ]
+        },
+        {
+          "id": "empty-signatures",
+          "model": {
+            "id": "target",
+            "api": "anthropic-messages",
+            "provider": "github-copilot",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "none",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "empty",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  },
+                  "thoughtSignature": ""
+                },
+                {
+                  "type": "toolCall",
+                  "id": "null",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  },
+                  "thoughtSignature": null
+                },
+                {
+                  "type": "text",
+                  "text": "",
+                  "textSignature": null
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "empty",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "null",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "wire-openai",
+          "wire": true,
+          "model": {
+            "id": "target",
+            "api": "openai-completions",
+            "provider": "openai",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "none",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=other",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|💡item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "raw-id",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=other",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|💡item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "raw-id",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        },
+        {
+          "id": "wire-other",
+          "wire": true,
+          "model": {
+            "id": "target",
+            "api": "openai-completions",
+            "provider": "other",
+            "input": [
+              "text"
+            ],
+            "reasoning": true
+          },
+          "normalize": "none",
+          "messages": [
+            {
+              "role": "assistant",
+              "api": "openai-responses",
+              "provider": "github-copilot",
+              "model": "source",
+              "content": [
+                {
+                  "type": "toolCall",
+                  "id": "call|item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=other",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|💡item",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "call|",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "raw-id",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                },
+                {
+                  "type": "toolCall",
+                  "id": "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+                  "name": "read",
+                  "arguments": {
+                    "path": "README.md"
+                  }
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "toolUse",
+              "timestamp": 1
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=other",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|💡item",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "call|",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "raw-id",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            },
+            {
+              "role": "toolResult",
+              "toolCallId": "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+              "toolName": "read",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "isError": false,
+              "timestamp": 2
+            }
+          ]
+        }
+      ],
+      "projection": "Full transformed messages, callback metadata and Chat Completions wire. Only synthetic ToolResult timestamps become 0. Missing/null content maps to Go zero-value content at the typed SDK boundary; strict JSON codecs remain unchanged. Images remain M12."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "same",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "thinking",
+                "thinking": "plan",
+                "thinkingSignature": "reasoning_content"
+              },
+              {
+                "type": "thinking",
+                "thinking": "",
+                "thinkingSignature": "encrypted"
+              },
+              {
+                "type": "thinking",
+                "thinking": " \n",
+                "thinkingSignature": "signed-space"
+              },
+              {
+                "type": "thinking",
+                "thinking": "",
+                "redacted": true,
+                "thinkingSignature": "opaque"
+              },
+              {
+                "type": "thinking",
+                "thinking": "hidden",
+                "redacted": true
+              },
+              {
+                "type": "text",
+                "text": "answer",
+                "textSignature": "text-id"
+              },
+              {
+                "type": "toolCall",
+                "id": "call|item",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                },
+                "thoughtSignature": "tool-signature",
+                "namespace": "files"
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call|item",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": []
+      },
+      {
+        "id": "different-model",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "text",
+                "text": "plan"
+              },
+              {
+                "type": "text",
+                "text": "answer"
+              },
+              {
+                "type": "toolCall",
+                "id": "call_item",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                },
+                "namespace": "files"
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_item",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|item",
+            "target": "other",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "different-api",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "text",
+                "text": "plan"
+              },
+              {
+                "type": "text",
+                "text": "answer"
+              },
+              {
+                "type": "toolCall",
+                "id": "call_item",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                },
+                "namespace": "files"
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_item",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|item",
+            "target": "source",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "different-provider",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "text",
+                "text": "plan"
+              },
+              {
+                "type": "text",
+                "text": "answer"
+              },
+              {
+                "type": "toolCall",
+                "id": "call_item",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                },
+                "namespace": "files"
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_item",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|item",
+            "target": "source",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "no-normalizer",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call|item",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call|item",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": []
+      },
+      {
+        "id": "identity-normalizer",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call|item",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call|item",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|item",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "long-anthropic-id",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call____________________________________________________________",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call____________________________________________________________",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=+/=",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "orphan-end",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call_done",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call_missing",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_done",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_missing",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "No result provided"
+              }
+            ],
+            "isError": true,
+            "timestamp": 0
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|done",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "call|missing",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "orphan-user",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call_done",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call_missing",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_done",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_missing",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "No result provided"
+              }
+            ],
+            "isError": true,
+            "timestamp": 0
+          },
+          {
+            "role": "user",
+            "content": "continue",
+            "timestamp": 3
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|done",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "call|missing",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "orphan-assistant",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call_done",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call_missing",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_done",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_missing",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "No result provided"
+              }
+            ],
+            "isError": true,
+            "timestamp": 0
+          },
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "text",
+                "text": "next"
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|done",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "call|missing",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "orphan-error",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call_done",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call_missing",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_done",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_missing",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "No result provided"
+              }
+            ],
+            "isError": true,
+            "timestamp": 0
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|done",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "call|missing",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "failed",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "orphan-aborted",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call_done",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call_missing",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_done",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_missing",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "No result provided"
+              }
+            ],
+            "isError": true,
+            "timestamp": 0
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|done",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "call|missing",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "failed",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "all-results",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call_one",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call_two",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_two",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_one",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "user",
+            "content": "continue",
+            "timestamp": 3
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|one",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "call|two",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "result-after-interruption",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "call_one",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                }
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_one",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "No result provided"
+              }
+            ],
+            "isError": true,
+            "timestamp": 0
+          },
+          {
+            "role": "user",
+            "content": "continue",
+            "timestamp": 3
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "call_one",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|one",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "failed-mapping",
+        "messages": [
+          {
+            "role": "toolResult",
+            "toolCallId": "call_failed",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "user",
+            "content": "continue",
+            "timestamp": 3
+          }
+        ],
+        "calls": [
+          {
+            "id": "call|failed",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          },
+          {
+            "id": "cancelled",
+            "target": "target",
+            "source": "source",
+            "api": "openai-responses",
+            "provider": "github-copilot"
+          }
+        ]
+      },
+      {
+        "id": "nil-content",
+        "messages": [
+          {
+            "role": "user",
+            "content": [],
+            "timestamp": 3
+          },
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "missing",
+            "toolName": "read",
+            "content": [],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "user",
+            "timestamp": 4,
+            "content": []
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "old",
+            "toolName": "read",
+            "isError": false,
+            "timestamp": 5,
+            "content": []
+          }
+        ],
+        "calls": []
+      },
+      {
+        "id": "empty-signatures",
+        "messages": [
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "github-copilot",
+            "model": "source",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "empty",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                },
+                "thoughtSignature": ""
+              },
+              {
+                "type": "toolCall",
+                "id": "null",
+                "name": "read",
+                "arguments": {
+                  "path": "README.md"
+                },
+                "thoughtSignature": null
+              },
+              {
+                "type": "text",
+                "text": ""
+              }
+            ],
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "empty",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "null",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "done"
+              }
+            ],
+            "isError": false,
+            "timestamp": 2
+          }
+        ],
+        "calls": []
+      },
+      {
+        "id": "wire-openai",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "call_item",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "call_17g4hki1",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "call_ntz2fv1d",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "call___item",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "call",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "raw-id",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "éééééééééééééééééééééééééééééééééééééééé",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call_item"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call_17g4hki1"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call_ntz2fv1d"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call___item"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "raw-id"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "éééééééééééééééééééééééééééééééééééééééé"
+          }
+        ],
+        "calls": []
+      },
+      {
+        "id": "wire-other",
+        "messages": [
+          {
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [
+              {
+                "id": "call_item",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "call_17g4hki1",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "call_ntz2fv1d",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "call___item",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "call",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "raw-id",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              },
+              {
+                "id": "éééééééééééééééééééééééééééééééééééééééééééééééééé",
+                "type": "function",
+                "function": {
+                  "name": "read",
+                  "arguments": "{\"path\":\"README.md\"}"
+                }
+              }
+            ]
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call_item"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call_17g4hki1"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call_ntz2fv1d"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call___item"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "call"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "raw-id"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          {
+            "role": "tool",
+            "content": "done",
+            "tool_call_id": "éééééééééééééééééééééééééééééééééééééééééééééééééé"
+          }
+        ],
+        "calls": []
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:cddda8850ae22028a0e82c1c10ea3d76fe2b64a163800838f3a69f3e7afd42ff",
+  "observation_hash": "sha256:0cecb23c34e767f13b19da76c62592d2dabad34e0823e80a789b93f4e98f4af1",
+  "execution_method": "node --experimental-strip-types parity/oracle/message-handoff.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/ai/src/api/transform-messages.ts"
+  }
+}

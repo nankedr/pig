@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9647
+- Total entries: 9648
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5181 |
+| inventoried | 5180 |
 | scaffolded | 4069 |
-| partial | 215 |
+| partial | 217 |
 | implemented | 18 |
 | verified | 162 |
 | deferred | 2 |
@@ -4426,7 +4426,6 @@
 | symbol:ai/src/api/simple-options.ts#buildBaseOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/simple-options.ts#clampMaxTokensToContext | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/simple-options.ts#clampReasoning | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/api/transform-messages.ts#transformMessages | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/auth/context.ts#defaultProviderAuthContext | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/auth/credential-store.ts#InMemoryCredentialStore | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/auth/helpers.ts#envApiKeyAuth | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
@@ -4836,6 +4835,7 @@
 | contract:ai/faux-provider | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/images | partial | M12 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/message | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/message-handoff | partial | M2 | contract | github.com/nankedr/pig/ai.TransformMessages | ai |
 | contract:ai/model | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/model-catalog | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/models-runtime | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
@@ -5000,6 +5000,7 @@
 | matrix:ai/openai-completions/usage/usage-completion-tokens-details-reasoning-tokens | partial | M2 | field | github.com/nankedr/pig/ai/internal/openai.OpenAIUsage.CompletionTokenDetails.ReasoningTokens | ai |
 | member:ai/src/types.ts#ToolResultMessage.addedToolNames | partial | M2 | contract | github.com/nankedr/pig/ai.ToolResultMessage.AddedToolNames | ai |
 | module-ai | partial | M1 | package | github.com/nankedr/pig/ai | ai |
+| symbol:ai/src/api/transform-messages.ts#transformMessages | partial | M2 | contract | github.com/nankedr/pig/ai.TransformMessages | ai |
 | symbol:ai/src/compat.ts#complete | partial | M2 | symbol | github.com/nankedr/pig/ai.Complete | ai |
 | symbol:ai/src/compat.ts#completeSimple | partial | M2 | symbol | github.com/nankedr/pig/ai.CompleteSimple | ai |
 | symbol:ai/src/compat.ts#registerFauxProvider | partial | M2 | symbol | github.com/nankedr/pig/ai.RegisterFauxProvider | ai |
