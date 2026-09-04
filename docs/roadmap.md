@@ -52,6 +52,17 @@ Issue #60 完成 M2 的第一条可运行切片：
 
 未在 fixture 中穷举全部 absent/null/zero 状态的矩阵行只提升为 `partial`。deferred handles 与 post-M2 thinking formats 仍保持精确 `ErrNotImplemented`，不由本切片提前完成。
 
+## M2.2 usage/cost/cache 门禁
+
+Issue #61 完成统一核算切片：
+
+- OpenAI Chat Completions 规范化 input、output、reasoning、cache read/write、total 和 cost，Go 公开契约保留 reasoning 缺失与显式零。
+- `CalculateCost` 覆盖基础费率、按总输入量选择的最高匹配 tier，以及一小时 cache write 使用当前 input rate 两倍的规则。
+- Faux 按 session 确定性模拟 prompt cache；跨 session 隔离、禁用 cache、取消与失败均有明确边界。
+- 固定 Pi Oracle `usage-cost-cache.json` 与公开 Go 重放覆盖 Stream、Result、Complete 和成本计算；`go run ./examples/usage-cost-cache` 提供离线 SDK 示例。
+
+Pi 的 OpenAI mapper 会把缺失 reasoning 计数折叠为零；Pig 通过 `Optional[int64]` 保留 absent/zero，Catalog 将这项额外 Go 契约证据与固定 Pi 对等证据分开记录。
+
 M0 的 Chat Completions 能力矩阵必须区分公开 API 与内部 wire 字段，并逐字段、逐 option、逐 compat flag 指明归属 M1、M2、M10 或 M12。M1 范围外的未实现项均为可调用但明确失败的 Capability Stub；固定快照明确规定为 ignore/no-op 的 option 则实现并验证该行为，不能把两者混淆。M2/M10/M12 依次关闭已登记缺口，不改变 M1 已冻结的公共类型与核心语义。
 
 ## 状态与凭证边界

@@ -5,6 +5,8 @@ Pig 是 Pi 固定版本的 Go 语义兼容实现。M1 已通过冻结门禁并�
 - [文档导航](docs/README.md)
 - [M1 Headless text 与 JSON](docs/learning/m1-headless-text.md)
 - [M1 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m1-headless-text.md)
+- [M2.2 Usage、cost 与 cache](docs/learning/m2-usage-cost-cache.md)
+- [M2.2 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-usage-cost-cache.md)
 - [M0 兼容骨架](docs/learning/m0-compatibility-skeleton.md)
 - [M0 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m0.md)
 

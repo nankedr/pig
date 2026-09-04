@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+	"unicode/utf16"
 )
 
 const (
@@ -23,6 +25,7 @@ var fauxID atomic.Uint64
 type fauxRuntime struct {
 	mu              sync.Mutex
 	responses       []FauxResponseStep
+	promptCache     map[string]string
 	state           *FauxProviderState
 	api             API
 	provider        ProviderID
@@ -123,6 +126,7 @@ func createFauxCore(options RegisterFauxProviderOptions) (*FauxCore, error) {
 	}
 	runtime := &fauxRuntime{
 		state:           &FauxProviderState{},
+		promptCache:     make(map[string]string),
 		api:             api,
 		provider:        provider,
 		minTokenSize:    minTokenSize,
@@ -326,7 +330,15 @@ func (r *fauxRuntime) run(
 		stream.stream.endWithError(err)
 		return
 	}
-	r.streamMessage(ctx, stream, message)
+	if ctx.Err() != nil {
+		message.Usage = Usage{}
+		r.streamMessage(ctx, stream, message, model)
+		return
+	}
+	usage := r.estimateUsage(input, options)
+	updateFauxUsage(&usage, model, assistantMessageText(message))
+	message.Usage = usage
+	r.streamMessage(ctx, stream, message, model)
 }
 
 func cloneFauxProviderState(state *FauxProviderState) *FauxProviderState {
@@ -341,10 +353,12 @@ func cloneFauxProviderState(state *FauxProviderState) *FauxProviderState {
 	return clone
 }
 
-func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessageEventStream, message AssistantMessage) {
+func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessageEventStream, message AssistantMessage, model Model) {
 	partial := CloneAssistantMessage(message)
 	partial.Content = []AssistantContent{}
 	partial.StopReason = StopReasonPending
+	updateFauxUsage(&partial.Usage, model, "")
+	var streamedOutput strings.Builder
 	if ctx.Err() != nil {
 		r.pushAborted(stream, partial)
 		return
@@ -354,6 +368,9 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 		if ctx.Err() != nil {
 			r.pushAborted(stream, partial)
 			return
+		}
+		if i > 0 {
+			streamedOutput.WriteByte('\n')
 		}
 		if text, ok := fauxTextContent(content); ok {
 			partial.Content = append(partial.Content, TextContent{
@@ -368,6 +385,8 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 				current := partial.Content[i].(TextContent)
 				current.Text += chunk
 				partial.Content[i] = current
+				streamedOutput.WriteString(chunk)
+				updateFauxUsage(&partial.Usage, model, streamedOutput.String())
 				stream.Push(AssistantMessageTextDeltaEvent{
 					Type: AssistantMessageEventTypeTextDelta, ContentIndex: i, Delta: chunk, Partial: partial,
 				})
@@ -392,6 +411,8 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 				current := partial.Content[i].(ThinkingContent)
 				current.Thinking += chunk
 				partial.Content[i] = current
+				streamedOutput.WriteString(chunk)
+				updateFauxUsage(&partial.Usage, model, streamedOutput.String())
 				stream.Push(AssistantMessageThinkingDeltaEvent{
 					Type: AssistantMessageEventTypeThinkingDelta, ContentIndex: i, Delta: chunk, Partial: partial,
 				})
@@ -402,6 +423,8 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 			continue
 		}
 		toolCall, _ := fauxToolCallContent(content)
+		streamedOutput.WriteString(toolCall.Name)
+		streamedOutput.WriteByte(':')
 		partial.Content = append(partial.Content, ToolCall{
 			Type: ContentTypeToolCall, ID: toolCall.ID, Name: toolCall.Name, Arguments: map[string]any{},
 			ThoughtSignature: toolCall.ThoughtSignature, Namespace: toolCall.Namespace,
@@ -419,6 +442,8 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 				r.pushAborted(stream, partial)
 				return
 			}
+			streamedOutput.WriteString(chunk)
+			updateFauxUsage(&partial.Usage, model, streamedOutput.String())
 			stream.Push(AssistantMessageToolCallDeltaEvent{
 				Type: AssistantMessageEventTypeToolCallDelta, ContentIndex: i, Delta: chunk, Partial: partial,
 			})
@@ -436,6 +461,12 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 	default:
 		stream.Push(AssistantMessageDoneEvent{Type: AssistantMessageEventTypeDone, Reason: message.StopReason, Message: message})
 	}
+}
+
+func updateFauxUsage(usage *Usage, model Model, output string) {
+	usage.Output = estimateFauxTokens(output)
+	usage.TotalTokens = usage.Input + usage.Output + usage.CacheRead + usage.CacheWrite
+	CalculateCost(model, usage)
 }
 
 func (r *fauxRuntime) waitChunk(ctx context.Context, chunk string) bool {
@@ -500,11 +531,157 @@ func unsupportedFauxOptions(options *SimpleStreamOptions) error {
 			return newNotImplemented("Faux.Deferred")
 		}
 	}
-	if options.SessionID != nil && *options.SessionID != "" &&
-		(options.CacheRetention == nil || *options.CacheRetention != CacheRetentionNone) {
-		return newNotImplemented("Faux.Cache")
-	}
 	return nil
+}
+
+func (r *fauxRuntime) estimateUsage(input Context, options *SimpleStreamOptions) Usage {
+	prompt := fauxContextText(input)
+	promptTokens := estimateFauxTokens(prompt)
+	usage := Usage{Input: promptTokens}
+	if options == nil || options.SessionID == nil || *options.SessionID == "" ||
+		(options.CacheRetention != nil && *options.CacheRetention == CacheRetentionNone) {
+		return usage
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	previous := r.promptCache[*options.SessionID]
+	if previous == "" {
+		usage.CacheWrite = promptTokens
+	} else {
+		cached, added := fauxPrefixUsage(previous, prompt)
+		usage.CacheRead = cached
+		usage.CacheWrite = added
+		usage.Input = max(0, promptTokens-usage.CacheRead)
+	}
+	r.promptCache[*options.SessionID] = prompt
+	return usage
+}
+
+func fauxContextText(input Context) string {
+	parts := make([]string, 0, len(input.Messages)+2)
+	if system, ok := input.SystemPrompt.Value(); ok && system != "" {
+		parts = append(parts, "system:"+system)
+	}
+	for _, message := range input.Messages {
+		parts = append(parts, string(message.MessageRole())+":"+fauxMessageText(message))
+	}
+	if len(input.Tools) != 0 {
+		encoded, _ := json.Marshal(input.Tools)
+		parts = append(parts, "tools:"+string(encoded))
+	}
+	return strings.Join(parts, "\n\n")
+}
+
+func fauxMessageText(message Message) string {
+	switch message := message.(type) {
+	case UserMessage:
+		return fauxUserContentText(message.Content)
+	case *UserMessage:
+		if message == nil {
+			return ""
+		}
+		return fauxUserContentText(message.Content)
+	case AssistantMessage:
+		return assistantMessageText(message)
+	case *AssistantMessage:
+		if message == nil {
+			return ""
+		}
+		return assistantMessageText(*message)
+	case ToolResultMessage:
+		return fauxToolResultText(message)
+	case *ToolResultMessage:
+		if message == nil {
+			return ""
+		}
+		return fauxToolResultText(*message)
+	default:
+		return ""
+	}
+}
+
+func fauxUserContentText(content UserMessageContent) string {
+	if text, ok := content.Text(); ok {
+		return text
+	}
+	blocks, _ := content.Blocks()
+	parts := make([]string, len(blocks))
+	for i, block := range blocks {
+		parts[i] = fauxContentText(block)
+	}
+	return strings.Join(parts, "\n")
+}
+
+func assistantMessageText(message AssistantMessage) string {
+	parts := make([]string, len(message.Content))
+	for i, block := range message.Content {
+		parts[i] = fauxContentText(block)
+	}
+	return strings.Join(parts, "\n")
+}
+
+func fauxToolResultText(message ToolResultMessage) string {
+	parts := make([]string, len(message.Content)+1)
+	parts[0] = message.ToolName
+	for i, block := range message.Content {
+		parts[i+1] = fauxContentText(block)
+	}
+	return strings.Join(parts, "\n")
+}
+
+func fauxContentText(content Content) string {
+	switch content := content.(type) {
+	case TextContent:
+		return content.Text
+	case *TextContent:
+		if content == nil {
+			return ""
+		}
+		return content.Text
+	case ThinkingContent:
+		return content.Thinking
+	case *ThinkingContent:
+		if content == nil {
+			return ""
+		}
+		return content.Thinking
+	case ImageContent:
+		return fmt.Sprintf("[image:%s:%d]", content.MIMEType, len(content.Data))
+	case *ImageContent:
+		if content == nil {
+			return ""
+		}
+		return fmt.Sprintf("[image:%s:%d]", content.MIMEType, len(content.Data))
+	case ToolCall:
+		arguments, _ := json.Marshal(content.Arguments)
+		return content.Name + ":" + string(arguments)
+	case *ToolCall:
+		if content == nil {
+			return ""
+		}
+		arguments, _ := json.Marshal(content.Arguments)
+		return content.Name + ":" + string(arguments)
+	default:
+		return ""
+	}
+}
+
+func estimateFauxTokens(text string) int64 {
+	return fauxTokens(len(utf16.Encode([]rune(text))))
+}
+
+func fauxPrefixUsage(previous, current string) (int64, int64) {
+	left, right := utf16.Encode([]rune(previous)), utf16.Encode([]rune(current))
+	length := min(len(left), len(right))
+	index := 0
+	for index < length && left[index] == right[index] {
+		index++
+	}
+	return fauxTokens(index), fauxTokens(len(right) - index)
+}
+
+func fauxTokens(characters int) int64 {
+	return int64((characters + 3) / 4)
 }
 
 func validateFauxM1Message(message AssistantMessage) error {

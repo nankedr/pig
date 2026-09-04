@@ -13,9 +13,9 @@
   "status_counts": {
     "deferred": 2,
     "implemented": 6,
-    "inventoried": 5223,
-    "partial": 214,
-    "scaffolded": 4086,
-    "verified": 114
+    "inventoried": 5216,
+    "partial": 191,
+    "scaffolded": 4071,
+    "verified": 159
   }
 }

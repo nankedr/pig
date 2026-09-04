@@ -1,0 +1,662 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/providers/faux.ts#withUsageEstimate + packages/ai/src/models.ts#calculateCost + packages/ai/src/api/openai-completions.ts#parseChunkUsage"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/ai/usage-cost-cache",
+    "catalog_id": "contract:ai/faux-provider",
+    "surface": "go-sdk",
+    "input": {
+      "api": "faux:usage-parity",
+      "provider": "faux-usage-parity",
+      "model_id": "usage-model",
+      "response": "done",
+      "context": {
+        "systemPrompt": "rules",
+        "messages": [
+          {
+            "role": "user",
+            "content": "hello",
+            "timestamp": 1
+          }
+        ]
+      },
+      "model_cost": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0
+      },
+      "requests": [
+        {
+          "id": "first",
+          "entrypoint": "stream",
+          "sessionId": "session-a"
+        },
+        {
+          "id": "hit",
+          "entrypoint": "complete",
+          "sessionId": "session-a"
+        },
+        {
+          "id": "isolated",
+          "entrypoint": "stream",
+          "sessionId": "session-b"
+        },
+        {
+          "id": "disabled",
+          "entrypoint": "stream",
+          "sessionId": "session-a",
+          "cacheRetention": "none"
+        }
+      ],
+      "cost_cases": [
+        {
+          "id": "zero-base",
+          "model": {
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            }
+          },
+          "usage": {
+            "input": 1,
+            "output": 1,
+            "cacheRead": 1,
+            "cacheWrite": 1,
+            "totalTokens": 4,
+            "cost": {}
+          }
+        },
+        {
+          "id": "base",
+          "model": {
+            "cost": {
+              "input": 1,
+              "output": 2,
+              "cacheRead": 3,
+              "cacheWrite": 4
+            }
+          },
+          "usage": {
+            "input": 1000000,
+            "output": 500000,
+            "cacheRead": 1000000,
+            "cacheWrite": 1000000,
+            "totalTokens": 3500000,
+            "cost": {}
+          }
+        },
+        {
+          "id": "empty-tier",
+          "model": {
+            "cost": {
+              "input": 1,
+              "output": 2,
+              "cacheRead": 3,
+              "cacheWrite": 4,
+              "tiers": []
+            }
+          },
+          "usage": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cacheWrite1h": 0,
+            "totalTokens": 0,
+            "cost": {}
+          }
+        },
+        {
+          "id": "zero-tier",
+          "model": {
+            "cost": {
+              "input": 1,
+              "output": 2,
+              "cacheRead": 3,
+              "cacheWrite": 4,
+              "tiers": [
+                {
+                  "inputTokensAbove": 0,
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0
+                }
+              ]
+            }
+          },
+          "usage": {
+            "input": 1,
+            "output": 1,
+            "cacheRead": 1,
+            "cacheWrite": 1,
+            "totalTokens": 4,
+            "cost": {}
+          }
+        },
+        {
+          "id": "tier",
+          "model": {
+            "cost": {
+              "input": 1000000,
+              "output": 2000000,
+              "cacheRead": 3000000,
+              "cacheWrite": 4000000,
+              "tiers": [
+                {
+                  "inputTokensAbove": 300,
+                  "input": 31000000,
+                  "output": 32000000,
+                  "cacheRead": 33000000,
+                  "cacheWrite": 34000000
+                },
+                {
+                  "inputTokensAbove": 100,
+                  "input": 11000000,
+                  "output": 12000000,
+                  "cacheRead": 13000000,
+                  "cacheWrite": 14000000
+                },
+                {
+                  "inputTokensAbove": 200,
+                  "input": 21000000,
+                  "output": 22000000,
+                  "cacheRead": 23000000,
+                  "cacheWrite": 24000000
+                }
+              ]
+            }
+          },
+          "usage": {
+            "input": 100,
+            "output": 1,
+            "cacheRead": 100,
+            "cacheWrite": 100,
+            "totalTokens": 301,
+            "cost": {}
+          }
+        },
+        {
+          "id": "one-hour",
+          "model": {
+            "cost": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 3,
+              "tiers": [
+                {
+                  "inputTokensAbove": 0,
+                  "input": 2,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 4
+                }
+              ]
+            }
+          },
+          "usage": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 1000000,
+            "cacheWrite1h": 250000,
+            "totalTokens": 1000000,
+            "cost": {}
+          }
+        }
+      ],
+      "openai": {
+        "model": {
+          "id": "usage-model",
+          "name": "Usage Model",
+          "api": "openai-completions",
+          "provider": "local-openai",
+          "baseUrl": "https://local.invalid/v1",
+          "reasoning": true,
+          "input": [
+            "text"
+          ],
+          "contextWindow": 32000,
+          "maxTokens": 2048,
+          "cost": {
+            "input": 1000000,
+            "output": 2000000,
+            "cacheRead": 3000000,
+            "cacheWrite": 4000000
+          }
+        },
+        "cases": [
+          {
+            "id": "detailed",
+            "sse": "data: {\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: {\"choices\":[{\"delta\":{},\"usage\":{\"prompt_tokens\":999,\"completion_tokens\":999,\"completion_tokens_details\":{\"reasoning_tokens\":999}}}],\"usage\":{\"prompt_tokens\":10,\"completion_tokens\":5,\"prompt_cache_hit_tokens\":99,\"prompt_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"completion_tokens_details\":{\"reasoning_tokens\":2}}}\n\ndata: [DONE]\n\n"
+          },
+          {
+            "id": "legacy",
+            "sse": "data: {\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: {\"choices\":[],\"usage\":{\"prompt_tokens\":8,\"completion_tokens\":1,\"prompt_cache_hit_tokens\":2,\"completion_tokens_details\":{\"reasoning_tokens\":0}}}\n\ndata: [DONE]\n\n"
+          },
+          {
+            "id": "legacy-zero",
+            "sse": "data: {\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: {\"choices\":[],\"usage\":{\"prompt_tokens\":0,\"completion_tokens\":0,\"prompt_cache_hit_tokens\":0,\"completion_tokens_details\":{\"reasoning_tokens\":0}}}\n\ndata: [DONE]\n\n"
+          },
+          {
+            "id": "zero",
+            "sse": "data: {\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: {\"choices\":[{\"delta\":{},\"usage\":{\"prompt_tokens\":0,\"completion_tokens\":0}}],\"usage\":{\"prompt_tokens\":0,\"completion_tokens\":0,\"prompt_cache_hit_tokens\":0,\"prompt_tokens_details\":{\"cached_tokens\":0,\"cache_write_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":0}}}\n\ndata: [DONE]\n\n"
+          },
+          {
+            "id": "choice",
+            "sse": "data: {\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: {\"choices\":[{\"delta\":{},\"usage\":{\"prompt_tokens\":6,\"completion_tokens\":2,\"prompt_cache_hit_tokens\":1,\"completion_tokens_details\":{\"reasoning_tokens\":1}}}]}\n\ndata: [DONE]\n\n"
+          },
+          {
+            "id": "choice-zero",
+            "sse": "data: {\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: {\"choices\":[{\"delta\":{},\"usage\":{\"prompt_tokens\":0,\"completion_tokens\":0,\"prompt_cache_hit_tokens\":0,\"completion_tokens_details\":{\"reasoning_tokens\":0}}}]}\n\ndata: [DONE]\n\n"
+          },
+          {
+            "id": "missing-tokens",
+            "sse": "data: {\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: {\"choices\":[],\"usage\":{\"completion_tokens_details\":{\"reasoning_tokens\":0}}}\n\ndata: [DONE]\n\n"
+          },
+          {
+            "id": "clamp",
+            "sse": "data: {\"choices\":[{\"delta\":{\"content\":\"done\"},\"finish_reason\":\"stop\"}]}\n\ndata: {\"choices\":[],\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":0,\"prompt_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"completion_tokens_details\":{\"reasoning_tokens\":0}}}\n\ndata: [DONE]\n\n"
+          }
+        ]
+      }
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "requests": {
+        "first": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 6,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 6,
+            "output": 1,
+            "totalTokens": 13
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "hit": {
+          "usage": {
+            "cacheRead": 6,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 0,
+            "output": 1,
+            "totalTokens": 7
+          }
+        },
+        "isolated": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 6,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 6,
+            "output": 1,
+            "totalTokens": 13
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "disabled": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 6,
+            "output": 1,
+            "totalTokens": 7
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        }
+      },
+      "costs": {
+        "zero-base": {
+          "usage": {
+            "cacheRead": 1,
+            "cacheWrite": 1,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 1,
+            "output": 1,
+            "totalTokens": 4
+          },
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          }
+        },
+        "base": {
+          "usage": {
+            "cacheRead": 1000000,
+            "cacheWrite": 1000000,
+            "cost": {
+              "cacheRead": 3,
+              "cacheWrite": 4,
+              "input": 1,
+              "output": 1,
+              "total": 9
+            },
+            "input": 1000000,
+            "output": 500000,
+            "totalTokens": 3500000
+          },
+          "cost": {
+            "cacheRead": 3,
+            "cacheWrite": 4,
+            "input": 1,
+            "output": 1,
+            "total": 9
+          }
+        },
+        "empty-tier": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cacheWrite1h": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 0,
+            "output": 0,
+            "totalTokens": 0
+          },
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          }
+        },
+        "zero-tier": {
+          "usage": {
+            "cacheRead": 1,
+            "cacheWrite": 1,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 1,
+            "output": 1,
+            "totalTokens": 4
+          },
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          }
+        },
+        "tier": {
+          "usage": {
+            "cacheRead": 100,
+            "cacheWrite": 100,
+            "cost": {
+              "cacheRead": 2300,
+              "cacheWrite": 2400,
+              "input": 2100,
+              "output": 22,
+              "total": 6822
+            },
+            "input": 100,
+            "output": 1,
+            "totalTokens": 301
+          },
+          "cost": {
+            "cacheRead": 2300,
+            "cacheWrite": 2400,
+            "input": 2100,
+            "output": 22,
+            "total": 6822
+          }
+        },
+        "one-hour": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 1000000,
+            "cacheWrite1h": 250000,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 4,
+              "input": 0,
+              "output": 0,
+              "total": 4
+            },
+            "input": 0,
+            "output": 0,
+            "totalTokens": 1000000
+          },
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 4,
+            "input": 0,
+            "output": 0,
+            "total": 4
+          }
+        }
+      },
+      "openai": {
+        "detailed": {
+          "usage": {
+            "cacheRead": 3,
+            "cacheWrite": 1,
+            "cost": {
+              "cacheRead": 9,
+              "cacheWrite": 4,
+              "input": 6,
+              "output": 10,
+              "total": 29
+            },
+            "input": 6,
+            "output": 5,
+            "reasoning": 2,
+            "totalTokens": 15
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "legacy": {
+          "usage": {
+            "cacheRead": 2,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 6,
+              "cacheWrite": 0,
+              "input": 6,
+              "output": 2,
+              "total": 14
+            },
+            "input": 6,
+            "output": 1,
+            "reasoning": 0,
+            "totalTokens": 9
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "legacy-zero": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 0,
+            "output": 0,
+            "reasoning": 0,
+            "totalTokens": 0
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "zero": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 0,
+            "output": 0,
+            "reasoning": 0,
+            "totalTokens": 0
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "choice": {
+          "usage": {
+            "cacheRead": 1,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 3,
+              "cacheWrite": 0,
+              "input": 5,
+              "output": 4,
+              "total": 12
+            },
+            "input": 5,
+            "output": 2,
+            "reasoning": 1,
+            "totalTokens": 8
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "choice-zero": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 0,
+            "output": 0,
+            "reasoning": 0,
+            "totalTokens": 0
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "missing-tokens": {
+          "usage": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0,
+              "total": 0
+            },
+            "input": 0,
+            "output": 0,
+            "reasoning": 0,
+            "totalTokens": 0
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        },
+        "clamp": {
+          "usage": {
+            "cacheRead": 3,
+            "cacheWrite": 1,
+            "cost": {
+              "cacheRead": 9,
+              "cacheWrite": 4,
+              "input": 0,
+              "output": 0,
+              "total": 13
+            },
+            "input": 0,
+            "output": 0,
+            "reasoning": 0,
+            "totalTokens": 4
+          },
+          "terminal_equal": true,
+          "repeat_equal": true
+        }
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:3a1b7e590a34e0a0a10068bf76fd51617acafa5f2a8c2b138bf697ffe7e7f0e5",
+  "observation_hash": "sha256:862e5d379903bc1626616c1fd6edc5a253aacea27ad54e8768e785049f4e8f93",
+  "execution_method": "node --experimental-strip-types parity/oracle/usage-cost-cache.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/ai/src/providers/faux.ts + packages/ai/src/models.ts + packages/ai/src/api/openai-completions.ts"
+  }
+}

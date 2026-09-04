@@ -72,6 +72,12 @@ func issue60PromoteCatalog(t *testing.T, root string, source []catalog.Entry) []
 	found := make(map[string]bool, len(fixtureIDs))
 	for index := range entries {
 		entry := &entries[index]
+		if issue61HasEvidence(entry.Evidence, "go-sdk/ai/usage-cost-cache-go") {
+			if fixtureIDs[entry.ID] {
+				found[entry.ID] = true
+			}
+			continue
+		}
 		if fixtureIDs[entry.ID] {
 			found[entry.ID] = true
 			if entry.Matrix == nil || len(entry.Matrix.EvidenceRequirements) == 0 {

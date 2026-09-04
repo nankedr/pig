@@ -378,19 +378,13 @@ func TestFauxUnsupportedOptionsFailWithoutConsumingScript(t *testing.T) {
 		t.Fatal("Faux must not advertise deferred support")
 	}
 
-	sessionID := "cache-session"
-	shortCache := ai.CacheRetentionShort
-	longCache := ai.CacheRetentionLong
 	for _, test := range []struct {
 		name      string
 		options   ai.SimpleStreamOptions
 		operation string
 	}{
-		{name: "enabled deferred", options: ai.SimpleStreamOptions{Deferred: ai.DeferredBoolean{Enabled: true}}, operation: "Faux.Deferred"},
-		{name: "deferred window", options: ai.SimpleStreamOptions{Deferred: ai.DeferredWindowOptions{}}, operation: "Faux.Deferred"},
-		{name: "default cache", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions, SessionID: &sessionID}}, operation: "Faux.Cache"},
-		{name: "short cache", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions, SessionID: &sessionID, CacheRetention: &shortCache}}, operation: "Faux.Cache"},
-		{name: "long cache", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions, SessionID: &sessionID, CacheRetention: &longCache}}, operation: "Faux.Cache"},
+		{name: "enabled deferred", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions}, Deferred: ai.DeferredBoolean{Enabled: true}}, operation: "Faux.Deferred"},
+		{name: "deferred window", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions}, Deferred: ai.DeferredWindowOptions{}}, operation: "Faux.Deferred"},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			_, err := handle.Provider.StreamSimple(context.Background(), model, ai.Context{}, test.options).Result(context.Background())
@@ -442,7 +436,7 @@ func TestFauxChecksCancellationBetweenContentBlocks(t *testing.T) {
 	}
 	handle.SetResponses([]ai.FauxResponseStep{message})
 	model, _ := handle.GetModel()
-	ctx := &cancelAfterErrChecks{Context: context.Background(), done: make(chan struct{}), cancelAt: 4}
+	ctx := &cancelAfterErrChecks{Context: context.Background(), done: make(chan struct{}), cancelAt: 5}
 	stream := handle.Provider.Stream(ctx, model, ai.Context{}, ai.StreamOptions{})
 	var types []ai.AssistantMessageEventType
 	for {

@@ -56,7 +56,7 @@ Markdown 报告、Issue 勾选、测试数量或文档中的阶段描述都不�
 - `docs/learning/`：Agent 原理、执行链、状态机、失败场景和实验；
 - `docs/mappings/typescript-to-go/`：Pi 文件、symbol、测试到 Pig 实现的导航。
 
-M0 入口：[兼容骨架](learning/m0-compatibility-skeleton.md)与 [TypeScript 到 Go 导航](mappings/typescript-to-go/m0.md)。M1 Headless text/JSON 入口：[执行链与运行说明](learning/m1-headless-text.md)和 [TypeScript 到 Go 导航](mappings/typescript-to-go/m1-headless-text.md)。
+M0 入口：[兼容骨架](learning/m0-compatibility-skeleton.md)与 [TypeScript 到 Go 导航](mappings/typescript-to-go/m0.md)。M1 Headless text/JSON 入口：[执行链与运行说明](learning/m1-headless-text.md)和 [TypeScript 到 Go 导航](mappings/typescript-to-go/m1-headless-text.md)。M2 已有 [thinking/signature](learning/m2-thinking-signatures.md) 与 [usage/cost/cache](learning/m2-usage-cost-cache.md) 两条可运行切片，对应导航见 [M2.1 mapping](mappings/typescript-to-go/m2-thinking-signatures.md) 和 [M2.2 mapping](mappings/typescript-to-go/m2-usage-cost-cache.md)。
 
 学习材料解释“为什么”和“如何运行”，mapping 帮助对照源码；二者都不记录权威完成度。每个 Runnable Milestone 必须同步代码、Go SDK、示例、Parity Catalog、学习材料和 mapping。
 

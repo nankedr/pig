@@ -880,6 +880,15 @@ func TestOpenAICompletionsMatrixTracksVerifiedSlices(t *testing.T) {
 			}
 			continue
 		}
+		if catalogHasEvidenceCase(entry, "go-sdk/ai/usage-cost-cache-go") {
+			if entry.Status != catalog.StatusVerified && entry.Status != catalog.StatusPartial || len(entry.Evidence) == 0 {
+				t.Errorf("usage fixture row %s = status %q, evidence %d", entry.ID, entry.Status, len(entry.Evidence))
+			}
+			if entry.Status == catalog.StatusPartial && entry.Partial == nil {
+				t.Errorf("partial usage fixture row %s has no supported/unsupported split", entry.ID)
+			}
+			continue
+		}
 		switch entry.Status {
 		case catalog.StatusInventoried, catalog.StatusScaffolded:
 		case catalog.StatusPartial:
@@ -897,6 +906,15 @@ func TestOpenAICompletionsMatrixTracksVerifiedSlices(t *testing.T) {
 			t.Errorf("matrix row %s claims achieved evidence before a Chat Completions parity case exists", entry.ID)
 		}
 	}
+}
+
+func catalogHasEvidenceCase(entry catalog.Entry, caseID string) bool {
+	for _, evidence := range entry.Evidence {
+		if evidence.CaseID == caseID {
+			return true
+		}
+	}
+	return false
 }
 
 func openAICompletionsFixtureCatalogIDs(t *testing.T, root, name, wantID string) map[string]bool {
