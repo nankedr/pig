@@ -92,7 +92,7 @@ type openAICompletionUsage struct {
 	} `json:"completion_tokens_details"`
 }
 
-func StreamOpenAICompletions(ctx context.Context, model Model, input Context, options OpenAICompletionsOptions) *AssistantMessageEventStream {
+func streamOpenAICompletions(ctx context.Context, model Model, input Context, options OpenAICompletionsOptions) *AssistantMessageEventStream {
 	ctx = nonNilContext(ctx)
 	if err := validateOpenAICompletions(model, input, options); err != nil {
 		return failedProviderStream(err)
@@ -102,7 +102,7 @@ func StreamOpenAICompletions(ctx context.Context, model Model, input Context, op
 	return stream
 }
 
-func StreamSimpleOpenAICompletions(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
+func streamSimpleOpenAICompletions(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
 	streamOptions := options.StreamOptions
 	maxTokens := model.MaxTokens
 	if streamOptions.MaxTokens != nil {
@@ -118,7 +118,7 @@ func StreamSimpleOpenAICompletions(ctx context.Context, model Model, input Conte
 			reasoningEffort = &effort
 		}
 	}
-	return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{
+	return streamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{
 		StreamOptions: streamOptions, ReasoningEffort: reasoningEffort, ThinkingBudgets: options.ThinkingBudgets,
 	})
 }

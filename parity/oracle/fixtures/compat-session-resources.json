@@ -1,0 +1,178 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/compat.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/ai/compat-session-resources",
+    "catalog_id": "contract:ai/compat",
+    "surface": "go-sdk",
+    "input": {
+      "api": "compat-fixture",
+      "provider": "fixture",
+      "text": "reply",
+      "session": "one",
+      "projection": "Registry order, Faux event types and outcome text/reason, counters, cache isolation, and cleanup order/errors; times and provider-generated identifiers are not observed."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "registry": {
+        "initial": [
+          "anthropic-messages",
+          "openai-completions",
+          "openai-responses",
+          "openai-codex-responses",
+          "azure-openai-responses",
+          "google-generative-ai",
+          "google-vertex",
+          "mistral-conversations",
+          "bedrock-converse-stream",
+          "pi-messages"
+        ],
+        "overwritten": [
+          "anthropic-messages",
+          "openai-completions",
+          "openai-responses",
+          "openai-codex-responses",
+          "azure-openai-responses",
+          "google-generative-ai",
+          "google-vertex",
+          "mistral-conversations",
+          "bedrock-converse-stream",
+          "pi-messages",
+          "first",
+          "second"
+        ],
+        "removed": [
+          "openai-completions",
+          "openai-responses",
+          "openai-codex-responses",
+          "azure-openai-responses",
+          "google-generative-ai",
+          "google-vertex",
+          "mistral-conversations",
+          "bedrock-converse-stream",
+          "pi-messages",
+          "first",
+          "second"
+        ],
+        "restored": [
+          "openai-completions",
+          "openai-responses",
+          "openai-codex-responses",
+          "azure-openai-responses",
+          "google-generative-ai",
+          "google-vertex",
+          "mistral-conversations",
+          "bedrock-converse-stream",
+          "pi-messages",
+          "first",
+          "second",
+          "anthropic-messages"
+        ],
+        "reset": [
+          "anthropic-messages",
+          "openai-completions",
+          "openai-responses",
+          "openai-codex-responses",
+          "azure-openai-responses",
+          "google-generative-ai",
+          "google-vertex",
+          "mistral-conversations",
+          "bedrock-converse-stream",
+          "pi-messages"
+        ]
+      },
+      "faux": {
+        "events": [
+          "start",
+          "text_start",
+          "text_delta",
+          "text_end",
+          "done"
+        ],
+        "results": [
+          {
+            "text": "reply",
+            "reason": "stop",
+            "cacheRead": 0
+          },
+          {
+            "text": "reply",
+            "reason": "stop",
+            "cacheRead": 3
+          },
+          {
+            "text": "reply",
+            "reason": "stop",
+            "cacheRead": 0
+          },
+          {
+            "text": "reply",
+            "reason": "stop",
+            "cacheRead": 0
+          }
+        ],
+        "factoryOptions": [
+          {
+            "session": "one",
+            "maxTokens": 0,
+            "reasoning": "high",
+            "count": 2
+          }
+        ],
+        "pendingBefore": 5,
+        "pendingAfter": 2,
+        "calls": 3,
+        "oldCalls": 0,
+        "missing": true,
+        "fresh": {
+          "calls": 0,
+          "pending": 0
+        }
+      },
+      "cleanup": {
+        "calls": [
+          "first:one",
+          "failure:one",
+          "last:one",
+          "first:one",
+          "failure:one",
+          "last:one",
+          "first:two",
+          "last:two",
+          "first:<all>",
+          "last:<all>"
+        ],
+        "failures": [
+          [
+            "failure"
+          ],
+          [
+            "failure"
+          ]
+        ]
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:9aeef4cff5bd567b6255c42f0cc42fac7633390cd599b06b6cb4f63c9ca496a1",
+  "observation_hash": "sha256:58534b40bb91e41aaddf2652eab9c65e06f4995d4d44df5f050338b875d1583c",
+  "execution_method": "node --experimental-strip-types parity/oracle/compat-session-resources.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/ai/src/compat.ts"
+  }
+}

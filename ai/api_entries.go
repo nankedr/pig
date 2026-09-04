@@ -69,11 +69,11 @@ func OpenAICodexResponsesAPI() ProviderStreams {
 }
 
 func OpenAICompletionsAPI() ProviderStreams {
-	streams := NewTypedProviderStreams(StreamOpenAICompletions)
+	streams := NewTypedProviderStreams(streamOpenAICompletions)
 	streams.Stream = func(ctx context.Context, model Model, input Context, options StreamOptions) *AssistantMessageEventStream {
-		return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: options})
+		return streamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: options})
 	}
-	streams.StreamSimple = StreamSimpleOpenAICompletions
+	streams.StreamSimple = streamSimpleOpenAICompletions
 	return streams
 }
 
@@ -98,10 +98,6 @@ func StreamAnthropicMessages(context.Context, Model, Context, AnthropicOptions) 
 	return failedAPIEntry("AnthropicMessages.Stream")
 }
 
-func StreamAzureOpenAIResponses(context.Context, Model, Context, AzureOpenAIResponsesOptions) *AssistantMessageEventStream {
-	return failedAPIEntry("AzureOpenAIResponses.Stream")
-}
-
 func StreamBedrockConverse(context.Context, Model, Context, BedrockOptions) *AssistantMessageEventStream {
 	return failedAPIEntry("BedrockConverseStream.Stream")
 }
@@ -110,16 +106,8 @@ func StreamGoogleGenerativeAI(context.Context, Model, Context, GoogleOptions) *A
 	return failedAPIEntry("GoogleGenerativeAI.Stream")
 }
 
-func StreamGoogleVertex(context.Context, Model, Context, GoogleVertexOptions) *AssistantMessageEventStream {
-	return failedAPIEntry("GoogleVertex.Stream")
-}
-
 func StreamMistralConversations(context.Context, Model, Context, MistralOptions) *AssistantMessageEventStream {
 	return failedAPIEntry("MistralConversations.Stream")
-}
-
-func StreamOpenAICodexResponses(context.Context, Model, Context, OpenAICodexResponsesOptions) *AssistantMessageEventStream {
-	return failedAPIEntry("OpenAICodexResponses.Stream")
 }
 
 // ConvertOpenAICompletionsMessagesOptions configures the published message
@@ -130,20 +118,12 @@ type ConvertOpenAICompletionsMessagesOptions struct {
 	GrammarToolInputProperties map[string]string
 }
 
-func StreamOpenAIResponses(context.Context, Model, Context, OpenAIResponsesOptions) *AssistantMessageEventStream {
-	return failedAPIEntry("OpenAIResponses.Stream")
-}
-
 func StreamPiMessages(context.Context, Model, Context, PiMessagesOptions) *AssistantMessageEventStream {
 	return failedAPIEntry("PiMessages.Stream")
 }
 
 func StreamSimpleAnthropicMessages(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
 	return failedAPIEntry("AnthropicMessages.StreamSimple")
-}
-
-func StreamSimpleAzureOpenAIResponses(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
-	return failedAPIEntry("AzureOpenAIResponses.StreamSimple")
 }
 
 func StreamSimpleBedrockConverse(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
@@ -154,20 +134,8 @@ func StreamSimpleGoogleGenerativeAI(context.Context, Model, Context, SimpleStrea
 	return failedAPIEntry("GoogleGenerativeAI.StreamSimple")
 }
 
-func StreamSimpleGoogleVertex(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
-	return failedAPIEntry("GoogleVertex.StreamSimple")
-}
-
 func StreamSimpleMistralConversations(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
 	return failedAPIEntry("MistralConversations.StreamSimple")
-}
-
-func StreamSimpleOpenAICodexResponses(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
-	return failedAPIEntry("OpenAICodexResponses.StreamSimple")
-}
-
-func StreamSimpleOpenAIResponses(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {
-	return failedAPIEntry("OpenAIResponses.StreamSimple")
 }
 
 func StreamSimplePiMessages(context.Context, Model, Context, SimpleStreamOptions) *AssistantMessageEventStream {

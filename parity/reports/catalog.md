@@ -11,10 +11,10 @@
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5214 |
+| inventoried | 5181 |
 | scaffolded | 4069 |
-| partial | 194 |
-| implemented | 6 |
+| partial | 215 |
+| implemented | 18 |
 | verified | 162 |
 | deferred | 2 |
 
@@ -4455,23 +4455,9 @@
 | symbol:ai/src/auth/types.ts#ProviderAuthInteraction | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/bedrock-provider.ts#bedrockProviderModule | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/bun-oauth.ts#registerBunOAuthFlows | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#ApiProvider | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#ApiStreamFunction | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#ApiStreamSimpleFunction | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#complete | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#completeSimple | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#getApiProvider | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#getApiProviders | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/compat.ts#getModel | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/compat.ts#getModels | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/compat.ts#getProviders | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#registerApiProvider | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#registerBuiltInApiProviders | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#registerFauxProvider | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#resetApiProviders | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#stream | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#streamSimple | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/compat.ts#unregisterApiProviders | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/compat/extension-oauth-types.ts#OAuthAuthInfo | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/compat/extension-oauth-types.ts#OAuthDeviceCodeInfo | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/compat/extension-oauth-types.ts#OAuthLoginCallbacks | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
@@ -4497,22 +4483,6 @@
 | symbol:ai/src/images-models.ts#createImagesModels | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/images-models.ts#createImagesProvider | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/images.ts#generateImages | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamAnthropic | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamAzureOpenAIResponses | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamGoogle | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamGoogleVertex | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamMistral | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamOpenAICodexResponses | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamOpenAICompletions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamOpenAIResponses | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamSimpleAnthropic | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamSimpleAzureOpenAIResponses | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamSimpleGoogle | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamSimpleGoogleVertex | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamSimpleMistral | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAICodexResponses | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAICompletions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAIResponses | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/models-store.ts#InMemoryModelsStore | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/models-store.ts#ModelsStore | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/models-store.ts#ModelsStoreEntry | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
@@ -4657,9 +4627,6 @@
 | symbol:ai/src/providers/zai-coding-cn.ts#zaiCodingCnProvider | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/providers/zai.models.ts#ZAI_MODELS | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/providers/zai.ts#zaiProvider | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/session-resources.ts#SessionResourceCleanup | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/session-resources.ts#cleanupSessionResources | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/session-resources.ts#registerSessionResourceCleanup | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/types.ts#AnthropicMessagesCompat | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/types.ts#Api | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/types.ts#ApiOptionsMap | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
@@ -5033,7 +5000,40 @@
 | matrix:ai/openai-completions/usage/usage-completion-tokens-details-reasoning-tokens | partial | M2 | field | github.com/nankedr/pig/ai/internal/openai.OpenAIUsage.CompletionTokenDetails.ReasoningTokens | ai |
 | member:ai/src/types.ts#ToolResultMessage.addedToolNames | partial | M2 | contract | github.com/nankedr/pig/ai.ToolResultMessage.AddedToolNames | ai |
 | module-ai | partial | M1 | package | github.com/nankedr/pig/ai | ai |
+| symbol:ai/src/compat.ts#complete | partial | M2 | symbol | github.com/nankedr/pig/ai.Complete | ai |
+| symbol:ai/src/compat.ts#completeSimple | partial | M2 | symbol | github.com/nankedr/pig/ai.CompleteSimple | ai |
+| symbol:ai/src/compat.ts#registerFauxProvider | partial | M2 | symbol | github.com/nankedr/pig/ai.RegisterFauxProvider | ai |
+| symbol:ai/src/compat.ts#stream | partial | M2 | symbol | github.com/nankedr/pig/ai.Stream | ai |
+| symbol:ai/src/compat.ts#streamSimple | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimple | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamAnthropic | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamAnthropic | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamAzureOpenAIResponses | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamAzureOpenAIResponses | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamGoogle | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamGoogle | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamGoogleVertex | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamGoogleVertex | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamMistral | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamMistral | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamOpenAICodexResponses | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamOpenAICodexResponses | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamOpenAICompletions | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamOpenAICompletions | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamOpenAIResponses | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamOpenAIResponses | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamSimpleAnthropic | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleAnthropic | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamSimpleAzureOpenAIResponses | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleAzureOpenAIResponses | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamSimpleGoogle | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleGoogle | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamSimpleGoogleVertex | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleGoogleVertex | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamSimpleMistral | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleMistral | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAICodexResponses | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleOpenAICodexResponses | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAICompletions | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleOpenAICompletions | ai |
+| symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAIResponses | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleOpenAIResponses | ai |
 | contract:ai/faux-provider/core-stream | implemented | M1 | contract | github.com/nankedr/pig/ai.CreateFauxCore | ai |
+| symbol:ai/src/compat.ts#ApiProvider | implemented | M2 | symbol | github.com/nankedr/pig/ai.APIProvider | ai |
+| symbol:ai/src/compat.ts#ApiStreamFunction | implemented | M2 | symbol | github.com/nankedr/pig/ai.CompatAPIStreamFunction | ai |
+| symbol:ai/src/compat.ts#ApiStreamSimpleFunction | implemented | M2 | symbol | github.com/nankedr/pig/ai.CompatAPISimpleStreamFunction | ai |
+| symbol:ai/src/compat.ts#getApiProvider | implemented | M2 | symbol | github.com/nankedr/pig/ai.GetAPIProvider | ai |
+| symbol:ai/src/compat.ts#getApiProviders | implemented | M2 | symbol | github.com/nankedr/pig/ai.GetAPIProviders | ai |
+| symbol:ai/src/compat.ts#registerApiProvider | implemented | M2 | symbol | github.com/nankedr/pig/ai.RegisterAPIProvider | ai |
+| symbol:ai/src/compat.ts#registerBuiltInApiProviders | implemented | M2 | symbol | github.com/nankedr/pig/ai.RegisterBuiltinAPIProviders | ai |
+| symbol:ai/src/compat.ts#resetApiProviders | implemented | M2 | symbol | github.com/nankedr/pig/ai.ResetAPIProviders | ai |
+| symbol:ai/src/compat.ts#unregisterApiProviders | implemented | M2 | symbol | github.com/nankedr/pig/ai.UnregisterAPIProviders | ai |
+| symbol:ai/src/session-resources.ts#SessionResourceCleanup | implemented | M2 | symbol | github.com/nankedr/pig/ai.SessionResourceCleanup | ai |
+| symbol:ai/src/session-resources.ts#cleanupSessionResources | implemented | M2 | symbol | github.com/nankedr/pig/ai.CleanupSessionResources | ai |
+| symbol:ai/src/session-resources.ts#registerSessionResourceCleanup | implemented | M2 | symbol | github.com/nankedr/pig/ai.RegisterSessionResourceCleanup | ai |
 | contract:ai/deferred-tools | verified | M2 | contract | github.com/nankedr/pig/ai.SplitDeferredTools | ai |
 | contract:baseline/catalog-snapshot | verified | M0 | contract | parity/baseline/snapshot.manifest.json | ai |
 | contract:baseline/image-catalog-snapshot | verified | M0 | contract | parity/baseline/catalog/image/models.json | ai |

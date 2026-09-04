@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/compat.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/ai/compat-session-resources-deviation",
+    "catalog_id": "contract:ai/compat",
+    "surface": "go-sdk",
+    "input": {
+      "projection": "Pi deprecated aliases bind the adapter and cleanup iterates a live Set; Pig issue #65 aliases follow the registry and cleanup snapshots registrations."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "compat": "registered",
+      "alias": "adapter",
+      "mutation": [
+        "first",
+        "added"
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:20610bcc3df4a8d264ad333ee5d43020cd2a7ca27dc44c8cd93ce5c562ded6ea",
+  "observation_hash": "sha256:e210a6e49cde0b211215ff1213b6f6143bd70e0a4d51ceeb3ab2b26c028bdae6",
+  "execution_method": "node --experimental-strip-types parity/oracle/compat-session-resources.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/ai/src/compat.ts"
+  }
+}

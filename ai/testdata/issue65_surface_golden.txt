@@ -1,0 +1,181 @@
+type ai.APIProvider struct
+fields:
+- API ai.API tag=""
+- Stream ai.CompatAPIStreamFunction tag=""
+- StreamSimple ai.CompatAPISimpleStreamFunction tag=""
+
+type ai.FauxCore struct
+fields:
+- API ai.API tag=""
+- Provider ai.ProviderID tag=""
+- Models []ai.Model tag=""
+- Stream ai.ProviderStreamFunction tag=""
+- StreamSimple ai.ProviderSimpleStreamFunction tag=""
+- FetchDeferred func(context.Context, ai.Model, ai.DeferredHandle, ai.DeferredFetchOptions) (*ai.AssistantMessageEventStream, error) tag=""
+- CancelDeferred func(context.Context, ai.Model, ai.DeferredHandle, ai.ProviderRequestOptions) error tag=""
+- GetModel func(...string) (ai.Model, bool) tag=""
+- State *ai.FauxProviderState tag=""
+- SetResponses func([]ai.FauxResponseStep) tag=""
+- AppendResponses func([]ai.FauxResponseStep) tag=""
+- GetPendingResponseCount func() int tag=""
+
+type ai.FauxProviderHandle struct
+fields:
+- Provider ai.Provider tag=""
+- API ai.API tag=""
+- Models []ai.Model tag=""
+- State *ai.FauxProviderState tag=""
+- GetModel func(...string) (ai.Model, bool) tag=""
+- SetResponses func([]ai.FauxResponseStep) tag=""
+- AppendResponses func([]ai.FauxResponseStep) tag=""
+- GetPendingResponseCount func() int tag=""
+
+type ai.FauxProviderRegistration struct
+fields:
+- API ai.API tag=""
+- Models []ai.Model tag=""
+- State *ai.FauxProviderState tag=""
+- GetModel func(...string) (ai.Model, bool) tag=""
+- SetResponses func([]ai.FauxResponseStep) tag=""
+- AppendResponses func([]ai.FauxResponseStep) tag=""
+- GetPendingResponseCount func() int tag=""
+- Unregister func() tag=""
+
+type ai.FauxProviderState struct
+fields:
+- CallCount int tag=""
+- DeferredFetchCount int tag=""
+- CancelledDeferred []ai.DeferredHandle tag=""
+
+type ai.RegisterFauxProviderOptions struct
+fields:
+- API ai.API tag=""
+- Provider ai.ProviderID tag=""
+- Models []ai.FauxModelDefinition tag=""
+- Deferred *ai.FauxDeferredOptions tag=""
+- TokensPerSecond *float64 tag=""
+- TokenSize *ai.FauxTokenSize tag=""
+
+type ai.FauxModelDefinition struct
+fields:
+- ID string tag=""
+- Name ai.Optional[string] tag=""
+- Reasoning ai.Optional[bool] tag=""
+- Input ai.Optional[[]github.com/nankedr/pig/ai.ModelInput] tag=""
+- Cost ai.Optional[github.com/nankedr/pig/ai.ModelCostRates] tag=""
+- ContextWindow ai.Optional[int] tag=""
+- MaxTokens ai.Optional[int] tag=""
+
+type ai.FauxAssistantMessageOptions struct
+fields:
+- StopReason ai.Optional[github.com/nankedr/pig/ai.StopReason] tag=""
+- Deferred ai.Optional[github.com/nankedr/pig/ai.DeferredHandle] tag=""
+- ErrorMessage ai.Optional[string] tag=""
+- ResponseID ai.Optional[string] tag=""
+- Timestamp ai.Optional[int64] tag=""
+
+type ai.FauxToolCallOptions struct
+fields:
+- ID ai.Optional[string] tag=""
+
+type ai.FauxTokenSize struct
+fields:
+- Min *int tag=""
+- Max *int tag=""
+
+type ai.FauxDeferredOptions struct
+fields:
+- PendingFetches *int tag=""
+- PollAfterMS *int64 tag=""
+
+type ai.SessionResourceCleanup func([]string) variadic
+
+type ai.CompatAPIStreamFunction func(context.Context, ai.Model, ai.Context, ai.ProviderStreamOptions) *ai.AssistantMessageEventStream
+
+type ai.CompatAPISimpleStreamFunction func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+type ai.FauxResponseFactory func(ai.Context, *ai.SimpleStreamOptions, *ai.FauxProviderState, ai.Model) (ai.AssistantMessage, error)
+
+type ai.FauxResponseStep ai.FauxResponseStep
+
+type ai.FauxContentBlock ai.AssistantContent
+
+func ai.CleanupSessionResources func(...string) error
+
+func ai.Complete func(context.Context, ai.Model, ai.Context, ...ai.ProviderStreamOptions) (ai.AssistantMessage, error)
+
+func ai.CompleteSimple func(context.Context, ai.Model, ai.Context, ...ai.SimpleStreamOptions) (ai.AssistantMessage, error)
+
+func ai.CreateFauxCore func(ai.RegisterFauxProviderOptions) (*ai.FauxCore, error)
+
+func ai.FauxAssistantBlocks func(...ai.AssistantContent) ai.FauxAssistantMessageContent
+
+func ai.FauxAssistantMessage func(ai.FauxAssistantMessageContent, ...ai.FauxAssistantMessageOptions) (ai.AssistantMessage, error)
+
+func ai.FauxAssistantText func(string) ai.FauxAssistantMessageContent
+
+func ai.FauxText func(string) ai.TextContent
+
+func ai.FauxThinking func(string) ai.ThinkingContent
+
+func ai.FauxToolCall func(string, map[string]interface {}, ...ai.FauxToolCallOptions) (ai.ToolCall, error)
+
+func ai.GetAPIProvider func(ai.API) (ai.APIProvider, bool)
+
+func ai.GetAPIProviders func() []ai.APIProvider
+
+func ai.GetModel func(ai.ProviderID, string) (ai.Model, bool)
+
+func ai.GetModels func(ai.ProviderID) []ai.Model
+
+func ai.GetProviders func() []ai.ProviderID
+
+func ai.NewFauxProvider func(...ai.RegisterFauxProviderOptions) (*ai.FauxProviderHandle, error)
+
+func ai.RegisterAPIProvider func(ai.APIProvider, ...string) error
+
+func ai.RegisterBuiltinAPIProviders func() error
+
+func ai.RegisterFauxProvider func(...ai.RegisterFauxProviderOptions) (*ai.FauxProviderRegistration, error)
+
+func ai.RegisterSessionResourceCleanup func(ai.SessionResourceCleanup) (func(), error)
+
+func ai.ResetAPIProviders func() error
+
+func ai.Stream func(context.Context, ai.Model, ai.Context, ...ai.ProviderStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamAnthropic func(context.Context, ai.Model, ai.Context, ai.AnthropicOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamAzureOpenAIResponses func(context.Context, ai.Model, ai.Context, ai.AzureOpenAIResponsesOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamGoogle func(context.Context, ai.Model, ai.Context, ai.GoogleOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamGoogleVertex func(context.Context, ai.Model, ai.Context, ai.GoogleVertexOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamMistral func(context.Context, ai.Model, ai.Context, ai.MistralOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamOpenAICodexResponses func(context.Context, ai.Model, ai.Context, ai.OpenAICodexResponsesOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamOpenAICompletions func(context.Context, ai.Model, ai.Context, ai.OpenAICompletionsOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamOpenAIResponses func(context.Context, ai.Model, ai.Context, ai.OpenAIResponsesOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimple func(context.Context, ai.Model, ai.Context, ...ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleAnthropic func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleAzureOpenAIResponses func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleGoogle func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleGoogleVertex func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleMistral func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleOpenAICodexResponses func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleOpenAICompletions func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.StreamSimpleOpenAIResponses func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream
+
+func ai.UnregisterAPIProviders func(string)

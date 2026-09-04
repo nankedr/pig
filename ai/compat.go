@@ -173,21 +173,21 @@ func builtinCompatAPIProvider(api API) APIProvider {
 		Stream: func(ctx context.Context, model Model, input Context, options ProviderStreamOptions) *AssistantMessageEventStream {
 			switch value := options.(type) {
 			case OpenAICompletionsOptions:
-				return StreamOpenAICompletions(ctx, model, input, value)
+				return streamOpenAICompletions(ctx, model, input, value)
 			case *OpenAICompletionsOptions:
 				if value != nil {
-					return StreamOpenAICompletions(ctx, model, input, *value)
+					return streamOpenAICompletions(ctx, model, input, *value)
 				}
 			case StreamOptions:
-				return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: value})
+				return streamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: value})
 			case *StreamOptions:
 				if value != nil {
-					return StreamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: *value})
+					return streamOpenAICompletions(ctx, model, input, OpenAICompletionsOptions{StreamOptions: *value})
 				}
 			}
 			return failedProviderStream(fmt.Errorf("%w: OpenAI Completions options type %T", ErrEventStreamInvariant, options))
 		},
-		StreamSimple: StreamSimpleOpenAICompletions,
+		StreamSimple: streamSimpleOpenAICompletions,
 	}
 }
 
@@ -374,35 +374,79 @@ func RegisterFauxProvider(options ...RegisterFauxProviderOptions) (*FauxProvider
 }
 
 func StreamAnthropic(ctx context.Context, model Model, input Context, options AnthropicOptions) *AssistantMessageEventStream {
-	return StreamAnthropicMessages(ctx, model, input, options)
-}
-
-func StreamGoogle(ctx context.Context, model Model, input Context, options GoogleOptions) *AssistantMessageEventStream {
-	return StreamGoogleGenerativeAI(ctx, model, input, options)
-}
-
-func StreamMistral(ctx context.Context, model Model, input Context, options MistralOptions) *AssistantMessageEventStream {
-	return StreamMistralConversations(ctx, model, input, options)
+	return streamCompatAlias(ctx, APIAnthropicMessages, model, input, options)
 }
 
 func StreamSimpleAnthropic(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
-	return StreamSimpleAnthropicMessages(ctx, model, input, options)
+	return streamSimpleCompatAlias(ctx, APIAnthropicMessages, model, input, options)
+}
+
+func StreamAzureOpenAIResponses(ctx context.Context, model Model, input Context, options AzureOpenAIResponsesOptions) *AssistantMessageEventStream {
+	return streamCompatAlias(ctx, APIAzureOpenAIResponses, model, input, options)
+}
+
+func StreamSimpleAzureOpenAIResponses(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
+	return streamSimpleCompatAlias(ctx, APIAzureOpenAIResponses, model, input, options)
+}
+
+func StreamGoogle(ctx context.Context, model Model, input Context, options GoogleOptions) *AssistantMessageEventStream {
+	return streamCompatAlias(ctx, APIGoogleGenerativeAI, model, input, options)
 }
 
 func StreamSimpleGoogle(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
-	return StreamSimpleGoogleGenerativeAI(ctx, model, input, options)
+	return streamSimpleCompatAlias(ctx, APIGoogleGenerativeAI, model, input, options)
+}
+
+func StreamGoogleVertex(ctx context.Context, model Model, input Context, options GoogleVertexOptions) *AssistantMessageEventStream {
+	return streamCompatAlias(ctx, APIGoogleVertex, model, input, options)
+}
+
+func StreamSimpleGoogleVertex(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
+	return streamSimpleCompatAlias(ctx, APIGoogleVertex, model, input, options)
+}
+
+func StreamMistral(ctx context.Context, model Model, input Context, options MistralOptions) *AssistantMessageEventStream {
+	return streamCompatAlias(ctx, APIMistralConversations, model, input, options)
 }
 
 func StreamSimpleMistral(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
-	return StreamSimpleMistralConversations(ctx, model, input, options)
+	return streamSimpleCompatAlias(ctx, APIMistralConversations, model, input, options)
 }
 
-type SessionResourceCleanup func(...string)
-
-func RegisterSessionResourceCleanup(SessionResourceCleanup) (func(), error) {
-	return nil, newNotImplemented("RegisterSessionResourceCleanup")
+func StreamOpenAICodexResponses(ctx context.Context, model Model, input Context, options OpenAICodexResponsesOptions) *AssistantMessageEventStream {
+	return streamCompatAlias(ctx, APIOpenAICodexResponses, model, input, options)
 }
 
-func CleanupSessionResources(...string) error {
-	return newNotImplemented("CleanupSessionResources")
+func StreamSimpleOpenAICodexResponses(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
+	return streamSimpleCompatAlias(ctx, APIOpenAICodexResponses, model, input, options)
+}
+
+func StreamOpenAICompletions(ctx context.Context, model Model, input Context, options OpenAICompletionsOptions) *AssistantMessageEventStream {
+	return streamCompatAlias(ctx, APIOpenAICompletions, model, input, options)
+}
+
+func StreamSimpleOpenAICompletions(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
+	return streamSimpleCompatAlias(ctx, APIOpenAICompletions, model, input, options)
+}
+
+func StreamOpenAIResponses(ctx context.Context, model Model, input Context, options OpenAIResponsesOptions) *AssistantMessageEventStream {
+	return streamCompatAlias(ctx, APIOpenAIResponses, model, input, options)
+}
+
+func StreamSimpleOpenAIResponses(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
+	return streamSimpleCompatAlias(ctx, APIOpenAIResponses, model, input, options)
+}
+
+func streamCompatAlias(ctx context.Context, api API, model Model, input Context, options ProviderStreamOptions) *AssistantMessageEventStream {
+	if model.API != api {
+		return failedProviderStream(fmt.Errorf("%w: model API %q does not match alias API %q", ErrEventStreamInvariant, model.API, api))
+	}
+	return Stream(ctx, model, input, options)
+}
+
+func streamSimpleCompatAlias(ctx context.Context, api API, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
+	if model.API != api {
+		return failedProviderStream(fmt.Errorf("%w: model API %q does not match alias API %q", ErrEventStreamInvariant, model.API, api))
+	}
+	return StreamSimple(ctx, model, input, options)
 }

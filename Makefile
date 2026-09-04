@@ -17,6 +17,7 @@ m0-offline:
 	go run ./examples/thinking-signatures
 	go run ./examples/deferred-response
 	go run ./examples/deferred-tools
+	go run ./examples/compat-session-resources
 	go run ./examples/telemetry
 
 m0-node-preflight:
@@ -33,6 +34,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/run.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/deferred-lifecycle.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/deferred-tools.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/compat-session-resources.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/telemetry.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/codingagent-auth-help.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-m0-no-op.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

@@ -158,27 +158,16 @@ func TestCompatCatalogAliasesAndDeferredEntriesAreExplicit(t *testing.T) {
 	if _, ok := ai.GetModel(ai.ProviderIDOpenAI, "missing"); ok {
 		t.Fatal("GetModel found a model before runtime catalog loading")
 	}
-	cleanups := 0
-	unregister, err := ai.RegisterSessionResourceCleanup(func(...string) { cleanups++ })
-	if unregister != nil || !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("RegisterSessionResourceCleanup returned unregister=%t, error=%v; want false/ErrNotImplemented", unregister != nil, err)
-	}
-	if err := ai.CleanupSessionResources("session"); !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("CleanupSessionResources error = %v, want ErrNotImplemented", err)
-	}
-	if cleanups != 0 {
-		t.Fatalf("cleanup callback invoked %d times, want zero", cleanups)
-	}
 }
 
 func TestDeprecatedStreamAliasesRemainExplicitStubs(t *testing.T) {
 	t.Parallel()
 
-	stream := ai.StreamAnthropic(context.Background(), ai.Model{}, ai.Context{}, ai.AnthropicOptions{})
+	stream := ai.StreamAnthropic(context.Background(), ai.Model{API: ai.APIAnthropicMessages}, ai.Context{}, ai.AnthropicOptions{})
 	if _, err := stream.Result(context.Background()); !errors.Is(err, ai.ErrNotImplemented) {
 		t.Fatalf("StreamAnthropic error = %v, want ErrNotImplemented", err)
 	}
-	stream = ai.StreamSimpleOpenAIResponses(context.Background(), ai.Model{}, ai.Context{}, ai.SimpleStreamOptions{})
+	stream = ai.StreamSimpleOpenAIResponses(context.Background(), ai.Model{API: ai.APIOpenAIResponses}, ai.Context{}, ai.SimpleStreamOptions{})
 	if _, err := stream.Result(context.Background()); !errors.Is(err, ai.ErrNotImplemented) {
 		t.Fatalf("StreamSimpleOpenAIResponses error = %v, want ErrNotImplemented", err)
 	}

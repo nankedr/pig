@@ -110,3 +110,7 @@ GitHub 以一个 V1 roadmap Issue 管理 M0～M14 子 Issue，并用原生 sub-i
 ## M2.5 Telemetry 门禁
 
 Issue #64 实现内存 span 生命周期、独立快照、并发父子关系和被动记录；全部 9 个 adapter conformance case 可执行。固定 Pi fixture、公开 SDK 示例、race、Catalog 和 API snapshot 覆盖该切片，默认 NOOP，无 exporter 或全局当前 span。见 [M2.5 学习文档](learning/m2-telemetry.md)。
+
+## M2.6 compat 与 Session Resource 门禁
+
+Issue #65 让 compat 与全部 deprecated aliases 复用同一注册表，验证 source 所有权、覆盖顺序、builtin 恢复与并发 reset；Faux 构造、注册、队列和注销与直接 Provider 观察一致。Session Resource 按注册快照顺序清理，失败汇总并继续执行，重复调用与并发注册均有测试。固定 Pi 共同 fixture、独立偏离 fixture、API snapshot、离线示例和 Catalog 同步；协议、ambient auth 与图片继续按 M10/M11/M12 推进。见 [M2.6 学习文档](learning/m2-compat-session-resources.md)与 [ADR-0017](adr/0017-compat-registry-and-resource-cleanup.md)。
