@@ -92,7 +92,7 @@ var nonCodingAgentConstructorMappings = map[string]constructorMappingSpec{
 	"symbol:protocol/src/framing.ts#FrameDecoder":          {module: "protocol", target: "github.com/nankedr/pig/protocol.NewFrameDecoder", status: catalog.StatusScaffolded, milestone: "M9", metadataFrom: "module-protocol"},
 	"symbol:protocol/src/framing.ts#FrameError":            {module: "protocol", target: "github.com/nankedr/pig/protocol.FrameError", status: catalog.StatusInventoried, milestone: "M9", metadataFrom: "module-protocol"},
 
-	"symbol:telemetry/src/memory.ts#InMemoryTelemetryContext": {module: "telemetry", target: "github.com/nankedr/pig/telemetry.InMemoryTelemetryContext", status: catalog.StatusInventoried, milestone: "M2", metadataFrom: "module-telemetry"},
+	"symbol:telemetry/src/memory.ts#InMemoryTelemetryContext": {module: "telemetry", target: "github.com/nankedr/pig/telemetry.InMemoryTelemetryContext", status: catalog.StatusVerified, milestone: "M2", metadataFrom: "contract:telemetry/memory"},
 
 	"symbol:tui/src/autocomplete.ts#CombinedAutocompleteProvider":           {module: "tui", target: "github.com/nankedr/pig/tui.NewCombinedAutocompleteProvider", status: catalog.StatusScaffolded, milestone: "M6"},
 	"symbol:tui/src/components/alt-screen-flash.ts#AltScreenFlashContainer": {module: "tui", target: "github.com/nankedr/pig/tui.NewAltScreenFlashContainer", status: catalog.StatusScaffolded, milestone: "M6"},
@@ -341,6 +341,16 @@ func expectedNonCodingAgentConstructors(symbols []surface.Symbol, entries []cata
 			Classification: metadata.Classification,
 			Notes:          note,
 		}
+		if symbol.Module == "telemetry" {
+			entry := expected[id]
+			entry.Notes = "Issue #64 verifies zero-value construction of the Go in-memory recorder; no separate factory is needed."
+			entry.Evidence = append([]catalog.Evidence(nil), metadata.Evidence...)
+			for i := range entry.Evidence {
+				entry.Evidence[i].CatalogID = id
+			}
+			expected[id] = entry
+		}
+
 	}
 
 	for _, symbol := range symbols {

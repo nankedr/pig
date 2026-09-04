@@ -4,16 +4,14 @@
 // ai and agent modules can instrument themselves without binding to any
 // concrete observability backend.
 //
-// M0 scope (issue #23): the full public surface is mapped so Go callers can
-// compile against TelemetryContext, TelemetrySpan, the dynamic schema types,
-// NOOP, the in-memory reference and the testing conformance harness. Only the
-// behavior that Pi's real implementation supplies at M2 is deferred; every
-// deferred operation fails with a structured *NotImplementedError rather than
-// pretending to succeed. The genuinely default-safe NOOP context is live now.
+// The default context is NOOP. InMemoryTelemetryContext provides unbounded,
+// concurrent recording and detached snapshots; telemetry/testing supplies
+// executable adapter conformance cases.
 //
 // Language mapping (docs/design/compatibility.md): Pi's Promise-returning
 // startSpan becomes a context.Context-taking StartSpan whose callback returns
-// (any, error); a rejected Promise maps to a non-nil error. The result value is
+// (any, error); a rejected Promise maps to a non-nil error. A panic settles
+// the span as failed and propagates unchanged. The result value is
 // type-erased to any, matching the erased-registry approach in ADR-0007. This
 // package is stdlib-only and carries no exporter, endpoint or global current
 // span; it is not imported by cmd/pig or cmd/pig-ai.
@@ -21,10 +19,9 @@ package telemetry
 
 import "context"
 
-// AttributeValue is a telemetry attribute value. Pi's contract admits string,
-// number, boolean and readonly arrays of those; Go erases the union to any so
-// the dynamic attribute bag stays usable without freezing a value model that
-// the M2 implementation and the future typed-helper generator will refine.
+// AttributeValue admits strings, numbers, booleans and arrays/slices of those.
+// Other dynamic values cause the whole recording call to be ignored. The
+// recorder never invokes user conversion, formatting or serialization hooks.
 type AttributeValue = any
 
 // SpanAttributes is a bag of named attribute values. A nil or absent value is

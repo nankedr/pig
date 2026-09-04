@@ -7,15 +7,15 @@
 
 ## Summary
 
-- Total entries: 9646
+- Total entries: 9647
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5215 |
-| scaffolded | 4070 |
-| partial | 193 |
+| inventoried | 5214 |
+| scaffolded | 4069 |
+| partial | 194 |
 | implemented | 6 |
-| verified | 160 |
+| verified | 162 |
 | deferred | 2 |
 
 ## Entries by module
@@ -8187,7 +8187,6 @@
 
 | ID | Status | Milestone | Kind | Target | Upstream |
 | --- | --- | --- | --- | --- | --- |
-| constructor:telemetry/src/memory.ts#InMemoryTelemetryContext | inventoried | M2 | contract | github.com/nankedr/pig/telemetry.InMemoryTelemetryContext | telemetry |
 | member:telemetry/src/index.ts#AttributeValue.toLocaleString | inventoried | M14 | package | github.com/nankedr/pig/telemetry | telemetry |
 | member:telemetry/src/index.ts#AttributeValue.toString | inventoried | M14 | package | github.com/nankedr/pig/telemetry | telemetry |
 | member:telemetry/src/index.ts#AttributeValue.valueOf | inventoried | M14 | package | github.com/nankedr/pig/telemetry | telemetry |
@@ -8442,7 +8441,9 @@
 | symbol:telemetry/src/testing/types.ts#TelemetryAdapterConformanceCase | inventoried | M14 | package | github.com/nankedr/pig/telemetry/testing | telemetry |
 | symbol:telemetry/src/testing/types.ts#TelemetryAdapterFixture | inventoried | M14 | package | github.com/nankedr/pig/telemetry/testing | telemetry |
 | symbol:telemetry/src/testing/types.ts#TelemetryAdapterFixtureFactory | inventoried | M14 | package | github.com/nankedr/pig/telemetry/testing | telemetry |
-| module-telemetry | scaffolded | M2 | package | github.com/nankedr/pig/telemetry | telemetry |
+| module-telemetry | partial | M2 | package | github.com/nankedr/pig/telemetry | telemetry |
+| constructor:telemetry/src/memory.ts#InMemoryTelemetryContext | verified | M2 | contract | github.com/nankedr/pig/telemetry.InMemoryTelemetryContext | telemetry |
+| contract:telemetry/memory | verified | M2 | contract | github.com/nankedr/pig/telemetry.InMemoryTelemetryContext | telemetry |
 
 ### tui
 

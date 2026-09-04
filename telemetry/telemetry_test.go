@@ -91,35 +91,25 @@ func TestDefineTelemetrySchemaIdentity(t *testing.T) {
 	}
 }
 
-// TestInMemoryStartSpanFailsExplicitly verifies the M0 deferral is honest: the
-// in-memory recorder does not run the callback (no disguised no-record success)
-// and returns a structured *NotImplementedError identifying the module.
-func TestInMemoryStartSpanFailsExplicitly(t *testing.T) {
+func TestInMemorySpanLifecycle(t *testing.T) {
 	mem := &telemetry.InMemoryTelemetryContext{}
-	ran := false
-	got, err := mem.StartSpan(context.Background(), telemetry.SpanOptions{Name: "s"},
-		func(context.Context, telemetry.TelemetrySpan) (any, error) {
-			ran = true
-			return "unexpected", nil
+	expected := &struct{ Value int }{42}
+	calls := 0
+	got, err := mem.StartSpan(context.Background(), telemetry.SpanOptions{Name: "work"},
+		func(ctx context.Context, span telemetry.TelemetrySpan) (any, error) {
+			calls++
+			active := mem.GetSpans()
+			if len(active) != 1 || active[0].Settled || active[0].EndSequence != nil || active[0].Status.Status != telemetry.SpanStatusOK {
+				t.Fatalf("active span = %#v", active)
+			}
+			return expected, nil
 		})
-	if ran {
-		t.Fatal("in-memory StartSpan ran the callback; a deferred stub must not")
+	if got != expected || err != nil || calls != 1 {
+		t.Fatalf("callback = %v, %v, calls %d", got, err, calls)
 	}
-	if got != nil {
-		t.Fatalf("result = %v, want nil", got)
-	}
-	if !errors.Is(err, telemetry.ErrNotImplemented) {
-		t.Fatalf("errors.Is(%v, ErrNotImplemented) = false", err)
-	}
-	var nie *telemetry.NotImplementedError
-	if !errors.As(err, &nie) {
-		t.Fatalf("errors.As(%v, *NotImplementedError) = false", err)
-	}
-	if nie.Module != "telemetry" {
-		t.Fatalf("NotImplementedError.Module = %q, want telemetry", nie.Module)
-	}
-	if spans := mem.GetSpans(); spans != nil {
-		t.Fatalf("GetSpans = %v, want nil", spans)
+	spans := mem.GetSpans()
+	if len(spans) != 1 || spans[0].ID != 1 || spans[0].Name != "work" || spans[0].ParentID != nil || !spans[0].Settled || spans[0].EndSequence == nil || *spans[0].EndSequence != 1 {
+		t.Fatalf("settled span = %#v", spans)
 	}
 }
 
@@ -151,18 +141,19 @@ func TestCreateTypedSpanStarterOverNOOP(t *testing.T) {
 	}
 }
 
-// TestCreateTypedSpanStarterOverInMemoryFails verifies the typed starter does
-// not paper over a deferred backend: bound to the in-memory recorder it surfaces
-// the same structured failure.
-func TestCreateTypedSpanStarterOverInMemoryFails(t *testing.T) {
-	starter := telemetry.CreateTypedSpanStarter(&telemetry.InMemoryTelemetryContext{},
-		telemetry.TelemetrySchemaDefinition{Version: 1})
-	_, err := starter(context.Background(), "span", nil,
-		func(context.Context, telemetry.TelemetrySpan, telemetry.TypedSpanStarter) (any, error) {
-			return nil, nil
+func TestCreateTypedSpanStarterOverInMemory(t *testing.T) {
+	mem := &telemetry.InMemoryTelemetryContext{}
+	starter := telemetry.CreateTypedSpanStarter(mem, telemetry.TelemetrySchemaDefinition{Version: 1})
+	got, err := starter(context.Background(), "parent", nil,
+		func(ctx context.Context, _ telemetry.TelemetrySpan, child telemetry.TypedSpanStarter) (any, error) {
+			return child(ctx, "child", nil, func(context.Context, telemetry.TelemetrySpan, telemetry.TypedSpanStarter) (any, error) { return 7, nil })
 		})
-	if !errors.Is(err, telemetry.ErrNotImplemented) {
-		t.Fatalf("errors.Is(%v, ErrNotImplemented) = false", err)
+	if got != 7 || err != nil {
+		t.Fatalf("typed callback = %v, %v", got, err)
+	}
+	spans := mem.GetSpans()
+	if len(spans) != 2 || spans[1].ParentID == nil || *spans[1].ParentID != spans[0].ID {
+		t.Fatalf("typed spans = %#v", spans)
 	}
 }
 

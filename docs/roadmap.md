@@ -106,3 +106,7 @@ Issue #62 通过公开 Faux、Provider 和 Models API 完成提交、pending/fin
 可以拆分里程碑或子任务，但不能通过移出 V1、隐藏 Capability Stub 或降低验收标准来完成阶段。改变功能顺序、Freeze Gate 或公开承诺前必须重新决策。M7 必须先完成扩展运行时专项调查、grilling 与 ADR，再冻结扩展 ABI。
 
 GitHub 以一个 V1 roadmap Issue 管理 M0～M14 子 Issue，并用原生 sub-issue 和 dependency 表达顺序。阶段内部只按可独立验收的子系统继续拆分；文件、符号和测试级进度仅进入 Parity Catalog。
+
+## M2.5 Telemetry 门禁
+
+Issue #64 实现内存 span 生命周期、独立快照、并发父子关系和被动记录；全部 9 个 adapter conformance case 可执行。固定 Pi fixture、公开 SDK 示例、race、Catalog 和 API snapshot 覆盖该切片，默认 NOOP，无 exporter 或全局当前 span。见 [M2.5 学习文档](learning/m2-telemetry.md)。

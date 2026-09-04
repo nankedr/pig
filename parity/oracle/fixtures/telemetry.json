@@ -1,0 +1,200 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/telemetry/src/memory.ts#InMemoryTelemetryContext"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/telemetry/memory",
+    "catalog_id": "contract:telemetry/memory",
+    "surface": "go-sdk",
+    "input": {
+      "attributes": {
+        "values": [
+          "initial"
+        ],
+        "count": 0
+      },
+      "failure": "failed",
+      "projection": "Detached span snapshots, callback identity, start/end order and nine public conformance results; Go errors use Error as name, invalid dynamic values replace unreadable JS proxies."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "active": [
+        {
+          "id": 1,
+          "parentId": null,
+          "name": "parent",
+          "attributes": {
+            "values": [
+              "initial"
+            ],
+            "count": 0
+          },
+          "events": [],
+          "status": {
+            "status": "ok"
+          },
+          "settled": false
+        }
+      ],
+      "spans": [
+        {
+          "id": 1,
+          "parentId": null,
+          "name": "parent",
+          "attributes": {
+            "values": [
+              "initial"
+            ],
+            "count": 1
+          },
+          "events": [
+            {
+              "name": "first",
+              "attributes": {
+                "values": [
+                  "changed"
+                ]
+              }
+            },
+            {
+              "name": "second",
+              "attributes": {}
+            }
+          ],
+          "status": {
+            "status": "ok"
+          },
+          "settled": true,
+          "endSequence": 3
+        },
+        {
+          "id": 2,
+          "parentId": 1,
+          "name": "first-child",
+          "attributes": {},
+          "events": [],
+          "status": {
+            "status": "ok"
+          },
+          "settled": true,
+          "endSequence": 2
+        },
+        {
+          "id": 3,
+          "parentId": 1,
+          "name": "second-child",
+          "attributes": {},
+          "events": [],
+          "status": {
+            "status": "error",
+            "error": {
+              "name": "Expected",
+              "message": "handled"
+            }
+          },
+          "settled": true,
+          "endSequence": 1
+        },
+        {
+          "id": 4,
+          "parentId": null,
+          "name": "failure",
+          "attributes": {},
+          "events": [],
+          "status": {
+            "status": "error",
+            "error": {
+              "name": "Error",
+              "message": "failed"
+            }
+          },
+          "settled": true,
+          "endSequence": 4
+        },
+        {
+          "id": 5,
+          "parentId": null,
+          "name": "explicit",
+          "attributes": {},
+          "events": [],
+          "status": {
+            "status": "ok"
+          },
+          "settled": true,
+          "endSequence": 5
+        }
+      ],
+      "same_result": true,
+      "same_error": true,
+      "late_result": 7,
+      "conformance": [
+        {
+          "group": "callback lifecycle",
+          "name": "admits once synchronously and preserves the result",
+          "passed": true
+        },
+        {
+          "group": "callback lifecycle",
+          "name": "preserves synchronous and asynchronous rejection values",
+          "passed": true
+        },
+        {
+          "group": "status",
+          "name": "uses last explicit status without automatic overwrite",
+          "passed": true
+        },
+        {
+          "group": "recording",
+          "name": "merges attributes and records ordered events",
+          "passed": true
+        },
+        {
+          "group": "recording",
+          "name": "ignores failed attribute calls atomically",
+          "passed": true
+        },
+        {
+          "group": "recording",
+          "name": "makes calls after settlement inert",
+          "passed": true
+        },
+        {
+          "group": "parentage",
+          "name": "records nested and concurrent child relationships",
+          "passed": true
+        },
+        {
+          "group": "passivity",
+          "name": "suppresses unreadable telemetry payload failures",
+          "passed": true
+        },
+        {
+          "group": "passivity",
+          "name": "ignores failed status calls atomically",
+          "passed": true
+        }
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:4c6a3264b919239cc71863a3503264e84283d5c5d2638480c1117be526e09acc",
+  "observation_hash": "sha256:85ec655ea6beac11f717d5f09e89b64358c546735a67aaa606dcc7e0da57cc9b",
+  "execution_method": "node --experimental-strip-types parity/oracle/telemetry.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/telemetry/src/memory.ts"
+  }
+}
