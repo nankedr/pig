@@ -2,7 +2,7 @@
 
 Pig V1 使用双来源对等基线：Code Baseline 是 Pi `936aff00918de1187f085f123c2812d8f2d67745`，Catalog Baseline 是 Pi v0.84.1 官方 source tar（commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model）。两者相差 40 个 commit，因此这不是 fixed-run parity；详见 ADR-0014。主学习路线一次只推进一个里程碑前沿；并行支线必须重新集成到持续可运行的 `pig`。
 
-当前 Milestone Frontier：**M2**。M1 已通过冻结门禁并发布 v0.1.0，冻结了本阶段首次触达的 AI Stream、Provider、Chat Completions 核心、Agent Loop、Tool 与 Headless Coding Agent 契约；逐符号完成度仍以 Parity Catalog 为准，M2 分支保持 `partial`。
+当前 Milestone Frontier：**M3**。M2/v0.2.0 在 M1 冻结契约上集成 Legacy AI、Agent 与 Telemetry 高级语义；范围、复现命令和剩余边界见 [M2 集成与冻结](learning/m2-freeze.md)。逐符号状态仍以 Parity Catalog 为准，明确说明范围的 `partial` 不代表全量 Pi 对等。
 
 | 阶段 | 可验收产物 |
 | --- | --- |
@@ -114,3 +114,9 @@ Issue #64 实现内存 span 生命周期、独立快照、并发父子关系和�
 ## M2.6 compat 与 Session Resource 门禁
 
 Issue #65 让 compat 与全部 deprecated aliases 复用同一注册表，验证 source 所有权、覆盖顺序、builtin 恢复与并发 reset；Faux 构造、注册、队列和注销与直接 Provider 观察一致。Session Resource 按注册快照顺序清理，失败汇总并继续执行，重复调用与并发注册均有测试。固定 Pi 共同 fixture、独立偏离 fixture、API snapshot、离线示例和 Catalog 同步；协议、ambient auth 与图片继续按 M10/M11/M12 推进。见 [M2.6 学习文档](learning/m2-compat-session-resources.md)与 [ADR-0017](adr/0017-compat-registry-and-resource-cleanup.md)。
+
+## M2 冻结门禁
+
+`make m2-gate` 提供全部已交付链路的离线回归、race、vet、darwin/arm64 无 CGO 构建、示例与 20 次随机顺序并发验证。`make m2-freeze` 必须从干净 Pig checkout 运行，再校验固定 Pi Oracle、source drift 和要求真实凭证的 M1 DeepSeek 冒烟。M2 Catalog ID、执行证据、明确的 partial 范围与 CLI/SDK 版本由 `internal/m2gate` 检查。
+
+详细范围与发布顺序见 [M2 集成与冻结](learning/m2-freeze.md)。本票只收口 #60–#69，不改变后续 Adapter、认证、图片和 broad contract 的未实现边界。

@@ -1,8 +1,11 @@
 # Pig
 
-Pig 是 Pi 固定版本的 Go 语义兼容实现。M1 已通过冻结门禁并发布 v0.1.0：faux 与 DeepSeek/OpenAI Chat Completions 核心、EventStream、SSE、partial JSON、retry、Tool 管线、内存 AgentSession 与完整 read 的 text/json Headless 路径端到端可运行。当前 Milestone Frontier 是 M2。
+Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口，并保留 M1 的 text/json Headless 和 Tool continuation 契约。当前 Milestone Frontier 是 M3。
 
 - [文档导航](docs/README.md)
+- [M2 集成与冻结](docs/learning/m2-freeze.md)
+- [M2 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-freeze.md)
+- [v0.2.0 发布说明](docs/releases/v0.2.0.md)
 - [M1 Headless text 与 JSON](docs/learning/m1-headless-text.md)
 - [M1 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m1-headless-text.md)
 - [M2.2 Usage、cost 与 cache](docs/learning/m2-usage-cost-cache.md)
@@ -34,9 +37,11 @@ go run ./examples/headless-json
 ```
 
 ```sh
-make m0-gate
+make m2-gate
 ```
 
-`m0-gate` 只重放仓库内已提交的 fixture，全程离线且不需要 Pi checkout。需要重新对照上游源码时，按 [M0 兼容骨架](docs/learning/m0-compatibility-skeleton.md#冻结门禁) 准备两个独立 checkout 后运行 `m0-freeze`。
+`m2-gate` 只重放仓库内已提交的 fixture，全程离线且不需要 Pi checkout。需要重新对照上游源码时，按 [M0 兼容骨架](docs/learning/m0-compatibility-skeleton.md#冻结门禁) 准备两个独立 checkout 后运行 `m0-freeze`。
 
 M1 冻结门禁在 `m0-freeze` 之上追加受保护的真实 DeepSeek live smoke。普通 PR 缺 `DEEPSEEK_API_KEY` 时 `make m1-live-smoke` 明确 skip；`make m1-freeze`（含 `PIG_REQUIRE_LIVE=1`）缺密钥时必须失败。
+
+M2 完整冻结使用 `make m2-freeze`：要求干净 Pig checkout，追加全部 M2 Oracle、source drift 与真实 DeepSeek 冒烟。准备方式与 Catalog 剩余边界见 [M2 集成与冻结](docs/learning/m2-freeze.md)。

@@ -18,8 +18,8 @@ import (
 // separate from Pi state as required by the repository identity contract.
 const ConfigDirName = ".pig"
 
-// Version is the fallback version exposed by the package-level SDK scaffold.
-const Version = "0.0.0"
+// Version is shared by the SDK and the pig CLI.
+const Version = "0.2.0"
 
 // Mode selects one of the local Coding Agent process interfaces. Remote
 // sessions use client/protocol instead and are deliberately not a Mode.

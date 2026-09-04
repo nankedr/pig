@@ -2,19 +2,19 @@ version long
   args: ["--version"]
   terminals: stdin=false stdout=false
   exit: 0
-  stdout: "0.0.0\n"
+  stdout: "0.2.0\n"
   stderr: ""
 version short
   args: ["-v"]
   terminals: stdin=false stdout=false
   exit: 0
-  stdout: "0.0.0\n"
+  stdout: "0.2.0\n"
   stderr: ""
 version bypasses root constraints
   args: ["--session-id" "-bad" "--version"]
   terminals: stdin=false stdout=false
   exit: 0
-  stdout: "0.0.0\n"
+  stdout: "0.2.0\n"
   stderr: ""
 bare help is a message
   args: ["help"]

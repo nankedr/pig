@@ -1,4 +1,6 @@
-.PHONY: m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze m1-live-smoke m1-freeze
+.PHONY: m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze m1-live-smoke m1-freeze m2-gate m2-repeat m2-oracle m2-freeze m2-clean
+
+.NOTPARALLEL: m0-offline m0-freeze m1-freeze m2-gate m2-freeze
 
 PI_CODE_COMMIT := 936aff00918de1187f085f123c2812d8f2d67745
 PI_TYPESCRIPT_VERSION := 5.9.3
@@ -15,6 +17,7 @@ m0-offline:
 	go run ./examples/headless-text
 	go run ./examples/headless-json
 	go run ./examples/thinking-signatures
+	go run ./examples/usage-cost-cache
 	go run ./examples/deferred-response
 	go run ./examples/deferred-tools
 	go run ./examples/compat-session-resources
@@ -22,6 +25,7 @@ m0-offline:
 	go run ./examples/telemetry
 	go run ./examples/message-handoff
 	go run ./examples/context-overflow
+	go run ./examples/agent-proxy
 
 m0-node-preflight:
 	@node --experimental-strip-types -e "" >/dev/null 2>&1 || (echo "freeze checks require Node >=22.6.0 with --experimental-strip-types" >&2; exit 2)
@@ -73,3 +77,18 @@ m1-live-smoke:
 	PIG_REQUIRE_LIVE=1 go test ./codingagent -run '^TestDeepSeekLiveHeadlessReadContinuation$$' -count=1
 
 m1-freeze: m0-freeze m1-live-smoke
+
+m2-gate: m0-offline m2-repeat
+
+m2-repeat:
+	go test -race ./ai ./agent ./telemetry/... -run 'Deferred|LegacyAgent|Proxy|SessionResourceCleanup|CompatRegistry|InMemoryConcurrent' -count=20 -shuffle=on
+
+m2-oracle: m0-oracle
+	node --experimental-strip-types parity/oracle/usage-cost-cache.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/agent-proxy.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+m2-clean:
+	@set -eu; state=$$(git status --porcelain=v1 --untracked-files=all); \
+		test -z "$$state" || (echo "M2 freeze requires a clean Pig checkout" >&2; exit 2)
+
+m2-freeze: m2-clean m2-gate m2-oracle m0-source-drift m1-live-smoke
