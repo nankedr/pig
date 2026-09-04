@@ -69,6 +69,10 @@ func issue61PromoteCatalog(t *testing.T, root string, source []catalog.Entry) []
 	found := map[string]bool{}
 	for index := range entries {
 		entry := &entries[index]
+		if issue61HasEvidence(entry.Evidence, "go-sdk/ai/deferred-lifecycle-go") {
+			found[entry.ID] = true
+			continue
+		}
 		if issue61TrackedMatrix(entry.ID) {
 			found[entry.ID] = true
 			assertion := entry.Matrix.EvidenceRequirements[0].Assertion

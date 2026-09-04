@@ -359,70 +359,48 @@ func TestCompatFauxRegistrationDrivesStreamAndComplete(t *testing.T) {
 	}
 }
 
-func TestFauxUnsupportedOptionsFailWithoutConsumingScript(t *testing.T) {
-	message, _ := ai.FauxAssistantMessage(ai.FauxAssistantText("still queued"))
-	handle, err := ai.NewFauxProvider(ai.RegisterFauxProviderOptions{
-		API: "faux:m2", Provider: "faux-m2", Models: []ai.FauxModelDefinition{{ID: "m2-model"}},
-	})
+func TestFauxDeferredOptionsReserveScriptAndCallResponseHook(t *testing.T) {
+	message, _ := ai.FauxAssistantMessage(ai.FauxAssistantText("queued"))
+	handle, err := ai.NewFauxProvider()
 	if err != nil {
-		t.Fatalf("NewFauxProvider() error = %v", err)
+		t.Fatal(err)
 	}
-	handle.SetResponses([]ai.FauxResponseStep{message})
+	handle.SetResponses([]ai.FauxResponseStep{message, message})
 	model, _ := handle.GetModel()
 	hookCalls := 0
-	requestOptions := ai.ProviderRequestOptions{OnResponse: func(context.Context, ai.ProviderResponse, ai.Model) error {
-		hookCalls++
-		return nil
-	}}
-	if handle.Provider.SupportsFetchDeferred() || handle.Provider.SupportsCancelDeferred() {
-		t.Fatal("Faux must not advertise deferred support")
+	if !handle.Provider.SupportsFetchDeferred() || !handle.Provider.SupportsCancelDeferred() {
+		t.Fatal("Faux must advertise implemented deferred support")
 	}
-
-	for _, test := range []struct {
-		name      string
-		options   ai.SimpleStreamOptions
-		operation string
-	}{
-		{name: "enabled deferred", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions}, Deferred: ai.DeferredBoolean{Enabled: true}}, operation: "Faux.Deferred"},
-		{name: "deferred window", options: ai.SimpleStreamOptions{StreamOptions: ai.StreamOptions{ProviderRequestOptions: requestOptions}, Deferred: ai.DeferredWindowOptions{}}, operation: "Faux.Deferred"},
-	} {
-		t.Run(test.name, func(t *testing.T) {
-			_, err := handle.Provider.StreamSimple(context.Background(), model, ai.Context{}, test.options).Result(context.Background())
-			if !errors.Is(err, ai.ErrNotImplemented) {
-				t.Fatalf("Result() error = %v, want ErrNotImplemented", err)
-			}
-			var notImplemented *ai.NotImplementedError
-			if !errors.As(err, &notImplemented) || notImplemented.Operation != test.operation {
-				t.Fatalf("Result() error = %#v, want %s", err, test.operation)
-			}
-		})
+	for _, deferred := range []ai.DeferredOption{ai.DeferredBoolean{Enabled: true}, ai.DeferredWindowOptions{}} {
+		options := ai.SimpleStreamOptions{Deferred: deferred, StreamOptions: ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{
+			OnResponse: func(context.Context, ai.ProviderResponse, ai.Model) error { hookCalls++; return nil },
+		}}}
+		result, err := handle.Provider.StreamSimple(context.Background(), model, ai.Context{}, options).Result(context.Background())
+		if err != nil || result.StopReason != ai.StopReasonDeferred || !result.Deferred.IsSet() {
+			t.Fatalf("deferred submission = %#v, %v", result, err)
+		}
 	}
-	if hookCalls != 0 || handle.State.CallCount != 0 || handle.GetPendingResponseCount() != 1 {
-		t.Fatalf("unsupported option hooks=%d calls=%d pending=%d, want 0/0/1", hookCalls, handle.State.CallCount, handle.GetPendingResponseCount())
+	if hookCalls != 2 || handle.State.CallCount != 2 || handle.GetPendingResponseCount() != 0 {
+		t.Fatalf("hooks=%d calls=%d pending=%d, want 2/2/0", hookCalls, handle.State.CallCount, handle.GetPendingResponseCount())
 	}
 }
 
-func TestFauxCoreDeferredMethodsFailExplicitly(t *testing.T) {
+func TestFauxCoreRejectsEmptyDeferredHandles(t *testing.T) {
 	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
 	if err != nil {
-		t.Fatalf("CreateFauxCore() error = %v", err)
+		t.Fatal(err)
 	}
 	model, _ := core.GetModel()
 	stream, err := core.FetchDeferred(context.Background(), model, ai.DeferredHandle{}, ai.DeferredFetchOptions{})
-	if stream != nil || !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("FetchDeferred() = (%#v, %v), want nil/ErrNotImplemented", stream, err)
+	if err != nil || stream == nil {
+		t.Fatalf("FetchDeferred() = %#v, %v", stream, err)
 	}
-	var notImplemented *ai.NotImplementedError
-	if !errors.As(err, &notImplemented) || notImplemented.Operation != "Faux.FetchDeferred" {
-		t.Fatalf("FetchDeferred() error = %#v", err)
+	result, err := stream.Result(context.Background())
+	if err != nil || result.StopReason != ai.StopReasonError {
+		t.Fatalf("invalid handle fetch = %#v, %v", result, err)
 	}
-	err = core.CancelDeferred(context.Background(), model, ai.DeferredHandle{}, ai.DeferredCancelOptions{})
-	if !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("CancelDeferred() error = %v, want ErrNotImplemented", err)
-	}
-	notImplemented = nil
-	if !errors.As(err, &notImplemented) || notImplemented.Operation != "Faux.CancelDeferred" {
-		t.Fatalf("CancelDeferred() error = %#v", err)
+	if err := core.CancelDeferred(context.Background(), model, ai.DeferredHandle{}, ai.DeferredCancelOptions{}); err == nil || errors.Is(err, ai.ErrNotImplemented) {
+		t.Fatalf("invalid handle cancel = %v", err)
 	}
 }
 

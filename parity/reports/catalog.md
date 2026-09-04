@@ -12,8 +12,8 @@
 | Status | Count |
 | --- | --- |
 | inventoried | 5216 |
-| scaffolded | 4071 |
-| partial | 191 |
+| scaffolded | 4070 |
+| partial | 192 |
 | implemented | 6 |
 | verified | 159 |
 | deferred | 2 |
@@ -4759,7 +4759,6 @@
 | constructor:ai/src/utils/event-stream.ts#AssistantMessageEventStream | scaffolded | M1 | contract | github.com/nankedr/pig/ai.NewAssistantMessageEventStream | ai |
 | constructor:ai/src/utils/event-stream.ts#EventStream | scaffolded | M1 | contract | github.com/nankedr/pig/ai.NewEventStream | ai |
 | contract:ai/api-adapter | scaffolded | M1 | contract | github.com/nankedr/pig/ai | ai |
-| contract:ai/provider | scaffolded | M1 | contract | github.com/nankedr/pig/ai | ai |
 | matrix:ai/openai-completions/compat/open-aicompletions-compat-cache-control-format | scaffolded | M10 | field | github.com/nankedr/pig/ai.OpenAICompletionsCompat.CacheControlFormat | ai |
 | matrix:ai/openai-completions/compat/open-aicompletions-compat-chat-template-args | scaffolded | M10 | field | github.com/nankedr/pig/ai.OpenAICompletionsCompat.ChatTemplateArgs | ai |
 | matrix:ai/openai-completions/compat/open-aicompletions-compat-chat-template-kwargs | scaffolded | M10 | field | github.com/nankedr/pig/ai.OpenAICompletionsCompat.ChatTemplateKwargs | ai |
@@ -4876,6 +4875,7 @@
 | contract:ai/models-runtime | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/models-store | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/options | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/provider | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/provider-factories | partial | M11 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/providers-all | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/tool | partial | M1 | contract | github.com/nankedr/pig/ai | ai |

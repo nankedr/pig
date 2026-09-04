@@ -31,6 +31,9 @@ type fauxRuntime struct {
 	provider        ProviderID
 	minTokenSize    int
 	tokensPerSecond *float64
+	deferred        map[string]*fauxDeferredResponse
+	pendingFetches  int
+	pollAfterMS     Optional[int64]
 }
 
 func newFauxToolCall(name string, arguments map[string]any, options ...FauxToolCallOptions) (ToolCall, error) {
@@ -53,18 +56,12 @@ func newFauxAssistantMessage(content FauxAssistantMessageContent, options ...Fau
 	if len(options) != 0 {
 		configured = options[0]
 	}
-	if configured.Deferred.IsSet() {
-		return AssistantMessage{}, newNotImplemented("Faux.AssistantMessage.Deferred")
-	}
 	stopReason := StopReasonStop
 	if configured.StopReason.IsNull() {
 		return AssistantMessage{}, fmt.Errorf("Faux AssistantMessage stop reason cannot be null")
 	}
 	if value, ok := configured.StopReason.Value(); ok {
 		stopReason = value
-	}
-	if stopReason == StopReasonDeferred {
-		return AssistantMessage{}, newNotImplemented("Faux.AssistantMessage.Deferred")
 	}
 	if stopReason != StopReasonPending && !validDoneReason(stopReason) && !validErrorReason(stopReason) {
 		return AssistantMessage{}, fmt.Errorf("invalid Faux stop reason %q", stopReason)
@@ -99,13 +96,11 @@ func newFauxAssistantMessage(content FauxAssistantMessageContent, options ...Fau
 	}
 	message.ErrorMessage = configured.ErrorMessage
 	message.ResponseID = configured.ResponseID
-	return message, nil
+	message.Deferred = configured.Deferred
+	return CloneAssistantMessage(message), nil
 }
 
 func createFauxCore(options RegisterFauxProviderOptions) (*FauxCore, error) {
-	if options.Deferred != nil {
-		return nil, newNotImplemented("Faux.Deferred")
-	}
 	api := options.API
 	if api == "" {
 		api = API(nextFauxID("faux"))
@@ -127,15 +122,21 @@ func createFauxCore(options RegisterFauxProviderOptions) (*FauxCore, error) {
 	runtime := &fauxRuntime{
 		state:           &FauxProviderState{},
 		promptCache:     make(map[string]string),
+		deferred:        make(map[string]*fauxDeferredResponse),
 		api:             api,
 		provider:        provider,
 		minTokenSize:    minTokenSize,
 		tokensPerSecond: tokensPerSecond,
 	}
-	start := func(ctx context.Context, model Model, input Context, options *SimpleStreamOptions) *AssistantMessageEventStream {
-		if err := unsupportedFauxOptions(options); err != nil {
-			return failedProviderStream(err)
+	if options.Deferred != nil {
+		if options.Deferred.PendingFetches != nil {
+			runtime.pendingFetches = max(0, *options.Deferred.PendingFetches)
 		}
+		if options.Deferred.PollAfterMS != nil {
+			runtime.pollAfterMS = Some(*options.Deferred.PollAfterMS)
+		}
+	}
+	start := func(ctx context.Context, model Model, input Context, options *SimpleStreamOptions) *AssistantMessageEventStream {
 		stream := NewAssistantMessageEventStream()
 		step, state := runtime.takeResponse()
 		go runtime.run(ctx, stream, step, state, model, input, options)
@@ -163,14 +164,10 @@ func createFauxCore(options RegisterFauxProviderOptions) (*FauxCore, error) {
 		StreamSimple: func(ctx context.Context, model Model, input Context, options SimpleStreamOptions) *AssistantMessageEventStream {
 			return start(ctx, model, input, &options)
 		},
-		FetchDeferred: func(context.Context, Model, DeferredHandle, DeferredFetchOptions) (*AssistantMessageEventStream, error) {
-			return nil, newNotImplemented("Faux.FetchDeferred")
-		},
-		CancelDeferred: func(context.Context, Model, DeferredHandle, DeferredCancelOptions) error {
-			return newNotImplemented("Faux.CancelDeferred")
-		},
-		GetModel: getModel,
-		State:    runtime.state,
+		FetchDeferred:  runtime.fetchDeferred,
+		CancelDeferred: runtime.cancelDeferred,
+		GetModel:       getModel,
+		State:          runtime.state,
 		SetResponses: func(responses []FauxResponseStep) {
 			runtime.setResponses(responses)
 		},
@@ -208,8 +205,10 @@ func newFauxProvider(options ...RegisterFauxProviderOptions) (*FauxProviderHandl
 		Auth:   ProviderAuth{APIKey: &auth},
 		Models: core.Models,
 		API: SingleProviderAPI(ProviderStreams{
-			Stream:       core.Stream,
-			StreamSimple: core.StreamSimple,
+			Stream:         core.Stream,
+			StreamSimple:   core.StreamSimple,
+			FetchDeferred:  core.FetchDeferred,
+			CancelDeferred: core.CancelDeferred,
 		}),
 	})
 	return &FauxProviderHandle{
@@ -308,12 +307,20 @@ func (r *fauxRuntime) run(
 	ctx = nonNilContext(ctx)
 	if options != nil && options.OnResponse != nil {
 		if err := options.OnResponse(ctx, ProviderResponse{Status: 200, Headers: map[string]string{}}, model); err != nil {
-			r.pushError(stream, model, err)
+			if fauxDeferredEnabled(options.Deferred) && ctx.Err() != nil {
+				r.pushAborted(stream, modelsTerminalMessage(model, ctx.Err()))
+			} else {
+				r.pushError(stream, model, err)
+			}
 			return
 		}
 	}
 	if step == nil {
 		r.pushError(stream, model, fmt.Errorf("No more faux responses queued"))
+		return
+	}
+	if options != nil && fauxDeferredEnabled(options.Deferred) {
+		r.submitDeferred(ctx, stream, step, state, model, input, options)
 		return
 	}
 	message, err := resolveFauxResponse(step, input, options, state, model)
@@ -353,7 +360,7 @@ func cloneFauxProviderState(state *FauxProviderState) *FauxProviderState {
 	return clone
 }
 
-func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessageEventStream, message AssistantMessage, model Model) {
+func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessageEventStream, message AssistantMessage, model Model, terminal ...func(AssistantMessageEvent)) {
 	partial := CloneAssistantMessage(message)
 	partial.Content = []AssistantContent{}
 	partial.StopReason = StopReasonPending
@@ -453,13 +460,21 @@ func (r *fauxRuntime) streamMessage(ctx context.Context, stream *AssistantMessag
 			Type: AssistantMessageEventTypeToolCallEnd, ContentIndex: i, ToolCall: toolCall, Partial: partial,
 		})
 	}
+	if ctx.Err() != nil {
+		r.pushAborted(stream, partial)
+		return
+	}
+	push := stream.Push
+	if len(terminal) != 0 {
+		push = terminal[0]
+	}
 	switch message.StopReason {
 	case StopReasonError, StopReasonAborted:
-		stream.Push(AssistantMessageErrorEvent{Type: AssistantMessageEventTypeError, Reason: message.StopReason, Error: message})
+		push(AssistantMessageErrorEvent{Type: AssistantMessageEventTypeError, Reason: message.StopReason, Error: message})
 	case StopReasonPending:
 		r.pushError(stream, messageToModel(message), fmt.Errorf("Faux response ended without a stop reason"))
 	default:
-		stream.Push(AssistantMessageDoneEvent{Type: AssistantMessageEventTypeDone, Reason: message.StopReason, Message: message})
+		push(AssistantMessageDoneEvent{Type: AssistantMessageEventTypeDone, Reason: message.StopReason, Message: message})
 	}
 }
 
@@ -511,27 +526,6 @@ func (r *fauxRuntime) pushAborted(stream *AssistantMessageEventStream, partial A
 	partial.ErrorMessage = Some("Request was aborted")
 	partial.Timestamp = time.Now().UnixMilli()
 	stream.Push(AssistantMessageErrorEvent{Type: AssistantMessageEventTypeError, Reason: StopReasonAborted, Error: partial})
-}
-
-func unsupportedFauxOptions(options *SimpleStreamOptions) error {
-	if options == nil {
-		return nil
-	}
-	if !isNilRuntimeValue(options.Deferred) {
-		switch deferred := options.Deferred.(type) {
-		case DeferredBoolean:
-			if deferred.Enabled {
-				return newNotImplemented("Faux.Deferred")
-			}
-		case *DeferredBoolean:
-			if deferred.Enabled {
-				return newNotImplemented("Faux.Deferred")
-			}
-		default:
-			return newNotImplemented("Faux.Deferred")
-		}
-	}
-	return nil
 }
 
 func (r *fauxRuntime) estimateUsage(input Context, options *SimpleStreamOptions) Usage {
@@ -685,9 +679,6 @@ func fauxTokens(characters int) int64 {
 }
 
 func validateFauxM1Message(message AssistantMessage) error {
-	if message.StopReason == StopReasonDeferred || message.Deferred.IsSet() {
-		return newNotImplemented("Faux.Deferred")
-	}
 	for _, content := range message.Content {
 		if _, ok := fauxTextContent(content); ok {
 			continue

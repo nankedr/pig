@@ -50,7 +50,7 @@ Issue #60 完成 M2 的第一条可运行切片：
 - 固定 Pi Oracle `openai-completions-thinking.json` 与 Go parity test 对齐请求、转换、事件和终态；API snapshot 冻结首次执行的公开字段和入口。
 - `go run ./examples/thinking-signatures` 提供不需要网络与凭证的 SDK 示例；学习文档和 TypeScript→Go 导航记录边界。
 
-未在 fixture 中穷举全部 absent/null/zero 状态的矩阵行只提升为 `partial`。deferred handles 与 post-M2 thinking formats 仍保持精确 `ErrNotImplemented`，不由本切片提前完成。
+未在 fixture 中穷举全部 absent/null/zero 状态的矩阵行只提升为 `partial`。deferred handles 由 M2.3 切片实现；post-M2 thinking formats 仍保持精确 `ErrNotImplemented`。
 
 ## M2.2 usage/cost/cache 门禁
 
@@ -64,6 +64,17 @@ Issue #61 完成统一核算切片：
 Pi 的 OpenAI mapper 会把缺失 reasoning 计数折叠为零；Pig 通过 `Optional[int64]` 保留 absent/zero，Catalog 将这项额外 Go 契约证据与固定 Pi 对等证据分开记录。
 
 M0 的 Chat Completions 能力矩阵必须区分公开 API 与内部 wire 字段，并逐字段、逐 option、逐 compat flag 指明归属 M1、M2、M10 或 M12。M1 范围外的未实现项均为可调用但明确失败的 Capability Stub；固定快照明确规定为 ignore/no-op 的 option 则实现并验证该行为，不能把两者混淆。M2/M10/M12 依次关闭已登记缺口，不改变 M1 已冻结的公共类型与核心语义。
+
+## M2.3 deferred response 门禁
+
+Issue #62 通过公开 Faux、Provider 和 Models API 完成提交、pending/final 轮询与取消：
+
+- Deferred Handle 保留身份与显式零轮询提示；重复读取共享稳定 final 或脚本错误。
+- 保留认证、请求转换、telemetry context、response hook、请求取消与 Stream Outcome 语义。
+- 并发 fetch/cancel、提交快照和取消终态顺序通过公开 SDK 与 race 测试；严格 handle 校验等 Pi 差异见 ADR-0015。
+- 固定 Pi `deferred-lifecycle.json` 与 Go 重放验证顺序生命周期，离线示例为 `go run ./examples/deferred-response`。
+
+真实网络适配器的 deferred 支持继续按各自里程碑实现，完整范围见 [M2.3 学习文档](learning/m2-deferred-response.md)。
 
 ## 状态与凭证边界
 

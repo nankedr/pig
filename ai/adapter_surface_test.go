@@ -79,7 +79,7 @@ var (
 	_ func(ai.Model, ai.Context, ai.OpenAICompletionsCompat, ...ai.ConvertOpenAICompletionsMessagesOptions) ([]json.RawMessage, error) = ai.ConvertOpenAICompletionsMessages          // upstream: convertMessages
 )
 
-func TestFauxM1RuntimeKeepsThinkingAndDeferredExplicit(t *testing.T) {
+func TestFauxPublicConstructorsSupportThinkingAndDeferred(t *testing.T) {
 	t.Parallel()
 
 	if text := ai.FauxText("hello"); text.Type != ai.ContentTypeText || text.Text != "hello" {
@@ -108,10 +108,10 @@ func TestFauxM1RuntimeKeepsThinkingAndDeferredExplicit(t *testing.T) {
 	}
 	if _, err := ai.FauxAssistantMessage(ai.FauxAssistantText("deferred"), ai.FauxAssistantMessageOptions{
 		StopReason: ai.Some(ai.StopReasonDeferred),
-	}); !errors.Is(err, ai.ErrNotImplemented) {
-		t.Fatalf("deferred FauxAssistantMessage error = %v, want ErrNotImplemented", err)
+	}); err != nil {
+		t.Fatalf("deferred FauxAssistantMessage error = %v", err)
 	}
-	if core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{Deferred: &ai.FauxDeferredOptions{}}); core != nil || !errors.Is(err, ai.ErrNotImplemented) {
+	if core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{Deferred: &ai.FauxDeferredOptions{}}); core == nil || err != nil {
 		t.Fatalf("deferred CreateFauxCore = (%#v, %v)", core, err)
 	}
 }

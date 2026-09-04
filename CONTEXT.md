@@ -72,6 +72,10 @@ _Avoid_: LLM 消息
 Assistant 或 Agent 事件流累积出的最终值；生成以错误或取消结束时仍保留已有部分内容。
 _Avoid_: Go error、最后一个事件
 
+**延迟响应句柄（Deferred Handle）**:
+标识 Provider 已接受的延迟响应，供调用者后续查询结果或取消该响应。
+_Avoid_: Stream Outcome、最终回复
+
 **Pi Oracle**:
 按需运行的固定对等基线，用于生成 fixture 并比较 Pi 与 Pig 行为。
 _Avoid_: Pig 运行时依赖、跟随上游移动的 checkout
