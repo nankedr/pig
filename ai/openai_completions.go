@@ -1470,7 +1470,7 @@ func clampOpenAIMaxTokens(model Model, input Context, maxTokens int64) int64 {
 	if model.ContextWindow <= 0 {
 		return maxTokens
 	}
-	available := model.ContextWindow - estimateOpenAITextTokens(input) - 4096
+	available := model.ContextWindow - EstimateContextTokens(input).Tokens - 4096
 	if available < 1 {
 		available = 1
 	}
@@ -1478,122 +1478,6 @@ func clampOpenAIMaxTokens(model Model, input Context, maxTokens int64) int64 {
 		return available
 	}
 	return maxTokens
-}
-
-func estimateOpenAITextTokens(input Context) int64 {
-	usageIndex, usageTokens := lastOpenAIAssistantUsage(input.Messages)
-	start := 0
-	if usageIndex >= 0 {
-		start = usageIndex + 1
-	}
-	tokens := usageTokens
-	for _, message := range input.Messages[start:] {
-		tokens += estimateOpenAIMessageTokens(message)
-	}
-	if usageIndex < 0 {
-		if system, ok := input.SystemPrompt.Value(); ok {
-			tokens += estimateOpenAICharacters(jsStringLength(system))
-		}
-	}
-	return tokens
-}
-
-func lastOpenAIAssistantUsage(messages []Message) (int, int64) {
-	latestTimestamp := int64(-1 << 63)
-	index, tokens := -1, int64(0)
-	for i, message := range messages {
-		var assistant *AssistantMessage
-		switch value := message.(type) {
-		case AssistantMessage:
-			assistant = &value
-		case *AssistantMessage:
-			assistant = value
-		}
-		if assistant != nil && assistant.Timestamp >= latestTimestamp && assistant.StopReason != StopReasonAborted && assistant.StopReason != StopReasonError {
-			usageTokens := assistant.Usage.TotalTokens
-			if usageTokens == 0 {
-				usageTokens = assistant.Usage.Input + assistant.Usage.Output + assistant.Usage.CacheRead + assistant.Usage.CacheWrite
-			}
-			if usageTokens > 0 {
-				index, tokens = i, usageTokens
-			}
-		}
-		switch value := message.(type) {
-		case UserMessage:
-			latestTimestamp = max(latestTimestamp, value.Timestamp)
-		case *UserMessage:
-			if value != nil {
-				latestTimestamp = max(latestTimestamp, value.Timestamp)
-			}
-		case AssistantMessage:
-			latestTimestamp = max(latestTimestamp, value.Timestamp)
-		case *AssistantMessage:
-			if value != nil {
-				latestTimestamp = max(latestTimestamp, value.Timestamp)
-			}
-		case ToolResultMessage:
-			latestTimestamp = max(latestTimestamp, value.Timestamp)
-		case *ToolResultMessage:
-			if value != nil {
-				latestTimestamp = max(latestTimestamp, value.Timestamp)
-			}
-		}
-	}
-	return index, tokens
-}
-
-func estimateOpenAIMessageTokens(message Message) int64 {
-	switch value := message.(type) {
-	case UserMessage:
-		return estimateOpenAICharacters(userMessageCharacters(value))
-	case *UserMessage:
-		if value != nil {
-			return estimateOpenAICharacters(userMessageCharacters(*value))
-		}
-	case AssistantMessage:
-		return estimateOpenAICharacters(assistantMessageCharacters(value))
-	case *AssistantMessage:
-		if value != nil {
-			return estimateOpenAICharacters(assistantMessageCharacters(*value))
-		}
-	}
-	return 0
-}
-
-func estimateOpenAICharacters(characters int) int64 {
-	return int64((characters + 3) / 4)
-}
-
-func userMessageCharacters(message UserMessage) int {
-	if text, ok := message.Content.Text(); ok {
-		return jsStringLength(text)
-	}
-	blocks, _ := message.Content.Blocks()
-	total := 0
-	for _, block := range blocks {
-		if text, ok := block.(TextContent); ok {
-			total += jsStringLength(text.Text)
-		} else if text, ok := block.(*TextContent); ok && text != nil {
-			total += jsStringLength(text.Text)
-		}
-	}
-	return total
-}
-
-func assistantMessageCharacters(message AssistantMessage) int {
-	total := 0
-	for _, block := range message.Content {
-		if text, ok := block.(TextContent); ok {
-			total += jsStringLength(text.Text)
-		} else if text, ok := block.(*TextContent); ok && text != nil {
-			total += jsStringLength(text.Text)
-		}
-	}
-	return total
-}
-
-func jsStringLength(value string) int {
-	return len(utf16.Encode([]rune(value)))
 }
 
 func sanitizeOpenAIText(text string) string {

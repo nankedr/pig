@@ -7,15 +7,15 @@
 
 ## Summary
 
-- Total entries: 9648
+- Total entries: 9649
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5180 |
+| inventoried | 5177 |
 | scaffolded | 4069 |
 | partial | 217 |
 | implemented | 18 |
-| verified | 162 |
+| verified | 166 |
 | deferred | 2 |
 
 ## Entries by module
@@ -4707,9 +4707,6 @@
 | symbol:ai/src/utils/json-parse.ts#parseJsonWithRepair | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/utils/json-parse.ts#parseStreamingJson | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/utils/json-parse.ts#repairJson | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/utils/overflow.ts#getOverflowPatterns | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/utils/overflow.ts#isContextOverflow | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/utils/overflow.ts#isRecoverableLength | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/utils/retry.ts#RetryCallbacks | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/utils/retry.ts#RetryPolicy | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/utils/retry.ts#isRetryableAssistantError | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
@@ -5035,6 +5032,7 @@
 | symbol:ai/src/session-resources.ts#SessionResourceCleanup | implemented | M2 | symbol | github.com/nankedr/pig/ai.SessionResourceCleanup | ai |
 | symbol:ai/src/session-resources.ts#cleanupSessionResources | implemented | M2 | symbol | github.com/nankedr/pig/ai.CleanupSessionResources | ai |
 | symbol:ai/src/session-resources.ts#registerSessionResourceCleanup | implemented | M2 | symbol | github.com/nankedr/pig/ai.RegisterSessionResourceCleanup | ai |
+| contract:ai/context-overflow | verified | M2 | contract | github.com/nankedr/pig/ai.EstimateContextTokens | ai |
 | contract:ai/deferred-tools | verified | M2 | contract | github.com/nankedr/pig/ai.SplitDeferredTools | ai |
 | contract:baseline/catalog-snapshot | verified | M0 | contract | parity/baseline/snapshot.manifest.json | ai |
 | contract:baseline/image-catalog-snapshot | verified | M0 | contract | parity/baseline/catalog/image/models.json | ai |
@@ -5194,6 +5192,9 @@
 | matrix:ai/openai-completions/usage/usage-source-chunk | verified | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.UsageMapper.ChunkSource | ai |
 | matrix:ai/openai-completions/usage/usage-total-formula | verified | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.UsageMapper.Total | ai |
 | matrix:ai/openai-completions/usage/usage-total-tokens | verified | M1 | field | github.com/nankedr/pig/ai.Usage.TotalTokens | ai |
+| symbol:ai/src/utils/overflow.ts#getOverflowPatterns | verified | M2 | symbol | github.com/nankedr/pig/ai.GetOverflowPatterns | ai |
+| symbol:ai/src/utils/overflow.ts#isContextOverflow | verified | M2 | symbol | github.com/nankedr/pig/ai.IsContextOverflow | ai |
+| symbol:ai/src/utils/overflow.ts#isRecoverableLength | verified | M2 | symbol | github.com/nankedr/pig/ai.IsRecoverableLength | ai |
 
 ### client
 

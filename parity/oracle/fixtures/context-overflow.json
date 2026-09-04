@@ -1,0 +1,3727 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/utils/estimate.ts;packages/ai/src/utils/overflow.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/ai/context-overflow",
+    "catalog_id": "contract:ai/context-overflow",
+    "surface": "go-sdk",
+    "input": {
+      "estimates": [
+        {
+          "id": "empty",
+          "context": {
+            "messages": []
+          }
+        },
+        {
+          "id": "all-content-no-usage",
+          "context": {
+            "systemPrompt": "system😀",
+            "tools": [
+              {
+                "name": "read",
+                "description": "read",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "👋你好abc"
+                  },
+                  {
+                    "type": "image",
+                    "data": "AA==",
+                    "mimeType": "image/png"
+                  }
+                ],
+                "timestamp": 1
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "thinking",
+                    "thinking": "plan😀",
+                    "thinkingSignature": "excluded"
+                  },
+                  {
+                    "type": "text",
+                    "text": "ok"
+                  },
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "read",
+                    "arguments": {
+                      "path": "<a>&😀",
+                      "n": 1e-7
+                    }
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "done!"
+                  },
+                  {
+                    "type": "image",
+                    "data": "AA==",
+                    "mimeType": "image/png"
+                  }
+                ],
+                "addedToolNames": [],
+                "isError": false,
+                "timestamp": 3
+              }
+            ]
+          }
+        },
+        {
+          "id": "total-precedence",
+          "context": {
+            "systemPrompt": "already counted",
+            "tools": [
+              {
+                "name": "read",
+                "description": "read",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 500,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 1
+              },
+              {
+                "role": "user",
+                "content": "tail",
+                "timestamp": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "usage-buckets",
+          "context": {
+            "messages": [
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "failed-usage-skipped",
+          "context": {
+            "messages": [
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 500,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 1
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 900,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "error",
+                "timestamp": 2
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 1000,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "aborted",
+                "timestamp": 3
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 4
+              },
+              {
+                "role": "user",
+                "content": "tail",
+                "timestamp": 5
+              }
+            ]
+          }
+        },
+        {
+          "id": "equal-timestamp",
+          "context": {
+            "messages": [
+              {
+                "role": "user",
+                "content": "prompt",
+                "timestamp": 1
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 500,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 1
+              }
+            ]
+          }
+        },
+        {
+          "id": "only-new-tool-definitions",
+          "context": {
+            "systemPrompt": "already counted",
+            "tools": [
+              {
+                "name": "old",
+                "description": "old",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "new",
+                "description": "new",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "unused",
+                "description": "unused",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "old"
+                ],
+                "isError": false,
+                "timestamp": 1
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 500,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "new",
+                  "new",
+                  "missing"
+                ],
+                "isError": false,
+                "timestamp": 3
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "new"
+                ],
+                "isError": false,
+                "timestamp": 4
+              }
+            ]
+          }
+        },
+        {
+          "id": "next-usage-covers-tools",
+          "context": {
+            "tools": [
+              {
+                "name": "old",
+                "description": "old",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "new",
+                "description": "new",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "old"
+                ],
+                "isError": false,
+                "timestamp": 1
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 500,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "new"
+                ],
+                "isError": false,
+                "timestamp": 3
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 800,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 4
+              }
+            ]
+          }
+        },
+        {
+          "id": "null-empty-added-names",
+          "context": {
+            "tools": [
+              {
+                "name": "unused",
+                "description": "unused",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 500,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 1
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": null,
+                "isError": false,
+                "timestamp": 2
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [],
+                "isError": false,
+                "timestamp": 3
+              }
+            ]
+          }
+        },
+        {
+          "id": "schema-json-semantics",
+          "context": {
+            "tools": [
+              {
+                "name": "a<&>",
+                "description": "line para  and literal \\u2028",
+                "parameters": {
+                  "type": "object",
+                  "properties": {
+                    "x": {
+                      "type": "number",
+                      "minimum": 1e-7,
+                      "maximum": 1e+21
+                    }
+                  }
+                },
+                "constrainedSampling": {
+                  "type": "json_schema",
+                  "strict": "require"
+                }
+              }
+            ],
+            "messages": []
+          }
+        },
+        {
+          "id": "stale-prefix",
+          "context": {
+            "systemPrompt": "system",
+            "messages": [
+              {
+                "role": "user",
+                "content": "summary",
+                "timestamp": 200
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 9500,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 100
+              },
+              {
+                "role": "user",
+                "content": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                "timestamp": 300
+              }
+            ]
+          }
+        },
+        {
+          "id": "fresh-after-summary",
+          "context": {
+            "messages": [
+              {
+                "role": "user",
+                "content": "summary",
+                "timestamp": 200
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 9500,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 100
+              },
+              {
+                "role": "user",
+                "content": "new prompt",
+                "timestamp": 300
+              },
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "kept"
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 2000,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 400
+              },
+              {
+                "role": "user",
+                "content": "tail",
+                "timestamp": 500
+              }
+            ]
+          }
+        }
+      ],
+      "overflows": [
+        {
+          "id": "anthropic",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "prompt is too long: 213462 tokens > 200000 maximum"
+          }
+        },
+        {
+          "id": "anthropic-bytes",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "413 {\"error\":{\"type\":\"request_too_large\",\"message\":\"Request exceeds the maximum size\"}}"
+          }
+        },
+        {
+          "id": "bedrock",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Input is too long for requested model"
+          }
+        },
+        {
+          "id": "openai",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Your input exceeds the context window of this model"
+          }
+        },
+        {
+          "id": "litellm",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Error: 503 litellm.ServiceUnavailableError: Requested token count exceeds the model's maximum context length of 131072 tokens."
+          }
+        },
+        {
+          "id": "compatible",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Input length (265330) exceeds model's maximum context length (262144)."
+          }
+        },
+        {
+          "id": "gemini",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "The input token count (1196265) exceeds the maximum number of tokens allowed (1048575)"
+          }
+        },
+        {
+          "id": "xai",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "This model's maximum prompt length is 131072 but the request contains 537812 tokens"
+          }
+        },
+        {
+          "id": "groq",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Please reduce the length of the messages or completion"
+          }
+        },
+        {
+          "id": "openrouter",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "This endpoint's maximum context length is 100 tokens. However, you requested about 200 tokens"
+          }
+        },
+        {
+          "id": "poolside",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Input length 131393 exceeds the maximum allowed input length of 131040 tokens."
+          }
+        },
+        {
+          "id": "together",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "The input (516368 tokens) is longer than the model's context length (262144 tokens)."
+          }
+        },
+        {
+          "id": "copilot",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "prompt token count of 200 exceeds the limit of 100"
+          }
+        },
+        {
+          "id": "llama-cpp",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "the request exceeds the available context size, try increasing it"
+          }
+        },
+        {
+          "id": "lm-studio",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "tokens to keep from the initial prompt is greater than the context length"
+          }
+        },
+        {
+          "id": "minimax",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "invalid params, context window exceeds limit"
+          }
+        },
+        {
+          "id": "kimi",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Your request exceeded model token limit: 100 (requested: 200)"
+          }
+        },
+        {
+          "id": "mistral",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Prompt contains 200 tokens ... too large for model with 100 maximum context length"
+          }
+        },
+        {
+          "id": "ds4",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Prompt has 5,958,968 tokens, but the configured context size is 256,000 tokens"
+          }
+        },
+        {
+          "id": "zai",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "model_context_window_exceeded"
+          }
+        },
+        {
+          "id": "ollama",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "400 prompt too long; exceeded max context length by 100918 tokens"
+          }
+        },
+        {
+          "id": "qwen",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Range of input length should be [1, 100]"
+          }
+        },
+        {
+          "id": "generic-code",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "context_length_exceeded"
+          }
+        },
+        {
+          "id": "generic-spaces",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "CONTEXT LENGTH EXCEEDED"
+          }
+        },
+        {
+          "id": "generic-many",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "too many tokens"
+          }
+        },
+        {
+          "id": "generic-limit",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "token limit exceeded"
+          }
+        },
+        {
+          "id": "cerebras-400",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "400 status code (no body)"
+          }
+        },
+        {
+          "id": "cerebras-413",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "413 (no body)"
+          }
+        },
+        {
+          "id": "throttling",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Throttling error: Too many tokens, please wait before trying again."
+          }
+        },
+        {
+          "id": "unavailable",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Service unavailable: too many tokens"
+          }
+        },
+        {
+          "id": "rate-limit",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Rate limit exceeded: token limit exceeded"
+          }
+        },
+        {
+          "id": "requests",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "Too many requests: too many tokens"
+          }
+        },
+        {
+          "id": "crashed",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "500 model runner crashed unexpectedly"
+          }
+        },
+        {
+          "id": "bodyless-500",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "500 status code (no body)"
+          }
+        },
+        {
+          "id": "bodyless-unanchored",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1,
+            "errorMessage": "wrapped 400 status code (no body)"
+          }
+        },
+        {
+          "id": "stop-98",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 97,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "stop-99",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 98,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "stop-100",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 99,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "stop-101",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 100,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-98",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 97,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-99",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 98,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-100",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 99,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-101",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 100,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "toolUse-98",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 97,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "toolUse-99",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 98,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "toolUse-100",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 99,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "toolUse-101",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 100,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "toolUse",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "aborted-98",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 97,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "aborted",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "aborted-99",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 98,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "aborted",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "aborted-100",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 99,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "aborted",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "aborted-101",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 100,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "aborted",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "error-98",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 97,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "error-99",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 98,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "error-100",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 99,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "error-101",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 0,
+              "cacheRead": 100,
+              "cacheWrite": 9999,
+              "totalTokens": 10000,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "error",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "window-absent",
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 101,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "window-0",
+          "contextWindow": 0,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 101,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "window-100",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 101,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-0-desired-0",
+          "contextWindow": 100,
+          "desiredMaxOutput": 0,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-0-desired-16",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-0-desired-128000",
+          "contextWindow": 100,
+          "desiredMaxOutput": 128000,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-15-desired-0",
+          "contextWindow": 100,
+          "desiredMaxOutput": 0,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 15,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-15-desired-16",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 15,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-15-desired-128000",
+          "contextWindow": 100,
+          "desiredMaxOutput": 128000,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 15,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-16-desired-0",
+          "contextWindow": 100,
+          "desiredMaxOutput": 0,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 16,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-16-desired-16",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 16,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-16-desired-128000",
+          "contextWindow": 100,
+          "desiredMaxOutput": 128000,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 16,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-17-desired-0",
+          "contextWindow": 100,
+          "desiredMaxOutput": 0,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 17,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-17-desired-16",
+          "contextWindow": 100,
+          "desiredMaxOutput": 16,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 17,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "length-output-17-desired-128000",
+          "contextWindow": 100,
+          "desiredMaxOutput": 128000,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 100,
+              "output": 17,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "length",
+            "timestamp": 1
+          }
+        },
+        {
+          "id": "ignore-error-text-on-success",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1,
+            "errorMessage": "too many tokens"
+          }
+        },
+        {
+          "id": "cache-write-is-not-input",
+          "contextWindow": 100,
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "kept"
+              }
+            ],
+            "api": "faux",
+            "provider": "faux",
+            "model": "faux-1",
+            "usage": {
+              "input": 1,
+              "output": 999,
+              "cacheRead": 0,
+              "cacheWrite": 1000,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          }
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "estimates": [
+        {
+          "id": "empty",
+          "tokens": 0,
+          "usageTokens": 0,
+          "trailingTokens": 0,
+          "lastUsageIndex": null
+        },
+        {
+          "id": "all-content-no-usage",
+          "tokens": 2438,
+          "usageTokens": 0,
+          "trailingTokens": 2438,
+          "lastUsageIndex": null
+        },
+        {
+          "id": "total-precedence",
+          "tokens": 501,
+          "usageTokens": 500,
+          "trailingTokens": 1,
+          "lastUsageIndex": 0
+        },
+        {
+          "id": "usage-buckets",
+          "tokens": 100,
+          "usageTokens": 100,
+          "trailingTokens": 0,
+          "lastUsageIndex": 0
+        },
+        {
+          "id": "failed-usage-skipped",
+          "tokens": 504,
+          "usageTokens": 500,
+          "trailingTokens": 4,
+          "lastUsageIndex": 0
+        },
+        {
+          "id": "equal-timestamp",
+          "tokens": 500,
+          "usageTokens": 500,
+          "trailingTokens": 0,
+          "lastUsageIndex": 1
+        },
+        {
+          "id": "only-new-tool-definitions",
+          "tokens": 521,
+          "usageTokens": 500,
+          "trailingTokens": 21,
+          "lastUsageIndex": 1
+        },
+        {
+          "id": "next-usage-covers-tools",
+          "tokens": 800,
+          "usageTokens": 800,
+          "trailingTokens": 0,
+          "lastUsageIndex": 3
+        },
+        {
+          "id": "null-empty-added-names",
+          "tokens": 500,
+          "usageTokens": 500,
+          "trailingTokens": 0,
+          "lastUsageIndex": 0
+        },
+        {
+          "id": "schema-json-semantics",
+          "tokens": 57,
+          "usageTokens": 0,
+          "trailingTokens": 57,
+          "lastUsageIndex": null
+        },
+        {
+          "id": "stale-prefix",
+          "tokens": 1005,
+          "usageTokens": 0,
+          "trailingTokens": 1005,
+          "lastUsageIndex": null
+        },
+        {
+          "id": "fresh-after-summary",
+          "tokens": 2001,
+          "usageTokens": 2000,
+          "trailingTokens": 1,
+          "lastUsageIndex": 3
+        }
+      ],
+      "overflows": [
+        {
+          "id": "anthropic",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            0
+          ]
+        },
+        {
+          "id": "anthropic-bytes",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            1
+          ]
+        },
+        {
+          "id": "bedrock",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            2
+          ]
+        },
+        {
+          "id": "openai",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            3
+          ]
+        },
+        {
+          "id": "litellm",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            4
+          ]
+        },
+        {
+          "id": "compatible",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            4
+          ]
+        },
+        {
+          "id": "gemini",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            5
+          ]
+        },
+        {
+          "id": "xai",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            6
+          ]
+        },
+        {
+          "id": "groq",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            7
+          ]
+        },
+        {
+          "id": "openrouter",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            8
+          ]
+        },
+        {
+          "id": "poolside",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            9
+          ]
+        },
+        {
+          "id": "together",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            10
+          ]
+        },
+        {
+          "id": "copilot",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            11
+          ]
+        },
+        {
+          "id": "llama-cpp",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            12
+          ]
+        },
+        {
+          "id": "lm-studio",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            13
+          ]
+        },
+        {
+          "id": "minimax",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            14
+          ]
+        },
+        {
+          "id": "kimi",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            15
+          ]
+        },
+        {
+          "id": "mistral",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            16
+          ]
+        },
+        {
+          "id": "ds4",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            17
+          ]
+        },
+        {
+          "id": "zai",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            18
+          ]
+        },
+        {
+          "id": "ollama",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            19
+          ]
+        },
+        {
+          "id": "qwen",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            20
+          ]
+        },
+        {
+          "id": "generic-code",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            21
+          ]
+        },
+        {
+          "id": "generic-spaces",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            21
+          ]
+        },
+        {
+          "id": "generic-many",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            22
+          ]
+        },
+        {
+          "id": "generic-limit",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            23
+          ]
+        },
+        {
+          "id": "cerebras-400",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            24
+          ]
+        },
+        {
+          "id": "cerebras-413",
+          "overflow": true,
+          "recoverable": false,
+          "matches": [
+            24
+          ]
+        },
+        {
+          "id": "throttling",
+          "overflow": false,
+          "recoverable": false,
+          "matches": [
+            22
+          ]
+        },
+        {
+          "id": "unavailable",
+          "overflow": false,
+          "recoverable": false,
+          "matches": [
+            22
+          ]
+        },
+        {
+          "id": "rate-limit",
+          "overflow": false,
+          "recoverable": false,
+          "matches": [
+            23
+          ]
+        },
+        {
+          "id": "requests",
+          "overflow": false,
+          "recoverable": false,
+          "matches": [
+            22
+          ]
+        },
+        {
+          "id": "crashed",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "bodyless-500",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "bodyless-unanchored",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "stop-98",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "stop-99",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "stop-100",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "stop-101",
+          "overflow": true,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "length-98",
+          "overflow": false,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "length-99",
+          "overflow": true,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "length-100",
+          "overflow": true,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "length-101",
+          "overflow": true,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "toolUse-98",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "toolUse-99",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "toolUse-100",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "toolUse-101",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "aborted-98",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "aborted-99",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "aborted-100",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "aborted-101",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "error-98",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "error-99",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "error-100",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "error-101",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "window-absent",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "window-0",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "window-100",
+          "overflow": true,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "length-output-0-desired-0",
+          "overflow": true,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "length-output-0-desired-16",
+          "overflow": true,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "length-output-0-desired-128000",
+          "overflow": true,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "length-output-15-desired-0",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "length-output-15-desired-16",
+          "overflow": false,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "length-output-15-desired-128000",
+          "overflow": false,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "length-output-16-desired-0",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "length-output-16-desired-16",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "length-output-16-desired-128000",
+          "overflow": false,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "length-output-17-desired-0",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "length-output-17-desired-16",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        },
+        {
+          "id": "length-output-17-desired-128000",
+          "overflow": false,
+          "recoverable": true,
+          "matches": []
+        },
+        {
+          "id": "ignore-error-text-on-success",
+          "overflow": false,
+          "recoverable": false,
+          "matches": [
+            22
+          ]
+        },
+        {
+          "id": "cache-write-is-not-input",
+          "overflow": false,
+          "recoverable": false,
+          "matches": []
+        }
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:6417ef1c22995fecfb89e76c9e635965f37810ae34d899d528bb4642b88f3eab",
+  "observation_hash": "sha256:57161e38e7d0af53531bfffa0f4de64bb41d042d0cb76163baa0cb12392e2b78",
+  "execution_method": "node --experimental-strip-types parity/oracle/context-overflow.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/ai/src/utils/estimate.ts;packages/ai/src/utils/overflow.ts"
+  }
+}
