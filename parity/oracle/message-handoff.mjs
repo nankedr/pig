@@ -82,6 +82,8 @@ function declaration() {
   { type: "thinking", thinking: "", redacted: true, thinkingSignature: "opaque" },
   { type: "thinking", thinking: "hidden", redacted: true },
   { type: "thinking", thinking: " \n" },
+  { type: "thinking", thinking: "\uFEFF" },
+  { type: "thinking", thinking: "\u0085" },
   { type: "text", text: "answer", textSignature: "text-id" },
   call("call|item", { thoughtSignature: "tool-signature", namespace: "files" }),
  ];
@@ -99,7 +101,7 @@ function declaration() {
  ];
  const ids = ["call|item", "call|" + "+/=".repeat(150), "call|" + "+/=".repeat(149) + "other", "call|💡item", "call|", "raw-id", "x".repeat(70), "é".repeat(50)];
  for (const provider of ["openai", "other"]) {
-  scenarios.push({ id: `wire-${provider}`, wire: true, model: { ...source, id: "target", api: "openai-completions", provider }, normalize: "none", messages: [assistant(ids.map((id) => call(id))), ...ids.map(result)] });
+  scenarios.push({ id: `wire-${provider}`, wire: true, model: { ...source, id: "target", api: "openai-completions", provider }, normalize: "none", messages: [assistant([...ids.map((id) => call(id)), { type: "thinking", thinking: "\uFEFF" }, { type: "thinking", thinking: "\u0085" }]), ...ids.map(result), assistant([{ type: "thinking", thinking: "\uFEFF", thinkingSignature: "reasoning" }, { type: "thinking", thinking: "\u0085", thinkingSignature: "reasoning_content" }, { type: "text", text: "\uFEFF" }, { type: "text", text: "\u0085" }], { model: "target", api: "openai-completions", provider, stopReason: "stop" })] });
  }
  return { schema_version: "1.0.0", id: "go-sdk/ai/message-handoff", catalog_id: "contract:ai/message-handoff", surface: "go-sdk", input: { scenarios, projection: "Full transformed messages, callback metadata and Chat Completions wire. Only synthetic ToolResult timestamps become 0. Missing/null content maps to Go zero-value content at the typed SDK boundary; strict JSON codecs remain unchanged. Images remain M12." }, observe: ["outcome", "side_effects"] };
 }

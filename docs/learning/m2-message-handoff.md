@@ -29,4 +29,6 @@ go test ./internal/parity -run '^TestMessageHandoffParity$' -count=1
 go test ./ai ./agent -run 'TestTransformMessages|TestIssue66Locked|TestAgentModelHandoff' -count=1
 ```
 
+空内容判定遵循固定 Pi 的 ECMAScript 空白定义：BOM（U+FEFF）视为空白，U+0085 保留为文本。
+
 19 个场景覆盖同/跨模型签名、ID 回调来源、完整与缺失 ToolResult、失败 Assistant、nil/旧 content、长 ID 与 Chat Completions wire。fixture 只把合成结果的时钟值投影为 0；真实测试另外检查时间戳范围。Go SDK 用 nil/零值表达 Pi 的缺失/null content，快照隔离延续 ADR-0006。完成度以 Parity Catalog 为准。

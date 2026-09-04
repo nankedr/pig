@@ -258,11 +258,11 @@ func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, comp
 	for _, block := range message.Content {
 		switch value := block.(type) {
 		case TextContent:
-			if strings.TrimSpace(value.Text) != "" {
+			if hasReplayText(value.Text) {
 				textParts = append(textParts, sanitizeOpenAIText(value.Text))
 			}
 		case *TextContent:
-			if value != nil && strings.TrimSpace(value.Text) != "" {
+			if value != nil && hasReplayText(value.Text) {
 				textParts = append(textParts, sanitizeOpenAIText(value.Text))
 			}
 		case ThinkingContent:
@@ -337,7 +337,7 @@ func appendOpenAIAssistantMessage(messages *[]json.RawMessage, model Model, comp
 }
 
 func appendOpenAIThinking(thinking *[]ThinkingContent, block ThinkingContent) {
-	if strings.TrimSpace(block.Thinking) != "" {
+	if hasReplayText(block.Thinking) {
 		*thinking = append(*thinking, block)
 	}
 }

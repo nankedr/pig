@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 	"time"
+	"unicode"
 )
 
 // ToolCallIDNormalizer applies the target API's ID constraints during handoff.
@@ -69,7 +70,7 @@ func TransformMessages(messages []Message, model Model, normalizers ...ToolCallI
 						if sameModel {
 							content = append(content, block)
 						}
-					} else if sameModel && signature != "" || strings.TrimSpace(block.Thinking) != "" {
+					} else if sameModel && signature != "" || hasReplayText(block.Thinking) {
 						if sameModel {
 							content = append(content, block)
 						} else {
@@ -138,6 +139,13 @@ func TransformMessages(messages []Message, model Model, normalizers ...ToolCallI
 	}
 	flush()
 	return replay, nil
+}
+
+func hasReplayText(text string) bool {
+	// Match ECMAScript trim: BOM is whitespace, U+0085 is not.
+	return strings.TrimFunc(text, func(r rune) bool {
+		return r == '\ufeff' || r != '\u0085' && unicode.IsSpace(r)
+	}) != ""
 }
 
 func checkReplayImages[T Content](blocks []T, model Model) error {

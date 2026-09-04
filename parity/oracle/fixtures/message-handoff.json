@@ -65,6 +65,14 @@
                   "thinking": " \n"
                 },
                 {
+                  "type": "thinking",
+                  "thinking": "﻿"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": ""
+                },
+                {
                   "type": "text",
                   "text": "answer",
                   "textSignature": "text-id"
@@ -160,6 +168,14 @@
                 {
                   "type": "thinking",
                   "thinking": " \n"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "﻿"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": ""
                 },
                 {
                   "type": "text",
@@ -259,6 +275,14 @@
                   "thinking": " \n"
                 },
                 {
+                  "type": "thinking",
+                  "thinking": "﻿"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": ""
+                },
+                {
                   "type": "text",
                   "text": "answer",
                   "textSignature": "text-id"
@@ -354,6 +378,14 @@
                 {
                   "type": "thinking",
                   "thinking": " \n"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "﻿"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": ""
                 },
                 {
                   "type": "text",
@@ -1501,6 +1533,14 @@
                   "arguments": {
                     "path": "README.md"
                   }
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "﻿"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": ""
                 }
               ],
               "usage": {
@@ -1623,6 +1663,48 @@
               ],
               "isError": false,
               "timestamp": 2
+            },
+            {
+              "role": "assistant",
+              "api": "openai-completions",
+              "provider": "openai",
+              "model": "target",
+              "content": [
+                {
+                  "type": "thinking",
+                  "thinking": "﻿",
+                  "thinkingSignature": "reasoning"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "thinkingSignature": "reasoning_content"
+                },
+                {
+                  "type": "text",
+                  "text": "﻿"
+                },
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "stop",
+              "timestamp": 1
             }
           ]
         },
@@ -1709,6 +1791,14 @@
                   "arguments": {
                     "path": "README.md"
                   }
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "﻿"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": ""
                 }
               ],
               "usage": {
@@ -1831,6 +1921,48 @@
               ],
               "isError": false,
               "timestamp": 2
+            },
+            {
+              "role": "assistant",
+              "api": "openai-completions",
+              "provider": "other",
+              "model": "target",
+              "content": [
+                {
+                  "type": "thinking",
+                  "thinking": "﻿",
+                  "thinkingSignature": "reasoning"
+                },
+                {
+                  "type": "thinking",
+                  "thinking": "",
+                  "thinkingSignature": "reasoning_content"
+                },
+                {
+                  "type": "text",
+                  "text": "﻿"
+                },
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ],
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "stop",
+              "timestamp": 1
             }
           ]
         }
@@ -1878,6 +2010,10 @@
                 "type": "thinking",
                 "thinking": "hidden",
                 "redacted": true
+              },
+              {
+                "type": "thinking",
+                "thinking": ""
               },
               {
                 "type": "text",
@@ -1940,6 +2076,10 @@
               {
                 "type": "text",
                 "text": "plan"
+              },
+              {
+                "type": "text",
+                "text": ""
               },
               {
                 "type": "text",
@@ -2011,6 +2151,10 @@
               },
               {
                 "type": "text",
+                "text": ""
+              },
+              {
+                "type": "text",
                 "text": "answer"
               },
               {
@@ -2076,6 +2220,10 @@
               {
                 "type": "text",
                 "text": "plan"
+              },
+              {
+                "type": "text",
+                "text": ""
               },
               {
                 "type": "text",
@@ -3129,7 +3277,7 @@
         "messages": [
           {
             "role": "assistant",
-            "content": null,
+            "content": "",
             "tool_calls": [
               {
                 "id": "call_item",
@@ -3236,6 +3384,11 @@
             "role": "tool",
             "content": "done",
             "tool_call_id": "éééééééééééééééééééééééééééééééééééééééé"
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "reasoning_content": ""
           }
         ],
         "calls": []
@@ -3245,7 +3398,7 @@
         "messages": [
           {
             "role": "assistant",
-            "content": null,
+            "content": "",
             "tool_calls": [
               {
                 "id": "call_item",
@@ -3352,6 +3505,11 @@
             "role": "tool",
             "content": "done",
             "tool_call_id": "éééééééééééééééééééééééééééééééééééééééééééééééééé"
+          },
+          {
+            "role": "assistant",
+            "content": "",
+            "reasoning_content": ""
           }
         ],
         "calls": []
@@ -3359,8 +3517,8 @@
     ],
     "side_effects": []
   },
-  "input_hash": "sha256:cddda8850ae22028a0e82c1c10ea3d76fe2b64a163800838f3a69f3e7afd42ff",
-  "observation_hash": "sha256:0cecb23c34e767f13b19da76c62592d2dabad34e0823e80a789b93f4e98f4af1",
+  "input_hash": "sha256:677463b1ea7cf86c8ebd3ece76c1d3024f9f10dfb34c0cd94c50ab2760455d27",
+  "observation_hash": "sha256:0d36f523f4b550547729f0d61f11a3f5f1d2c1a6d34bdd6dfc6dded92bf8f947",
   "execution_method": "node --experimental-strip-types parity/oracle/message-handoff.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {
