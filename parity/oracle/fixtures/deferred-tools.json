@@ -1,0 +1,594 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/ai/src/utils/deferred-tools.ts#splitDeferredTools"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/ai/deferred-tools",
+    "catalog_id": "contract:ai/deferred-tools",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "id": "disabled",
+          "enabled": false,
+          "normalize": true,
+          "context": {
+            "tools": [
+              {
+                "name": "discover",
+                "description": "discover",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "Read",
+                "description": "old",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "spare",
+                "description": "spare",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "read",
+                "description": "replacement",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "write",
+                "description": "write",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "READ",
+                  "read",
+                  "write",
+                  "missing"
+                ],
+                "isError": false,
+                "timestamp": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "discovered",
+          "enabled": true,
+          "normalize": true,
+          "context": {
+            "tools": [
+              {
+                "name": "discover",
+                "description": "discover",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "Read",
+                "description": "old",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "spare",
+                "description": "spare",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "read",
+                "description": "replacement",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "write",
+                "description": "write",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "discover",
+                    "arguments": {}
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "toolUse",
+                "timestamp": 1
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "READ",
+                  "read",
+                  "write",
+                  "missing"
+                ],
+                "isError": false,
+                "timestamp": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "used-before-marker",
+          "enabled": true,
+          "normalize": true,
+          "context": {
+            "tools": [
+              {
+                "name": "discover",
+                "description": "discover",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "Read",
+                "description": "old",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "spare",
+                "description": "spare",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "read",
+                "description": "replacement",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "write",
+                "description": "write",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "READ",
+                    "arguments": {}
+                  }
+                ],
+                "api": "faux",
+                "provider": "faux",
+                "model": "faux-1",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "toolUse",
+                "timestamp": 1
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "READ",
+                  "read",
+                  "write",
+                  "missing"
+                ],
+                "isError": false,
+                "timestamp": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "identity",
+          "enabled": true,
+          "normalize": false,
+          "context": {
+            "tools": [
+              {
+                "name": "discover",
+                "description": "discover",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "Read",
+                "description": "old",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "spare",
+                "description": "spare",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "read",
+                "description": "replacement",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "write",
+                "description": "write",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [
+                  "READ",
+                  "read",
+                  "write",
+                  "missing"
+                ],
+                "isError": false,
+                "timestamp": 2
+              }
+            ]
+          }
+        },
+        {
+          "id": "empty",
+          "enabled": true,
+          "normalize": false,
+          "context": {
+            "messages": []
+          }
+        },
+        {
+          "id": "unmarked",
+          "enabled": true,
+          "normalize": false,
+          "context": {
+            "tools": [
+              {
+                "name": "read",
+                "description": "read",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              },
+              {
+                "name": "read",
+                "description": "latest",
+                "parameters": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            ],
+            "messages": [
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": null,
+                "isError": false,
+                "timestamp": 2
+              },
+              {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "discover",
+                "content": [],
+                "addedToolNames": [],
+                "isError": false,
+                "timestamp": 2
+              }
+            ]
+          }
+        }
+      ],
+      "projection": "Tool metadata in stable order; Pi deferred Map values become an ordered array. Normalizer lowercases ASCII test names only."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "disabled",
+        "immediate": [
+          {
+            "name": "discover",
+            "description": "discover",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "read",
+            "description": "replacement",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "spare",
+            "description": "spare",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "write",
+            "description": "write",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "deferred": []
+      },
+      {
+        "id": "discovered",
+        "immediate": [
+          {
+            "name": "discover",
+            "description": "discover",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "spare",
+            "description": "spare",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "deferred": [
+          {
+            "name": "read",
+            "description": "replacement",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "write",
+            "description": "write",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "used-before-marker",
+        "immediate": [
+          {
+            "name": "discover",
+            "description": "discover",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "read",
+            "description": "replacement",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "spare",
+            "description": "spare",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "deferred": [
+          {
+            "name": "write",
+            "description": "write",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "identity",
+        "immediate": [
+          {
+            "name": "discover",
+            "description": "discover",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "Read",
+            "description": "old",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "spare",
+            "description": "spare",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "deferred": [
+          {
+            "name": "read",
+            "description": "replacement",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "write",
+            "description": "write",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ]
+      },
+      {
+        "id": "empty",
+        "immediate": [],
+        "deferred": []
+      },
+      {
+        "id": "unmarked",
+        "immediate": [
+          {
+            "name": "read",
+            "description": "latest",
+            "parameters": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "deferred": []
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:752b770960f3051571eae7f1517a17afac50cd940a3a81e720872a4bb234ef50",
+  "observation_hash": "sha256:34aa4744d0e23b815a6bbccd7611ed5c105b9ce8a9bc3c8751d0e88dd946557a",
+  "execution_method": "node --experimental-strip-types parity/oracle/deferred-tools.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/ai/src/utils/deferred-tools.ts"
+  }
+}

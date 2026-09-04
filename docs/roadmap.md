@@ -76,6 +76,14 @@ Issue #62 通过公开 Faux、Provider 和 Models API 完成提交、pending/fin
 
 真实网络适配器的 deferred 支持继续按各自里程碑实现，完整范围见 [M2.3 学习文档](learning/m2-deferred-response.md)。
 
+## M2.4 deferred tools 门禁
+
+- `ai.SplitDeferredTools` 按规范化名称去重当前 Tool 集，保留最后定义与首次出现顺序，根据 transcript 标记和调用记录拆分。
+- 关闭时全部 immediate；开启时仅未调用的动态 Tool deferred，后续调用恢复 immediate 的基线差异见 ADR-0016。
+- 固定 Pi fixture、公开 Agent/Faux continuation、API snapshot 和 `go run ./examples/deferred-tools` 覆盖完整 SDK 路径。
+
+具体 API Adapter 的 deferred-tool wire 方言继续留给 M10，见 [M2.4 学习文档](learning/m2-deferred-tools.md)。
+
 ## 状态与凭证边界
 
 - Pig 默认只使用 `.pig`、`~/.pig` 和 `PIG_*`，不隐式读取 `.pi`、`PI_*` 或当前目录中的 Pi 文件。

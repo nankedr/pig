@@ -7,15 +7,15 @@
 
 ## Summary
 
-- Total entries: 9645
+- Total entries: 9646
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5216 |
+| inventoried | 5215 |
 | scaffolded | 4070 |
-| partial | 192 |
+| partial | 193 |
 | implemented | 6 |
-| verified | 159 |
+| verified | 160 |
 | deferred | 2 |
 
 ## Entries by module
@@ -4239,7 +4239,6 @@
 | member:ai/src/types.ts#ToolCall.namespace | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | member:ai/src/types.ts#ToolCall.thoughtSignature | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | member:ai/src/types.ts#ToolCall.type | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| member:ai/src/types.ts#ToolResultMessage.addedToolNames | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | member:ai/src/types.ts#ToolResultMessage.content | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | member:ai/src/types.ts#ToolResultMessage.details | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | member:ai/src/types.ts#ToolResultMessage.isError | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
@@ -5032,8 +5031,10 @@
 | matrix:ai/openai-completions/tool/tool-call-type | partial | M1 | field | github.com/nankedr/pig/ai.ToolCall.Type | ai |
 | matrix:ai/openai-completions/usage/usage-assistant-output-only | partial | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.UsageMapper.AssistantOutputOnly | ai |
 | matrix:ai/openai-completions/usage/usage-completion-tokens-details-reasoning-tokens | partial | M2 | field | github.com/nankedr/pig/ai/internal/openai.OpenAIUsage.CompletionTokenDetails.ReasoningTokens | ai |
+| member:ai/src/types.ts#ToolResultMessage.addedToolNames | partial | M2 | contract | github.com/nankedr/pig/ai.ToolResultMessage.AddedToolNames | ai |
 | module-ai | partial | M1 | package | github.com/nankedr/pig/ai | ai |
 | contract:ai/faux-provider/core-stream | implemented | M1 | contract | github.com/nankedr/pig/ai.CreateFauxCore | ai |
+| contract:ai/deferred-tools | verified | M2 | contract | github.com/nankedr/pig/ai.SplitDeferredTools | ai |
 | contract:baseline/catalog-snapshot | verified | M0 | contract | parity/baseline/snapshot.manifest.json | ai |
 | contract:baseline/image-catalog-snapshot | verified | M0 | contract | parity/baseline/catalog/image/models.json | ai |
 | matrix:ai/openai-completions/content/assistant-message-content-thinking | verified | M2 | behavior | github.com/nankedr/pig/ai.ThinkingContent | ai |

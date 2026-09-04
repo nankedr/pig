@@ -9,6 +9,8 @@ Pig 是 Pi 固定版本的 Go 语义兼容实现。M1 已通过冻结门禁并�
 - [M2.2 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-usage-cost-cache.md)
 - [M2.3 Deferred response 生命周期](docs/learning/m2-deferred-response.md)
 - [M2.3 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-deferred-response.md)
+- [M2.4 Deferred tools 与动态 Tool 定义](docs/learning/m2-deferred-tools.md)
+- [M2.4 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-deferred-tools.md)
 - [M0 兼容骨架](docs/learning/m0-compatibility-skeleton.md)
 - [M0 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m0.md)
 

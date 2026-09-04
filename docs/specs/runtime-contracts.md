@@ -105,6 +105,12 @@ Listener 按注册顺序串行等待。它们不是 fire-and-forget 回调，也
 
 工具、被阻止的 `beforeToolCall` 或 `afterToolCall` 覆盖结果都可设置 `terminate: true`。只有 batch 中每一个最终结果都为 `terminate: true` 时才停止自动 follow-up；混合 batch 继续。它只影响下一次模型调用，不撤销已经运行的工具。
 
+### 6.5 动态定义与 deferred tools
+
+`ai.SplitDeferredTools` 按调用者提供的名称归一化函数去重当前 Tool 定义，最后一个定义覆盖前值但保留首次出现顺序，两个输出组均保持该顺序。关闭 deferred 时全部定义 immediate；开启时，只有 transcript 的 AddedToolNames 标记且没有任何 ToolCall 的名称进入 deferred。已调用动态 Tool 恢复 immediate，包括调用晚于标记的情况（#63、ADR-0016）；不存在于当前 Tool 集的名称不会恢复定义。归一化只影响匹配，不改写 Tool 或 transcript。
+
+动态 Tool 的定义和执行器由宿主注册，AddedToolNames 本身只声明发现标记。M2 提供公共 helper 与 Faux/Agent SDK 验证，具体 API Adapter 的 wire 方言保留到 M10。
+
 ## 7. Session、客户端请求与资源上限
 
 生产 coding-agent 继续使用 `Agent + AgentSession + v3 JSONL`；Harness v4 是独立架构和独立格式，不能拿未来设计文档补齐固定快照中不存在的操作。M1 为内存 Session，不读写会话文件；M3 实现 v3；M8 再实现固定快照的 v4。

@@ -1,0 +1,1 @@
+func ai.SplitDeferredTools func(ai.Context, bool, func(string) string) ([]ai.Tool, []ai.Tool)
