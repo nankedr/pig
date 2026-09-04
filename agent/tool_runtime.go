@@ -149,37 +149,8 @@ func finishToolTurn(ctx context.Context, emit AgentEventSink, agentContext Agent
 	if err := emitAgentEvent(ctx, emit, TurnEndEvent{Type: AgentEventTypeTurnEnd, Message: message, ToolResults: toolResults}); err != nil {
 		return agentTurnCompletion{}, err
 	}
-	completed := agentTurnCompletion{agentContext: agentContext, newMessages: newMessages}
-	if cause := context.Cause(ctx); cause != nil {
-		if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: newMessages}); err != nil {
-			return agentTurnCompletion{}, err
-		}
-		return completed, cause
-	}
-	shouldStop := false
-	if config.ShouldStopAfterTurn != nil {
-		callbackContext, err := cloneAgentContext(agentContext)
-		if err != nil {
-			return agentTurnCompletion{}, err
-		}
-		shouldStop, err = config.ShouldStopAfterTurn(ctx, ShouldStopAfterTurnContext{
-			Message: ai.CloneAssistantMessage(message), ToolResults: cloneToolResultMessages(toolResults), Context: callbackContext, NewMessages: cloneAgentMessages(newMessages),
-		})
-		if cause := context.Cause(ctx); cause != nil {
-			return agentTurnCompletion{}, cause
-		}
-		if err != nil {
-			return agentTurnCompletion{}, err
-		}
-	}
-	if !shouldTerminateAgentToolBatch(finalized) && !shouldStop {
-		completed.continueRun = true
-		return completed, nil
-	}
-	if err := emitAgentEvent(ctx, emit, AgentEndEvent{Type: AgentEventTypeAgentEnd, Messages: newMessages}); err != nil {
-		return agentTurnCompletion{}, err
-	}
-	return completed, nil
+	completed := agentTurnCompletion{agentContext: agentContext, newMessages: newMessages, continueRun: !shouldTerminateAgentToolBatch(finalized)}
+	return continueAgentTurn(ctx, emit, completed, config, message, toolResults)
 }
 
 func failTruncatedAgentToolCalls(ctx context.Context, emit AgentEventSink, toolCalls []AgentToolCall) ([]finalizedAgentToolCall, error) {

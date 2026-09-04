@@ -180,10 +180,11 @@ func TestIssue29MemberMappingsMatchLockedLegacyAgentSurface(t *testing.T) {
 		if entry.Mapping.Target != wantMember.target {
 			t.Errorf("%s target = %q, want %q", entry.ID, entry.Mapping.Target, wantMember.target)
 		}
-		if entry.Status != wantMember.status {
-			t.Errorf("%s status = %q, want %q", entry.ID, entry.Status, wantMember.status)
+		advanced := wantMember.status == catalog.StatusScaffolded && (entry.Status == catalog.StatusPartial || entry.Status == catalog.StatusImplemented || entry.Status == catalog.StatusVerified)
+		if entry.Status != wantMember.status && !advanced {
+			t.Errorf("%s status = %q, want %q or an evidence-backed advancement", entry.ID, entry.Status, wantMember.status)
 		}
-		if entry.Milestone != issue29MemberMilestone(entry.ID) {
+		if !advanced && entry.Milestone != issue29MemberMilestone(entry.ID) {
 			t.Errorf("%s milestone = %q, want %q", entry.ID, entry.Milestone, issue29MemberMilestone(entry.ID))
 		}
 		if entry.Classification != "public-api" {
@@ -234,8 +235,14 @@ func issue29MemberMilestone(id string) string {
 
 func issue29ValidateScaffoldedMemberEvidence(t *testing.T, entry catalog.Entry, member issue29ExpectedMember) {
 	t.Helper()
-	if len(entry.Evidence) != 1 {
-		t.Errorf("%s evidence count = %d, want 1", entry.ID, len(entry.Evidence))
+	var mappingEvidence []catalog.Evidence
+	for _, evidence := range entry.Evidence {
+		if evidence.Ref == issue29MemberTestRef {
+			mappingEvidence = append(mappingEvidence, evidence)
+		}
+	}
+	if len(mappingEvidence) != 1 {
+		t.Errorf("%s mapping evidence count = %d, want 1", entry.ID, len(mappingEvidence))
 		return
 	}
 	want := catalog.Evidence{
@@ -250,8 +257,8 @@ func issue29ValidateScaffoldedMemberEvidence(t *testing.T, entry catalog.Entry, 
 		Platform:        "any",
 		CatalogID:       entry.ID,
 	}
-	if entry.Evidence[0] != want {
-		t.Errorf("%s evidence = %+v, want %+v", entry.ID, entry.Evidence[0], want)
+	if mappingEvidence[0] != want {
+		t.Errorf("%s evidence = %+v, want %+v", entry.ID, mappingEvidence[0], want)
 	}
 
 	wantNote := fmt.Sprintf("Issue #29 concrete %s member mapping authority. Behavioral status remains on the broader %s row.", member.symbol, member.broaderContract)
@@ -261,7 +268,7 @@ func issue29ValidateScaffoldedMemberEvidence(t *testing.T, entry catalog.Entry, 
 	if member.symbol == "CustomAgentMessages" {
 		wantNote = "Issue #29 concrete CustomAgentMessages declaration-merge key mapping authority for the open AgentMessage seam. The key maps to AgentMessage rather than a closed Go field; behavioral status remains on the broader contract:agent/messages row."
 	}
-	if entry.Notes != wantNote {
+	if entry.Status == catalog.StatusScaffolded && entry.Notes != wantNote {
 		t.Errorf("%s notes = %q, want %q", entry.ID, entry.Notes, wantNote)
 	}
 }

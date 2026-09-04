@@ -1,0 +1,458 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/agent/src/agent.ts#Agent"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/agent/legacy-queues",
+    "catalog_id": "contract:agent/legacy-queues",
+    "surface": "go-sdk",
+    "input": {
+      "modes": [
+        "one-at-a-time",
+        "all"
+      ],
+      "resume": [
+        false,
+        true
+      ],
+      "prompt": "prompt",
+      "steering": [
+        "s1",
+        "s2"
+      ],
+      "follow_up": [
+        "f1",
+        "f2"
+      ],
+      "reply": "reply"
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "one-at-a-time",
+        "resume": false,
+        "requests": [
+          [
+            "prompt"
+          ],
+          [
+            "s1"
+          ],
+          [
+            "s2"
+          ],
+          [
+            "f1"
+          ],
+          [
+            "f2"
+          ]
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "user:prompt",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:s1",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:s2",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f1",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f2",
+          "assistant",
+          "turn_end",
+          "agent_end"
+        ],
+        "listeners": [
+          "first-start",
+          "first-end",
+          "second"
+        ],
+        "queued": false,
+        "streaming": false
+      },
+      {
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "one-at-a-time",
+        "resume": true,
+        "requests": [
+          [
+            "prompt"
+          ],
+          [
+            "s1"
+          ],
+          [
+            "s2"
+          ],
+          [
+            "f1"
+          ],
+          [
+            "f2"
+          ]
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "user:prompt",
+          "assistant",
+          "turn_end",
+          "agent_end",
+          "agent_start",
+          "turn_start",
+          "user:s1",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:s2",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f1",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f2",
+          "assistant",
+          "turn_end",
+          "agent_end"
+        ],
+        "listeners": [
+          "first-start",
+          "first-end",
+          "second",
+          "first-start",
+          "first-end",
+          "second"
+        ],
+        "queued": false,
+        "streaming": false
+      },
+      {
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "all",
+        "resume": false,
+        "requests": [
+          [
+            "prompt"
+          ],
+          [
+            "s1"
+          ],
+          [
+            "s2"
+          ],
+          [
+            "f1",
+            "f2"
+          ]
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "user:prompt",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:s1",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:s2",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f1",
+          "user:f2",
+          "assistant",
+          "turn_end",
+          "agent_end"
+        ],
+        "listeners": [
+          "first-start",
+          "first-end",
+          "second"
+        ],
+        "queued": false,
+        "streaming": false
+      },
+      {
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "all",
+        "resume": true,
+        "requests": [
+          [
+            "prompt"
+          ],
+          [
+            "s1"
+          ],
+          [
+            "s2"
+          ],
+          [
+            "f1",
+            "f2"
+          ]
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "user:prompt",
+          "assistant",
+          "turn_end",
+          "agent_end",
+          "agent_start",
+          "turn_start",
+          "user:s1",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:s2",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f1",
+          "user:f2",
+          "assistant",
+          "turn_end",
+          "agent_end"
+        ],
+        "listeners": [
+          "first-start",
+          "first-end",
+          "second",
+          "first-start",
+          "first-end",
+          "second"
+        ],
+        "queued": false,
+        "streaming": false
+      },
+      {
+        "steeringMode": "all",
+        "followUpMode": "one-at-a-time",
+        "resume": false,
+        "requests": [
+          [
+            "prompt"
+          ],
+          [
+            "s1",
+            "s2"
+          ],
+          [
+            "f1"
+          ],
+          [
+            "f2"
+          ]
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "user:prompt",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:s1",
+          "user:s2",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f1",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f2",
+          "assistant",
+          "turn_end",
+          "agent_end"
+        ],
+        "listeners": [
+          "first-start",
+          "first-end",
+          "second"
+        ],
+        "queued": false,
+        "streaming": false
+      },
+      {
+        "steeringMode": "all",
+        "followUpMode": "one-at-a-time",
+        "resume": true,
+        "requests": [
+          [
+            "prompt"
+          ],
+          [
+            "s1",
+            "s2"
+          ],
+          [
+            "f1"
+          ],
+          [
+            "f2"
+          ]
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "user:prompt",
+          "assistant",
+          "turn_end",
+          "agent_end",
+          "agent_start",
+          "turn_start",
+          "user:s1",
+          "user:s2",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f1",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f2",
+          "assistant",
+          "turn_end",
+          "agent_end"
+        ],
+        "listeners": [
+          "first-start",
+          "first-end",
+          "second",
+          "first-start",
+          "first-end",
+          "second"
+        ],
+        "queued": false,
+        "streaming": false
+      },
+      {
+        "steeringMode": "all",
+        "followUpMode": "all",
+        "resume": false,
+        "requests": [
+          [
+            "prompt"
+          ],
+          [
+            "s1",
+            "s2"
+          ],
+          [
+            "f1",
+            "f2"
+          ]
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "user:prompt",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:s1",
+          "user:s2",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f1",
+          "user:f2",
+          "assistant",
+          "turn_end",
+          "agent_end"
+        ],
+        "listeners": [
+          "first-start",
+          "first-end",
+          "second"
+        ],
+        "queued": false,
+        "streaming": false
+      },
+      {
+        "steeringMode": "all",
+        "followUpMode": "all",
+        "resume": true,
+        "requests": [
+          [
+            "prompt"
+          ],
+          [
+            "s1",
+            "s2"
+          ],
+          [
+            "f1",
+            "f2"
+          ]
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "user:prompt",
+          "assistant",
+          "turn_end",
+          "agent_end",
+          "agent_start",
+          "turn_start",
+          "user:s1",
+          "user:s2",
+          "assistant",
+          "turn_end",
+          "turn_start",
+          "user:f1",
+          "user:f2",
+          "assistant",
+          "turn_end",
+          "agent_end"
+        ],
+        "listeners": [
+          "first-start",
+          "first-end",
+          "second",
+          "first-start",
+          "first-end",
+          "second"
+        ],
+        "queued": false,
+        "streaming": false
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:76a0602875a90023121e5a2dd5b7f679c245a5da9b76cd61316d418048d1bd7c",
+  "observation_hash": "sha256:46ed6bf5033f820c5643ced7261b61cd6e7e9026621caf01994232aae42e1d11",
+  "execution_method": "node --experimental-strip-types parity/oracle/legacy-agent-queues.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/agent/src/agent.ts"
+  }
+}

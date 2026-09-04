@@ -55,6 +55,14 @@ Listener 按注册顺序串行等待。它们不是 fire-and-forget 回调，也
 
 `shouldStopAfterTurn` 在 `turn_end` 发布且当前 Assistant/工具全部正常完成后运行；返回 true 时直接发布 `agent_end`，不再轮询 steering/follow-up queue，也不开始下一次 Provider request。它不取消已经结束的 Provider stream、不取消工具，也不修改 Assistant stop reason。
 
+### 5.1 Legacy Agent 队列
+
+steering 与 follow-up 是独立 FIFO，one/all 分别取一项或当前全部项。steering 在首轮模型调用前及正常 turn 结束后消费；follow-up 仅在工具继续与 steering 均结束、Agent 原本会正常停止时开始下一 turn，最后统一发布 agent_end。错误、取消及 shouldStopAfterTurn=true 不自动消费 follow-up。
+
+Continue 的状态校验和启动原子执行；assistant 尾部允许从遗留队列恢复，先 steering 后 follow-up，steering 恢复跳过首轮重复轮询。busy Prompt/Continue/Reset、空 transcript Continue 均报错。按 issue #68，idle、取消后或收尾期间的 Steer/FollowUp 报错；最后的空队列检查与关闭接收原子执行。Reset 清理运行状态和队列，保留配置及订阅。
+
+agent_end 的全部 listener 按序完成后才 idle；其中的错误汇总返回，不重建终态、不重复发布 agent_end。与 Pi 宽松入队和 listener 抛错处理的差异见 ADR-0018。
+
 ## 6. 工具契约
 
 ### 6.1 参数流水线
