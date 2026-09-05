@@ -75,9 +75,9 @@ func CreateAgentSession(_ context.Context, options ...CreateAgentSessionOptions)
 		manager = NewInMemorySessionManager(config.CWD)
 	}
 	sessionContext := manager.BuildSessionContext()
-	hasExistingSession := len(sessionContext.Messages) != 0
+	hasMessages := len(sessionContext.Messages) != 0
 	thinkingLevel := config.ThinkingLevel
-	if hasExistingSession && thinkingLevel == "" {
+	if hasMessages && thinkingLevel == "" {
 		thinkingLevel = agent.ThinkingLevel(sessionContext.ThinkingLevel)
 	}
 
@@ -95,7 +95,7 @@ func CreateAgentSession(_ context.Context, options ...CreateAgentSessionOptions)
 	if err != nil {
 		return CreateAgentSessionResult{}, err
 	}
-	if !hasExistingSession {
+	if !hasMessages {
 		if _, err := manager.AppendModelChange(string(config.Model.Provider), config.Model.ID); err != nil {
 			return CreateAgentSessionResult{}, err
 		}

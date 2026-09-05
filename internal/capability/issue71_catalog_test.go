@@ -90,7 +90,8 @@ func issue71PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 			entry.Notes = "Issue #33 owns the static command contract, deterministic mode parsing and Extension Surface routing. Issues #56 and #57 activate Headless text and JSON. Issue #71 activates Session path, ID, directory, and explicit memory selection while preserving later interactive, RPC, continue, and fork boundaries."
 		case "contract:codingagent/headless":
 			found[entry.ID] = true
-			entry.Evidence = issue56UpsertEvidence(entry.Evidence, issue71Evidence(t, entry.ID, "cmd/pig/issue71_process_test.go#TestPigProcessesPersistAndReopenExplicitSessionPath", "issue71-headless-session-persistence", "the reusable Headless lifecycle accepts an injected memory or persisted Session and the CLI defaults to Pig-owned persistence", "PASS; two processes continued one transcript, terminal partial outcomes persisted, and explicit memory stayed side-effect-free"))
+			entry.Evidence = issue71RemoveEvidence(entry.Evidence, "issue71-headless-session-persistence")
+			entry.Evidence = issue56UpsertEvidence(entry.Evidence, issue71SDKOutcomeEvidence(t, entry.ID))
 			entry.Partial = &catalog.Partial{
 				Supported:   []string{"reusable Headless prompt lifecycle with injected memory or persisted Sessions, final outcome inspection, text and session-first JSONL presentation, Provider errors, cancellation, and cleanup"},
 				Unsupported: []string{"image inputs remain deferred to M12"},
@@ -105,6 +106,30 @@ func issue71PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 	}
 	sort.Slice(entries, func(i, j int) bool { return entries[i].ID < entries[j].ID })
 	return entries
+}
+
+func issue71RemoveEvidence(evidence []catalog.Evidence, caseID string) []catalog.Evidence {
+	result := make([]catalog.Evidence, 0, len(evidence))
+	for _, item := range evidence {
+		if item.CaseID != caseID {
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+func issue71SDKOutcomeEvidence(t *testing.T, catalogID string) catalog.Evidence {
+	t.Helper()
+	caseID := "issue71-headless-session-outcomes"
+	return catalog.Evidence{
+		Kind: "go-test", Ref: "codingagent/issue71_session_persistence_test.go#TestPersistedAgentSessionKeepsProviderFailureAndReportsStorageFailure",
+		Baseline: issue56BaselineCommit, CaseID: caseID,
+		InputHash:       issue33CanonicalInputHash(t, issue56RepoRoot(t), issue33EvidenceInputPaths(caseID)),
+		ExecutionMethod: "go test ./codingagent -run '^TestPersistedAgentSessionKeepsProviderFailureAndReportsStorageFailure$' -count=1",
+		Expected:        "the reusable Headless lifecycle preserves Provider failure, cancellation, cleanup, and partial Stream outcomes while surfacing storage failures",
+		Actual:          "PASS; terminal partial outcomes persisted, storage errors remained observable, and the completed in-memory Provider outcome was retained without claiming a stored file",
+		Platform:        "any", CatalogID: catalogID,
+	}
 }
 
 func issue71Evidence(t *testing.T, catalogID, ref, caseID, expected, actual string) catalog.Evidence {

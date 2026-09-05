@@ -235,7 +235,8 @@ func OpenSessionManager(path string, sessionDir, cwdOverride *string) (*SessionM
 		}
 		headerFields, headerObject := decodeJSONObject(parsed[0].Raw)
 		_, hasStringID := decodeJSONField[string](headerFields, "id")
-		if !headerObject || !hasStringID || parsed[0].Header == nil || parsed[0].Header.Type != "session" {
+		if !headerObject || !hasStringID || parsed[0].Header == nil || parsed[0].Header.Type != "session" ||
+			parsed[0].Header.Version == nil || *parsed[0].Header.Version != CurrentSessionVersion {
 			return nil, fmt.Errorf("Session file is not a valid pi session: %s", resolvedPath)
 		}
 		header = cloneSessionHeader(*parsed[0].Header)
@@ -464,21 +465,9 @@ func (m *SessionManager) AppendMessage(message agent.AgentMessage) (string, erro
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	used := make(map[string]struct{}, len(m.entries))
-	for i := range m.entries {
-		used[m.entries[i].ID] = struct{}{}
-	}
-	id := generateMigratedSessionEntryID(used)
-	entry := SessionEntry{
-		SessionEntryBase: SessionEntryBase{
-			Type:      "message",
-			ID:        id,
-			ParentID:  cloneStringPointer(m.leafID),
-			Timestamp: sessionTimestamp(),
-		},
-		Message: owned,
-	}
-	return id, m.appendEntryLocked(entry)
+	entry := m.newEntryLocked("message")
+	entry.Message = owned
+	return entry.ID, m.appendEntryLocked(entry)
 }
 func (m *SessionManager) AppendThinkingLevelChange(thinkingLevel string) (string, error) {
 	m.mu.Lock()

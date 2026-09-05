@@ -127,6 +127,21 @@ func TestNewSessionManagerUsesPigDefaultLayoutAndValidatesBeforeIO(t *testing.T)
 	}
 }
 
+func TestOpenSessionManagerRejectsLegacySessionWithoutMutation(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "legacy.jsonl")
+	content := []byte("{\"type\":\"session\",\"version\":2,\"id\":\"legacy\",\"timestamp\":\"2026-01-01T00:00:00.000Z\",\"cwd\":\"/project\"}\n")
+	if err := os.WriteFile(path, content, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := codingagent.OpenSessionManager(path, nil, nil); err == nil || !strings.Contains(err.Error(), "not a valid pi session") {
+		t.Fatalf("legacy Session error = %v", err)
+	}
+	after, err := os.ReadFile(path)
+	if err != nil || !reflect.DeepEqual(after, content) {
+		t.Fatalf("legacy Session after open = %q, err %v", after, err)
+	}
+}
+
 func TestPersistedAgentSessionKeepsProviderFailureAndReportsStorageFailure(t *testing.T) {
 	t.Run("cancellation and cleanup", func(t *testing.T) {
 		dir := t.TempDir()
