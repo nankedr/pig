@@ -1,6 +1,9 @@
 type codingagent.CreateHeadlessSessionOptions struct
 fields:
 - CWD string tag=""
+- AgentDir string tag=""
+- SettingsManager *codingagent.SettingsManager tag=""
+- SessionDir *string tag=""
 - Provider ai.ProviderID tag=""
 - Model string tag=""
 - APIKey *string tag=""

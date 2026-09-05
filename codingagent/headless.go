@@ -29,18 +29,21 @@ type HeadlessOutcome struct {
 
 // CreateHeadlessSessionOptions contains the explicit Headless product inputs.
 type CreateHeadlessSessionOptions struct {
-	CWD            string
-	Provider       ai.ProviderID
-	Model          string
-	APIKey         *string
-	Environment    ai.ProviderEnv
-	BaseURL        *string
-	Thinking       agent.ThinkingLevel
-	Tools          []string
-	ExcludeTools   []string
-	NoTools        NoToolsMode
-	SystemPrompt   *string
-	SessionManager *SessionManager
+	CWD             string
+	AgentDir        string
+	SettingsManager *SettingsManager
+	SessionDir      *string
+	Provider        ai.ProviderID
+	Model           string
+	APIKey          *string
+	Environment     ai.ProviderEnv
+	BaseURL         *string
+	Thinking        agent.ThinkingLevel
+	Tools           []string
+	ExcludeTools    []string
+	NoTools         NoToolsMode
+	SystemPrompt    *string
+	SessionManager  *SessionManager
 }
 
 // CreateHeadlessSession assembles an AgentSession from explicit inputs and the
@@ -52,21 +55,27 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if options.Provider == "" {
-		return nil, &CLIArgumentError{Message: "Headless mode requires --provider <provider>"}
+	settings := options.SettingsManager
+	if settings == nil {
+		var dir *string
+		if options.AgentDir != "" {
+			dir = &options.AgentDir
+		}
+		var err error
+		settings, err = NewSettingsManager(options.CWD, dir)
+		if err != nil {
+			return nil, err
+		}
 	}
-	if options.Model == "" {
-		return nil, &CLIArgumentError{Message: "Headless mode requires --model <model>"}
+	if err := checkHeadlessSettings(settings); err != nil {
+		return nil, err
 	}
-
 	models := ai.BuiltinModels(ai.CreateModelsOptions{AuthContext: headlessAuthContext(options.Environment)})
-	if _, ok := models.GetProvider(options.Provider); !ok {
-		return nil, &CLIArgumentError{Message: fmt.Sprintf("Unknown provider %q", options.Provider)}
+	model, thinking, err := resolveHeadlessModel(ctx, models, settings, options)
+	if err != nil {
+		return nil, err
 	}
-	model, ok := models.GetModel(options.Provider, options.Model)
-	if !ok {
-		return nil, &CLIArgumentError{Message: fmt.Sprintf("Unknown model %q for provider %q", options.Model, options.Provider)}
-	}
+	options.Thinking = thinking
 	if options.BaseURL != nil {
 		baseURL := strings.TrimSpace(*options.BaseURL)
 		if baseURL == "" {
@@ -100,21 +109,44 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	}
 	manager := options.SessionManager
 	if manager == nil {
-		manager, err = NewSessionManager(options.CWD, nil)
+		dir := options.SessionDir
+		if dir == nil {
+			value, err := settings.GetSessionDir()
+			if err != nil {
+				return nil, err
+			}
+			if value != "" {
+				dir = &value
+			}
+		}
+		if dir == nil && options.AgentDir != "" {
+			agentDir, err := resolveSessionPath(options.AgentDir)
+			if err != nil {
+				return nil, err
+			}
+			cwd, err := resolveSessionPath(options.CWD)
+			if err != nil {
+				return nil, err
+			}
+			value := defaultSessionDir(cwd, agentDir)
+			dir = &value
+		}
+		manager, err = NewSessionManager(options.CWD, dir)
 		if err != nil {
 			return nil, err
 		}
 	}
 	created, err := CreateAgentSession(ctx, CreateAgentSessionOptions{
-		CWD:            options.CWD,
-		Model:          &model,
-		StreamFunction: agent.StreamFunction(stream),
-		ThinkingLevel:  options.Thinking,
-		Tools:          options.Tools,
-		ExcludeTools:   options.ExcludeTools,
-		NoTools:        options.NoTools,
-		AgentTools:     availableTools,
-		SessionManager: manager,
+		CWD:             options.CWD,
+		Model:           &model,
+		StreamFunction:  agent.StreamFunction(stream),
+		ThinkingLevel:   options.Thinking,
+		Tools:           options.Tools,
+		ExcludeTools:    options.ExcludeTools,
+		NoTools:         options.NoTools,
+		AgentTools:      availableTools,
+		SessionManager:  manager,
+		SettingsManager: settings,
 	})
 	if err != nil {
 		return nil, err
@@ -136,7 +168,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		promptOptions.CustomPrompt = *options.SystemPrompt
 	}
 	created.Session.Agent().SetSystemPrompt(buildSystemPrompt(promptOptions))
-	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD}, nil, nil, nil), nil
+	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD, SettingsManager: settings}, nil, nil, nil), nil
 }
 
 // HeadlessOutcomeError presents a terminal Provider failure or cancellation

@@ -1,0 +1,189 @@
+type codingagent.Settings
+- LastChangelogVersion *string "json:\"lastChangelogVersion,omitempty\""
+- DefaultProvider *string "json:\"defaultProvider,omitempty\""
+- DefaultModel *string "json:\"defaultModel,omitempty\""
+- DefaultThinkingLevel *ai.ModelThinkingLevel "json:\"defaultThinkingLevel,omitempty\""
+- Transport *ai.Transport "json:\"transport,omitempty\""
+- SteeringMode *agent.QueueMode "json:\"steeringMode,omitempty\""
+- FollowUpMode *agent.QueueMode "json:\"followUpMode,omitempty\""
+- Theme *string "json:\"theme,omitempty\""
+- Compaction *agent.CompactionSettings "json:\"compaction,omitempty\""
+- Retry *codingagent.RetrySettings "json:\"retry,omitempty\""
+- HideThinkingBlock *bool "json:\"hideThinkingBlock,omitempty\""
+- ShowCacheMissNotices *bool "json:\"showCacheMissNotices,omitempty\""
+- ExternalEditor *string "json:\"externalEditor,omitempty\""
+- ShellPath *string "json:\"shellPath,omitempty\""
+- QuietStartup *bool "json:\"quietStartup,omitempty\""
+- DefaultProjectTrust *codingagent.DefaultProjectTrust "json:\"defaultProjectTrust,omitempty\""
+- ShellCommandPrefix *string "json:\"shellCommandPrefix,omitempty\""
+- NpmCommand []string "json:\"npmCommand,omitzero\""
+- CollapseChangelog *bool "json:\"collapseChangelog,omitempty\""
+- EnableInstallTelemetry *bool "json:\"enableInstallTelemetry,omitempty\""
+- EnableAnalytics *bool "json:\"enableAnalytics,omitempty\""
+- TrackingID *string "json:\"trackingId,omitempty\""
+- Packages []codingagent.PackageSource "json:\"packages,omitzero\""
+- Extensions []string "json:\"extensions,omitzero\""
+- Skills []string "json:\"skills,omitzero\""
+- Prompts []string "json:\"prompts,omitzero\""
+- Themes []string "json:\"themes,omitzero\""
+- EnableSkillCommands *bool "json:\"enableSkillCommands,omitempty\""
+- Images *codingagent.ImageSettings "json:\"images,omitempty\""
+- EnabledModels []string "json:\"enabledModels,omitzero\""
+- SessionDir *string "json:\"sessionDir,omitempty\""
+- HTTPIdleTimeoutMS *int64 "json:\"httpIdleTimeoutMs,omitempty\""
+- WebSocketConnectTimeoutMS *int64 "json:\"websocketConnectTimeoutMs,omitempty\""
+- TuiMode *tui.TUIMode "json:\"tuiMode,omitempty\""
+- FullscreenExitOutput *codingagent.FullscreenExitOutput "json:\"fullscreenExitOutput,omitempty\""
+- FullscreenScrollbar *tui.ScrollViewScrollbar "json:\"fullscreenScrollbar,omitempty\""
+- BranchSummary *codingagent.BranchSummarySettings "json:\"branchSummary,omitempty\""
+- Terminal map[string]interface {} "json:\"terminal,omitzero\""
+- ThinkingBudgets map[ai.ModelThinkingLevel]int64 "json:\"thinkingBudgets,omitzero\""
+- Markdown map[string]interface {} "json:\"markdown,omitzero\""
+- Warnings map[string]bool "json:\"warnings,omitzero\""
+- DoubleEscapeAction *string "json:\"doubleEscapeAction,omitempty\""
+- TreeFilterMode *string "json:\"treeFilterMode,omitempty\""
+- EditorPaddingX *int "json:\"editorPaddingX,omitempty\""
+- OutputPad *int "json:\"outputPad,omitempty\""
+- AutocompleteMaxVisible *int "json:\"autocompleteMaxVisible,omitempty\""
+- ShowHardwareCursor *bool "json:\"showHardwareCursor,omitempty\""
+- HTTPProxy *string "json:\"httpProxy,omitempty\""
+- Extra map[string]json.RawMessage "json:\"-\""
+type codingagent.SettingsManagerCreateOptions
+- ProjectTrusted *bool ""
+type codingagent.CreateHeadlessSessionOptions
+- CWD string ""
+- AgentDir string ""
+- SettingsManager *codingagent.SettingsManager ""
+- SessionDir *string ""
+- Provider ai.ProviderID ""
+- Model string ""
+- APIKey *string ""
+- Environment ai.ProviderEnv ""
+- BaseURL *string ""
+- Thinking ai.ModelThinkingLevel ""
+- Tools []string ""
+- ExcludeTools []string ""
+- NoTools codingagent.NoToolsMode ""
+- SystemPrompt *string ""
+- SessionManager *codingagent.SessionManager ""
+method ApplyOverrides func(codingagent.SettingsManager, codingagent.Settings) error
+method DrainErrors func(codingagent.SettingsManager) ([]error, error)
+method Flush func(codingagent.SettingsManager, context.Context) error
+method GetAutocompleteMaxVisible func(codingagent.SettingsManager) (int, error)
+method GetBlockImages func(codingagent.SettingsManager) (bool, error)
+method GetBranchSummarySettings func(codingagent.SettingsManager) (codingagent.BranchSummarySettings, error)
+method GetBranchSummarySkipPrompt func(codingagent.SettingsManager) (bool, error)
+method GetClearOnShrink func(codingagent.SettingsManager) (bool, error)
+method GetCodeBlockIndent func(codingagent.SettingsManager) (string, error)
+method GetCollapseChangelog func(codingagent.SettingsManager) (bool, error)
+method GetCompactionEnabled func(codingagent.SettingsManager) (bool, error)
+method GetCompactionKeepRecentTokens func(codingagent.SettingsManager) (int64, error)
+method GetCompactionReserveTokens func(codingagent.SettingsManager) (int64, error)
+method GetCompactionSettings func(codingagent.SettingsManager) (agent.CompactionSettings, error)
+method GetDefaultModel func(codingagent.SettingsManager) (string, error)
+method GetDefaultProjectTrust func(codingagent.SettingsManager) (codingagent.DefaultProjectTrust, error)
+method GetDefaultProvider func(codingagent.SettingsManager) (string, error)
+method GetDefaultThinkingLevel func(codingagent.SettingsManager) (ai.ModelThinkingLevel, error)
+method GetDoubleEscapeAction func(codingagent.SettingsManager) (string, error)
+method GetEditorPaddingX func(codingagent.SettingsManager) (int, error)
+method GetEnableAnalytics func(codingagent.SettingsManager) (bool, error)
+method GetEnableInstallTelemetry func(codingagent.SettingsManager) (bool, error)
+method GetEnableSkillCommands func(codingagent.SettingsManager) (bool, error)
+method GetEnabledModels func(codingagent.SettingsManager) ([]string, error)
+method GetExtensionPaths func(codingagent.SettingsManager) ([]string, error)
+method GetExternalEditorCommand func(codingagent.SettingsManager) (string, error)
+method GetFollowUpMode func(codingagent.SettingsManager) (agent.QueueMode, error)
+method GetFullscreenExitOutput func(codingagent.SettingsManager) (codingagent.FullscreenExitOutput, error)
+method GetFullscreenScrollbar func(codingagent.SettingsManager) (tui.ScrollViewScrollbar, error)
+method GetGlobalSettings func(codingagent.SettingsManager) (codingagent.Settings, error)
+method GetHTTPIdleTimeoutMS func(codingagent.SettingsManager) (int64, error)
+method GetHideThinkingBlock func(codingagent.SettingsManager) (bool, error)
+method GetImageAutoResize func(codingagent.SettingsManager) (bool, error)
+method GetImageWidthCells func(codingagent.SettingsManager) (int, error)
+method GetLastChangelogVersion func(codingagent.SettingsManager) (string, error)
+method GetMermaidRenderingMode func(codingagent.SettingsManager) (string, error)
+method GetNpmCommand func(codingagent.SettingsManager) ([]string, error)
+method GetOutputPad func(codingagent.SettingsManager) (int, error)
+method GetPackages func(codingagent.SettingsManager) ([]codingagent.PackageSource, error)
+method GetProjectSettings func(codingagent.SettingsManager) (codingagent.Settings, error)
+method GetPromptTemplatePaths func(codingagent.SettingsManager) ([]string, error)
+method GetProviderRetrySettings func(codingagent.SettingsManager) (codingagent.ProviderRetrySettings, error)
+method GetQuietStartup func(codingagent.SettingsManager) (bool, error)
+method GetRetryEnabled func(codingagent.SettingsManager) (bool, error)
+method GetRetrySettings func(codingagent.SettingsManager) (codingagent.RetrySettings, error)
+method GetSessionDir func(codingagent.SettingsManager) (string, error)
+method GetShellCommandPrefix func(codingagent.SettingsManager) (string, error)
+method GetShellPath func(codingagent.SettingsManager) (string, error)
+method GetShowCacheMissNotices func(codingagent.SettingsManager) (bool, error)
+method GetShowHardwareCursor func(codingagent.SettingsManager) (bool, error)
+method GetShowImages func(codingagent.SettingsManager) (bool, error)
+method GetShowTerminalProgress func(codingagent.SettingsManager) (bool, error)
+method GetSkillPaths func(codingagent.SettingsManager) ([]string, error)
+method GetSteeringMode func(codingagent.SettingsManager) (agent.QueueMode, error)
+method GetTUIMode func(codingagent.SettingsManager) (tui.TUIMode, error)
+method GetTheme func(codingagent.SettingsManager) (string, error)
+method GetThemePaths func(codingagent.SettingsManager) ([]string, error)
+method GetThemeSetting func(codingagent.SettingsManager) (string, error)
+method GetThinkingBudgets func(codingagent.SettingsManager) (map[ai.ModelThinkingLevel]int64, error)
+method GetTrackingID func(codingagent.SettingsManager) (string, error)
+method GetTransport func(codingagent.SettingsManager) (ai.Transport, error)
+method GetTreeFilterMode func(codingagent.SettingsManager) (string, error)
+method GetWarnings func(codingagent.SettingsManager) (map[string]bool, error)
+method GetWebSocketConnectTimeoutMS func(codingagent.SettingsManager) (int64, error)
+method IsProjectTrusted func(codingagent.SettingsManager) (bool, error)
+method Reload func(codingagent.SettingsManager, context.Context) error
+method SetAutocompleteMaxVisible func(codingagent.SettingsManager, int) error
+method SetBlockImages func(codingagent.SettingsManager, bool) error
+method SetClearOnShrink func(codingagent.SettingsManager, bool) error
+method SetCollapseChangelog func(codingagent.SettingsManager, bool) error
+method SetCompactionEnabled func(codingagent.SettingsManager, bool) error
+method SetDefaultModel func(codingagent.SettingsManager, string) error
+method SetDefaultModelAndProvider func(codingagent.SettingsManager, string, string) error
+method SetDefaultProjectTrust func(codingagent.SettingsManager, codingagent.DefaultProjectTrust) error
+method SetDefaultProvider func(codingagent.SettingsManager, string) error
+method SetDefaultThinkingLevel func(codingagent.SettingsManager, ai.ModelThinkingLevel) error
+method SetDoubleEscapeAction func(codingagent.SettingsManager, string) error
+method SetEditorPaddingX func(codingagent.SettingsManager, int) error
+method SetEnableAnalytics func(codingagent.SettingsManager, bool) error
+method SetEnableInstallTelemetry func(codingagent.SettingsManager, bool) error
+method SetEnableSkillCommands func(codingagent.SettingsManager, bool) error
+method SetEnabledModels func(codingagent.SettingsManager, []string) error
+method SetExtensionPaths func(codingagent.SettingsManager, []string) error
+method SetFollowUpMode func(codingagent.SettingsManager, agent.QueueMode) error
+method SetFullscreenExitOutput func(codingagent.SettingsManager, codingagent.FullscreenExitOutput) error
+method SetFullscreenScrollbar func(codingagent.SettingsManager, tui.ScrollViewScrollbar) error
+method SetHTTPIdleTimeoutMS func(codingagent.SettingsManager, int64) error
+method SetHideThinkingBlock func(codingagent.SettingsManager, bool) error
+method SetImageAutoResize func(codingagent.SettingsManager, bool) error
+method SetImageWidthCells func(codingagent.SettingsManager, int) error
+method SetLastChangelogVersion func(codingagent.SettingsManager, string) error
+method SetMermaidRenderingMode func(codingagent.SettingsManager, string) error
+method SetNpmCommand func(codingagent.SettingsManager, []string) error
+method SetOutputPad func(codingagent.SettingsManager, int) error
+method SetPackages func(codingagent.SettingsManager, []codingagent.PackageSource) error
+method SetProjectExtensionPaths func(codingagent.SettingsManager, []string) error
+method SetProjectPackages func(codingagent.SettingsManager, []codingagent.PackageSource) error
+method SetProjectPromptTemplatePaths func(codingagent.SettingsManager, []string) error
+method SetProjectSkillPaths func(codingagent.SettingsManager, []string) error
+method SetProjectThemePaths func(codingagent.SettingsManager, []string) error
+method SetProjectTrusted func(codingagent.SettingsManager, bool) error
+method SetPromptTemplatePaths func(codingagent.SettingsManager, []string) error
+method SetQuietStartup func(codingagent.SettingsManager, bool) error
+method SetRetryEnabled func(codingagent.SettingsManager, bool) error
+method SetShellCommandPrefix func(codingagent.SettingsManager, string) error
+method SetShellPath func(codingagent.SettingsManager, string) error
+method SetShowCacheMissNotices func(codingagent.SettingsManager, bool) error
+method SetShowHardwareCursor func(codingagent.SettingsManager, bool) error
+method SetShowImages func(codingagent.SettingsManager, bool) error
+method SetShowTerminalProgress func(codingagent.SettingsManager, bool) error
+method SetSkillPaths func(codingagent.SettingsManager, []string) error
+method SetSteeringMode func(codingagent.SettingsManager, agent.QueueMode) error
+method SetTUIMode func(codingagent.SettingsManager, tui.TUIMode) error
+method SetTheme func(codingagent.SettingsManager, string) error
+method SetThemePaths func(codingagent.SettingsManager, []string) error
+method SetTransport func(codingagent.SettingsManager, ai.Transport) error
+method SetTreeFilterMode func(codingagent.SettingsManager, string) error
+method SetWarnings func(codingagent.SettingsManager, map[string]bool) error
+func(string, *string, ...codingagent.SettingsManagerCreateOptions) (*codingagent.SettingsManager, error)
+func(codingagent.SettingsStorage, ...codingagent.SettingsManagerCreateOptions) (*codingagent.SettingsManager, error)
+func(codingagent.Settings, ...codingagent.SettingsManagerCreateOptions) (*codingagent.SettingsManager, error)

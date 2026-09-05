@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/cli.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/pig/settings-startup",
+    "catalog_id": "contract:config/settings",
+    "surface": "cli",
+    "input": {
+      "projection": "Real locked Pi CLI: saved defaults, settings changed before restart, session restoration, explicit model/thinking/path override, environment path override. Only random paths/IDs/time are projected."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "cases": [
+        {
+          "name": "settings",
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "sessionDir": true
+        },
+        {
+          "name": "restart",
+          "model": "deepseek-v4-pro",
+          "thinking": "high",
+          "sessionDir": true
+        },
+        {
+          "name": "reopen",
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "history": [
+            "system",
+            "user",
+            "assistant",
+            "user"
+          ]
+        },
+        {
+          "name": "explicit",
+          "model": "deepseek-v4-flash",
+          "thinking": "off",
+          "sessionDir": true
+        },
+        {
+          "name": "environment",
+          "model": "deepseek-v4-pro",
+          "thinking": "high",
+          "sessionDir": true
+        }
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:f31728f8ac54c344f6970d70b11e986414628900718935e708ba10953cbc6e44",
+  "observation_hash": "sha256:de62cbc14519f9ad96f9d907b43cfaa4202cf3f368025f339a948759addec53b",
+  "execution_method": "node --experimental-strip-types parity/oracle/settings-startup.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/cli.ts"
+  }
+}

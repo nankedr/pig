@@ -104,7 +104,6 @@ func TestStaticFactoryProjectionsAreInertCapabilityStubs(t *testing.T) {
 		t.Fatalf("NewClient() error = %v", err)
 	}
 
-	trusted := false
 	refreshOnCreate := true
 	tests := []struct {
 		operation string
@@ -149,15 +148,6 @@ func TestStaticFactoryProjectionsAreInertCapabilityStubs(t *testing.T) {
 				SessionDir: &invalidPath,
 				OnProgress: func(int, int) { callbackCalls++ },
 			})
-		}},
-		{"NewSettingsManager", func() (any, error) {
-			return codingagent.NewSettingsManager(invalidPath, &invalidPath, codingagent.SettingsManagerCreateOptions{ProjectTrusted: &trusted})
-		}},
-		{"NewSettingsManagerFromStorage", func() (any, error) {
-			return codingagent.NewSettingsManagerFromStorage(staticFactoryPanicSettingsStorage{calls: &dependencyCalls}, codingagent.SettingsManagerCreateOptions{ProjectTrusted: &trusted})
-		}},
-		{"NewInMemorySettingsManager", func() (any, error) {
-			return codingagent.NewInMemorySettingsManager(codingagent.Settings{QuietStartup: &trusted}, codingagent.SettingsManagerCreateOptions{ProjectTrusted: &trusted})
 		}},
 	}
 

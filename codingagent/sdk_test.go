@@ -133,12 +133,14 @@ func TestSettingsResourcePackageAndTrustStubsDoNotTouchHostState(t *testing.T) {
 
 	trusted := true
 	settings, err := codingagent.NewSettingsManager(env.cwd, &env.agentDir, codingagent.SettingsManagerCreateOptions{ProjectTrusted: &trusted})
-	assertCodingAgentNotImplemented(t, err, "NewSettingsManager")
+	assertCodingAgentNotImplemented(t, err, "SettingsManager.ProjectTrusted")
 	if settings != nil {
 		t.Fatalf("NewSettingsManager result = %#v, want nil", settings)
 	}
 	var zeroSettings codingagent.SettingsManager
-	assertCodingAgentNotImplemented(t, zeroSettings.Reload(ctx), "SettingsManager.Reload")
+	if zeroSettings.Reload(ctx) == nil {
+		t.Fatal("uninitialized settings reload succeeded")
+	}
 
 	var loader codingagent.DefaultResourceLoader
 	assertCodingAgentNotImplemented(t, loader.Reload(ctx), "DefaultResourceLoader.Reload")
