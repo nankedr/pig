@@ -394,18 +394,18 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	if parsed.SessionID != nil {
 		option.ID = *parsed.SessionID
 	}
-	var manager *SessionManager
-	var managerErr error
-	switch {
-	case parsed.NoSession:
-		manager = NewInMemorySessionManager(cwd, option)
-	case parsed.Session != nil:
-		manager, managerErr = OpenSessionManager(*parsed.Session, sessionDir, nil)
-	default:
-		manager, managerErr = NewSessionManager(cwd, sessionDir, option)
-	}
+	manager, managerErr := selectHeadlessSession(ctx, parsed, cwd, sessionDir, option)
 	if managerErr != nil {
 		return managerErr
+	}
+	if manager == nil {
+		return nil
+	}
+	cwd = manager.GetCWD()
+	if parsed.Name != nil {
+		if _, err := manager.AppendSessionInfo(*parsed.Name); err != nil {
+			return err
+		}
 	}
 
 	messages := append([]string(nil), parsed.Messages...)
@@ -466,7 +466,7 @@ func unsupportedHeadlessOperation(parsed Args) string {
 	switch {
 	case len(parsed.FileArgs) != 0:
 		return "headless.file-arguments"
-	case parsed.Continue || parsed.Resume || parsed.Fork != nil || parsed.Name != nil:
+	case parsed.Resume:
 		return "headless.session-persistence"
 	case len(parsed.AppendSystemPrompt) != 0:
 		return "headless.append-system-prompt"

@@ -3,7 +3,6 @@ package codingagent
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"strings"
 	"testing"
 
@@ -222,24 +221,14 @@ func equalStrings(left, right []string) bool {
 	return true
 }
 
-func TestSessionManagerTreeOperationsAreExplicitCapabilityStubs(t *testing.T) {
+func TestSessionManagerEmptyTreeAndMissingChildren(t *testing.T) {
 	manager := NewInMemorySessionManager("/project")
-
-	tree, treeErr := manager.GetTree()
-	if tree != nil || !errors.Is(treeErr, ErrNotImplemented) {
-		t.Fatalf("GetTree() = (%#v, %v), want (nil, ErrNotImplemented)", tree, treeErr)
+	tree, err := manager.GetTree()
+	if err != nil || tree == nil || len(tree) != 0 {
+		t.Fatalf("tree=%v err=%v", tree, err)
 	}
-	var treeCapability *NotImplementedError
-	if !errors.As(treeErr, &treeCapability) || treeCapability.Operation != "SessionManager.GetTree" {
-		t.Fatalf("GetTree() error = %#v, want structured SessionManager.GetTree capability error", treeErr)
-	}
-
-	children, childrenErr := manager.GetChildren("entry-1")
-	if children != nil || !errors.Is(childrenErr, ErrNotImplemented) {
-		t.Fatalf("GetChildren() = (%#v, %v), want (nil, ErrNotImplemented)", children, childrenErr)
-	}
-	var childrenCapability *NotImplementedError
-	if !errors.As(childrenErr, &childrenCapability) || childrenCapability.Operation != "SessionManager.GetChildren" {
-		t.Fatalf("GetChildren() error = %#v, want structured SessionManager.GetChildren capability error", childrenErr)
+	children, err := manager.GetChildren("missing")
+	if err != nil || children == nil || len(children) != 0 {
+		t.Fatalf("children=%v err=%v", children, err)
 	}
 }

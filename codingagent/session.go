@@ -844,8 +844,32 @@ type ForkMessage struct {
 	Text    string
 }
 
-func (*AgentSession) GetUserMessagesForForking() ([]ForkMessage, error) {
-	return nil, notImplemented("AgentSession.GetUserMessagesForForking")
+func (s *AgentSession) GetUserMessagesForForking() ([]ForkMessage, error) {
+	result := []ForkMessage{}
+	if s.sessionManager == nil {
+		return result, nil
+	}
+	for _, entry := range s.sessionManager.GetEntries() {
+		if entry.Type == "message" && entry.Message != nil && entry.Message.MessageRole() == ai.MessageRoleUser {
+			if text := sessionUserText(entry.Message); text != "" {
+				result = append(result, ForkMessage{EntryID: entry.ID, Text: text})
+			}
+		}
+	}
+	return result, nil
+}
+func sessionUserText(message agent.AgentMessage) string {
+	switch m := message.(type) {
+	case ai.UserMessage:
+		data, _ := json.Marshal(m.Content)
+		return sessionContentText(data, "")
+	case *ai.UserMessage:
+		if m != nil {
+			data, _ := json.Marshal(m.Content)
+			return sessionContentText(data, "")
+		}
+	}
+	return ""
 }
 func (*AgentSession) HasExtensionHandlers(string) (bool, error) {
 	return false, notImplemented("AgentSession.HasExtensionHandlers")
@@ -876,8 +900,12 @@ func (s *AgentSession) SetModel(ai.Model) error { return notImplemented("AgentSe
 func (s *AgentSession) SetScopedModels([]ScopedModel) error {
 	return notImplemented("AgentSession.SetScopedModels")
 }
-func (s *AgentSession) SetSessionName(string) error {
-	return notImplemented("AgentSession.SetSessionName")
+func (s *AgentSession) SetSessionName(name string) error {
+	if s.sessionManager == nil {
+		return fmt.Errorf("AgentSession has no SessionManager")
+	}
+	_, err := s.sessionManager.AppendSessionInfo(name)
+	return err
 }
 func (s *AgentSession) SetSteeringMode(agent.QueueMode) error {
 	return notImplemented("AgentSession.SetSteeringMode")

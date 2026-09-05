@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/session-manager.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/session-tree",
+    "catalog_id": "contract:session/v3-jsonl",
+    "surface": "go-sdk",
+    "input": {
+      "projection": "Persist/reopen branching, children, selected-path fork, parent source, name and resolved labels, label timestamp, rewiring and independent writes; invalid entries and reset leaf."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "children": [
+        "abandoned",
+        "selected"
+      ],
+      "name": "path name",
+      "label": "latest",
+      "roles": [
+        "user",
+        "assistant",
+        "user"
+      ],
+      "texts": [
+        "first",
+        "selected"
+      ],
+      "parentsValid": true,
+      "labelTimePreserved": true,
+      "sourceUnchanged": true,
+      "parentMatches": true,
+      "idChanged": true,
+      "leafType": "label",
+      "sourceUnchangedAfterAppend": true,
+      "resetEmpty": true,
+      "errors": [
+        "Entry missing not found",
+        "Entry missing not found",
+        "Entry missing not found"
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:eebf0fe33eed2fe4b6f6c1fcb506bdee8e92d9673c0795e30850495f5a70ee00",
+  "observation_hash": "sha256:b4d26ab7469d4482a436a787a17f2b81a6d2cfdceb094ba3ee98b1c13e806a5b",
+  "execution_method": "node --experimental-strip-types parity/oracle/session-tree.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/session-manager.ts"
+  }
+}

@@ -210,13 +210,7 @@ func TestAgentSessionUnavailableQueriesReturnStructuredErrors(t *testing.T) {
 			}
 			return err
 		}},
-		{name: "forking messages", operation: "AgentSession.GetUserMessagesForForking", call: func() error {
-			value, err := session.GetUserMessagesForForking()
-			if value != nil {
-				t.Errorf("GetUserMessagesForForking = %#v, want nil with an error", value)
-			}
-			return err
-		}},
+
 		{name: "extension handlers", operation: "AgentSession.HasExtensionHandlers", call: func() error {
 			value, err := session.HasExtensionHandlers("tool_call")
 			if value {

@@ -69,10 +69,10 @@ func issue71PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 				},
 				Unsupported: []string{
 					"interactive and RPC execution remain milestone-specific Capability Stubs",
-					"package, auth, export, model-list, continue, fork, resource and extension operations remain explicit Capability Stubs",
+					"package, auth, export, model-list, resource and extension operations remain explicit Capability Stubs",
 				},
 			}
-			entry.Notes = "Issue #33 establishes the public product entry and inert MainOptions with later Capability Stubs. Issues #56 and #57 add Headless text and JSONL. Issue #71 adds Pig-owned v3 create, append, and explicit reopen plus side-effect-free --no-session without migrating Pi state."
+			entry.Notes = "Issue #33 establishes the public product entry and inert MainOptions with later Capability Stubs. Issues #56 and #57 add Headless text and JSONL. Issue #71 adds Pig-owned v3 create, append, and explicit reopen plus side-effect-free --no-session without migrating Pi state. Issue #73 adds continue, ID selection, naming and fork."
 		case "contract:cli/pig/args":
 			found[entry.ID] = true
 			entry.Evidence = issue56UpsertEvidence(entry.Evidence, issue71Evidence(t, entry.ID, "cmd/pig/issue71_process_test.go#TestPigNoSessionDoesNotCreatePigState", "issue71-pig-cli-session-args", "session path, ID, directory, and explicit memory arguments select their documented Session boundary", "PASS; default and explicit storage persisted under Pig paths while --no-session created no Pig state"))
@@ -84,10 +84,10 @@ func issue71PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 				},
 				Unsupported: []string{
 					"interactive, RPC, package management, stored credential resolution, export and model listing remain assigned to later milestones",
-					"continue, resume, and fork remain precise Capability Stubs",
+					"interactive --resume remains a Capability Stub; --session path or ID supports selection without TUI",
 				},
 			}
-			entry.Notes = "Issue #33 owns the static command contract, deterministic mode parsing and Extension Surface routing. Issues #56 and #57 activate Headless text and JSON. Issue #71 activates Session path, ID, directory, and explicit memory selection while preserving later interactive, RPC, continue, and fork boundaries."
+			entry.Notes = "Issue #33 owns the static command contract, deterministic mode parsing and Extension Surface routing. Issues #56 and #57 activate Headless text and JSON. Issue #71 activates Session path, ID, directory, and explicit memory selection while preserving later interactive and RPC boundaries. Issue #73 activates continue, ID selection, naming and fork."
 		case "contract:codingagent/headless":
 			found[entry.ID] = true
 			entry.Evidence = issue71RemoveEvidence(entry.Evidence, "issue71-headless-session-persistence")
@@ -99,6 +99,14 @@ func issue71PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 			entry.Notes = "Issues #56 and #57 implement the reusable Headless lifecycle and text/JSON presentation. Issue #71 adds persisted create and reopen while retaining explicit memory injection; image inputs remain deferred to M12."
 		}
 	}
+	for i := range entries {
+		entry := &entries[i]
+		if entry.ID == "cmd-pig" || entry.ID == "contract:cli/pig/args" {
+			entry.Partial.Supported = append(entry.Partial.Supported, "Issue #73: --continue, --session exact or prefix ID, --name, and --fork preserve history and source isolation without TUI")
+			entry.Evidence = issue56UpsertEvidence(entry.Evidence, catalog.Evidence{Kind: "go-test", Ref: "cmd/pig/issue73_process_test.go#TestPigContinueSelectAndForkSessions", Baseline: issue56BaselineCommit, CaseID: "issue73-cli-session-navigation", InputHash: issue33CanonicalInputHash(t, issue56RepoRoot(t), issue33EvidenceInputPaths("issue73-cli-session-navigation")), ExecutionMethod: "go test ./cmd/pig -run '^TestPigContinueSelectAndForkSessions$' -count=1", Expected: "continue, ID selection, naming and independent fork work through real CLI processes", Actual: "PASS; retained history, source bytes, name and parent metadata; invalid selection and duplicate target IDs failed", Platform: "darwin/linux", CatalogID: entry.ID})
+		}
+	}
+
 	for _, id := range []string{"cmd-pig", "contract:cli/pig/args", "contract:codingagent/headless"} {
 		if !found[id] {
 			t.Fatalf("missing catalog row %s", id)

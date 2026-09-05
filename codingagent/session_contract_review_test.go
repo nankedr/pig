@@ -128,8 +128,8 @@ func TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers(t *testing.T) {
 	if got := first.GetEntries(); got == nil || len(got) != 0 {
 		t.Fatalf("GetEntries() = %#v, want non-nil empty slice", got)
 	}
-	if got, err := first.GetTree(); got != nil || !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("GetTree() = (%#v, %v), want nil and ErrNotImplemented", got, err)
+	if got, err := first.GetTree(); got == nil || len(got) != 0 || err != nil {
+		t.Fatalf("GetTree() = (%#v, %v), want empty tree", got, err)
 	}
 	if got := first.GetBranch(); got == nil || len(got) != 0 {
 		t.Fatalf("GetBranch() = %#v, want non-nil empty slice", got)
@@ -146,23 +146,30 @@ func TestSessionManagerGetSessionNameReturnsNormalizedDefensiveCopy(t *testing.T
 		t.Fatalf("initial name = %q, want nil", *name)
 	}
 
-	// The stub must not fabricate a name or mutate the in-memory session. The
-	// defensive-copy case itself is exercised by a parsed manager fixture below.
-	before := manager.GetHeader()
-	if id, err := manager.AppendSessionInfo("  title  "); !errors.Is(err, codingagent.ErrNotImplemented) || id != "" {
-		t.Fatalf("AppendSessionInfo = (%q, %v), want empty ID and ErrNotImplemented", id, err)
+	if id, err := manager.AppendSessionInfo("  title  "); err != nil || id == "" {
+		t.Fatal(id, err)
 	}
-	if !reflect.DeepEqual(manager.GetHeader(), before) || manager.GetSessionName() != nil {
-		t.Fatal("AppendSessionInfo stub changed manager state")
+	name := manager.GetSessionName()
+	if name == nil || *name != "title" {
+		t.Fatal(name)
 	}
+	*name = "changed"
+	if *manager.GetSessionName() != "title" {
+		t.Fatal("name not owned")
+	}
+	if _, err := manager.AppendSessionInfo(" "); err != nil {
+		t.Fatal(err)
+	}
+	if manager.GetSessionName() != nil {
+		t.Fatal("name not cleared")
+	}
+
 }
 
 func TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects(t *testing.T) {
 	manager := codingagent.NewInMemorySessionManager("/project", codingagent.NewSessionOptions{ID: "session-1"})
 	beforeHeader := manager.GetHeader()
 	beforeEntries := manager.GetEntries()
-	name := "label"
-	root := (*string)(nil)
 
 	tests := []struct {
 		name string
@@ -171,9 +178,6 @@ func TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects(t *testing.T
 		{"append compaction", func() (string, error) { return manager.AppendCompaction("summary", "entry", 1) }},
 		{"append custom", func() (string, error) { return manager.AppendCustomEntry("kind") }},
 		{"append custom message", func() (string, error) { return manager.AppendCustomMessageEntry("kind", ai.UserText("text"), true) }},
-		{"append label", func() (string, error) { return manager.AppendLabelChange("entry", &name) }},
-		{"append info", func() (string, error) { return manager.AppendSessionInfo("name") }},
-		{"branch summary from root", func() (string, error) { return manager.BranchWithSummary(root, "summary") }},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -184,15 +188,6 @@ func TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects(t *testing.T
 		})
 	}
 
-	if err := manager.ResetLeaf(); !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("ResetLeaf error = %v, want ErrNotImplemented", err)
-	}
-	if file, err := manager.NewSession(); file != nil || !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("NewSession = (%v, %v), want nil and ErrNotImplemented", file, err)
-	}
-	if file, err := manager.CreateBranchedSession("entry"); file != nil || !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("CreateBranchedSession = (%v, %v), want nil and ErrNotImplemented", file, err)
-	}
 	if !reflect.DeepEqual(manager.GetHeader(), beforeHeader) || !reflect.DeepEqual(manager.GetEntries(), beforeEntries) || manager.GetLeafID() != nil {
 		t.Fatal("unsupported SessionManager operations changed in-memory state")
 	}

@@ -136,7 +136,18 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		promptOptions.CustomPrompt = *options.SystemPrompt
 	}
 	created.Session.Agent().SetSystemPrompt(buildSystemPrompt(promptOptions))
-	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD}, nil, nil, nil), nil
+	factory := func(ctx context.Context, next CreateAgentSessionRuntimeOptions) (CreateAgentSessionRuntimeResult, error) {
+		config := options
+		config.CWD = next.CWD
+		config.SessionManager = next.SessionManager
+		runtime, err := CreateHeadlessSession(ctx, config)
+		if err != nil {
+			return CreateAgentSessionRuntimeResult{}, err
+		}
+		runtime.session.sessionStartEvent = next.SessionStartEvent
+		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session()}, Services: runtime.Services()}, nil
+	}
+	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD}, factory, nil, nil), nil
 }
 
 // HeadlessOutcomeError presents a terminal Provider failure or cancellation

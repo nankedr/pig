@@ -132,24 +132,6 @@ func TestStaticFactoryProjectionsAreInertCapabilityStubs(t *testing.T) {
 				RefreshOnCreate: &refreshOnCreate,
 			})
 		}},
-		{"ContinueRecentSessionManager", func() (any, error) {
-			return codingagent.ContinueRecentSessionManager(invalidPath, &invalidPath)
-		}},
-		{"ForkSessionManager", func() (any, error) {
-			return codingagent.ForkSessionManager(invalidPath, invalidPath, &invalidPath, codingagent.NewSessionOptions{ID: "fork-1"})
-		}},
-		{"ListSessions", func() (any, error) {
-			return codingagent.ListSessions(canceled, invalidPath, codingagent.SessionListOptions{
-				SessionDir: &invalidPath,
-				OnProgress: func(int, int) { callbackCalls++ },
-			})
-		}},
-		{"ListAllSessions", func() (any, error) {
-			return codingagent.ListAllSessions(canceled, codingagent.SessionListOptions{
-				SessionDir: &invalidPath,
-				OnProgress: func(int, int) { callbackCalls++ },
-			})
-		}},
 		{"NewSettingsManager", func() (any, error) {
 			return codingagent.NewSettingsManager(invalidPath, &invalidPath, codingagent.SettingsManagerCreateOptions{ProjectTrusted: &trusted})
 		}},

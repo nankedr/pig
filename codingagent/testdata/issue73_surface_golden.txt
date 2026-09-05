@@ -1,0 +1,144 @@
+func codingagent.ListSessions func(context.Context, string, ...codingagent.SessionListOptions) ([]codingagent.SessionInfo, error)
+
+func codingagent.ListAllSessions func(context.Context, ...codingagent.SessionListOptions) ([]codingagent.SessionInfo, error)
+
+func codingagent.ContinueRecentSessionManager func(string, *string) (*codingagent.SessionManager, error)
+
+func codingagent.ForkSessionManager func(string, string, *string, ...codingagent.NewSessionOptions) (*codingagent.SessionManager, error)
+
+type codingagent.SessionInfo struct
+fields:
+- Path string tag=""
+- ID string tag=""
+- CWD string tag=""
+- Name *string tag=""
+- ParentSessionPath *string tag=""
+- Created time.Time tag=""
+- Modified time.Time tag=""
+- MessageCount int tag=""
+- FirstMessage string tag=""
+- AllMessagesText string tag=""
+
+type codingagent.SessionListOptions struct
+fields:
+- SessionDir *string tag=""
+- OnProgress codingagent.SessionListProgress tag=""
+
+type codingagent.SessionTreeNode struct
+fields:
+- Entry codingagent.SessionEntry tag=""
+- Children []codingagent.SessionTreeNode tag=""
+- Label *string tag=""
+- LabelTimestamp *string tag=""
+
+type codingagent.SwitchSessionOptions struct
+fields:
+- CWDOverride *string tag=""
+- WithSession codingagent.ExtensionHandler tag=""
+- ProjectTrustContextFactory func(string) codingagent.ProjectTrustContext tag=""
+
+type codingagent.NewRuntimeSessionOptions struct
+fields:
+- ParentSession *string tag=""
+- Setup codingagent.ExtensionHandler tag=""
+- WithSession codingagent.ExtensionHandler tag=""
+
+type codingagent.ForkSessionOptions struct
+fields:
+- Position *string tag=""
+- WithSession codingagent.ExtensionHandler tag=""
+
+type codingagent.SessionReplacementResult struct
+fields:
+- Cancelled bool tag=""
+- SelectedText *string tag=""
+
+method *codingagent.SessionManager.AppendBranchSummary func(*codingagent.SessionManager, codingagent.BranchSummaryEntry) error
+
+method *codingagent.SessionManager.AppendCompaction func(*codingagent.SessionManager, string, string, int64, ...codingagent.AppendCompactionOptions) (string, error)
+
+method *codingagent.SessionManager.AppendCustomEntry func(*codingagent.SessionManager, string, ...interface {}) (string, error)
+
+method *codingagent.SessionManager.AppendCustomMessageEntry func(*codingagent.SessionManager, string, ai.UserMessageContent, bool, ...json.RawMessage) (string, error)
+
+method *codingagent.SessionManager.AppendLabelChange func(*codingagent.SessionManager, string, *string) (string, error)
+
+method *codingagent.SessionManager.AppendMessage func(*codingagent.SessionManager, agent.AgentMessage) (string, error)
+
+method *codingagent.SessionManager.AppendModelChange func(*codingagent.SessionManager, string, string) (string, error)
+
+method *codingagent.SessionManager.AppendSessionInfo func(*codingagent.SessionManager, string) (string, error)
+
+method *codingagent.SessionManager.AppendThinkingLevelChange func(*codingagent.SessionManager, string) (string, error)
+
+method *codingagent.SessionManager.Branch func(*codingagent.SessionManager, string) error
+
+method *codingagent.SessionManager.BranchWithSummary func(*codingagent.SessionManager, *string, string, ...codingagent.BranchSummaryOptions) (string, error)
+
+method *codingagent.SessionManager.BuildContextEntries func(*codingagent.SessionManager) []codingagent.SessionEntry
+
+method *codingagent.SessionManager.BuildSessionContext func(*codingagent.SessionManager) codingagent.SessionContext
+
+method *codingagent.SessionManager.CreateBranchedSession func(*codingagent.SessionManager, string) (*string, error)
+
+method *codingagent.SessionManager.GetBranch func(*codingagent.SessionManager, ...string) []codingagent.SessionEntry
+
+method *codingagent.SessionManager.GetCWD func(*codingagent.SessionManager) string
+
+method *codingagent.SessionManager.GetChildren func(*codingagent.SessionManager, string) ([]codingagent.SessionEntry, error)
+
+method *codingagent.SessionManager.GetEntries func(*codingagent.SessionManager) []codingagent.SessionEntry
+
+method *codingagent.SessionManager.GetEntry func(*codingagent.SessionManager, string) *codingagent.SessionEntry
+
+method *codingagent.SessionManager.GetHeader func(*codingagent.SessionManager) *codingagent.SessionHeader
+
+method *codingagent.SessionManager.GetLabel func(*codingagent.SessionManager, string) *string
+
+method *codingagent.SessionManager.GetLeafEntry func(*codingagent.SessionManager) *codingagent.SessionEntry
+
+method *codingagent.SessionManager.GetLeafID func(*codingagent.SessionManager) *string
+
+method *codingagent.SessionManager.GetSessionDir func(*codingagent.SessionManager) string
+
+method *codingagent.SessionManager.GetSessionFile func(*codingagent.SessionManager) *string
+
+method *codingagent.SessionManager.GetSessionID func(*codingagent.SessionManager) string
+
+method *codingagent.SessionManager.GetSessionName func(*codingagent.SessionManager) *string
+
+method *codingagent.SessionManager.GetTree func(*codingagent.SessionManager) ([]codingagent.SessionTreeNode, error)
+
+method *codingagent.SessionManager.IsPersisted func(*codingagent.SessionManager) bool
+
+method *codingagent.SessionManager.NewSession func(*codingagent.SessionManager, ...codingagent.NewSessionOptions) (*string, error)
+
+method *codingagent.SessionManager.ResetLeaf func(*codingagent.SessionManager) error
+
+method *codingagent.SessionManager.SetSessionFile func(*codingagent.SessionManager, string) error
+
+method *codingagent.SessionManager.UsesDefaultSessionDir func(*codingagent.SessionManager) bool
+
+method *codingagent.AgentSessionRuntime.CWD func(*codingagent.AgentSessionRuntime) string
+
+method *codingagent.AgentSessionRuntime.Diagnostics func(*codingagent.AgentSessionRuntime) []codingagent.AgentSessionRuntimeDiagnostic
+
+method *codingagent.AgentSessionRuntime.Dispose func(*codingagent.AgentSessionRuntime, context.Context) error
+
+method *codingagent.AgentSessionRuntime.Fork func(*codingagent.AgentSessionRuntime, context.Context, string, ...codingagent.ForkSessionOptions) (codingagent.SessionReplacementResult, error)
+
+method *codingagent.AgentSessionRuntime.ImportFromJSONL func(*codingagent.AgentSessionRuntime, context.Context, string, ...string) (codingagent.SessionReplacementResult, error)
+
+method *codingagent.AgentSessionRuntime.ModelFallbackMessage func(*codingagent.AgentSessionRuntime) *string
+
+method *codingagent.AgentSessionRuntime.NewSession func(*codingagent.AgentSessionRuntime, context.Context, ...codingagent.NewRuntimeSessionOptions) (codingagent.SessionReplacementResult, error)
+
+method *codingagent.AgentSessionRuntime.Services func(*codingagent.AgentSessionRuntime) codingagent.AgentSessionServices
+
+method *codingagent.AgentSessionRuntime.Session func(*codingagent.AgentSessionRuntime) *codingagent.AgentSession
+
+method *codingagent.AgentSessionRuntime.SetBeforeSessionInvalidate func(*codingagent.AgentSessionRuntime, func())
+
+method *codingagent.AgentSessionRuntime.SetRebindSession func(*codingagent.AgentSessionRuntime, func(*codingagent.AgentSession) error)
+
+method *codingagent.AgentSessionRuntime.SwitchSession func(*codingagent.AgentSessionRuntime, context.Context, string, ...codingagent.SwitchSessionOptions) (codingagent.SessionReplacementResult, error)

@@ -141,6 +141,8 @@ func assertIssue33EvidenceRefPath(t *testing.T, root, ref string) {
 
 func issue33EvidenceInputPaths(caseID string) []string {
 	switch caseID {
+	case "issue73-cli-session-navigation":
+		return []string{"cmd/pig/issue73_process_test.go"}
 	case "issue33-pig-process-entry", "issue33-static-success-exits":
 		return []string{
 			"internal/capability/command_test.go",

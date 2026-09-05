@@ -30,7 +30,7 @@ Go SDK 可把 `NewSessionManager` 或 `OpenSessionManager` 返回值传给 `Crea
 go run ./examples/session-persistence
 ```
 
-最近会话查找、`--continue`、`--resume`、fork 和树修改属于后续 M3 slice，当前仍返回结构化 Capability Stub。
+最近会话查找、`--continue`、fork 和树修改已由 [M3.3](m3-session-navigation.md) 接通；TUI 的 `--resume` 仍保留后续阶段边界。
 
 ## 对等证据
 
