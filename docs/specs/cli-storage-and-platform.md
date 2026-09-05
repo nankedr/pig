@@ -59,6 +59,7 @@ V1 只实现 Pig Client，并与固定快照的 server package 测试 host/受�
 
 - M1：内存 Session，不创建会话文件；
 - M3.1：实现固定 Pi 快照 v3 的创建、追加写入和显式路径重开；
+- M3.2：显式打开 v1/v2 历史与可恢复文件，迁移写回 v3、恢复上下文并验证 Pi/Pig 双向正式 reader/writer；
 - M3 后续：继续实现最近会话查找、树/分支和 fork 语义；
 - M8：另行实现固定快照的 v4 Harness Session；v4 不读取 v3，也不把未来 Harness 文档中的 API 补进来。
 

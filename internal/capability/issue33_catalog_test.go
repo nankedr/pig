@@ -197,6 +197,8 @@ func issue33EvidenceInputPaths(caseID string) []string {
 		return []string{"cmd/pig/headless_process_test.go", "cmd/pig/testdata/headless_json_text.golden.jsonl"}
 	case "issue71-pig-session-persistence", "issue71-pig-cli-session-args", "issue71-headless-session-persistence":
 		return []string{"cmd/pig/issue71_process_test.go"}
+	case "issue72-cli-historical-product":
+		return []string{"cmd/pig/issue72_process_test.go"}
 	case "issue71-headless-session-outcomes":
 		return []string{"codingagent/issue71_session_persistence_test.go"}
 	default:
