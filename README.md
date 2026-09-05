@@ -1,12 +1,14 @@
 # Pig
 
-Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口，并保留 M1 的 text/json Headless 和 Tool continuation 契约。当前 Milestone Frontier 是 M3。
+Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口；当前 M3 已支持 v3 Session 创建、持久化和显式路径重开。
 
 - [文档导航](docs/README.md)
 - [M2 集成与冻结](docs/learning/m2-freeze.md)
 - [M2 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-freeze.md)
 - [v0.2.0 发布说明](docs/releases/v0.2.0.md)
 - [M1 Headless text 与 JSON](docs/learning/m1-headless-text.md)
+- [M3.1 v3 Session 持久化](docs/learning/m3-session-persistence.md)
+- [M3.1 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m3-session-persistence.md)
 - [M1 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m1-headless-text.md)
 - [M2.2 Usage、cost 与 cache](docs/learning/m2-usage-cost-cache.md)
 - [M2.2 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-usage-cost-cache.md)
@@ -23,7 +25,7 @@ Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking
 - [M0 兼容骨架](docs/learning/m0-compatibility-skeleton.md)
 - [M0 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m0.md)
 
-Headless Coding Agent 支持最终文本输出和 session-first JSONL 事件流。JSON 模式的第一行是内存 v3 Session header，之后每行是一个 `AgentSessionEvent`；stdin 始终作为 Prompt，不是 RPC command：
+Headless Coding Agent 支持最终文本输出和 session-first JSONL 事件流，并默认把 v3 Session 写入 `~/.pig/agent/sessions/`。JSON 模式第一行是 v3 Session header，之后每行是一个 `AgentSessionEvent`；stdin 始终作为 Prompt，不是 RPC command。使用 `--session <path>` 重开，或用 `--no-session` 明确关闭持久化：
 
 ```sh
 export DEEPSEEK_API_KEY=...
@@ -34,6 +36,7 @@ go run ./cmd/pig --provider deepseek --model deepseek-v4-flash --mode json "Expl
 
 ```sh
 go run ./examples/headless-json
+go run ./examples/session-persistence
 ```
 
 ```sh

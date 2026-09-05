@@ -232,13 +232,15 @@ func TestHeadlessRunnerStopsAfterTerminalProviderError(t *testing.T) {
 
 func TestCreateHeadlessSessionUsesExplicitAndAmbientCredentialsWithoutStateRuntime(t *testing.T) {
 	const explicit = "explicit-key"
+	cwd := t.TempDir()
 	runtime, err := codingagent.CreateHeadlessSession(context.Background(), codingagent.CreateHeadlessSessionOptions{
-		CWD:         t.TempDir(),
-		Provider:    ai.ProviderIDDeepSeek,
-		Model:       "deepseek-v4-flash",
-		APIKey:      ptrString(explicit),
-		Environment: ai.ProviderEnv{"DEEPSEEK_API_KEY": "ambient-key"},
-		Tools:       []string{"read"},
+		CWD:            cwd,
+		Provider:       ai.ProviderIDDeepSeek,
+		Model:          "deepseek-v4-flash",
+		APIKey:         ptrString(explicit),
+		Environment:    ai.ProviderEnv{"DEEPSEEK_API_KEY": "ambient-key"},
+		Tools:          []string{"read"},
+		SessionManager: codingagent.NewInMemorySessionManager(cwd),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -291,13 +293,14 @@ func TestCreateHeadlessSessionBuildsDefaultSystemPromptAndHonorsOverride(t *test
 		t.Run(test.name, func(t *testing.T) {
 			cwd := t.TempDir()
 			runtime, err := codingagent.CreateHeadlessSession(context.Background(), codingagent.CreateHeadlessSessionOptions{
-				CWD:          cwd,
-				Provider:     ai.ProviderIDDeepSeek,
-				Model:        "deepseek-v4-flash",
-				Environment:  ai.ProviderEnv{"DEEPSEEK_API_KEY": "offline-test-key"},
-				Tools:        test.tools,
-				NoTools:      test.noTools,
-				SystemPrompt: test.override,
+				CWD:            cwd,
+				Provider:       ai.ProviderIDDeepSeek,
+				Model:          "deepseek-v4-flash",
+				Environment:    ai.ProviderEnv{"DEEPSEEK_API_KEY": "offline-test-key"},
+				Tools:          test.tools,
+				NoTools:        test.noTools,
+				SystemPrompt:   test.override,
+				SessionManager: codingagent.NewInMemorySessionManager(cwd),
 			})
 			if err != nil {
 				t.Fatal(err)

@@ -77,7 +77,7 @@ func TestCreateAgentSessionRunsTextRoundAndSettlesAfterTranscriptUpdate(t *testi
 		if event.AgentSessionEventType() != codingagent.AgentSessionEventTypeAgentSettled {
 			return
 		}
-		entries := session.SessionManager().GetEntries()
+		entries := issue71MessageEntries(session.SessionManager().GetEntries())
 		if len(entries) != 2 || entries[0].Message.MessageRole() != ai.MessageRoleUser || entries[1].Message.MessageRole() != ai.MessageRoleAssistant {
 			t.Errorf("transcript at agent_settled = %#v, want user and assistant", entries)
 		}
@@ -253,7 +253,7 @@ func TestCreateAgentSessionRunsReadContinuationWithInjectedProviderAndTool(t *te
 	}
 
 	messages := session.Messages()
-	entries := session.SessionManager().GetEntries()
+	entries := issue71MessageEntries(session.SessionManager().GetEntries())
 	if len(messages) != 4 || len(entries) != 4 {
 		t.Fatalf("transcript lengths = Agent %d, SessionManager %d; want four", len(messages), len(entries))
 	}
@@ -335,7 +335,7 @@ func TestAgentSessionAbortRequestsCancellationAndWaitForIdleObservesSettledTrans
 	if err := <-promptDone; err != nil {
 		t.Fatalf("Prompt() after Abort error = %v", err)
 	}
-	entries := session.SessionManager().GetEntries()
+	entries := issue71MessageEntries(session.SessionManager().GetEntries())
 	if len(entries) != 2 {
 		t.Fatalf("aborted transcript = %#v, want user and partial Assistant", entries)
 	}
@@ -489,7 +489,7 @@ func TestAgentSessionDisposeCancelsWithoutDroppingActiveTranscript(t *testing.T)
 	if err := <-promptDone; err != nil {
 		t.Fatalf("Prompt() after Dispose error = %v", err)
 	}
-	entries := session.SessionManager().GetEntries()
+	entries := issue71MessageEntries(session.SessionManager().GetEntries())
 	if len(entries) != 2 {
 		t.Fatalf("disposed transcript = %#v, want user and partial Assistant", entries)
 	}
@@ -576,4 +576,14 @@ func TestCreateAgentSessionNoToolsModesMatchPublicSelectionContract(t *testing.T
 			}
 		})
 	}
+}
+
+func issue71MessageEntries(entries []codingagent.SessionEntry) []codingagent.SessionEntry {
+	messages := make([]codingagent.SessionEntry, 0, len(entries))
+	for _, entry := range entries {
+		if entry.Type == "message" {
+			messages = append(messages, entry)
+		}
+	}
+	return messages
 }

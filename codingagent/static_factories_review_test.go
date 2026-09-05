@@ -132,12 +132,6 @@ func TestStaticFactoryProjectionsAreInertCapabilityStubs(t *testing.T) {
 				RefreshOnCreate: &refreshOnCreate,
 			})
 		}},
-		{"NewSessionManager", func() (any, error) {
-			return codingagent.NewSessionManager(invalidPath, &invalidPath, codingagent.NewSessionOptions{ID: "session-1"})
-		}},
-		{"OpenSessionManager", func() (any, error) {
-			return codingagent.OpenSessionManager(invalidPath, &invalidPath, &invalidPath)
-		}},
 		{"ContinueRecentSessionManager", func() (any, error) {
 			return codingagent.ContinueRecentSessionManager(invalidPath, &invalidPath)
 		}},

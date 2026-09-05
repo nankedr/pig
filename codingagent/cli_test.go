@@ -212,7 +212,7 @@ func TestRunCLIRootHelpInventoriesTheCompleteStaticContract(t *testing.T) {
 		"--provider <name>", "--model <id>", "--api-key <key>",
 		"--system-prompt <text>", "--append-system-prompt <text>",
 		"--mode <mode>", "--print, -p", "--continue, -c", "--resume, -r",
-		"--session <path|id>", "--session-id <id>", "--fork <path|id>",
+		"--session <path>", "--session-id <id>", "--fork <path|id>",
 		"--session-dir <dir>", "--no-session", "--name, -n <name>",
 		"--models <patterns>", "--no-tools, -nt", "--no-builtin-tools, -nbt",
 		"--tools, -t <tools>", "--exclude-tools, -xt <tools>", "--thinking <level>",

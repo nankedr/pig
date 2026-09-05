@@ -58,7 +58,8 @@ V1 只实现 Pig Client，并与固定快照的 server package 测试 host/受�
 生产路径是 `Agent + AgentSession + v3 JSONL`，Harness v4 是独立实现：
 
 - M1：内存 Session，不创建会话文件；
-- M3：实现固定 Pi 快照 v3 的读写、树/分支和恢复语义；
+- M3.1：实现固定 Pi 快照 v3 的创建、追加写入和显式路径重开；
+- M3 后续：继续实现最近会话查找、树/分支和 fork 语义；
 - M8：另行实现固定快照的 v4 Harness Session；v4 不读取 v3，也不把未来 Harness 文档中的 API 补进来。
 
 语义兼容要求在双方都存在 reader/writer 的格式上做双向 fixture：Pi 写入 Pig 读取，Pig 写入 Pi 读取。v3 reader 保留快照的容错行为，包括跳过畸形 JSONL 行；不能因 Go decoder 默认严格而把整份可恢复 Session 判死。

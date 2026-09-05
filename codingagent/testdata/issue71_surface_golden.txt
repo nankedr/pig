@@ -1,0 +1,41 @@
+type codingagent.CreateHeadlessSessionOptions struct
+fields:
+- CWD string tag=""
+- Provider ai.ProviderID tag=""
+- Model string tag=""
+- APIKey *string tag=""
+- Environment ai.ProviderEnv tag=""
+- BaseURL *string tag=""
+- Thinking ai.ModelThinkingLevel tag=""
+- Tools []string tag=""
+- ExcludeTools []string tag=""
+- NoTools codingagent.NoToolsMode tag=""
+- SystemPrompt *string tag=""
+- SessionManager *codingagent.SessionManager tag=""
+
+type codingagent.NewSessionOptions struct
+fields:
+- ID string tag=""
+- ParentSession string tag=""
+
+func codingagent.GetAgentDir func() (string, error)
+
+func codingagent.NewSessionManager func(string, *string, ...codingagent.NewSessionOptions) (*codingagent.SessionManager, error)
+
+func codingagent.OpenSessionManager func(string, *string, *string) (*codingagent.SessionManager, error)
+
+method codingagent.SessionManager.AppendMessage func(*codingagent.SessionManager, agent.AgentMessage) (string, error)
+
+method codingagent.SessionManager.AppendModelChange func(*codingagent.SessionManager, string, string) (string, error)
+
+method codingagent.SessionManager.AppendThinkingLevelChange func(*codingagent.SessionManager, string) (string, error)
+
+method codingagent.SessionManager.BuildSessionContext func(*codingagent.SessionManager) codingagent.SessionContext
+
+method codingagent.SessionManager.GetHeader func(*codingagent.SessionManager) *codingagent.SessionHeader
+
+method codingagent.SessionManager.GetSessionFile func(*codingagent.SessionManager) *string
+
+method codingagent.SessionManager.IsPersisted func(*codingagent.SessionManager) bool
+
+method codingagent.SessionManager.UsesDefaultSessionDir func(*codingagent.SessionManager) bool

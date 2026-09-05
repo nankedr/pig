@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -383,6 +384,29 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	if cwdErr != nil {
 		return fmt.Errorf("resolve working directory: %w", cwdErr)
 	}
+	var sessionDir *string
+	if parsed.SessionDir != nil {
+		sessionDir = parsed.SessionDir
+	} else if value := strings.TrimSpace(os.Getenv("PIG_CODING_AGENT_SESSION_DIR")); value != "" {
+		sessionDir = &value
+	}
+	option := NewSessionOptions{}
+	if parsed.SessionID != nil {
+		option.ID = *parsed.SessionID
+	}
+	var manager *SessionManager
+	var managerErr error
+	switch {
+	case parsed.NoSession:
+		manager = NewInMemorySessionManager(cwd, option)
+	case parsed.Session != nil:
+		manager, managerErr = OpenSessionManager(*parsed.Session, sessionDir, nil)
+	default:
+		manager, managerErr = NewSessionManager(cwd, sessionDir, option)
+	}
+	if managerErr != nil {
+		return managerErr
+	}
 
 	messages := append([]string(nil), parsed.Messages...)
 	var initialMessage *string
@@ -414,17 +438,18 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		noTools = NoToolsBuiltin
 	}
 	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
-		CWD:          cwd,
-		Provider:     ai.ProviderID(*parsed.Provider),
-		Model:        *parsed.Model,
-		APIKey:       parsed.APIKey,
-		Environment:  environment,
-		BaseURL:      baseURL,
-		Thinking:     parsed.Thinking,
-		Tools:        parsed.Tools,
-		ExcludeTools: parsed.ExcludeTools,
-		NoTools:      noTools,
-		SystemPrompt: parsed.SystemPrompt,
+		CWD:            cwd,
+		Provider:       ai.ProviderID(*parsed.Provider),
+		Model:          *parsed.Model,
+		APIKey:         parsed.APIKey,
+		Environment:    environment,
+		BaseURL:        baseURL,
+		Thinking:       parsed.Thinking,
+		Tools:          parsed.Tools,
+		ExcludeTools:   parsed.ExcludeTools,
+		NoTools:        noTools,
+		SystemPrompt:   parsed.SystemPrompt,
+		SessionManager: manager,
 	})
 	if err != nil {
 		return err
@@ -441,7 +466,7 @@ func unsupportedHeadlessOperation(parsed Args) string {
 	switch {
 	case len(parsed.FileArgs) != 0:
 		return "headless.file-arguments"
-	case parsed.Continue || parsed.Resume || parsed.Session != nil || parsed.SessionID != nil || parsed.Fork != nil || parsed.SessionDir != nil || parsed.Name != nil:
+	case parsed.Continue || parsed.Resume || parsed.Fork != nil || parsed.Name != nil:
 		return "headless.session-persistence"
 	case len(parsed.AppendSystemPrompt) != 0:
 		return "headless.append-system-prompt"
@@ -470,9 +495,21 @@ func isNotImplementedOperation(err error, operation string) bool {
 	return errors.As(err, &unavailable) && unavailable.Module == "codingagent" && unavailable.Operation == operation
 }
 
-// Package and user configuration paths are ambient filesystem capabilities.
-// They fail before reading environment variables, the home directory, or disk.
-func GetAgentDir() (string, error) { return "", notImplemented("GetAgentDir") }
+// GetAgentDir resolves Pig's canonical user-owned state directory.
+func GetAgentDir() (string, error) {
+	if value := strings.TrimSpace(os.Getenv("PIG_CODING_AGENT_DIR")); value != "" {
+		path, err := resolveSessionPath(value)
+		if err != nil {
+			return "", fmt.Errorf("resolve PIG_CODING_AGENT_DIR: %w", err)
+		}
+		return path, nil
+	}
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("resolve user home: %w", err)
+	}
+	return filepath.Join(home, ConfigDirName, "agent"), nil
+}
 func GetDocsPath() (string, error) { return "", notImplemented("GetDocsPath") }
 func GetExamplesPath() (string, error) {
 	return "", notImplemented("GetExamplesPath")

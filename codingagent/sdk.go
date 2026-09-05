@@ -44,10 +44,8 @@ type CreateAgentSessionResult struct {
 	ModelFallbackMessage *string
 }
 
-// CreateAgentSession constructs the M1 in-memory SDK path when the caller
-// supplies both a model and a Provider or StreamFunction. Ambient model
-// discovery, credentials, settings, extensions, and persistence remain later
-// capabilities and therefore retain the existing structured stub.
+// CreateAgentSession constructs the SDK path when the caller supplies both a
+// model and a Provider or StreamFunction.
 func CreateAgentSession(_ context.Context, options ...CreateAgentSessionOptions) (CreateAgentSessionResult, error) {
 	if len(options) != 1 || options[0].Model == nil {
 		return CreateAgentSessionResult{}, notImplemented("CreateAgentSession")
@@ -76,23 +74,47 @@ func CreateAgentSession(_ context.Context, options ...CreateAgentSessionOptions)
 	if manager == nil {
 		manager = NewInMemorySessionManager(config.CWD)
 	}
-	if manager.IsPersisted() {
-		return CreateAgentSessionResult{}, notImplemented("CreateAgentSession.Persistence")
+	sessionContext := manager.BuildSessionContext()
+	hasExistingSession := len(sessionContext.Messages) != 0
+	thinkingLevel := config.ThinkingLevel
+	if hasExistingSession && thinkingLevel == "" {
+		thinkingLevel = agent.ThinkingLevel(sessionContext.ThinkingLevel)
 	}
 
 	tools := selectAgentTools(config.AgentTools, config.Tools, config.ExcludeTools, config.NoTools)
 	created, err := agent.NewAgent(agent.AgentOptions{
 		InitialState: &agent.AgentInitialState{
 			Model:         *config.Model,
-			ThinkingLevel: config.ThinkingLevel,
+			ThinkingLevel: thinkingLevel,
 			Tools:         tools,
-			Messages:      manager.BuildSessionContext().Messages,
+			Messages:      sessionContext.Messages,
 		},
 		StreamFunction: stream,
 		SessionID:      manager.GetSessionID(),
 	})
 	if err != nil {
 		return CreateAgentSessionResult{}, err
+	}
+	if !hasExistingSession {
+		if _, err := manager.AppendModelChange(string(config.Model.Provider), config.Model.ID); err != nil {
+			return CreateAgentSessionResult{}, err
+		}
+		if _, err := manager.AppendThinkingLevelChange(string(created.State().ThinkingLevel)); err != nil {
+			return CreateAgentSessionResult{}, err
+		}
+	} else {
+		hasThinkingEntry := false
+		for _, entry := range manager.GetBranch() {
+			if entry.Type == "thinking_level_change" {
+				hasThinkingEntry = true
+				break
+			}
+		}
+		if !hasThinkingEntry {
+			if _, err := manager.AppendThinkingLevelChange(string(created.State().ThinkingLevel)); err != nil {
+				return CreateAgentSessionResult{}, err
+			}
+		}
 	}
 
 	activeToolNames := make([]string, len(tools))

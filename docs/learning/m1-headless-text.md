@@ -1,6 +1,6 @@
 # M1 Headless text 与 JSON 路径
 
-Headless Coding Agent 是不启动 TUI、通过最终文本或 JSON 事件工作的产品路径。M1 的 text 和 JSON slice 都可以从真实 `pig` 子进程完成一次或多次 Prompt；两者共用 `RunHeadless` 生命周期，但当前不包含设置、持久化、资源加载或扩展运行时。
+Headless Coding Agent 是不启动 TUI、通过最终文本或 JSON 事件工作的产品路径。M1 的 text 和 JSON slice 都可以从真实 `pig` 子进程完成一次或多次 Prompt；两者共用 `RunHeadless` 生命周期。M3.1 已在这条路径上加入 v3 Session 持久化，设置、资源加载和扩展运行时仍未装配。
 
 ## 执行链
 
@@ -19,7 +19,7 @@ pig process
   -> final HeadlessOutcome
 ```
 
-`CreateHeadlessSession` 只接受显式工作目录、Provider、模型、凭证输入和 Tool 选择。它使用固定内置模型目录和 `NewInMemorySessionManager`，不会读取 M3 的 settings、credential store、trust 或 session 文件。`RunHeadless` 保留最终 `AssistantMessage`、其中的 text blocks 和取消标记；`RunPrintMode` 才负责选择文本或 JSON presenter。
+`CreateHeadlessSession` 接受显式工作目录、Provider、模型、凭证输入、Tool 选择和可注入的 `SessionManager`。CLI 默认创建 Pig v3 Session，`--no-session` 注入内存 manager；它不会读取 settings、credential store 或 trust。`RunHeadless` 保留最终 `AssistantMessage`、其中的 text blocks 和取消标记；`RunPrintMode` 才负责选择文本或 JSON presenter。
 
 ## 运行 CLI
 
@@ -75,7 +75,7 @@ go run ./cmd/pig \
   -p "Read go.mod and report the module path"
 ```
 
-指定其他 Tool 会返回对应的结构化 `ErrNotImplemented`。RPC、session persistence、`@file`、skills、prompt templates、themes 和 extensions 仍是精确 Capability Stub；禁用尚未装配的资源发现开关不会激活这些子系统。`PIG_DEEPSEEK_BASE_URL` 只用于把 DeepSeek 请求指向确定性的本地验证端点，不替代正式 Provider 配置。
+指定其他 Tool 会返回对应的结构化 `ErrNotImplemented`。RPC、Session continue/fork、`@file`、skills、prompt templates、themes 和 extensions 仍是精确 Capability Stub；禁用尚未装配的资源发现开关不会激活这些子系统。`PIG_DEEPSEEK_BASE_URL` 只用于把 DeepSeek 请求指向确定性的本地验证端点，不替代正式 Provider 配置。
 
 ## DeepSeek 真实 live smoke
 

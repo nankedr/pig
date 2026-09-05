@@ -195,6 +195,8 @@ func issue33EvidenceInputPaths(caseID string) []string {
 		return []string{"cmd/pig/headless_process_test.go"}
 	case "issue57-pig-session-first-json", "issue57-pig-json-cli-contract", "issue57-pig-json-exit-status", "issue57-headless-json-boundary":
 		return []string{"cmd/pig/headless_process_test.go", "cmd/pig/testdata/headless_json_text.golden.jsonl"}
+	case "issue71-pig-session-persistence", "issue71-pig-cli-session-args", "issue71-headless-session-persistence":
+		return []string{"cmd/pig/issue71_process_test.go"}
 	default:
 		return nil
 	}

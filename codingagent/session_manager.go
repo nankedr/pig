@@ -6,6 +6,8 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -159,6 +161,8 @@ type SessionManager struct {
 	header                                  SessionHeader
 	entries                                 []SessionEntry
 	leafID                                  *string
+	flushed                                 bool
+	usesDefaultSessionDir                   bool
 }
 
 // NewInMemorySessionManager creates only in-memory state and performs no I/O.
@@ -169,7 +173,7 @@ func NewInMemorySessionManager(cwd string, options ...NewSessionOptions) *Sessio
 		header: SessionHeader{
 			Type:      "session",
 			ID:        newSessionID(),
-			Timestamp: time.Now().UTC().Format(time.RFC3339Nano),
+			Timestamp: sessionTimestamp(),
 			CWD:       cwd,
 		},
 	}
@@ -187,11 +191,114 @@ func NewInMemorySessionManager(cwd string, options ...NewSessionOptions) *Sessio
 	m.sessionID = m.header.ID
 	return m
 }
-func NewSessionManager(string, *string, ...NewSessionOptions) (*SessionManager, error) {
-	return nil, notImplemented("NewSessionManager")
+func NewSessionManager(cwd string, sessionDir *string, options ...NewSessionOptions) (*SessionManager, error) {
+	option := NewSessionOptions{}
+	if len(options) != 0 {
+		option = options[0]
+	}
+	if option.ID != "" && !customSessionID.MatchString(option.ID) {
+		return nil, fmt.Errorf("Session id must be non-empty, contain only alphanumeric characters, '-', '_', and '.', and start and end with an alphanumeric character")
+	}
+	resolvedCWD, err := resolveSessionPath(cwd)
+	if err != nil {
+		return nil, fmt.Errorf("resolve session cwd: %w", err)
+	}
+	dir, usesDefault, err := resolveSessionDir(resolvedCWD, sessionDir)
+	if err != nil {
+		return nil, err
+	}
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return nil, fmt.Errorf("create session directory %q: %w", dir, err)
+	}
+	manager := NewInMemorySessionManager(resolvedCWD, option)
+	manager.sessionDir = dir
+	manager.usesDefaultSessionDir = usesDefault
+	manager.sessionFile = filepath.Join(dir, sessionFileName(manager.header.Timestamp, manager.sessionID))
+	return manager, nil
 }
-func OpenSessionManager(string, *string, *string) (*SessionManager, error) {
-	return nil, notImplemented("OpenSessionManager")
+func OpenSessionManager(path string, sessionDir, cwdOverride *string) (*SessionManager, error) {
+	resolvedPath, err := resolveSessionPath(path)
+	if err != nil {
+		return nil, fmt.Errorf("resolve session file: %w", err)
+	}
+	data, readErr := os.ReadFile(resolvedPath)
+	if readErr != nil && !os.IsNotExist(readErr) {
+		return nil, fmt.Errorf("read session file %q: %w", resolvedPath, readErr)
+	}
+
+	var header SessionHeader
+	var entries []SessionEntry
+	if readErr == nil && len(data) != 0 {
+		parsed := ParseSessionEntries(string(data))
+		if len(parsed) == 0 {
+			return nil, fmt.Errorf("Session file is not a valid pi session: %s", resolvedPath)
+		}
+		headerFields, headerObject := decodeJSONObject(parsed[0].Raw)
+		_, hasStringID := decodeJSONField[string](headerFields, "id")
+		if !headerObject || !hasStringID || parsed[0].Header == nil || parsed[0].Header.Type != "session" {
+			return nil, fmt.Errorf("Session file is not a valid pi session: %s", resolvedPath)
+		}
+		header = cloneSessionHeader(*parsed[0].Header)
+		for _, item := range parsed[1:] {
+			if item.Entry != nil {
+				entries = append(entries, cloneSessionEntry(*item.Entry))
+			}
+		}
+	}
+
+	cwd := ""
+	if cwdOverride != nil {
+		cwd = *cwdOverride
+	} else if header.CWD != "" {
+		cwd = header.CWD
+	}
+	if cwd == "" {
+		cwd, err = os.Getwd()
+		if err != nil {
+			return nil, fmt.Errorf("resolve session cwd: %w", err)
+		}
+	}
+	resolvedCWD, err := resolveSessionPath(cwd)
+	if err != nil {
+		return nil, fmt.Errorf("resolve session cwd: %w", err)
+	}
+	dir := filepath.Dir(resolvedPath)
+	usesDefault := false
+	if sessionDir != nil {
+		dir, err = resolveSessionPath(*sessionDir)
+		if err != nil {
+			return nil, fmt.Errorf("resolve session directory: %w", err)
+		}
+	} else if defaultDir, _, defaultErr := resolveSessionDir(resolvedCWD, nil); defaultErr == nil {
+		usesDefault = dir == defaultDir
+	}
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return nil, fmt.Errorf("create session directory %q: %w", dir, err)
+	}
+
+	if readErr != nil || len(data) == 0 {
+		manager := NewInMemorySessionManager(resolvedCWD)
+		manager.sessionDir = dir
+		manager.sessionFile = resolvedPath
+		manager.usesDefaultSessionDir = usesDefault
+		if readErr == nil {
+			manager.flushed = true
+			if err := manager.rewriteFile(); err != nil {
+				return nil, err
+			}
+		}
+		return manager, nil
+	}
+
+	manager := &SessionManager{
+		cwd: resolvedCWD, sessionDir: dir, sessionID: header.ID, sessionFile: resolvedPath,
+		header: header, entries: entries, flushed: true, usesDefaultSessionDir: usesDefault,
+	}
+	if len(entries) != 0 {
+		leaf := entries[len(entries)-1].ID
+		manager.leafID = &leaf
+	}
+	return manager, nil
 }
 func ContinueRecentSessionManager(string, *string) (*SessionManager, error) {
 	return nil, notImplemented("ContinueRecentSessionManager")
@@ -333,7 +440,11 @@ func (m *SessionManager) IsPersisted() bool {
 	defer m.mu.RUnlock()
 	return m.sessionFile != ""
 }
-func (m *SessionManager) UsesDefaultSessionDir() bool { return false }
+func (m *SessionManager) UsesDefaultSessionDir() bool {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	return m.usesDefaultSessionDir
+}
 func (m *SessionManager) SetSessionFile(string) error {
 	return notImplemented("SessionManager.SetSessionFile")
 }
@@ -342,9 +453,6 @@ func (m *SessionManager) NewSession(...NewSessionOptions) (*string, error) {
 }
 func (m *SessionManager) ResetLeaf() error { return notImplemented("SessionManager.ResetLeaf") }
 func (m *SessionManager) AppendMessage(message agent.AgentMessage) (string, error) {
-	if m.IsPersisted() {
-		return "", notImplemented("SessionManager.AppendMessage")
-	}
 	encoded, err := agent.MarshalAgentMessage(message)
 	if err != nil {
 		return "", fmt.Errorf("append session message: %w", err)
@@ -366,20 +474,25 @@ func (m *SessionManager) AppendMessage(message agent.AgentMessage) (string, erro
 			Type:      "message",
 			ID:        id,
 			ParentID:  cloneStringPointer(m.leafID),
-			Timestamp: time.Now().UTC().Format(time.RFC3339Nano),
+			Timestamp: sessionTimestamp(),
 		},
 		Message: owned,
 	}
-	m.entries = append(m.entries, entry)
-	leafID := id
-	m.leafID = &leafID
-	return id, nil
+	return id, m.appendEntryLocked(entry)
 }
-func (m *SessionManager) AppendThinkingLevelChange(string) (string, error) {
-	return "", notImplemented("SessionManager.AppendThinkingLevelChange")
+func (m *SessionManager) AppendThinkingLevelChange(thinkingLevel string) (string, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	entry := m.newEntryLocked("thinking_level_change")
+	entry.ThinkingLevel = thinkingLevel
+	return entry.ID, m.appendEntryLocked(entry)
 }
-func (m *SessionManager) AppendModelChange(string, string) (string, error) {
-	return "", notImplemented("SessionManager.AppendModelChange")
+func (m *SessionManager) AppendModelChange(provider, modelID string) (string, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	entry := m.newEntryLocked("model_change")
+	entry.Provider, entry.ModelID = provider, modelID
+	return entry.ID, m.appendEntryLocked(entry)
 }
 func (m *SessionManager) AppendCompaction(string, string, int64, ...AppendCompactionOptions) (string, error) {
 	return "", notImplemented("SessionManager.AppendCompaction")
@@ -408,6 +521,198 @@ func (m *SessionManager) CreateBranchedSession(string) (*string, error) {
 }
 func (m *SessionManager) GetChildren(string) ([]SessionEntry, error) {
 	return nil, notImplemented("SessionManager.GetChildren")
+}
+
+func (m *SessionManager) newEntryLocked(entryType string) SessionEntry {
+	used := make(map[string]struct{}, len(m.entries))
+	for i := range m.entries {
+		used[m.entries[i].ID] = struct{}{}
+	}
+	return SessionEntry{SessionEntryBase: SessionEntryBase{
+		Type: entryType, ID: generateMigratedSessionEntryID(used), ParentID: cloneStringPointer(m.leafID), Timestamp: sessionTimestamp(),
+	}}
+}
+
+func (m *SessionManager) appendEntryLocked(entry SessionEntry) error {
+	m.entries = append(m.entries, entry)
+	leaf := entry.ID
+	m.leafID = &leaf
+	return m.persistEntryLocked(entry)
+}
+
+func (m *SessionManager) persistEntryLocked(entry SessionEntry) error {
+	if m.sessionFile == "" {
+		return nil
+	}
+	hasAssistant := false
+	for i := range m.entries {
+		if m.entries[i].Type == "message" {
+			if _, ok := sessionAssistantMessage(m.entries[i].Message); ok {
+				hasAssistant = true
+				break
+			}
+		}
+	}
+	if !hasAssistant {
+		if m.flushed {
+			return appendSessionRecord(m.sessionFile, entry)
+		}
+		return nil
+	}
+	if m.flushed {
+		return appendSessionRecord(m.sessionFile, entry)
+	}
+	data, err := encodeSessionFile(m.header, m.entries)
+	if err != nil {
+		return err
+	}
+	file, err := os.OpenFile(m.sessionFile, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		return fmt.Errorf("persist session %q: %w", m.sessionFile, err)
+	}
+	_, writeErr := file.Write(data)
+	closeErr := file.Close()
+	if writeErr != nil {
+		return fmt.Errorf("persist session %q: %w", m.sessionFile, writeErr)
+	}
+	if closeErr != nil {
+		return fmt.Errorf("persist session %q: %w", m.sessionFile, closeErr)
+	}
+	m.flushed = true
+	return nil
+}
+
+func (m *SessionManager) rewriteFile() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	data, err := encodeSessionFile(m.header, m.entries)
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(m.sessionFile, data, 0o600); err != nil {
+		return fmt.Errorf("persist session %q: %w", m.sessionFile, err)
+	}
+	return nil
+}
+
+func appendSessionRecord(path string, entry SessionEntry) error {
+	data, err := marshalSessionEntry(entry)
+	if err != nil {
+		return err
+	}
+	data = append(data, '\n')
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND, 0o600)
+	if err != nil {
+		return fmt.Errorf("persist session %q: %w", path, err)
+	}
+	_, writeErr := file.Write(data)
+	closeErr := file.Close()
+	if writeErr != nil {
+		return fmt.Errorf("persist session %q: %w", path, writeErr)
+	}
+	if closeErr != nil {
+		return fmt.Errorf("persist session %q: %w", path, closeErr)
+	}
+	return nil
+}
+
+func encodeSessionFile(header SessionHeader, entries []SessionEntry) ([]byte, error) {
+	var out bytes.Buffer
+	headerData, err := json.Marshal(header)
+	if err != nil {
+		return nil, fmt.Errorf("encode session header: %w", err)
+	}
+	out.Write(headerData)
+	out.WriteByte('\n')
+	for _, entry := range entries {
+		data, err := marshalSessionEntry(entry)
+		if err != nil {
+			return nil, err
+		}
+		out.Write(data)
+		out.WriteByte('\n')
+	}
+	return out.Bytes(), nil
+}
+
+func marshalSessionEntry(entry SessionEntry) ([]byte, error) {
+	base := struct {
+		Type      string  `json:"type"`
+		ID        string  `json:"id"`
+		ParentID  *string `json:"parentId"`
+		Timestamp string  `json:"timestamp"`
+	}{entry.Type, entry.ID, entry.ParentID, entry.Timestamp}
+	switch entry.Type {
+	case "message":
+		message, err := agent.MarshalAgentMessage(entry.Message)
+		if err != nil {
+			return nil, fmt.Errorf("encode session message: %w", err)
+		}
+		return json.Marshal(struct {
+			Type      string          `json:"type"`
+			ID        string          `json:"id"`
+			ParentID  *string         `json:"parentId"`
+			Timestamp string          `json:"timestamp"`
+			Message   json.RawMessage `json:"message"`
+		}{base.Type, base.ID, base.ParentID, base.Timestamp, message})
+	case "model_change":
+		return json.Marshal(struct {
+			Type      string  `json:"type"`
+			ID        string  `json:"id"`
+			ParentID  *string `json:"parentId"`
+			Timestamp string  `json:"timestamp"`
+			Provider  string  `json:"provider"`
+			ModelID   string  `json:"modelId"`
+		}{base.Type, base.ID, base.ParentID, base.Timestamp, entry.Provider, entry.ModelID})
+	case "thinking_level_change":
+		return json.Marshal(struct {
+			Type          string  `json:"type"`
+			ID            string  `json:"id"`
+			ParentID      *string `json:"parentId"`
+			Timestamp     string  `json:"timestamp"`
+			ThinkingLevel string  `json:"thinkingLevel"`
+		}{base.Type, base.ID, base.ParentID, base.Timestamp, entry.ThinkingLevel})
+	default:
+		if len(entry.Raw) != 0 {
+			return cloneRawMessage(entry.Raw), nil
+		}
+		return nil, fmt.Errorf("encode session entry type %q: unsupported", entry.Type)
+	}
+}
+
+func resolveSessionDir(cwd string, explicit *string) (string, bool, error) {
+	if explicit != nil {
+		dir, err := resolveSessionPath(*explicit)
+		if err != nil {
+			return "", false, fmt.Errorf("resolve session directory: %w", err)
+		}
+		return dir, false, nil
+	}
+	agentDir, err := GetAgentDir()
+	if err != nil {
+		return "", false, err
+	}
+	safe := strings.NewReplacer("/", "-", `\`, "-", ":", "-").Replace(strings.TrimLeft(cwd, `/\`))
+	return filepath.Join(agentDir, "sessions", "--"+safe+"--"), true, nil
+}
+
+func resolveSessionPath(path string) (string, error) {
+	if path == "~" || strings.HasPrefix(path, "~/") || strings.HasPrefix(path, `~\`) {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		path = filepath.Join(home, strings.TrimLeft(path[1:], `/\`))
+	}
+	return filepath.Abs(path)
+}
+
+func sessionTimestamp() string {
+	return time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+}
+
+func sessionFileName(timestamp, id string) string {
+	return strings.NewReplacer(":", "-", ".", "-").Replace(timestamp) + "_" + id + ".jsonl"
 }
 
 var fallbackSessionID uint64

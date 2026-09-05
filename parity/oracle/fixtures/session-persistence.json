@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/session-manager.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/session-persistence",
+    "catalog_id": "contract:session/v3-jsonl",
+    "surface": "go-sdk",
+    "input": {
+      "id": "m3-session",
+      "projection": "File creation timing, v3 header, model/thinking/messages/tool result parent chain, explicit reopen append, memory mode, empty and invalid explicit paths; random IDs and timestamps are projected."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "created": {
+        "id": "m3-session",
+        "fileHasID": true,
+        "existence": [
+          false,
+          false,
+          false,
+          false,
+          true
+        ],
+        "records": [
+          {
+            "type": "model_change",
+            "provider": "fixture",
+            "modelId": "model-1",
+            "parent": null
+          },
+          {
+            "type": "thinking_level_change",
+            "thinkingLevel": "high",
+            "parent": 0
+          },
+          {
+            "type": "message",
+            "role": "user",
+            "parent": 1
+          },
+          {
+            "type": "message",
+            "role": "assistant",
+            "parent": 2
+          },
+          {
+            "type": "message",
+            "role": "toolResult",
+            "parent": 3
+          }
+        ],
+        "header": {
+          "type": "session",
+          "version": 3,
+          "id": "m3-session",
+          "cwdMatches": true
+        }
+      },
+      "reopened": {
+        "id": "m3-session",
+        "roles": [
+          "user",
+          "assistant",
+          "toolResult",
+          "user"
+        ],
+        "unchangedBeforeAppend": true,
+        "appendedLines": 1
+      },
+      "memory": {
+        "persisted": false,
+        "file": null
+      },
+      "empty": {
+        "idMatchesHeader": true,
+        "lines": 1
+      },
+      "invalid": {
+        "failed": true,
+        "preserved": true
+      }
+    },
+    "side_effects": [
+      {
+        "kind": "file-create",
+        "target": "session",
+        "detail": "after-first-assistant"
+      },
+      {
+        "kind": "file-write",
+        "target": "explicit-empty",
+        "detail": "header"
+      },
+      {
+        "kind": "file-preserve",
+        "target": "explicit-invalid",
+        "detail": "unchanged"
+      }
+    ]
+  },
+  "input_hash": "sha256:d39f9b5619c7160ad5fecb9618956414d4d95a7639e7b7c082ebb8e5167d3289",
+  "observation_hash": "sha256:79e7d83bedc0009fd792a136aa2389b2be3cef00456f4a834e0b35dac2412a55",
+  "execution_method": "node --experimental-strip-types parity/oracle/session-persistence.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/session-manager.ts"
+  }
+}

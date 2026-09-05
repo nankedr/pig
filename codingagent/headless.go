@@ -27,25 +27,24 @@ type HeadlessOutcome struct {
 	Canceled     bool
 }
 
-// CreateHeadlessSessionOptions is the narrow M1 product assembly surface. It
-// intentionally contains no settings, trust, resource, credential-store, or
-// persistence inputs.
+// CreateHeadlessSessionOptions contains the explicit Headless product inputs.
 type CreateHeadlessSessionOptions struct {
-	CWD          string
-	Provider     ai.ProviderID
-	Model        string
-	APIKey       *string
-	Environment  ai.ProviderEnv
-	BaseURL      *string
-	Thinking     agent.ThinkingLevel
-	Tools        []string
-	ExcludeTools []string
-	NoTools      NoToolsMode
-	SystemPrompt *string
+	CWD            string
+	Provider       ai.ProviderID
+	Model          string
+	APIKey         *string
+	Environment    ai.ProviderEnv
+	BaseURL        *string
+	Thinking       agent.ThinkingLevel
+	Tools          []string
+	ExcludeTools   []string
+	NoTools        NoToolsMode
+	SystemPrompt   *string
+	SessionManager *SessionManager
 }
 
-// CreateHeadlessSession assembles a pure in-memory AgentSession from explicit
-// M1 inputs and the fixed built-in Provider catalog.
+// CreateHeadlessSession assembles an AgentSession from explicit inputs and the
+// fixed built-in Provider catalog.
 func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOptions) (*AgentSessionRuntime, error) {
 	if ctx == nil {
 		return nil, fmt.Errorf("CreateHeadlessSession context must not be nil")
@@ -99,6 +98,13 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		}
 		return models.StreamSimple(runContext, requestModel, input, ai.ModelsSimpleStreamOptions{SimpleStreamOptions: streamOptions})
 	}
+	manager := options.SessionManager
+	if manager == nil {
+		manager, err = NewSessionManager(options.CWD, nil)
+		if err != nil {
+			return nil, err
+		}
+	}
 	created, err := CreateAgentSession(ctx, CreateAgentSessionOptions{
 		CWD:            options.CWD,
 		Model:          &model,
@@ -108,7 +114,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		ExcludeTools:   options.ExcludeTools,
 		NoTools:        options.NoTools,
 		AgentTools:     availableTools,
-		SessionManager: NewInMemorySessionManager(options.CWD),
+		SessionManager: manager,
 	})
 	if err != nil {
 		return nil, err

@@ -1442,7 +1442,8 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 	const (
-		headlessProcessHash = "sha256:175b8a0125ca5c84835a80986815c751b32454d313e514dffe03afb8a1f67c9f"
+		headlessProcessHash = "sha256:f0c26458070ac2ff1c89393991ab14834564f15dc512f0a073c90a8378fed80f"
+		sessionProcessHash  = "sha256:a47c1ca79073e8a07ca4853ecef36d700711bbb5ad473be3b8501af4d7d3bbc1"
 		exactResultsHash    = "sha256:f2830b602eb2c667d64a799c5bd558b93c8d9e405b1d72651f17616943c5785c"
 		runtimeTestHash     = "sha256:d4cf309c1b8e8a4f68a3478c6e73ebdeb931842cfe4a47c65aa21c559e0bc6fe"
 	)
@@ -1455,7 +1456,7 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 	switch entry.ID {
 	case "symbol:codingagent/src/main.ts#main":
 		entry.Status = catalog.StatusPartial
-		entry.Evidence = append(evidence(
+		entry.Evidence = append(append(evidence(
 			"cmd/pig/headless_process_test.go#TestPigProcessRunsHeadlessTextWithExplicitDeepSeekInputs",
 			"issue56-codingagent-main-headless-text", headlessProcessHash,
 			"go test ./cmd/pig -run '^TestPigProcess' -count=1",
@@ -1469,12 +1470,19 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 			"the real pig --mode json process emits a v3 Session header followed by ordered projected events while stdin remains prompt input",
 			"PASS; JSONL was session-first, every event was parseable and ordered, cumulative partial snapshots were absent, and piped JSON remained literal prompt text",
 			"darwin/linux",
+		)...), evidence(
+			"cmd/pig/issue71_process_test.go#TestPigProcessesPersistAndReopenExplicitSessionPath",
+			"issue71-codingagent-main-session-persistence", sessionProcessHash,
+			"go test ./cmd/pig -run '^TestPig(ProcessesPersistAndReopenExplicitSessionPath|NoSessionDoesNotCreatePigState|ExplicitPiSessionDoesNotMigrateAdjacentPiState)$' -count=1",
+			"real pig processes create and reopen Pig-owned v3 Sessions while explicit memory remains side-effect-free and explicit Pi files do not migrate adjacent state",
+			"PASS; a second process received prior history, appended without duplication, --no-session wrote no state, and explicit Pi state remained untouched",
+			"darwin/linux",
 		)...)
 		entry.Partial = &catalog.Partial{
-			Supported:   []string{"Headless text and one-way session-first JSON dispatch accept explicit Provider, exact model, API key or DEEPSEEK_API_KEY, prompt arguments or stdin, and an in-memory Session"},
-			Unsupported: []string{"interactive, RPC, persistence, resource, extension, and broader Provider assembly remain exact Capability Stubs"},
+			Supported:   []string{"Headless text and one-way session-first JSON dispatch accept explicit Provider, exact model, API key or DEEPSEEK_API_KEY, prompt arguments or stdin, default Pig-owned v3 persistence, explicit-path reopen, and explicit memory"},
+			Unsupported: []string{"interactive, RPC, continue/recent lookup, fork, resource, extension, and broader Provider assembly remain exact Capability Stubs"},
 		}
-		entry.Notes = "Issues #56 and #57 promote the pinned main entrypoint for real Headless text and session-first JSONL without activating later state, resource, extension, interactive, or RPC capabilities."
+		entry.Notes = "Issues #56 and #57 promote the pinned main entrypoint for real Headless text and session-first JSONL. Issue #71 adds Pig-owned v3 persistence and explicit reopen without migrating Pi state; later resource, extension, interactive, RPC, continue, and fork capabilities remain deferred."
 	case "symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent":
 		entry.Status = catalog.StatusImplemented
 		entry.Evidence = evidence(
@@ -1756,13 +1764,14 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				Supported: []string{
 					"callers can inject a model, narrow Provider or StreamFunction, and executable Agent Tools into a pure in-memory AgentSession",
 					"text and read Tool continuation, AgentSession event bridging, in-memory transcript append, cancellation, settlement, disposal, header identity, and nil SessionFile are implemented",
+					"callers can inject a persisted v3 SessionManager, reopen its history in a new runtime, and continue without rewriting prior entries",
 				},
 				Unsupported: []string{
-					"ambient model, credential, settings, trust, resource, package, and persisted-session assembly remain explicit Capability Stubs",
+					"ambient model, credential, settings, trust, resource, and package assembly remain explicit Capability Stubs",
 					"queues, extension ToolDefinition execution, branches, compaction, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
 				},
 			},
-			Notes: "Issue #55 delivers the narrow M1 Go SDK AgentSession slice without activating M3 persistence or M7 extension execution. Session event listeners are ordered barriers, agent_settled follows transcript updates, and creation plus execution perform no ambient disk writes.",
+			Notes: "Issue #55 delivers the narrow M1 Go SDK AgentSession slice and issue #71 adds explicit M3 v3 persistence injection and reopen. Session event listeners are ordered barriers, agent_settled follows transcript updates, and in-memory creation plus execution perform no ambient disk writes.",
 		},
 		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32ReadToolCatalogID,
@@ -1814,13 +1823,14 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				Supported: []string{
 					"newline-delimited session records preserve every syntactically valid raw JSON value while projecting recognized v3 headers, message discriminators, and session entries",
 					"branch lookup, latest-compaction context reconstruction, model and thinking-level recovery, defensive snapshots, and side-effect-free in-memory v3 sessions with owned message append are implemented",
+					"filesystem-backed create and explicit-path open persist v3 headers, model and thinking changes, messages, ToolResults, failures, cancellation outcomes, and parent chains with Pi-compatible first-write timing and append-only reopen",
 				},
 				Unsupported: []string{
-					"filesystem-backed create, open, continue, fork, session-file assignment, append persistence, branch mutation, and persistence remain explicit Capability Stubs",
-					"tree and child traversal plus end-to-end resume and fork persistence semantics remain explicit Capability Stubs",
+					"continue/recent lookup, fork, session-file reassignment, and branch mutation remain explicit Capability Stubs",
+					"tree and child traversal plus end-to-end continue and fork persistence semantics remain explicit Capability Stubs",
 				},
 			},
-			Notes: "Behavior owner for production Coding Agent v3 JSONL parsing and in-memory session projection. The implemented read path remains separate from Harness v4; filesystem persistence, resume, fork, and mutation are not claimed.",
+			Notes: "Behavior owner for production Coding Agent v3 JSONL parsing, append-only persistence, explicit reopen, and in-memory projection. Issue #71 verifies the highest public CLI and Go SDK boundaries against the fixed Pi baseline; continue, fork, tree, and later mutations remain unclaimed.",
 		},
 		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32MigrationCatalogID,
@@ -1841,17 +1851,22 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	var descriptors []issue32ModuleEvidenceDescriptor
 	switch catalogID {
 	case issue32AgentSessionID:
-		descriptors = []issue32ModuleEvidenceDescriptor{{
-			InputPath: "codingagent/agent_session_runtime_test.go",
-			Evidence: catalog.Evidence{
+		descriptors = []issue32ModuleEvidenceDescriptor{
+			{InputPath: "codingagent/agent_session_runtime_test.go", Evidence: catalog.Evidence{
 				Kind: "go-test", Ref: "codingagent/agent_session_runtime_test.go#TestCreateAgentSessionRunsTextRoundAndSettlesAfterTranscriptUpdate", Baseline: issue32BaselineCommit,
 				CaseID:          "issue55-codingagent-in-memory-agent-session",
 				ExecutionMethod: "go test -race ./codingagent -run '^(TestCreateAgentSessionRunsTextRoundAndSettlesAfterTranscriptUpdate|TestCreateAgentSessionRunsReadContinuationWithInjectedProviderAndTool|TestAgentSessionAbortRequestsCancellationAndWaitForIdleObservesSettledTranscript|TestAgentSessionAbortIsSafeFromSynchronousListeners|TestAgentSessionDisposeCancelsWithoutDroppingActiveTranscript|TestAgentSessionUnsupportedPromptOptionsAreExactInertStubs|TestCreateAgentSessionNoToolsModesMatchPublicSelectionContract|TestSessionManagerAppendMessageBuildsInMemoryOwnedChain|TestSDKInMemorySessionInjectionFields|TestAgentSessionExactOperationStubsAreInert)$' -count=1",
 				Expected:        "the public Go SDK constructs a side-effect-free in-memory session from injected model, Provider or stream, and Tool dependencies; bridges ordered events; publishes agent_settled after transcript updates; and settles abort and disposal without activating later capabilities",
 				Actual:          "PASS; text and real read continuation completed through CreateAgentSession, transcript and identity remained in memory, cancellation settled deterministically under the race detector, and later operations retained structured stubs",
 				Platform:        "any", CatalogID: catalogID,
-			},
-		}}
+			}},
+			{InputPath: "codingagent/issue71_session_persistence_test.go", Evidence: catalog.Evidence{
+				Kind: catalog.MatrixEvidenceGoTest, Ref: "codingagent/issue71_session_persistence_test.go#TestCreateAgentSessionReopensPersistedHistoryWithoutDuplicatingIt", Baseline: issue32BaselineCommit,
+				CaseID: "issue71-codingagent-persisted-agent-session", ExecutionMethod: "go test ./codingagent -run '^(TestCreateAgentSessionReopensPersistedHistoryWithoutDuplicatingIt|TestPersistedAgentSessionKeepsProviderFailureAndReportsStorageFailure)$' -count=1",
+				Expected: "a new public SDK runtime reopens persisted history without duplicate entries and preserves Provider failure, cancellation, cleanup, and observable storage-failure outcomes",
+				Actual:   "PASS; the second runtime sent prior history to the Provider, appended one new round, retained partial terminal outcomes, and returned persistence errors without claiming a stored file", Platform: "any", CatalogID: catalogID,
+			}},
+		}
 	case issue32ReadToolCatalogID:
 		const (
 			inputHash       = "sha256:f4f006f254b90ce868c7f6440fca8c5cef7595f18a1e404fc80200abd4d5117d"
@@ -1917,7 +1932,9 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = []issue32ModuleEvidenceDescriptor{
 			{InputPath: "codingagent/session_parse_final_review_test.go", Evidence: catalog.Evidence{Kind: "go-test", Ref: "codingagent/session_parse_final_review_test.go#TestParseSessionEntriesPreservesEverySyntacticallyValidRecord", Baseline: issue32BaselineCommit, CaseID: "issue32-codingagent-v3-jsonl-forward-compatible-read", ExecutionMethod: "go test ./codingagent -run '^(TestParseSessionEntriesPreservesEverySyntacticallyValidRecord|TestParseSessionEntriesNormalizesMissingAndNullBuiltInMessageContent|TestSessionManagerGetBranchDistinguishesOmittedAndInvalidLeafIDs|TestSessionManagerTreeOperationsAreExplicitCapabilityStubs)$' -count=1", Expected: "the v3 read path retains syntactically valid raw JSON, projects known records, distinguishes branch selection states, and reports unimplemented tree operations explicitly", Actual: "PASS; valid records remained lossless, known message content normalized, branch reads selected the intended path, and tree operations returned structured ErrNotImplemented", Platform: "any", CatalogID: catalogID}},
 			{InputPath: "codingagent/session_test.go", Evidence: catalog.Evidence{Kind: "go-test", Ref: "codingagent/session_test.go#TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings", Baseline: issue32BaselineCommit, CaseID: "issue32-codingagent-v3-jsonl-context-projection", ExecutionMethod: "go test ./codingagent -run '^(TestParseSessionEntriesDecodesV3MessageDiscriminators|TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings|TestSessionCarriersDefensivelyCopyNestedMutableValues)$' -count=1", Expected: "recognized v3 messages decode into typed carriers and context projection uses the latest compaction while retaining full-path model and thinking settings with defensive ownership", Actual: "PASS; v3 messages decoded, latest-compaction context and settings were reconstructed, and mutable carrier values did not alias inputs or getters", Platform: "any", CatalogID: catalogID}},
-			{InputPath: "codingagent/session_contract_review_test.go", Evidence: catalog.Evidence{Kind: "go-test", Ref: "codingagent/session_contract_review_test.go#TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers", Baseline: issue32BaselineCommit, CaseID: "issue32-codingagent-v3-jsonl-in-memory-boundary", ExecutionMethod: "go test ./codingagent -run '^(TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers|TestSessionManagerAppendMessageBuildsInMemoryOwnedChain|TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects)$' -count=1", Expected: "in-memory managers create complete distinct v3 headers and owned message chains without persistence, while filesystem-backed or later mutation methods return structured ErrNotImplemented without side effects", Actual: "PASS; in-memory headers and message parent chains were complete and defensively owned while all covered filesystem-backed or later mutation operations remained inert Capability Stubs", Platform: "any", CatalogID: catalogID}},
+			{InputPath: "codingagent/session_contract_review_test.go", Evidence: catalog.Evidence{Kind: "go-test", Ref: "codingagent/session_contract_review_test.go#TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers", Baseline: issue32BaselineCommit, CaseID: "issue32-codingagent-v3-jsonl-in-memory-boundary", ExecutionMethod: "go test ./codingagent -run '^(TestNewInMemorySessionManagerBuildsCompleteUniqueV3Headers|TestSessionManagerAppendMessageBuildsInMemoryOwnedChain|TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects)$' -count=1", Expected: "in-memory managers create complete distinct v3 headers and owned message chains without persistence, while later mutation methods return structured ErrNotImplemented without side effects", Actual: "PASS; in-memory headers and message parent chains were complete and defensively owned while all covered later mutation operations remained inert Capability Stubs", Platform: "any", CatalogID: catalogID}},
+			{InputPath: "parity/oracle/fixtures/session-persistence.json", Evidence: catalog.Evidence{Kind: catalog.MatrixEvidenceOracle, Ref: "parity/oracle/fixtures/session-persistence.json", Baseline: issue32BaselineCommit, CaseID: "go-sdk/codingagent/session-persistence", ExecutionMethod: "node --experimental-strip-types parity/oracle/session-persistence.mjs <locked-pi-checkout>", Expected: "the locked Pi SessionManager establishes first-write timing, v3 metadata and message parent chains, explicit reopen append, memory mode, and explicit empty/invalid path behavior", Actual: "PASS; locked Pi produced observation sha256:79e7d83bedc0009fd792a136aa2389b2be3cef00456f4a834e0b35dac2412a55", Platform: "any", CatalogID: catalogID}},
+			{InputPath: "parity/oracle/fixtures/session-persistence.json", Evidence: catalog.Evidence{Kind: catalog.MatrixEvidenceGoTest, Ref: "internal/parity/session_persistence_test.go#TestSessionPersistenceParity", Baseline: issue32BaselineCommit, CaseID: "go-sdk/codingagent/session-persistence", ExecutionMethod: "go test ./internal/parity -run '^TestSessionPersistenceParity$' -count=1", Expected: "Pig's public SessionManager observation matches the fixed Pi fixture without semantic normalization", Actual: "PASS; Pig matched observation sha256:79e7d83bedc0009fd792a136aa2389b2be3cef00456f4a834e0b35dac2412a55", Platform: "any", CatalogID: catalogID}},
 		}
 	case issue32MigrationCatalogID:
 		descriptors = []issue32ModuleEvidenceDescriptor{{
@@ -2011,8 +2028,8 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 				Baseline:        issue32BaselineCommit,
 				CaseID:          "issue32-codingagent-static-factory-projections",
 				ExecutionMethod: "go test ./codingagent -run '^(TestStaticFactoryProjectionsAreInertCapabilityStubs|TestNewInMemorySessionManagerRemainsFunctional|TestStaticFactorySupportingCarriersPreserveAbsence)$' -count=1",
-				Expected:        "all 14 static-member package-function projections have exact signatures; 13 deferred factories return zero values and structured ErrNotImplemented without dependencies, callbacks, transports, or host I/O, while the in-memory session factory remains functional and side-effect-free",
-				Actual:          "PASS; all 14 static factory signatures matched, 13 deferred factories were inert structured capability stubs, and NewInMemorySessionManager remained functional without persistence",
+				Expected:        "all 14 static-member package-function projections have exact signatures; 11 deferred factories return zero values and structured ErrNotImplemented without dependencies, callbacks, transports, or host I/O, while create, open, and in-memory Session factories remain functional",
+				Actual:          "PASS; all 14 static factory signatures matched, 11 deferred factories were inert structured capability stubs, and the three implemented SessionManager factories remained functional",
 				Platform:        "any",
 				CatalogID:       issue32ModuleCatalogID,
 			},
@@ -2071,6 +2088,15 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 				Actual:          "PASS; local DeepSeek text used explicit and ambient credentials, stdout contained only the final Assistant text, failures stayed stable, and SIGINT exited 130",
 				Platform:        "darwin/linux",
 				CatalogID:       issue32ModuleCatalogID,
+			},
+		},
+		{
+			InputPath: "cmd/pig/issue71_process_test.go",
+			Evidence: catalog.Evidence{
+				Kind: catalog.MatrixEvidenceGoTest, Ref: "cmd/pig/issue71_process_test.go#TestPigProcessesPersistAndReopenExplicitSessionPath", Baseline: issue32BaselineCommit,
+				CaseID: "issue71-codingagent-session-persistence-product-path", ExecutionMethod: "go test ./cmd/pig -run '^TestPig(ProcessesPersistAndReopenExplicitSessionPath|NoSessionDoesNotCreatePigState)$' -count=1",
+				Expected: "two real pig processes persist and reopen one explicit v3 Session while --no-session creates no Pig state",
+				Actual:   "PASS; the second process sent the first round to the Provider, appended without duplicate records, and explicit memory mode left Pig state absent", Platform: "darwin/linux", CatalogID: issue32ModuleCatalogID,
 			},
 		},
 		{
@@ -2189,17 +2215,18 @@ func issue32ModulePartial() *catalog.Partial {
 			"the public Go SDK runs an injected in-memory AgentSession for text and read Tool continuation with deterministic lifecycle events",
 			"the real pig process runs Headless text with explicit DeepSeek model and credentials, final-text stdout, stable errors, and SIGINT exit 130",
 			"the real pig process runs one-way session-first Headless JSONL with projected ordered events for text, Tool, Provider error, and cancellation",
+			"public SDK and real pig processes create, append, reopen, and continue v3 Sessions while explicit --no-session remains side-effect-free",
 			"Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects",
 		},
 		Unsupported: []string{
-			"persisted sessions, settings, resources, packages, remaining tools, ambient model/auth assembly, interactive mode, and RPC remain explicit Capability Stubs until their roadmap milestones",
+			"continue/recent lookup, fork, settings, resources, packages, remaining tools, ambient model/auth assembly, interactive mode, and RPC remain explicit Capability Stubs until their roadmap milestones",
 			"surface tests prove API coverage and target resolution, not runtime parity",
 		},
 	}
 }
 
 func issue32ModuleNotes() string {
-	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, issue #55 adds the injected in-memory legacy AgentSession, and issues #56/#57 add the real Headless text and session-first JSONL product paths; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
+	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, issue #55 adds the injected in-memory legacy AgentSession, issues #56/#57 add real Headless text and session-first JSONL, and issue #71 adds Pig-owned v3 create/open persistence; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
 }
 
 var issue32NameExceptions = map[string]string{

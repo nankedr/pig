@@ -32,8 +32,8 @@ Options:
   --print, -p                    Run the Headless text mode, process prompts, and exit
   --continue, -c                 Continue previous session
   --resume, -r                   Select a session to resume
-  --session <path|id>            Use specific session file or partial UUID
-  --session-id <id>              Use exact project session ID, creating it if missing
+  --session <path>               Reopen a specific v3 session file
+  --session-id <id>              Use an exact ID for a new session
   --fork <path|id>               Fork specific session file or partial UUID into a new session
   --session-dir <dir>            Directory for session storage and lookup
   --no-session                   Don't save session (ephemeral)
@@ -68,15 +68,15 @@ Options:
 
 Modes:
   interactive  text mode with terminal stdin and stdout; not implemented
-  print        --print or non-terminal stdin/stdout; implemented with an in-memory Session
+  print        --print or non-terminal stdin/stdout; persisted v3 Session by default
   json         --mode json; one-way session-first newline-delimited JSON events
   rpc          --mode rpc; not implemented (reserved for a local JSONL subprocess interface)
 
 Current Headless Availability:
   Requires --provider deepseek and an exact --model ID. Credentials come from
-  --api-key or DEEPSEEK_API_KEY. The read Tool is available; other built-in
-  Tools, persisted Sessions, resources, extensions, and RPC remain explicit
-  Capability Stubs. Text output contains only final Assistant text. JSON output
+  --api-key or DEEPSEEK_API_KEY. The read Tool and v3 Session create/open are
+  available; other built-in Tools, continue/fork, resources, extensions, and RPC
+  remain explicit Capability Stubs. Text output contains only final Assistant text. JSON output
   writes a v3 Session header followed by AgentSessionEvent records, one value per
   line; stdin is prompt input, not RPC commands. SIGINT exits 130.
 
@@ -94,6 +94,10 @@ Examples:
   # Run Headless text with the standard DeepSeek environment credential
   export DEEPSEEK_API_KEY=...
   pig --provider deepseek --model deepseek-v4-flash -p "Explain this package"
+
+  # Reopen a prior v3 Session, or opt out of persistence
+  pig --provider deepseek --model deepseek-v4-flash --session ./session.jsonl -p "Continue"
+  pig --provider deepseek --model deepseek-v4-flash --no-session -p "Do not save this"
 
   # Supply the prompt on stdin (non-terminal I/O selects Headless text)
   printf 'Summarize go.mod' | pig --provider deepseek --model deepseek-v4-flash

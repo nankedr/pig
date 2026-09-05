@@ -80,6 +80,9 @@ func issue57PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 		case "cmd-pig":
 			found[entry.ID] = true
 			entry.Evidence = issue56UpsertEvidence(entry.Evidence, issue57Evidence(t, entry.ID, "cmd/pig/headless_process_test.go#TestPigProcessStreamsSessionFirstHeadlessJSON", "issue57-pig-session-first-json", "the real pig --mode json process writes a v3 Session header followed by parseable ordered AgentSessionEvent records for text, Tool, Provider-error, and cancellation flows", "PASS; the real process matched the normalized JSONL golden, preserved event ordering and projection, encoded Provider failure in-band with exit 0, and completed cancellation with exit 130"))
+			if issue71HasEvidence(entry.Evidence) {
+				break
+			}
 			entry.Partial = &catalog.Partial{
 				Supported: []string{
 					"the public product entry and real pig process expose Pig-branded root and subcommand help plus version with exact stream and exit behavior",
@@ -95,6 +98,9 @@ func issue57PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 		case "contract:cli/pig/args":
 			found[entry.ID] = true
 			entry.Evidence = issue56UpsertEvidence(entry.Evidence, issue57Evidence(t, entry.ID, "cmd/pig/headless_process_test.go#TestPigProcessTreatsPipedJSONAsPromptNotRPCCommand", "issue57-pig-json-cli-contract", "--mode json selects one-way output and treats piped JSON as literal prompt input while --mode rpc remains unavailable", "PASS; piped JSON reached the Provider as user text and the RPC route retained its exact codingagent.mode.rpc Capability Stub"))
+			if issue71HasEvidence(entry.Evidence) {
+				break
+			}
 			entry.Partial = &catalog.Partial{
 				Supported: []string{
 					"Pig-branded command and subcommand help snapshots plus an exact routing matrix for every advertised flag and alias, effective mode, package/auth form, one-shot operation, Extension Surface form, recoverable warning, and distinct argument-error boundary",
@@ -122,6 +128,9 @@ func issue57PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 		case "contract:codingagent/headless":
 			found[entry.ID] = true
 			entry.Evidence = issue56UpsertEvidence(entry.Evidence, issue57Evidence(t, entry.ID, "cmd/pig/headless_process_test.go#TestPigProcessStreamsSessionFirstHeadlessJSON", "issue57-headless-json-boundary", "the shared Headless lifecycle presents a one-way session-first JSONL stream with formal event projection and complete terminal events", "PASS; text, read Tool, Provider-error, piped-prompt, and SIGINT process cases produced the expected JSONL records and exit states"))
+			if issue71HasEvidence(entry.Evidence) {
+				break
+			}
 			entry.Partial = &catalog.Partial{
 				Supported:   []string{"reusable in-memory Headless prompt lifecycle, final outcome inspection, text presentation, session-first JSONL event presentation, Provider errors, and cancellation"},
 				Unsupported: []string{"image inputs remain deferred to M12"},
@@ -137,6 +146,15 @@ func issue57PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 	}
 	sort.Slice(entries, func(i, j int) bool { return entries[i].ID < entries[j].ID })
 	return entries
+}
+
+func issue71HasEvidence(evidence []catalog.Evidence) bool {
+	for _, item := range evidence {
+		if strings.HasPrefix(item.CaseID, "issue71-") {
+			return true
+		}
+	}
+	return false
 }
 
 func issue57Evidence(t *testing.T, catalogID, ref, caseID, expected, actual string) catalog.Evidence {

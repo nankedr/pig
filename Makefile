@@ -14,6 +14,7 @@ m0-offline:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build ./...
 	go run ./examples/m0-contracts
 	go run ./examples/sdk-agent-session
+	go run ./examples/session-persistence
 	go run ./examples/headless-text
 	go run ./examples/headless-json
 	go run ./examples/thinking-signatures
@@ -46,6 +47,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/telemetry.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/message-handoff.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/context-overflow.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/session-persistence.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/codingagent-auth-help.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-m0-no-op.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-text.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

@@ -69,7 +69,7 @@ func TestDeepSeekLiveHeadlessReadContinuation(t *testing.T) {
 		t.Fatal(err)
 	}
 	runtime, err := codingagent.CreateHeadlessSession(ctx, codingagent.CreateHeadlessSessionOptions{
-		CWD: cwd, Provider: ai.ProviderIDDeepSeek, Model: "deepseek-v4-flash", Environment: environment, Tools: []string{"read"},
+		CWD: cwd, Provider: ai.ProviderIDDeepSeek, Model: "deepseek-v4-flash", Environment: environment, Tools: []string{"read"}, SessionManager: codingagent.NewInMemorySessionManager(cwd),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -85,6 +85,9 @@ func TestDeepSeekLiveHeadlessReadContinuation(t *testing.T) {
 
 func runLiveHeadless(t *testing.T, ctx context.Context, options codingagent.CreateHeadlessSessionOptions, prompt string) codingagent.HeadlessOutcome {
 	t.Helper()
+	if options.SessionManager == nil {
+		options.SessionManager = codingagent.NewInMemorySessionManager(options.CWD)
+	}
 	runtime, err := codingagent.CreateHeadlessSession(ctx, options)
 	if err != nil {
 		t.Fatal(err)

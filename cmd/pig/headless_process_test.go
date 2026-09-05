@@ -41,6 +41,7 @@ func TestPigProcessRunsHeadlessTextWithExplicitDeepSeekInputs(t *testing.T) {
 		"--provider", "deepseek",
 		"--model", "deepseek-v4-flash",
 		"--api-key", "explicit-test-key",
+		"--no-session",
 		"--print", "say hello",
 	)
 	command.Env = append(filteredEnvironment(os.Environ(), "DEEPSEEK_API_KEY", "PIG_DEEPSEEK_BASE_URL"), "PIG_DEEPSEEK_BASE_URL="+server.URL)
@@ -87,6 +88,7 @@ func TestPigProcessStreamsSessionFirstHeadlessJSON(t *testing.T) {
 		"--provider", "deepseek",
 		"--model", "deepseek-v4-flash",
 		"--api-key", "json-test-key",
+		"--no-session",
 		"say hello",
 	)
 	command.Env = append(os.Environ(), "PIG_DEEPSEEK_BASE_URL="+server.URL)
@@ -174,6 +176,7 @@ func TestPigProcessStreamsHeadlessJSONToolContinuation(t *testing.T) {
 		"--model", "deepseek-v4-flash",
 		"--api-key", "json-tool-key",
 		"--tools", "read",
+		"--no-session",
 		"read sentinel.txt",
 	)
 	command.Dir = cwd
@@ -229,6 +232,7 @@ func TestPigProcessStreamsHeadlessJSONProviderError(t *testing.T) {
 		"--provider", "deepseek",
 		"--model", "deepseek-v4-flash",
 		"--api-key", "json-error-key",
+		"--no-session",
 		"fail",
 	)
 	command.Env = append(os.Environ(), "PIG_DEEPSEEK_BASE_URL="+server.URL)
@@ -280,6 +284,7 @@ func TestPigProcessTreatsPipedJSONAsPromptNotRPCCommand(t *testing.T) {
 		"--provider", "deepseek",
 		"--model", "deepseek-v4-flash",
 		"--api-key", "json-stdin-key",
+		"--no-session",
 	)
 	command.Env = append(os.Environ(), "PIG_DEEPSEEK_BASE_URL="+server.URL)
 	command.Stdin = strings.NewReader(input + "\n")
@@ -313,7 +318,7 @@ func TestPigProcessUsesStandardDeepSeekAPIKey(t *testing.T) {
 	}))
 	defer server.Close()
 
-	command := exec.Command(buildPigBinary(t), "--provider", "deepseek", "--model", "deepseek-v4-flash", "-p", "hello")
+	command := exec.Command(buildPigBinary(t), "--provider", "deepseek", "--model", "deepseek-v4-flash", "--no-session", "-p", "hello")
 	command.Env = append(os.Environ(), "PIG_DEEPSEEK_BASE_URL="+server.URL, "DEEPSEEK_API_KEY=ambient-test-key")
 	output, err := command.CombinedOutput()
 	if err != nil {
@@ -333,10 +338,9 @@ func TestPigProcessReportsStableHeadlessFailures(t *testing.T) {
 	}{
 		{name: "missing provider", arguments: []string{"-p", "hello"}, want: "Error: Headless mode requires --provider <provider>\n"},
 		{name: "JSON missing provider", arguments: []string{"--mode", "json", "hello"}, want: "Error: Headless mode requires --provider <provider>\n"},
-		{name: "unknown provider", arguments: []string{"--provider", "unknown", "--model", "model", "-p", "hello"}, want: "Error: Unknown provider \"unknown\"\n"},
-		{name: "provider error", arguments: []string{"--provider", "deepseek", "--model", "deepseek-v4-flash", "-p", "hello"}, want: "auth: Provider is not configured: deepseek\n"},
+		{name: "unknown provider", arguments: []string{"--provider", "unknown", "--model", "model", "--no-session", "-p", "hello"}, want: "Error: Unknown provider \"unknown\"\n"},
+		{name: "provider error", arguments: []string{"--provider", "deepseek", "--model", "deepseek-v4-flash", "--no-session", "-p", "hello"}, want: "auth: Provider is not configured: deepseek\n"},
 		{name: "rpc stub", arguments: []string{"--mode", "rpc", "--provider", "deepseek", "--model", "deepseek-v4-flash"}, want: "codingagent.mode.rpc: not implemented\n"},
-		{name: "persistent session stub", arguments: []string{"--provider", "deepseek", "--model", "deepseek-v4-flash", "--session", "old.jsonl", "-p", "hello"}, want: "codingagent.headless.session-persistence: not implemented\n"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -375,7 +379,7 @@ func TestPigProcessSIGINTCancelsHeadlessRun(t *testing.T) {
 	}))
 	defer server.Close()
 
-	command := exec.Command(buildPigBinary(t), "--provider", "deepseek", "--model", "deepseek-v4-flash", "--api-key", "signal-key", "-p", "hello")
+	command := exec.Command(buildPigBinary(t), "--provider", "deepseek", "--model", "deepseek-v4-flash", "--api-key", "signal-key", "--no-session", "-p", "hello")
 	command.Env = append(os.Environ(), "PIG_DEEPSEEK_BASE_URL="+server.URL)
 	var stdout, stderr bytes.Buffer
 	command.Stdout = &stdout
@@ -425,6 +429,7 @@ func TestPigProcessSIGINTCompletesHeadlessJSONStream(t *testing.T) {
 		"--provider", "deepseek",
 		"--model", "deepseek-v4-flash",
 		"--api-key", "json-signal-key",
+		"--no-session",
 		"hello",
 	)
 	command.Env = append(os.Environ(), "PIG_DEEPSEEK_BASE_URL="+server.URL)
