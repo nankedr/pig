@@ -112,9 +112,49 @@ func (*KeybindingsManager) Reload() error {
 	return notImplemented("KeybindingsManager.Reload")
 }
 
-// ConvertToLLM reuses the established Agent transcript projection.
+// ConvertToLLM projects persisted Coding Agent messages into Provider input.
 func ConvertToLLM(messages []agent.AgentMessage) []ai.Message {
-	return agent.ConvertToLLM(messages)
+	out := []ai.Message{}
+	for _, message := range messages {
+		if raw, ok := message.(interface{ RawJSON() json.RawMessage }); ok {
+			switch message.MessageRole() {
+			case "custom":
+				var value agent.CustomMessage
+				if json.Unmarshal(raw.RawJSON(), &value) == nil {
+					message = value
+				}
+			case "branchSummary":
+				var value agent.BranchSummaryMessage
+				if json.Unmarshal(raw.RawJSON(), &value) == nil {
+					message = value
+				}
+			case "compactionSummary":
+				var value agent.CompactionSummaryMessage
+				if json.Unmarshal(raw.RawJSON(), &value) == nil {
+					message = value
+				}
+			case "bashExecution":
+				var value agent.BashExecutionMessage
+				if json.Unmarshal(raw.RawJSON(), &value) == nil {
+					fields, _ := decodeJSONObject(raw.RawJSON())
+					value.ExitCodeSet = len(fields["exitCode"]) != 0 && string(fields["exitCode"]) != "null"
+					message = value
+				}
+			}
+		}
+		for _, converted := range agent.ConvertToLLM([]agent.AgentMessage{message}) {
+			if user, ok := converted.(ai.UserMessage); ok {
+				if _, builtin := message.(ai.Message); !builtin {
+					if text, ok := user.Content.Text(); ok {
+						user.Content = ai.UserBlocks(ai.TextContent{Type: ai.ContentTypeText, Text: text})
+					}
+					converted = user
+				}
+			}
+			out = append(out, converted)
+		}
+	}
+	return out
 }
 
 type ExtensionUIDialogOptions struct {

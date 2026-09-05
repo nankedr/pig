@@ -1,6 +1,7 @@
 package codingagent
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -271,18 +272,16 @@ func ForkSessionManager(source, cwd string, dir *string, options ...NewSessionOp
 	if err != nil {
 		return nil, err
 	}
-	data, err := os.ReadFile(path)
-	if err != nil {
+	records, _, err := loadSessionFile(path)
+	if err != nil || len(records) == 0 || records[0].Header == nil {
 		return nil, fmt.Errorf("Cannot fork: source session file is empty or invalid: %s", path)
 	}
-	records := ParseSessionEntries(string(data))
-	if len(records) == 0 || records[0].Header == nil {
+	fields, _ := decodeJSONObject(records[0].Raw)
+	_, validID := decodeJSONField[string](fields, "id")
+	if !validID || bytes.Equal(bytes.TrimSpace(fields["id"]), []byte("null")) {
 		return nil, fmt.Errorf("Cannot fork: source session file is empty or invalid: %s", path)
 	}
-	sourceManager, err := OpenSessionManager(path, nil, nil)
-	if err != nil {
-		return nil, err
-	}
+	MigrateSessionEntries(records)
 	option := NewSessionOptions{}
 	if len(options) > 0 {
 		option = options[0]
@@ -292,17 +291,30 @@ func ForkSessionManager(source, cwd string, dir *string, options ...NewSessionOp
 	if err != nil {
 		return nil, err
 	}
-	next.entries = sourceManager.GetEntries()
-	next.leafID = sourceManager.GetLeafID()
-	encoded, err := encodeSessionFile(next.header, next.entries)
+	header, err := json.Marshal(next.header)
 	if err != nil {
 		return nil, err
+	}
+	var encoded bytes.Buffer
+	encoded.Write(header)
+	encoded.WriteByte('\n')
+	for _, record := range records[1:] {
+		if record.Header != nil {
+			continue
+		}
+		encoded.Write(record.Raw)
+		encoded.WriteByte('\n')
+		if record.Entry != nil {
+			entry := cloneSessionEntry(*record.Entry)
+			next.entries = append(next.entries, entry)
+			next.leafID = cloneStringPointer(&entry.ID)
+		}
 	}
 	file, err := os.OpenFile(next.sessionFile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
 	}
-	_, writeErr := file.Write(encoded)
+	_, writeErr := file.Write(encoded.Bytes())
 	closeErr := file.Close()
 	if writeErr != nil || closeErr != nil {
 		_ = os.Remove(next.sessionFile)

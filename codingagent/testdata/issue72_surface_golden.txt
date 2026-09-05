@@ -1,0 +1,82 @@
+type codingagent.SessionHeader struct
+fields:
+- Type string tag="json:\"type\""
+- Version *int tag="json:\"version,omitempty\""
+- ID string tag="json:\"id\""
+- Timestamp string tag="json:\"timestamp\""
+- CWD string tag="json:\"cwd\""
+- ParentSession *string tag="json:\"parentSession,omitempty\""
+
+type codingagent.SessionEntry struct
+fields:
+- SessionEntryBase codingagent.SessionEntryBase tag=""
+- Raw json.RawMessage tag="json:\"-\""
+- Message agent.AgentMessage tag=""
+- ThinkingLevel string tag=""
+- Provider string tag=""
+- ModelID string tag=""
+- Summary string tag=""
+- FirstKeptEntryID string tag=""
+- TokensBefore int64 tag=""
+- FromID string tag=""
+- CustomType string tag=""
+- Data json.RawMessage tag=""
+- Content interface {} tag=""
+- Details json.RawMessage tag=""
+- Display bool tag=""
+- TargetID string tag=""
+- Label *string tag=""
+- Name *string tag=""
+- Usage *ai.Usage tag=""
+- FromHook *bool tag=""
+
+type codingagent.FileEntry struct
+fields:
+- Type string tag=""
+- ID string tag=""
+- Timestamp string tag=""
+- Header *codingagent.SessionHeader tag=""
+- Entry *codingagent.SessionEntry tag=""
+- Raw json.RawMessage tag="json:\"-\""
+
+type codingagent.SessionContext struct
+fields:
+- Messages []agent.AgentMessage tag=""
+- ThinkingLevel string tag=""
+- Model *codingagent.SessionModel tag=""
+
+func codingagent.ConvertToLLM func([]agent.AgentMessage) []ai.Message
+
+func codingagent.OpenSessionManager func(string, *string, *string) (*codingagent.SessionManager, error)
+
+func codingagent.MigrateSessionEntries func([]codingagent.FileEntry)
+
+method agent.CustomMessage.CloneAgentMessage func(agent.CustomMessage) agent.AgentMessage
+
+method agent.BranchSummaryMessage.CloneAgentMessage func(agent.BranchSummaryMessage) agent.AgentMessage
+
+method agent.CompactionSummaryMessage.CloneAgentMessage func(agent.CompactionSummaryMessage) agent.AgentMessage
+
+method codingagent.SessionManager.AppendMessage func(*codingagent.SessionManager, agent.AgentMessage) (string, error)
+
+method codingagent.SessionManager.GetEntries func(*codingagent.SessionManager) []codingagent.SessionEntry
+
+method codingagent.SessionManager.GetEntry func(*codingagent.SessionManager, string) *codingagent.SessionEntry
+
+method codingagent.SessionManager.GetLabel func(*codingagent.SessionManager, string) *string
+
+method codingagent.SessionManager.GetSessionName func(*codingagent.SessionManager) *string
+
+method codingagent.SessionManager.GetBranch func(*codingagent.SessionManager, ...string) []codingagent.SessionEntry
+
+method codingagent.SessionManager.BuildContextEntries func(*codingagent.SessionManager) []codingagent.SessionEntry
+
+method codingagent.SessionManager.BuildSessionContext func(*codingagent.SessionManager) codingagent.SessionContext
+
+method codingagent.SessionManager.GetHeader func(*codingagent.SessionManager) *codingagent.SessionHeader
+
+method codingagent.SessionManager.GetSessionFile func(*codingagent.SessionManager) *string
+
+method codingagent.SessionManager.IsPersisted func(*codingagent.SessionManager) bool
+
+method codingagent.SessionManager.UsesDefaultSessionDir func(*codingagent.SessionManager) bool

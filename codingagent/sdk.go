@@ -89,6 +89,9 @@ func CreateAgentSession(_ context.Context, options ...CreateAgentSessionOptions)
 			Tools:         tools,
 			Messages:      sessionContext.Messages,
 		},
+		ConvertToLLM: func(_ context.Context, messages []agent.AgentMessage) ([]ai.Message, error) {
+			return ConvertToLLM(messages), nil
+		},
 		StreamFunction: stream,
 		SessionID:      manager.GetSessionID(),
 	})

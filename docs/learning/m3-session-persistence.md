@@ -4,7 +4,7 @@ Pig 的 Headless CLI 默认创建生产 v3 Session。默认目录是 `~/.pig/age
 
 ## 创建与首次写入
 
-`NewSessionManager` 先确定 Session ID 和目标路径，但不会立刻创建 JSONL 文件。model、thinking 和首条 user 消息先保留在内存；第一条 Assistant 消息（包括 error 或 aborted 的部分结果）到达时，writer 用排他创建一次写入 header 和已有 entry。之后每个 entry 只追加一行。显式打开空文件会立即写入 header；非空且不是 v3 Session 的文件会报错并保持原内容。
+`NewSessionManager` 先确定 Session ID 和目标路径，但不会立刻创建 JSONL 文件。model、thinking 和首条 user 消息先保留在内存；第一条 Assistant 消息（包括 error 或 aborted 的部分结果）到达时，writer 用排他创建一次写入 header 和已有 entry。之后每个 entry 只追加一行。显式打开空文件会立即写入 header；非空非法 Session 会报错并保持原内容。M3.2 已支持 v1/v2 原地迁移，详见[历史 Session 恢复](m3-session-interop.md)。
 
 每条 entry 都包含 ID、时间戳和 `parentId`。正式 writer 覆盖 `model_change`、`thinking_level_change` 与 Agent message；ToolResult 作为 message 持久化。Provider 失败、取消和清理不会丢掉已经形成的 Assistant outcome。磁盘写入失败会返回可观察错误，内存 outcome 仍可检查，但不会伪报已持久化。
 
@@ -16,7 +16,7 @@ Pig 的 Headless CLI 默认创建生产 v3 Session。默认目录是 `~/.pig/age
 pig --provider deepseek --model deepseek-v4-flash --session ./session.jsonl -p "Continue"
 ```
 
-`OpenSessionManager` 从 header 恢复工作目录，从 model/thinking entry 恢复设置，并把 message 历史交给新 Agent runtime。打开本身不重写历史；下一轮只追加新 entry。显式传入一个 Pi v3 Session 文件只授权读写该文件，不触发 Pi 状态、trust 或凭证迁移。
+`OpenSessionManager` 从 header 恢复工作目录，从 model/thinking entry 恢复设置，并把 message 历史交给新 Agent runtime。打开已有 v3 本身不重写历史；v1/v2 会在打开时迁移写回。下一轮只追加新 entry。显式传入一个 Pi v3 Session 文件只授权读写该文件，不触发 Pi 状态、trust 或凭证迁移。
 
 无需文件时使用：
 

@@ -1821,6 +1821,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Status:   catalog.StatusPartial, Milestone: "M3", Classification: "public-api",
 			Partial: &catalog.Partial{
 				Supported: []string{
+					"Issue #72: streaming explicit historical v1/v2/v3 opens, immediate lossless v3 migration rewrite, registered entry and label restoration, compaction/branch context, and formal Pi/Pig bidirectional fixtures",
 					"newline-delimited session records preserve every syntactically valid raw JSON value while projecting recognized v3 headers, message discriminators, and session entries",
 					"branch lookup, latest-compaction context reconstruction, model and thinking-level recovery, defensive snapshots, and side-effect-free in-memory v3 sessions with owned message append are implemented",
 					"filesystem-backed create and explicit-path open persist v3 headers, model and thinking changes, messages, ToolResults, failures, cancellation outcomes, and parent chains with Pi-compatible first-write timing and append-only reopen",
@@ -1831,14 +1832,14 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 					"AgentSession tree navigation and automatic branch summaries remain M4; extension callbacks and interactive selection retain their later milestone boundaries",
 				},
 			},
-			Notes: "Behavior owner for production Coding Agent v3 JSONL parsing, append-only persistence, explicit reopen, and in-memory projection. Issue #71 verifies the highest public CLI and Go SDK boundaries against the fixed Pi baseline; Issue #73 adds discovery, continue, fork, tree and label persistence; AgentSession tree orchestration remains M4.",
+			Notes: "Behavior owner for production Coding Agent v3 JSONL parsing, append-only persistence, explicit reopen, and in-memory projection. Issue #71 verifies the highest public CLI and Go SDK boundaries against the fixed Pi baseline; Issue #73 adds discovery, continue, fork, tree and label persistence; AgentSession tree orchestration remains M4. Issue #72 adds historical file recovery and bidirectional production reader/writer interoperability; no fixed line/file/entry-count limits are imposed.",
 		},
 		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32MigrationCatalogID,
 			Upstream: catalog.Upstream{Module: "coding-agent", Repository: repository, Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/session-manager.ts#migrateSessionEntries"},
 			Mapping:  catalog.Mapping{Module: "codingagent", Target: issue32GoPackage, Kind: "contract"},
-			Status:   catalog.StatusImplemented, Milestone: "M3", Classification: "public-api",
-			Notes: "Behavior owner for production Coding Agent session data migration. In-memory v1 records upgrade to v3 with generated IDs, parent chains, and compaction first-kept references; v2 hookMessage records become custom-role messages without rewriting an existing tree. This does not perform filesystem, credential, trust, layout, or CLI migration.",
+			Status:   catalog.StatusVerified, Milestone: "M3", Classification: "public-api",
+			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
 	for index := range entries {
@@ -1946,6 +1947,7 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	default:
 		t.Fatalf("unknown behavior owner %q", catalogID)
 	}
+	descriptors = append(descriptors, issue72SessionEvidence(t, catalogID)...)
 	for index := range descriptors {
 		inputHash := issue32FileHash(t, descriptors[index].InputPath)
 		if descriptors[index].PinnedInputHash != "" {

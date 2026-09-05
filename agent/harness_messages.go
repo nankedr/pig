@@ -30,33 +30,43 @@ type BashExecutionMessage struct {
 func (m BashExecutionMessage) MessageRole() ai.MessageRole { return m.Role }
 
 type CustomMessage struct {
-	Role       ai.MessageRole
-	CustomType string
-	Content    ai.UserMessageContent
-	Display    bool
-	Details    ai.Optional[ai.JSONValue]
-	Timestamp  int64
+	Role       ai.MessageRole            `json:"role"`
+	CustomType string                    `json:"customType"`
+	Content    ai.UserMessageContent     `json:"content"`
+	Display    bool                      `json:"display"`
+	Details    ai.Optional[ai.JSONValue] `json:"details,omitzero"`
+	Timestamp  int64                     `json:"timestamp"`
 }
 
 func (m CustomMessage) MessageRole() ai.MessageRole { return m.Role }
 
-type BranchSummaryMessage struct {
-	Role      ai.MessageRole
-	Summary   string
-	FromID    string
-	Timestamp int64
+func (m CustomMessage) CloneAgentMessage() AgentMessage {
+	m.Content = cloneUserMessage(ai.UserMessage{Role: ai.MessageRoleUser, Content: m.Content}).Content
+	if details, ok := m.Details.Value(); ok {
+		m.Details = ai.Some[ai.JSONValue](cloneJSONValue(details))
+	}
+	return m
 }
 
-func (m BranchSummaryMessage) MessageRole() ai.MessageRole { return m.Role }
+type BranchSummaryMessage struct {
+	Role      ai.MessageRole `json:"role"`
+	Summary   string         `json:"summary"`
+	FromID    string         `json:"fromId"`
+	Timestamp int64          `json:"timestamp"`
+}
+
+func (m BranchSummaryMessage) MessageRole() ai.MessageRole     { return m.Role }
+func (m BranchSummaryMessage) CloneAgentMessage() AgentMessage { return m }
 
 type CompactionSummaryMessage struct {
-	Role         ai.MessageRole
-	Summary      string
-	TokensBefore int64
-	Timestamp    int64
+	Role         ai.MessageRole `json:"role"`
+	Summary      string         `json:"summary"`
+	TokensBefore int64          `json:"tokensBefore"`
+	Timestamp    int64          `json:"timestamp"`
 }
 
-func (m CompactionSummaryMessage) MessageRole() ai.MessageRole { return m.Role }
+func (m CompactionSummaryMessage) MessageRole() ai.MessageRole     { return m.Role }
+func (m CompactionSummaryMessage) CloneAgentMessage() AgentMessage { return m }
 
 func BashExecutionToText(message BashExecutionMessage) string {
 	var result strings.Builder

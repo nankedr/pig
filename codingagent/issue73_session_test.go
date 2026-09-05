@@ -115,3 +115,27 @@ func TestSessionDiscoveryKeepsLiteralNoMessagesFirstText(t *testing.T) {
 		t.Fatal(list, err)
 	}
 }
+
+func TestForkHistoricalSessionPreservesSource(t *testing.T) {
+	dir := t.TempDir()
+	source := filepath.Join(dir, "legacy.jsonl")
+	content := []byte("{\"type\":\"session\",\"version\":1,\"id\":\"legacy\",\"cwd\":\"/project\"}\n{\"type\":\"message\",\"message\":{\"role\":\"user\",\"content\":\"historical prompt\",\"timestamp\":1}}\n")
+	if err := os.WriteFile(source, content, 0600); err != nil {
+		t.Fatal(err)
+	}
+	fork, err := codingagent.ForkSessionManager(source, dir, &dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	after, err := os.ReadFile(source)
+	if err != nil || string(after) != string(content) {
+		t.Fatalf("fork rewrote historical source: %s %v", after, err)
+	}
+	reopened, err := codingagent.OpenSessionManager(*fork.GetSessionFile(), nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if *reopened.GetHeader().Version != 3 || len(reopened.BuildSessionContext().Messages) != 1 {
+		t.Fatal("fork lost migrated history")
+	}
+}

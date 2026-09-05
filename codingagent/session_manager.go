@@ -1,10 +1,12 @@
 package codingagent
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -219,24 +221,26 @@ func OpenSessionManager(path string, sessionDir, cwdOverride *string) (*SessionM
 	if err != nil {
 		return nil, fmt.Errorf("resolve session file: %w", err)
 	}
-	data, readErr := os.ReadFile(resolvedPath)
+	parsed, size, readErr := loadSessionFile(resolvedPath)
 	if readErr != nil && !os.IsNotExist(readErr) {
 		return nil, fmt.Errorf("read session file %q: %w", resolvedPath, readErr)
 	}
 
 	var header SessionHeader
 	var entries []SessionEntry
-	if readErr == nil && len(data) != 0 {
-		parsed := ParseSessionEntries(string(data))
+	migrated := false
+	if readErr == nil && size != 0 {
 		if len(parsed) == 0 {
 			return nil, fmt.Errorf("Session file is not a valid pi session: %s", resolvedPath)
 		}
 		headerFields, headerObject := decodeJSONObject(parsed[0].Raw)
 		_, hasStringID := decodeJSONField[string](headerFields, "id")
-		if !headerObject || !hasStringID || parsed[0].Header == nil || parsed[0].Header.Type != "session" ||
-			parsed[0].Header.Version == nil || *parsed[0].Header.Version != CurrentSessionVersion {
+		hasStringID = hasStringID && !bytes.Equal(bytes.TrimSpace(headerFields["id"]), []byte("null"))
+		if !headerObject || !hasStringID || parsed[0].Header == nil || parsed[0].Header.Type != "session" {
 			return nil, fmt.Errorf("Session file is not a valid pi session: %s", resolvedPath)
 		}
+		migrated = parsed[0].Header.Version == nil || *parsed[0].Header.Version < CurrentSessionVersion
+		MigrateSessionEntries(parsed)
 		header = cloneSessionHeader(*parsed[0].Header)
 		for _, item := range parsed[1:] {
 			if item.Entry != nil {
@@ -272,7 +276,7 @@ func OpenSessionManager(path string, sessionDir, cwdOverride *string) (*SessionM
 		return nil, fmt.Errorf("create session directory %q: %w", dir, err)
 	}
 
-	if readErr != nil || len(data) == 0 {
+	if readErr != nil || size == 0 {
 		manager := NewInMemorySessionManager(resolvedCWD)
 		manager.sessionDir = dir
 		manager.sessionFile = resolvedPath
@@ -293,8 +297,51 @@ func OpenSessionManager(path string, sessionDir, cwdOverride *string) (*SessionM
 		leaf := entries[len(entries)-1].ID
 		manager.leafID = &leaf
 	}
+	if migrated {
+		var data bytes.Buffer
+		for _, item := range parsed {
+			data.Write(item.Raw)
+			data.WriteByte('\n')
+		}
+		if err := os.WriteFile(resolvedPath, data.Bytes(), 0o600); err != nil {
+			return nil, fmt.Errorf("persist session %q: %w", resolvedPath, err)
+		}
+	}
 	return manager, nil
 }
+
+func loadSessionFile(path string) ([]FileEntry, int64, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return nil, 0, err
+	}
+	var entries []FileEntry
+	reader := bufio.NewReader(file)
+	for {
+		line, err := reader.ReadString('\n')
+		for _, entry := range ParseSessionEntries(line) {
+			if entry.Header == nil && entry.Entry == nil {
+				var value any
+				if json.Unmarshal(entry.Raw, &value) == nil && (value == nil || value == false || value == float64(0) || value == "") {
+					continue
+				}
+			}
+			entries = append(entries, entry)
+		}
+		if err == io.EOF {
+			return entries, info.Size(), nil
+		}
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+}
+
 func (m *SessionManager) GetCWD() string {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
@@ -877,6 +924,41 @@ func MigrateSessionEntries(entries []FileEntry) {
 	}
 	if version < 3 {
 		migrateSessionV2ToV3(entries)
+	}
+	for index := range entries {
+		item := &entries[index]
+		fields, ok := decodeJSONObject(item.Raw)
+		if !ok {
+			continue
+		}
+		if item.Header != nil {
+			fields["version"] = json.RawMessage("3")
+		} else if item.Entry != nil {
+			if version < 2 {
+				fields["id"], _ = json.Marshal(item.Entry.ID)
+				fields["parentId"], _ = json.Marshal(item.Entry.ParentID)
+				if item.Type == "compaction" {
+					if _, ok := decodeJSONField[float64](fields, "firstKeptEntryIndex"); ok {
+						delete(fields, "firstKeptEntryIndex")
+						if item.Entry.FirstKeptEntryID != "" {
+							fields["firstKeptEntryId"], _ = json.Marshal(item.Entry.FirstKeptEntryID)
+						}
+					}
+				}
+			}
+			if item.Type == "message" {
+				if message, ok := decodeJSONObject(fields["message"]); ok {
+					if role, _ := decodeJSONField[string](message, "role"); role == "hookMessage" {
+						message["role"] = json.RawMessage(`"custom"`)
+						fields["message"], _ = json.Marshal(message)
+					}
+				}
+			}
+		}
+		item.Raw, _ = json.Marshal(fields)
+		if item.Entry != nil {
+			item.Entry.Raw = cloneRawMessage(item.Raw)
+		}
 	}
 }
 

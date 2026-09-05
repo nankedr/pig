@@ -1,0 +1,330 @@
+{
+  "llmContext": [
+    {
+      "role": "user",
+      "content": "hi",
+      "timestamp": 1
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "continue"
+        }
+      ],
+      "timestamp": 5
+    },
+    {
+      "role": "assistant",
+      "api": "faux:1",
+      "provider": "faux",
+      "model": "faux-1",
+      "usage": {
+        "input": 6,
+        "output": 5,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "totalTokens": 11,
+        "cost": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 0
+        }
+      },
+      "stopReason": "stop",
+      "timestamp": 3,
+      "content": [
+        {
+          "type": "text",
+          "text": "continued history"
+        }
+      ]
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "typed custom"
+        }
+      ],
+      "timestamp": 6
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "explicit null"
+        }
+      ],
+      "timestamp": 7
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\ntyped branch summary</summary>"
+        }
+      ],
+      "timestamp": 8
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "The conversation history before this point was compacted into the following summary:\n\n<summary>\ntyped compaction summary\n</summary>"
+        }
+      ],
+      "timestamp": 9
+    }
+  ],
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "producer": "go run ./examples/session-interop <path>",
+  "consumer": "packages/coding-agent/src/core/session-manager.ts#SessionManager.open",
+  "normalization": "Generated entry IDs/references, entry timestamps and runtime user timestamp only",
+  "records": [
+    {
+      "cwd": "/project",
+      "futureHeader": {
+        "keep": true
+      },
+      "id": "pig-writer",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "type": "session",
+      "version": 3
+    },
+    {
+      "futureEntry": {
+        "keep": true
+      },
+      "id": "historical",
+      "message": {
+        "role": "user",
+        "content": "hi",
+        "timestamp": 1
+      },
+      "parentId": null,
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "type": "message"
+    },
+    {
+      "type": "thinking_level_change",
+      "id": "entry-1",
+      "parentId": "historical",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "thinkingLevel": "off"
+    },
+    {
+      "type": "message",
+      "id": "entry-2",
+      "parentId": "entry-1",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "continue"
+          }
+        ],
+        "timestamp": 5
+      }
+    },
+    {
+      "type": "message",
+      "id": "entry-3",
+      "parentId": "entry-2",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "message": {
+        "role": "assistant",
+        "api": "faux:1",
+        "provider": "faux",
+        "model": "faux-1",
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "totalTokens": 11,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        "stopReason": "stop",
+        "timestamp": 3,
+        "content": [
+          {
+            "type": "text",
+            "text": "continued history"
+          }
+        ]
+      }
+    },
+    {
+      "type": "message",
+      "id": "entry-4",
+      "parentId": "entry-3",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "message": {
+        "role": "custom",
+        "customType": "note",
+        "content": "typed custom",
+        "display": true,
+        "timestamp": 6
+      }
+    },
+    {
+      "type": "message",
+      "id": "entry-5",
+      "parentId": "entry-4",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "message": {
+        "role": "custom",
+        "customType": "null-details",
+        "content": "explicit null",
+        "display": false,
+        "details": null,
+        "timestamp": 7
+      }
+    },
+    {
+      "type": "message",
+      "id": "entry-6",
+      "parentId": "entry-5",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "message": {
+        "role": "branchSummary",
+        "summary": "typed branch summary",
+        "fromId": "historical",
+        "timestamp": 8
+      }
+    },
+    {
+      "type": "message",
+      "id": "entry-7",
+      "parentId": "entry-6",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "message": {
+        "role": "compactionSummary",
+        "summary": "typed compaction summary",
+        "tokensBefore": 9,
+        "timestamp": 9
+      }
+    },
+    {
+      "type": "message",
+      "id": "entry-8",
+      "parentId": "entry-7",
+      "timestamp": "2025-01-01T00:00:00.000Z",
+      "message": {
+        "role": "futureRole",
+        "payload": {
+          "keep": [
+            1,
+            2
+          ]
+        },
+        "timestamp": 4
+      }
+    }
+  ],
+  "context": {
+    "messages": [
+      {
+        "role": "user",
+        "content": "hi",
+        "timestamp": 1
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "continue"
+          }
+        ],
+        "timestamp": 5
+      },
+      {
+        "role": "assistant",
+        "api": "faux:1",
+        "provider": "faux",
+        "model": "faux-1",
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "totalTokens": 11,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        "stopReason": "stop",
+        "timestamp": 3,
+        "content": [
+          {
+            "type": "text",
+            "text": "continued history"
+          }
+        ]
+      },
+      {
+        "role": "custom",
+        "customType": "note",
+        "content": "typed custom",
+        "display": true,
+        "timestamp": 6
+      },
+      {
+        "role": "custom",
+        "customType": "null-details",
+        "content": "explicit null",
+        "display": false,
+        "details": null,
+        "timestamp": 7
+      },
+      {
+        "role": "branchSummary",
+        "summary": "typed branch summary",
+        "fromId": "historical",
+        "timestamp": 8
+      },
+      {
+        "role": "compactionSummary",
+        "summary": "typed compaction summary",
+        "tokensBefore": 9,
+        "timestamp": 9
+      },
+      {
+        "role": "futureRole",
+        "payload": {
+          "keep": [
+            1,
+            2
+          ]
+        },
+        "timestamp": 4
+      }
+    ],
+    "thinkingLevel": "off",
+    "model": {
+      "provider": "faux",
+      "modelId": "faux-1"
+    }
+  }
+}

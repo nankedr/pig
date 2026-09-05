@@ -16,6 +16,7 @@ m0-offline:
 	go run ./examples/sdk-agent-session
 	go run ./examples/session-navigation
 	go run ./examples/session-persistence
+	go run ./examples/session-interop
 	go run ./examples/headless-text
 	go run ./examples/headless-json
 	go run ./examples/thinking-signatures
@@ -51,6 +52,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/session-navigation.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-tree.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-persistence.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/session-interop.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/codingagent-auth-help.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-m0-no-op.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-text.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
