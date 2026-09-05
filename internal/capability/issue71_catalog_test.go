@@ -98,6 +98,7 @@ func issue71PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 			}
 			entry.Notes = "Issues #56 and #57 implement the reusable Headless lifecycle and text/JSON presentation. Issue #71 adds persisted create and reopen while retaining explicit memory injection; image inputs remain deferred to M12."
 		}
+		issue74ExtendProductEntry(t, entry)
 	}
 	for i := range entries {
 		entry := &entries[i]

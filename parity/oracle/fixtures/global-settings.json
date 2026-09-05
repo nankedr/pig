@@ -1,0 +1,187 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/settings-manager.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/global-settings",
+    "catalog_id": "contract:config/settings",
+    "surface": "go-sdk",
+    "input": {
+      "settings": {
+        "defaultProvider": "deepseek",
+        "defaultModel": "deepseek-v4-flash",
+        "defaultThinkingLevel": "high",
+        "sessionDir": "./saved-sessions",
+        "queueMode": "all",
+        "websockets": false,
+        "skills": {
+          "enableSkillCommands": false,
+          "customDirectories": [
+            "./skills"
+          ]
+        },
+        "retry": {
+          "maxDelayMs": 45000,
+          "provider": {
+            "timeoutMs": 30000
+          }
+        },
+        "packages": [
+          "npm:old"
+        ],
+        "future": {
+          "keep": [
+            1,
+            2
+          ]
+        }
+      },
+      "overrides": {
+        "retry": {
+          "provider": {
+            "maxRetries": 2
+          }
+        },
+        "packages": [],
+        "defaultModel": "temporary"
+      }
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "defaults": {
+        "compaction": {
+          "enabled": true,
+          "reserveTokens": 16384,
+          "keepRecentTokens": 20000
+        },
+        "retry": {
+          "enabled": true,
+          "maxRetries": 3,
+          "baseDelayMs": 2000
+        },
+        "providerRetry": {
+          "maxRetryDelayMs": 60000
+        },
+        "transport": "auto",
+        "steering": "one-at-a-time",
+        "trust": "ask",
+        "sessionDir": null
+      },
+      "migrated": {
+        "defaultProvider": "deepseek",
+        "defaultModel": "deepseek-v4-flash",
+        "defaultThinkingLevel": "high",
+        "sessionDir": "./saved-sessions",
+        "skills": [
+          "./skills"
+        ],
+        "retry": {
+          "provider": {
+            "timeoutMs": 30000,
+            "maxRetryDelayMs": 45000
+          }
+        },
+        "packages": [
+          "npm:old"
+        ],
+        "future": {
+          "keep": [
+            1,
+            2
+          ]
+        },
+        "steeringMode": "all",
+        "transport": "sse",
+        "enableSkillCommands": false
+      },
+      "overrides": {
+        "retry": {
+          "timeoutMs": 30000,
+          "maxRetries": 2,
+          "maxRetryDelayMs": 45000
+        },
+        "packages": [],
+        "model": "temporary",
+        "globalModel": "deepseek-v4-flash"
+      },
+      "saved": {
+        "defaultProvider": "deepseek",
+        "defaultModel": "deepseek-v4-flash",
+        "defaultThinkingLevel": "low",
+        "sessionDir": "./saved-sessions",
+        "skills": [
+          "./skills"
+        ],
+        "retry": {
+          "provider": {
+            "timeoutMs": 30000,
+            "maxRetries": 7,
+            "maxRetryDelayMs": 45000
+          },
+          "enabled": false
+        },
+        "packages": [],
+        "future": {
+          "keep": [
+            1,
+            2
+          ]
+        },
+        "steeringMode": "all",
+        "transport": "sse",
+        "enableSkillCommands": false
+      },
+      "reloaded": {
+        "retry": {
+          "timeoutMs": 30000,
+          "maxRetries": 7,
+          "maxRetryDelayMs": 45000
+        },
+        "model": "deepseek-v4-flash",
+        "thinking": "low",
+        "packages": []
+      },
+      "invalid": {
+        "retained": "deepseek-v4-flash",
+        "errors": [
+          "global"
+        ],
+        "drained": 0,
+        "preserved": true
+      },
+      "repaired": {
+        "defaultModel": "repaired",
+        "defaultProvider": "deepseek"
+      },
+      "memory": "seed",
+      "writeFailure": {
+        "model": "local",
+        "errors": [
+          "global"
+        ]
+      },
+      "globalOnly": true
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:a0734ab94caecba46bb4d21357ea7596cc6aa721676c751a68ff0a6ed5e69298",
+  "observation_hash": "sha256:f890779f5b63f82905b8cc36587e2afa98ae4f65df2815a695ad153803422596",
+  "execution_method": "node --experimental-strip-types parity/oracle/global-settings.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/settings-manager.ts"
+  }
+}

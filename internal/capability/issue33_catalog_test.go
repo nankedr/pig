@@ -203,6 +203,8 @@ func issue33EvidenceInputPaths(caseID string) []string {
 		return []string{"cmd/pig/issue72_process_test.go"}
 	case "issue71-headless-session-outcomes":
 		return []string{"codingagent/issue71_session_persistence_test.go"}
+	case "issue74-global-settings-startup":
+		return []string{"cmd/pig/issue74_process_test.go", "parity/oracle/fixtures/settings-startup.json"}
 	default:
 		return nil
 	}

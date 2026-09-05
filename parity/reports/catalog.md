@@ -11,9 +11,9 @@
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5170 |
+| inventoried | 5169 |
 | scaffolded | 4020 |
-| partial | 237 |
+| partial | 238 |
 | implemented | 54 |
 | verified | 167 |
 | deferred | 2 |
@@ -5448,7 +5448,6 @@
 | constructor:codingagent/src/modes/interactive/theme/theme.ts#Theme | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.Theme | coding-agent |
 | contract:config/auth-json | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:config/models-json | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
-| contract:config/settings | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:migration/auth-and-layout | inventoried | M5 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:rpc/command-union | inventoried | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:rpc/jsonl-transport | inventoried | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
@@ -8025,6 +8024,7 @@
 | contract:codingagent/compaction | partial | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
+| contract:config/settings | partial | M3 | contract | github.com/nankedr/pig/codingagent.SettingsManager | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |

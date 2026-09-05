@@ -482,8 +482,8 @@ func TestIssue32CatalogPromotionWritesCompleteClaimSpecificEvidence(t *testing.T
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(entries) != 10 {
-		t.Fatalf("written catalog entry count = %d, want 10", len(entries))
+	if len(entries) != 4 + len(staleBehaviorOwners) {
+		t.Fatalf("written catalog entry count = %d, want %d", len(entries), 4 + len(staleBehaviorOwners))
 	}
 	byID := make(map[string]catalog.Entry, len(entries))
 	for _, entry := range entries {
@@ -1444,7 +1444,7 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 	const (
 		headlessProcessHash = "sha256:f0c26458070ac2ff1c89393991ab14834564f15dc512f0a073c90a8378fed80f"
 		sessionProcessHash  = "sha256:a47c1ca79073e8a07ca4853ecef36d700711bbb5ad473be3b8501af4d7d3bbc1"
-		exactResultsHash    = "sha256:f2830b602eb2c667d64a799c5bd558b93c8d9e405b1d72651f17616943c5785c"
+		exactResultsHash    = "sha256:ce08293fc33a104302e5a26e4a11f2e2b46e3e57d469ae9ac58ac7fa6f6d5912"
 		runtimeTestHash     = "sha256:d4cf309c1b8e8a4f68a3478c6e73ebdeb931842cfe4a47c65aa21c559e0bc6fe"
 	)
 	evidence := func(ref, caseID, inputHash, run, expected, actual, platform string) []catalog.Evidence {
@@ -1546,6 +1546,8 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 
 func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/settings-manager.ts#"):
+		return issue74SettingsCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/agent-session.ts#"),
 		strings.HasPrefix(reference, issue32ReferencePrefix+"core/sdk.ts#createAgentSession"),
 		strings.HasPrefix(reference, issue32ReferencePrefix+"core/sdk.ts#CreateAgentSessionOptions"):
@@ -1842,6 +1844,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
+	entries = append(entries, issue74SettingsCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1852,6 +1855,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	t.Helper()
 	var descriptors []issue32ModuleEvidenceDescriptor
 	switch catalogID {
+	case issue74SettingsCatalogID:
+		descriptors = issue74SettingsEvidence(t)
 	case issue32AgentSessionID:
 		descriptors = []issue32ModuleEvidenceDescriptor{
 			{InputPath: "codingagent/agent_session_runtime_test.go", Evidence: catalog.Evidence{
@@ -2220,17 +2225,18 @@ func issue32ModulePartial() *catalog.Partial {
 			"the real pig process runs Headless text with explicit DeepSeek model and credentials, final-text stdout, stable errors, and SIGINT exit 130",
 			"the real pig process runs one-way session-first Headless JSONL with projected ordered events for text, Tool, Provider error, and cancellation",
 			"public SDK and real pig processes create, append, reopen, and continue v3 Sessions while explicit --no-session remains side-effect-free",
+			"global SettingsManager and Headless startup consume saved model/thinking and Session paths with locked saves and no project settings access",
 			"Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects",
 		},
 		Unsupported: []string{
-			"continue/recent lookup, fork, settings, resources, packages, remaining tools, ambient model/auth assembly, interactive mode, and RPC remain explicit Capability Stubs until their roadmap milestones",
+			"continue/recent lookup, fork, project settings, resources, packages, remaining tools, ambient model/auth assembly, interactive mode, and RPC remain explicit Capability Stubs until their roadmap milestones",
 			"surface tests prove API coverage and target resolution, not runtime parity",
 		},
 	}
 }
 
 func issue32ModuleNotes() string {
-	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, issue #55 adds the injected in-memory legacy AgentSession, issues #56/#57 add real Headless text and session-first JSONL, and issue #71 adds Pig-owned v3 create/open persistence; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
+	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, issue #55 adds the injected in-memory legacy AgentSession, issues #56/#57 add real Headless text and session-first JSONL, issue #71 adds Pig-owned v3 create/open persistence, and issue #74 adds global settings-driven Headless startup; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
 }
 
 var issue32NameExceptions = map[string]string{

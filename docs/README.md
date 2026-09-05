@@ -2,7 +2,7 @@
 
 Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学习与证据”组织。阅读代码或设计任务前，先确认固定 Parity Baseline 和当前 Milestone Frontier。
 
-当前 Milestone Frontier：**M3**。M3.1 的 Session 创建、持久化与重开见 [v3 Session 持久化](learning/m3-session-persistence.md) 和 [源码导航](mappings/typescript-to-go/m3-session-persistence.md)；M2/v0.2.0 的公共行为与证据边界见 [M2 集成与冻结](learning/m2-freeze.md) 和 [M2 源码导航](mappings/typescript-to-go/m2-freeze.md)；M1 首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)。
+当前 Milestone Frontier：**M3**。M3.4 的全局 settings 驱动启动见 [全局设置](learning/m3-global-settings.md) 和 [源码导航](mappings/typescript-to-go/m3-global-settings.md)。M3.1 的 Session 创建、持久化与重开见 [v3 Session 持久化](learning/m3-session-persistence.md) 和 [源码导航](mappings/typescript-to-go/m3-session-persistence.md)；M2/v0.2.0 的公共行为与证据边界见 [M2 集成与冻结](learning/m2-freeze.md) 和 [M2 源码导航](mappings/typescript-to-go/m2-freeze.md)；M1 首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)。
 
 ## 首次阅读
 

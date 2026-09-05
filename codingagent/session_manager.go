@@ -718,8 +718,12 @@ func resolveSessionDir(cwd string, explicit *string) (string, bool, error) {
 	if err != nil {
 		return "", false, err
 	}
+	return defaultSessionDir(cwd, agentDir), true, nil
+}
+
+func defaultSessionDir(cwd, agentDir string) string {
 	safe := strings.NewReplacer("/", "-", `\`, "-", ":", "-").Replace(strings.TrimLeft(cwd, `/\`))
-	return filepath.Join(agentDir, "sessions", "--"+safe+"--"), true, nil
+	return filepath.Join(agentDir, "sessions", "--"+safe+"--")
 }
 
 func resolveSessionPath(path string) (string, error) {

@@ -35,7 +35,9 @@ func TestBranchSummarySettingsCarrier(t *testing.T) {
 	if result != (BranchSummarySettings{}) {
 		t.Fatalf("GetBranchSummarySettings result = %#v, want zero BranchSummarySettings", result)
 	}
-	assertExactResultsNotImplemented(t, err, "SettingsManager.GetBranchSummarySettings")
+	if err == nil {
+		t.Fatal("uninitialized settings succeeded")
+	}
 }
 
 func TestSettingsManagerHTTPIdleTimeoutMSUsesCanonicalGoSpelling(t *testing.T) {
@@ -47,8 +49,12 @@ func TestSettingsManagerHTTPIdleTimeoutMSUsesCanonicalGoSpelling(t *testing.T) {
 		t.Fatal("SettingsManager exposes misspelled SetHTTPIDleTimeoutMS")
 	}
 	_, err := (SettingsManager{}).GetHTTPIdleTimeoutMS()
-	assertExactResultsNotImplemented(t, err, "SettingsManager.GetHTTPIdleTimeoutMS")
-	assertExactResultsNotImplemented(t, (SettingsManager{}).SetHTTPIdleTimeoutMS(0), "SettingsManager.SetHTTPIdleTimeoutMS")
+	if err == nil {
+		t.Fatal("uninitialized settings succeeded")
+	}
+	if (SettingsManager{}).SetHTTPIdleTimeoutMS(0) == nil {
+		t.Fatal("uninitialized settings save succeeded")
+	}
 }
 
 func TestLatestReleaseCarrier(t *testing.T) {

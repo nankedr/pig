@@ -374,21 +374,53 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	if operation := unsupportedHeadlessOperation(parsed); operation != "" {
 		return notImplemented(operation)
 	}
-	if parsed.Provider == nil || strings.TrimSpace(*parsed.Provider) == "" {
-		return &CLIArgumentError{Message: "Headless mode requires --provider <provider>"}
+	messages := append([]string(nil), parsed.Messages...)
+	var initialMessage *string
+	stdin, stdinErr := readHeadlessStdin()
+	if stdinErr != nil {
+		return fmt.Errorf("read stdin: %w", stdinErr)
 	}
-	if parsed.Model == nil || strings.TrimSpace(*parsed.Model) == "" {
-		return &CLIArgumentError{Message: "Headless mode requires --model <model>"}
+	if stdin != "" || len(messages) != 0 {
+		initial := stdin
+		if len(messages) != 0 {
+			initial += messages[0]
+			messages = messages[1:]
+		}
+		initialMessage = &initial
 	}
+	if initialMessage == nil {
+		return &CLIArgumentError{Message: "Headless mode requires a prompt"}
+	}
+
 	cwd, cwdErr := os.Getwd()
 	if cwdErr != nil {
 		return fmt.Errorf("resolve working directory: %w", cwdErr)
+	}
+	settings, err := NewSettingsManager(cwd, nil)
+	if err != nil {
+		return err
+	}
+	diagnostics, err := settings.DrainErrors()
+	if err != nil {
+		return err
+	}
+	for _, diagnostic := range diagnostics {
+		fmt.Fprintln(os.Stderr, diagnostic)
 	}
 	var sessionDir *string
 	if parsed.SessionDir != nil {
 		sessionDir = parsed.SessionDir
 	} else if value := strings.TrimSpace(os.Getenv("PIG_CODING_AGENT_SESSION_DIR")); value != "" {
 		sessionDir = &value
+	}
+	if sessionDir == nil {
+		value, err := settings.GetSessionDir()
+		if err != nil {
+			return err
+		}
+		if value != "" {
+			sessionDir = &value
+		}
 	}
 	option := NewSessionOptions{}
 	if parsed.SessionID != nil {
@@ -408,25 +440,13 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		}
 	}
 
-	messages := append([]string(nil), parsed.Messages...)
-	var initialMessage *string
-	stdin, stdinErr := readHeadlessStdin()
-	if stdinErr != nil {
-		return fmt.Errorf("read stdin: %w", stdinErr)
-	}
-	if stdin != "" || len(messages) != 0 {
-		initial := stdin
-		if len(messages) != 0 {
-			initial += messages[0]
-			messages = messages[1:]
+	environment := ai.ProviderEnv{}
+	for _, entry := range os.Environ() {
+		key, value, ok := strings.Cut(entry, "=")
+		if ok {
+			environment[key] = value
 		}
-		initialMessage = &initial
 	}
-	if initialMessage == nil {
-		return &CLIArgumentError{Message: "Headless mode requires a prompt"}
-	}
-
-	environment := ai.ProviderEnv{"DEEPSEEK_API_KEY": os.Getenv("DEEPSEEK_API_KEY")}
 	var baseURL *string
 	if value := os.Getenv("PIG_DEEPSEEK_BASE_URL"); value != "" {
 		baseURL = &value
@@ -438,18 +458,19 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		noTools = NoToolsBuiltin
 	}
 	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
-		CWD:            cwd,
-		Provider:       ai.ProviderID(*parsed.Provider),
-		Model:          *parsed.Model,
-		APIKey:         parsed.APIKey,
-		Environment:    environment,
-		BaseURL:        baseURL,
-		Thinking:       parsed.Thinking,
-		Tools:          parsed.Tools,
-		ExcludeTools:   parsed.ExcludeTools,
-		NoTools:        noTools,
-		SystemPrompt:   parsed.SystemPrompt,
-		SessionManager: manager,
+		CWD:             cwd,
+		Provider:        ai.ProviderID(optionalHeadlessString(parsed.Provider)),
+		Model:           optionalHeadlessString(parsed.Model),
+		APIKey:          parsed.APIKey,
+		Environment:     environment,
+		BaseURL:         baseURL,
+		Thinking:        parsed.Thinking,
+		Tools:           parsed.Tools,
+		ExcludeTools:    parsed.ExcludeTools,
+		NoTools:         noTools,
+		SystemPrompt:    parsed.SystemPrompt,
+		SessionManager:  manager,
+		SettingsManager: settings,
 	})
 	if err != nil {
 		return err
@@ -576,4 +597,11 @@ func FormatDimensionNote(result ResizedImage) *string {
 
 func GetShellConfig(...string) (ShellConfig, error) {
 	return ShellConfig{}, notImplemented("GetShellConfig")
+}
+
+func optionalHeadlessString(value *string) string {
+	if value == nil {
+		return ""
+	}
+	return *value
 }

@@ -1,12 +1,14 @@
 # Pig
 
-Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口；当前 M3 已支持 v3 Session 创建、持久化和显式路径重开。
+Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口；当前 M3 已支持 v3 Session 创建、持久化、显式路径重开和全局 settings 驱动的 Headless 启动。
 
 - [文档导航](docs/README.md)
 - [M2 集成与冻结](docs/learning/m2-freeze.md)
 - [M2 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-freeze.md)
 - [v0.2.0 发布说明](docs/releases/v0.2.0.md)
 - [M1 Headless text 与 JSON](docs/learning/m1-headless-text.md)
+- [M3.4 全局设置](docs/learning/m3-global-settings.md)
+- [M3.4 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m3-global-settings.md)
 - [M3.1 v3 Session 持久化](docs/learning/m3-session-persistence.md)
 - [M3.1 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m3-session-persistence.md)
 - [M1 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m1-headless-text.md)
@@ -37,6 +39,7 @@ go run ./cmd/pig --provider deepseek --model deepseek-v4-flash --mode json "Expl
 ```sh
 go run ./examples/headless-json
 go run ./examples/session-persistence
+go run ./examples/global-settings
 ```
 
 ```sh
