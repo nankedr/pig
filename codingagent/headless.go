@@ -97,9 +97,17 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	}
 	availableTools = append(availableTools, readTool)
 	for _, name := range options.Tools {
-		if name != "read" {
+		if name != "read" && name != "write" {
 			return nil, notImplemented("tool." + name)
 		}
+	}
+
+	if containsTool(options.Tools, "write", false) {
+		writeTool, err := CreateWriteTool(options.CWD)
+		if err != nil {
+			return nil, err
+		}
+		availableTools = append(availableTools, writeTool)
 	}
 
 	stream := func(runContext context.Context, requestModel ai.Model, input ai.Context, streamOptions ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
@@ -164,11 +172,15 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		CWD:           options.CWD,
 		SelectedTools: activeTools,
 		ToolSnippets: map[string]string{
-			"read": "Read file contents",
+			"read":  "Read file contents",
+			"write": "Create or overwrite files",
 		},
 	}
 	if containsTool(activeTools, "read", false) {
 		promptOptions.PromptGuidelines = []string{"Use read to examine files instead of cat or sed."}
+	}
+	if containsTool(activeTools, "write", false) {
+		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, "Use write only for new files or complete rewrites.")
 	}
 	if options.SystemPrompt != nil {
 		promptOptions.CustomPrompt = *options.SystemPrompt

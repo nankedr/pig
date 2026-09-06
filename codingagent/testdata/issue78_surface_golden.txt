@@ -1,0 +1,31 @@
+type codingagent.WriteToolInput
+- Path string ""
+- Content string ""
+type codingagent.WriteToolOptions
+- Operations codingagent.WriteOperations ""
+type codingagent.ToolDefinition
+- ConstrainedSampling ai.ConstrainedSampling ""
+- Description string ""
+- Execute codingagent.ToolExecuteFunc ""
+- ExecutionMode agent.ToolExecutionMode ""
+- Label string ""
+- Name string ""
+- Parameters json.RawMessage ""
+- PrepareArguments codingagent.ExtensionHandler ""
+- PromptGuidelines []string ""
+- PromptSnippet string ""
+- RenderCall codingagent.ExtensionHandler ""
+- RenderResult codingagent.ExtensionHandler ""
+- RenderShell string ""
+func(string, ...codingagent.WriteToolOptions) (agent.ErasedAgentTool, error)
+func(string, ...codingagent.WriteToolOptions) (codingagent.ToolDefinition, error)
+codingagent.ToolExecuteFunc
+func(context.Context, string, func(context.Context) (string, error)) (string, error)
+Execute input 0 context.Context
+Execute input 1 string
+Execute input 2 interface {}
+Execute input 3 agent.AgentToolUpdateCallback[interface {}]
+Execute output 0 agent.AgentToolResult[interface {}]
+Execute output 1 error
+method Mkdir func(context.Context, string) error
+method WriteFile func(context.Context, string, []uint8) error

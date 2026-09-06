@@ -1548,6 +1548,8 @@ func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/trust-manager.ts#"), reference == issue32ReferencePrefix+"core/resource-loader.ts#loadProjectContextFiles":
 		return issue75TrustCatalogID
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/write.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/file-mutation-queue.ts#"):
+		return issue78WriteCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/settings-manager.ts#"):
 		return issue74SettingsCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/agent-session.ts#"),
@@ -1846,7 +1848,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1859,6 +1861,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	switch catalogID {
 	case issue75TrustCatalogID:
 		descriptors = issue75TrustEvidence(t)
+	case issue78WriteCatalogID:
+		descriptors = issue78WriteEvidence(t)
 	case issue74SettingsCatalogID:
 		descriptors = issue74SettingsEvidence(t)
 	case issue32AgentSessionID:
@@ -2127,20 +2131,6 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 			},
 		},
 		{
-			InputPath: "codingagent/tools_review_test.go",
-			Evidence: catalog.Evidence{
-				Kind:            "go-test",
-				Ref:             "codingagent/tools_review_test.go#TestWithFileMutationQueueIsCapabilityStub",
-				Baseline:        issue32BaselineCommit,
-				CaseID:          "issue32-codingagent-file-mutation-queue-stub",
-				ExecutionMethod: "go test ./codingagent -run '^TestWithFileMutationQueueIsCapabilityStub$' -count=1",
-				Expected:        "WithFileMutationQueue returns the generic zero value and a structured codingagent.WithFileMutationQueue ErrNotImplemented without inspecting the invalid path or invoking the callback",
-				Actual:          "PASS; WithFileMutationQueue returned the zero value and structured ErrNotImplemented without inspecting an invalid-NUL path or invoking the callback",
-				Platform:        "any",
-				CatalogID:       issue32ModuleCatalogID,
-			},
-		},
-		{
 			InputPath: "codingagent/extensions_abi_final_review_test.go",
 			Evidence: catalog.Evidence{
 				Kind:            "go-test",
@@ -2226,6 +2216,7 @@ func issue32ModulePartial() *catalog.Partial {
 		Supported: []string{
 			"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings",
 			"the public Go SDK runs an injected in-memory AgentSession for text and read Tool continuation with deterministic lifecycle events",
+			"issue #78 adds explicit write/read continuation and shared per-file mutation queues under contract:codingagent/write-tool",
 			"the real pig process runs Headless text with explicit DeepSeek model and credentials, final-text stdout, stable errors, and SIGINT exit 130",
 			"the real pig process runs one-way session-first Headless JSONL with projected ordered events for text, Tool, Provider error, and cancellation",
 			"public SDK and real pig processes create, append, reopen, and continue v3 Sessions while explicit --no-session remains side-effect-free",
@@ -2240,7 +2231,7 @@ func issue32ModulePartial() *catalog.Partial {
 }
 
 func issue32ModuleNotes() string {
-	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, issue #55 adds the injected in-memory legacy AgentSession, issues #56/#57 add real Headless text and session-first JSONL, issue #71 adds Pig-owned v3 create/open persistence, issue #74 adds global settings-driven Headless startup, and issue #75 adds Project Trust and gated project settings with the Context File exception; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
+	return "Issue #32 maps all 376 symbols, 2,172 instance/type members, 14 static members, and 38 constructors across root and ./client into the canonical Go codingagent package. The public text read Tool is live under contract:codingagent/read-tool, issue #55 adds the injected in-memory legacy AgentSession, issues #56/#57 add real Headless text and session-first JSONL, issue #71 adds Pig-owned v3 create/open persistence, issue #74 adds global settings-driven Headless startup, and issue #75 adds Project Trust and gated project settings with the Context File exception, and issue #78 adds explicit write/read continuation and per-file mutation queues; the remaining deferred operations stay Capability Stubs. The production v3 session path remains separate from Harness v4. Stubs do not read .pig, credential, project setting, resource or package state and produce no side effects."
 }
 
 var issue32NameExceptions = map[string]string{
