@@ -614,6 +614,102 @@
           }
         },
         {
+          "name": "unicode16-outlined",
+          "content": "𜳖\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "A",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "unicode16-ccc",
+          "content": "A𞗯𞗮\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "A𞗯𞗮",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "unicode16-composition",
+          "content": "𐗉\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "𐗉",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "unicode16-ccc-zero-composition",
+          "content": "𖄦\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "𖄦",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "long-combining",
+          "content": "Ａ̀̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "À̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "long-combining-cgj",
+          "content": "Ａ̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "A̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "hangul-composition",
+          "content": "각\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "각",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "combining-blocked",
+          "content": "Ａ̅̀\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "A̅̀",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
           "name": "diff-path-0",
           "content": "a\nb\na\n\nc\n\nb\nc\n\na\nc\nb\n\nb\nc\n\nc\na\na\n\na\na\nc\n\na\nc\nb\na\nc\na",
           "args": {
@@ -1441,6 +1537,94 @@
         {
           "text": "Successfully replaced 1 block(s) in target.txt.",
           "details": {
+            "diff": "-1 𜳖\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-𜳖\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 A𞗯𞗮\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-A𞗯𞗮\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 𐗉\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-𐗉\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 𖄦\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-𖄦\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 Ａ̀̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-Ａ̀̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 Ａ̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-Ａ̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 각\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-각\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 Ａ̅̀\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-Ａ̅̀\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
             "diff": "    ...\n 10 a\n 11 c\n 12 b\n 13 \n-14 b\n+14 a\n+15 new\n 15 c\n-16 \n-17 c\n 18 a\n 19 a\n 20 \n 21 a\n    ...",
             "patch": "--- target.txt\n+++ target.txt\n@@ -10,12 +10,11 @@\n a\n c\n b\n \n-b\n+a\n+new\n c\n-\n-c\n a\n a\n \n a\n",
             "firstChangedLine": 14
@@ -1836,8 +2020,8 @@
     },
     "side_effects": []
   },
-  "input_hash": "sha256:f40508aa40584970750cef6ce491ad0acbff420ec94a95b84170352e29dc725f",
-  "observation_hash": "sha256:4ad25b5eba3329f776f4a082b0b27e4b2c8840ce8b7f161c8455a38eaa1521f2",
+  "input_hash": "sha256:9c4654a68620bfed1d773ccb3e405fdbdab32e7bdc9b32bcb2ebd56a1d3df8ff",
+  "observation_hash": "sha256:050cc251f2aec2e02ed242892fcda5e3babacadb3fb773d04c686a988071e6c5",
   "execution_method": "node --experimental-strip-types parity/oracle/edit-tool.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {

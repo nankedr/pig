@@ -2,14 +2,13 @@ package codingagent
 
 import (
 	"fmt"
-	"golang.org/x/text/unicode/norm"
 	"slices"
 	"strings"
 	"unicode/utf16"
 )
 
 func normalizeEditFuzzy(text string) string {
-	lines := strings.Split(norm.NFKC.String(text), "\n")
+	lines := strings.Split(normalizeEditNFKC(text), "\n")
 	for i, line := range lines {
 		lines[i] = strings.TrimRightFunc(line, func(r rune) bool {
 			return r == '\t' || r == '\v' || r == '\f' || r == '\r' || r == ' ' || r == '\u00a0' || r == '\u1680' || r >= '\u2000' && r <= '\u200a' || r == '\u2028' || r == '\u2029' || r == '\u202f' || r == '\u205f' || r == '\u3000' || r == '\ufeff'

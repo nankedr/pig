@@ -21,7 +21,7 @@ SDK 将 `CreateEditTool(cwd)` 返回值放进 `CreateAgentSessionOptions.AgentTo
 
 每项 oldText 都针对同一份原文件匹配，按位置逆序应用，不能利用前一项替换产生的文字匹配下一项。空 edits、空 oldText、缺失、规范化后的多次出现、重叠和完全无变化都会返回错误，所有匹配通过前不会写入。newText 可以为空，用于删除。直接调用 `CreateEditToolDefinition` 时先调用 `PrepareArguments`，再 `Execute`；旧式顶层 oldText/newText 会追加进 edits，字符串形式的 edits 会先解析为数组。公开 schema 仍只声明 path/edits。
 
-匹配先尝试精确文本，再按 Pi 做 NFKC、行尾空白、智能引号、Unicode 连字符及空格规范化。即使精确匹配成功，也在规范化空间检查唯一性。任一项需要模糊匹配时，整批在规范化空间定位，再按实际触及的行覆盖原文；未触及行保留原始字节，不会误选相邻的相同行。
+匹配先尝试精确文本，再按固定 Oracle 的 Unicode 16 做 NFKC、行尾空白、智能引号、Unicode 连字符及空格规范化。即使精确匹配成功，也在规范化空间检查唯一性。任一项需要模糊匹配时，整批在规范化空间定位，再按实际触及的行覆盖原文；未触及行保留原始字节，不会误选相邻的相同行。
 
 编辑前去除 BOM 参与匹配，写入时恢复 BOM；CRLF 和单独 CR 先转 LF，结果按原文件最先出现的 LF/CRLF 恢复整份文件的换行。diff/patch 比较去 BOM 的 LF 原文与结果。`details.diff` 是带行号、四行上下文的展示文本，`details.patch` 是带 EOF 换行标记的标准 unified patch，`details.firstChangedLine` 指向新文件中的第一个变更位置。它们保存在 Session ToolResult 和 CLI JSON 事件中；模型收到成功文本和后续 read 内容，Provider 对 ToolResult details 的投影沿用已有契约。
 

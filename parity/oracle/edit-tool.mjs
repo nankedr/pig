@@ -55,6 +55,7 @@ function parseArgs(argv) {
 
 async function main() {
  const args = parseArgs(process.argv);
+ if(process.versions.unicode!=="16.0") throw new Error("edit Oracle requires Node with Unicode 16.0");
  const lock = JSON.parse(readFileSync(join(root, "parity/baseline/upstream.lock.json"), "utf8"));
  if (execFileSync("git", ["-C", args.pi, "rev-parse", "HEAD"], {encoding:"utf8"}).trim() !== lock.upstream.commit) throw new Error("Pi checkout does not match Code Baseline");
  if (execFileSync("git", ["-C", args.pi, "status", "--porcelain", "--untracked-files=no"], {encoding:"utf8"}).trim()) throw new Error("Pi checkout has tracked changes");
@@ -110,6 +111,16 @@ async function main() {
 {"name": "diff-gap-eight", "content": "start\n0\n1\n2\n3\n4\n5\n6\n7\nend\n", "args": {"edits": [{"oldText": "start", "newText": "START\nextra"}, {"oldText": "end", "newText": "END"}]}}
   ]};
   input.cases.push({name:"invalid-utf8",bytes:[0xef,0xbb,0xbf,0xe2,0x82,0x0a,0x74,0x61,0x72,0x67,0x65,0x74],args:{edits:[{oldText:"target",newText:"done"}]}});
+  for(const [name,content,oldText] of [
+   ["unicode16-outlined","\u{1CCD6}\n","A"],
+   ["unicode16-ccc","A\u{1E5EE}\u{1E5EF}\n","A\u{1E5EF}\u{1E5EE}"],
+   ["unicode16-composition","\u{105D2}\u0307\n","\u{105C9}"],
+   ["unicode16-ccc-zero-composition","\u{1611E}\u{1611E}\u{1611F}\n","\u{16126}"],
+   ["long-combining","Ａ"+"\u0315".repeat(35)+"\u0300\n","À"+"\u0315".repeat(35)],
+   ["long-combining-cgj","Ａ"+"\u0315".repeat(31)+"\u034f\u0300\n","A"+"\u0315".repeat(31)+"\u034f\u0300"],
+   ["hangul-composition","\u1100\u1161\u11a8\n","각"],
+   ["combining-blocked","Ａ\u0305\u0300\n","A\u0305\u0300"]
+  ]) input.cases.push({name,content,args:{edits:[{oldText,newText:"done"}]}});
   let seed = 79;
   const next = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0);
   for(let i=0;i<32;i++) {
