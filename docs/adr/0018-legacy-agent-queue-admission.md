@@ -11,3 +11,5 @@ Pig 仅在未取消、仍可接收消息的活动 run 中允许 Steer/FollowUp�
 Issue #85 将同一 admission 决策接到 AgentSession；独立 `session-messages-deviation.json` 通过固定 Pi 的公开 SDK 记录 idle、取消后、agent_end 和 agent_settled 的宽松入队结果。Go 的 Session 不在拒绝后写展示队列或发送成功队列事件。Session 的 ClearQueue 保留已发布的 error-only 签名，清空前内容可通过独立快照查询。
 
 Session 用本次用户消息的单调毫秒时间戳与文本识别消费，避免固定 Pi 按非空文本查找时的空文本残留，以及相同文本在新 Prompt 和保留队列之间误删展示项。时间戳是生成的身份，不要求与 Pi 的 Date.now 字节一致；内容、消费顺序与已消费历史仍须相同。该调整服务于 #85 的并发与历史一致性要求，不改变 Legacy Agent 调度。
+
+Pi 的 sendUserMessage 返回 Promise，Go 保留已发布的同步 error 签名。为避免 idle queue_update 回调启动新运行时自等待，或多 listener 通知倒序，队列通知在途时 Prompt/SendUserMessage 启动新运行明确拒绝。已有活动运行的 steer/follow-up 不受此限制；新运行应在通知调用（如 ClearQueue）返回后开始。这是同步 Go API 的回调重入边界，由公开 SDK 回归测试固定。

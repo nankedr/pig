@@ -19,7 +19,7 @@ Go 中选项使用 `codingagent.SendUserMessageOptions` 和 `codingagent.PromptO
 
 `SendUserMessage` 将多个文本块以换行合为一个文本块，并把 `/...` 当作字面文本。`PromptOptions.ExpandPromptTemplates=false` 明确关闭展开；true、图片、Source 与 PreflightResult 仍返回精确的结构化未实现错误。`Steer`/`FollowUp` 当前只有文本签名；模板、skill command、扩展输入处理与扩展命令执行由后续阶段提供，不能据此宣称扩展 API 已可运行。
 
-`SetSteeringMode` 与 `SetFollowUpMode` 同时更新 SettingsManager 和 Legacy Agent。无效模式拒绝且不改设置。查询返回独立切片，队列事件为每个 listener 分别复制切片；并发入队的队列通知按接收顺序发布。listener 可查询、投递、清空和调用 Abort。与其他同步事件回调一样，不能在 callback 内等待当前运行结束；需等待时从其他 goroutine 调用。
+`SetSteeringMode` 与 `SetFollowUpMode` 同时更新 SettingsManager 和 Legacy Agent。无效模式拒绝且不改设置。查询返回独立切片，队列事件为每个 listener 分别复制切片；并发入队的队列通知按接收顺序发布。listener 可查询、向已有运行投递、清空和调用 Abort。队列通知在途时，启动新运行会明确报错，防止同步回调自等待及通知倒序；应在 ClearQueue 返回后再调用 Prompt/SendUserMessage 开始新运行。同样不能在 callback 内等待当前运行结束；需等待时从其他 goroutine 调用。
 
 消费在用户 `message_start` 前更新队列并发送 `queue_update`，`message_end` 使用既有 AppendMessage 写入历史。`agent_settled` 与 `WaitForIdle` 位于历史追加之后。未消费消息在取消后留在内存，可通过后续 Prompt/SendUserMessage 继续消费或 ClearQueue 丢弃；关闭进程不会保存队列。已消费消息重开后完整恢复，旧历史不会重复追加。ClearQueue 清除尚在 Legacy Agent 队列中的消息，不撤回已经开始消费的消息；Go 保留原有 error-only 签名，不返回 Pi 的清空前队列对象。不要混用 `Session.Agent()` 上的直接排队/重置操作来维护 Session 的队列展示。
 

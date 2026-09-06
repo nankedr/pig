@@ -680,6 +680,11 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		cancel(nil)
 		return fmt.Errorf("AgentSession has no Agent")
 	}
+	if s.queueDispatchDone != nil {
+		s.mu.Unlock()
+		cancel(nil)
+		return fmt.Errorf("AgentSession is delivering queue notifications; start a new run after callbacks return")
+	}
 	message := s.userMessageLocked(text)
 	s.active = true
 	s.idle = make(chan struct{})

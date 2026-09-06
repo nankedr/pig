@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
@@ -513,5 +514,47 @@ func TestSessionMessagesQueueModePersistence(t *testing.T) {
 	}
 	if steering != agent.QueueAll || follow != agent.QueueAll || created.Session.Agent().SteeringMode() != steering || created.Session.Agent().FollowUpMode() != follow {
 		t.Fatal("settings and Legacy Agent modes diverged")
+	}
+}
+
+func TestSessionMessagesIdleQueueCallbacksRejectNewRuns(t *testing.T) {
+	session := newMessage85Session(t, nil)
+	entered, release := make(chan struct{}), make(chan struct{})
+	_, _ = session.Subscribe(func(e codingagent.AgentSessionEvent) {
+		if e.AgentSessionEventType() == codingagent.AgentSessionEventTypeQueueUpdate {
+			if err := session.SendUserMessage(ai.UserText("nested")); err == nil {
+				t.Error("started a run inside queue callback")
+			}
+			close(entered)
+			<-release
+		}
+	})
+	events := []codingagent.AgentSessionEventType{}
+	_, _ = session.Subscribe(func(e codingagent.AgentSessionEvent) { events = append(events, e.AgentSessionEventType()) })
+	done := make(chan error, 1)
+	go func() { done <- session.ClearQueue() }()
+	select {
+	case <-entered:
+	case <-time.After(2 * time.Second):
+		t.Fatal("queue callback blocked starting a run")
+	}
+	if err := session.Prompt(context.Background(), "concurrent"); err == nil {
+		t.Error("started a run before queue notifications completed")
+	}
+	if len(session.Messages()) != 0 {
+		t.Error("rejected run changed history")
+	}
+	close(release)
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
+	if err := session.SendUserMessage(ai.UserText("after callbacks")); err != nil {
+		t.Fatal(err)
+	}
+	if len(events) == 0 || events[0] != codingagent.AgentSessionEventTypeQueueUpdate || events[len(events)-1] != codingagent.AgentSessionEventTypeAgentSettled {
+		t.Fatal(events)
+	}
+	if got := message85History(session.Messages()); !reflect.DeepEqual(got, []string{"user:after callbacks", "assistant:reply"}) {
+		t.Fatal(got)
 	}
 }
