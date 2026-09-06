@@ -531,10 +531,6 @@ type ToolDefinition struct {
 	RenderShell         string
 }
 
-func CreateBashToolDefinition(string, ...BashToolOptions) (ToolDefinition, error) {
-	return ToolDefinition{}, notImplemented("CreateBashToolDefinition")
-}
-
 func CreateEditToolDefinition(string, ...EditToolOptions) (ToolDefinition, error) {
 	return ToolDefinition{}, notImplemented("CreateEditToolDefinition")
 }
@@ -555,10 +551,6 @@ func CreateReadToolDefinition(string, ...ReadToolOptions) (ToolDefinition, error
 	return ToolDefinition{}, notImplemented("CreateReadToolDefinition")
 }
 
-func CreateBashTool(cwd string, options ...BashToolOptions) (agent.ErasedAgentTool, error) {
-	_, _ = cwd, options
-	return agent.ErasedAgentTool{}, notImplemented("CreateBashTool")
-}
 func CreateEditTool(cwd string, options ...EditToolOptions) (agent.ErasedAgentTool, error) {
 	_, _ = cwd, options
 	return agent.ErasedAgentTool{}, notImplemented("CreateEditTool")
@@ -1048,14 +1040,6 @@ func validBMP(content []byte) bool {
 	}
 	return planes == 1 && (bitsPerPixel == 1 || bitsPerPixel == 4 || bitsPerPixel == 8 || bitsPerPixel == 16 || bitsPerPixel == 24 || bitsPerPixel == 32)
 }
-
-type localBashOperations struct{}
-
-func (localBashOperations) Exec(context.Context, string, string, BashExecOptions) (BashExecResult, error) {
-	return BashExecResult{}, notImplemented("BashOperations.Exec")
-}
-
-func CreateLocalBashOperations(...BashToolOptions) BashOperations { return localBashOperations{} }
 
 func SortedToolNames(definitions []ToolDefinition) []string {
 	names := make([]string, len(definitions))

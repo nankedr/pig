@@ -608,10 +608,6 @@ func FormatDimensionNote(result ResizedImage) *string {
 	return &note
 }
 
-func GetShellConfig(...string) (ShellConfig, error) {
-	return ShellConfig{}, notImplemented("GetShellConfig")
-}
-
 func optionalHeadlessString(value *string) string {
 	if value == nil {
 		return ""

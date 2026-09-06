@@ -97,7 +97,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	}
 	availableTools = append(availableTools, readTool)
 	for _, name := range options.Tools {
-		if name != "read" && name != "write" {
+		if name != "read" && name != "write" && name != "bash" {
 			return nil, notImplemented("tool." + name)
 		}
 	}
@@ -108,6 +108,22 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			return nil, err
 		}
 		availableTools = append(availableTools, writeTool)
+	}
+
+	if containsTool(options.Tools, "bash", false) {
+		shell, err := settings.GetShellPath()
+		if err != nil {
+			return nil, err
+		}
+		prefix, err := settings.GetShellCommandPrefix()
+		if err != nil {
+			return nil, err
+		}
+		tool, err := CreateBashTool(options.CWD, BashToolOptions{ShellPath: shell, CommandPrefix: prefix})
+		if err != nil {
+			return nil, err
+		}
+		availableTools = append(availableTools, tool)
 	}
 
 	stream := func(runContext context.Context, requestModel ai.Model, input ai.Context, streamOptions ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
@@ -173,6 +189,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		SelectedTools: activeTools,
 		ToolSnippets: map[string]string{
 			"read":  "Read file contents",
+			"bash":  "Execute bash commands (ls, grep, find, etc.)",
 			"write": "Create or overwrite files",
 		},
 	}
@@ -182,6 +199,10 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if containsTool(activeTools, "write", false) {
 		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, "Use write only for new files or complete rewrites.")
 	}
+	if containsTool(activeTools, "bash", false) {
+		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, "You can inspect PIG_* environment variables for current model and session details.")
+	}
+
 	if options.SystemPrompt != nil {
 		promptOptions.CustomPrompt = *options.SystemPrompt
 	}

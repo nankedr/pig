@@ -43,7 +43,7 @@ func TestCommandStubsHaveNoSideEffects(t *testing.T) {
 				t.Fatalf("list dependencies: %v\n%s", err, output)
 			}
 			for _, dependency := range strings.Fields(string(output)) {
-				if dependency == "os/exec" {
+				if dependency == "os/exec" && tt.path != "./cmd/pig" {
 					t.Fatalf("process dependency = %s", dependency)
 				}
 			}

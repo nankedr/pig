@@ -699,7 +699,7 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 		s.emit(AgentSessionAgentSettledEvent{Type: AgentSessionEventTypeAgentSettled})
 	}()
 
-	return s.agent.PromptText(runContext, text)
+	return s.agent.PromptText(context.WithValue(runContext, bashSessionKey{}, s), text)
 }
 
 func (s *AgentSession) handleAgentEvent(_ context.Context, event agent.AgentEvent) error {

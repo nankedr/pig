@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	ctx, stop := signal.NotifyContext(context.Background(), shutdownSignals...)
 	defer stop()
 	if err := codingagent.Main(ctx, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)

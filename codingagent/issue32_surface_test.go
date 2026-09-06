@@ -1546,6 +1546,8 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 
 func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/bash.ts#"), reference == issue32ReferencePrefix+"utils/shell.ts#getShellConfig":
+		return issue80BashCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/trust-manager.ts#"), reference == issue32ReferencePrefix+"core/resource-loader.ts#loadProjectContextFiles":
 		return issue75TrustCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/write.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/file-mutation-queue.ts#"):
@@ -1848,7 +1850,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue80BashCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1859,6 +1861,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	t.Helper()
 	var descriptors []issue32ModuleEvidenceDescriptor
 	switch catalogID {
+	case issue80BashCatalogID:
+		descriptors = issue80BashEvidence(t)
 	case issue75TrustCatalogID:
 		descriptors = issue75TrustEvidence(t)
 	case issue78WriteCatalogID:
@@ -2217,6 +2221,7 @@ func issue32ModulePartial() *catalog.Partial {
 			"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings",
 			"the public Go SDK runs an injected in-memory AgentSession for text and read Tool continuation with deterministic lifecycle events",
 			"issue #78 adds explicit write/read continuation and shared per-file mutation queues under contract:codingagent/write-tool",
+			"issue #80 adds explicit host bash execution, cancellation and retained output under contract:codingagent/bash-tool",
 			"the real pig process runs Headless text with explicit DeepSeek model and credentials, final-text stdout, stable errors, and SIGINT exit 130",
 			"the real pig process runs one-way session-first Headless JSONL with projected ordered events for text, Tool, Provider error, and cancellation",
 			"public SDK and real pig processes create, append, reopen, and continue v3 Sessions while explicit --no-session remains side-effect-free",

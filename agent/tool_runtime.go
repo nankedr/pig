@@ -468,7 +468,11 @@ func executeSingleAgentToolCall(ctx context.Context, emit AgentEventSink, prepar
 	}
 	if err != nil {
 		if cause := context.Cause(ctx); cause != nil && (errors.Is(err, cause) || errors.Is(err, ctx.Err())) {
-			return canceledAgentToolCall(prepared.toolCall), false, nil
+			canceled := canceledAgentToolCall(prepared.toolCall)
+			if err.Error() != cause.Error() && err.Error() != ctx.Err().Error() {
+				canceled.result = errorAgentToolResult(err.Error())
+			}
+			return canceled, false, nil
 		}
 		return finalizedAgentToolCall{toolCall: prepared.toolCall, result: errorAgentToolResult(err.Error()), isError: true}, true, nil
 	}
