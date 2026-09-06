@@ -76,19 +76,21 @@ func TestCreateAgentSessionAssemblyStubsAreSideEffectFree(t *testing.T) {
 	ctx := context.Background()
 
 	result, err := codingagent.CreateAgentSession(ctx, codingagent.CreateAgentSessionOptions{
-		CWD:      env.cwd,
-		AgentDir: env.agentDir,
+		CWD:         env.cwd,
+		AgentDir:    env.agentDir,
+		CustomTools: []codingagent.ToolDefinition{{}},
 	})
-	assertCodingAgentNotImplemented(t, err, "CreateAgentSession")
+	assertCodingAgentNotImplemented(t, err, "CreateAgentSession.CustomTools")
 	if !reflect.DeepEqual(result, codingagent.CreateAgentSessionResult{}) {
 		t.Fatalf("CreateAgentSession result = %#v, want zero value", result)
 	}
 
 	services, err := codingagent.CreateAgentSessionServices(ctx, codingagent.CreateAgentSessionServicesOptions{
-		CWD:      env.cwd,
-		AgentDir: env.agentDir,
+		CWD:                 env.cwd,
+		AgentDir:            env.agentDir,
+		ExtensionFlagValues: map[string]any{"future": true},
 	})
-	assertCodingAgentNotImplemented(t, err, "CreateAgentSessionServices")
+	assertCodingAgentNotImplemented(t, err, "CreateAgentSessionServices.Resources")
 	if !reflect.DeepEqual(services, codingagent.AgentSessionServices{}) {
 		t.Fatalf("CreateAgentSessionServices result = %#v, want zero value", services)
 	}

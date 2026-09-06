@@ -448,7 +448,6 @@ func TestRunCLIRoutesOneShotRootOperationsToDedicatedStubs(t *testing.T) {
 		arguments []string
 		operation string
 	}{
-		{arguments: []string{"--list-models"}, operation: "models.list"},
 		{arguments: []string{"--export", "session.jsonl"}, operation: "session.export"},
 	} {
 		_, err := codingagent.RunCLI(context.Background(), codingagent.CLIInvocation{Arguments: test.arguments})

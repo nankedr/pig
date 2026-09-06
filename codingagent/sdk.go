@@ -2,6 +2,7 @@ package codingagent
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
@@ -44,13 +45,21 @@ type CreateAgentSessionResult struct {
 	ModelFallbackMessage *string
 }
 
-// CreateAgentSession constructs the SDK path when the caller supplies both a
-// model and a Provider or StreamFunction.
-func CreateAgentSession(_ context.Context, options ...CreateAgentSessionOptions) (CreateAgentSessionResult, error) {
-	if len(options) != 1 || options[0].Model == nil {
+// CreateAgentSession uses the shared model runtime unless a stream is injected.
+func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOptions) (CreateAgentSessionResult, error) {
+	if len(options) > 1 {
 		return CreateAgentSessionResult{}, notImplemented("CreateAgentSession")
 	}
-	config := options[0]
+	config := CreateAgentSessionOptions{}
+	if len(options) == 1 {
+		config = options[0]
+	}
+	if ctx == nil {
+		return CreateAgentSessionResult{}, fmt.Errorf("CreateAgentSession context must not be nil")
+	}
+	if err := ctx.Err(); err != nil {
+		return CreateAgentSessionResult{}, err
+	}
 	if len(config.CustomTools) != 0 {
 		return CreateAgentSessionResult{}, notImplemented("CreateAgentSession.CustomTools")
 	}
@@ -58,8 +67,54 @@ func CreateAgentSession(_ context.Context, options ...CreateAgentSessionOptions)
 	if stream == nil && config.Provider != nil {
 		stream = agent.StreamFunction(config.Provider.StreamSimple)
 	}
+	runtimePath := stream == nil
+	var fallback *string
 	if stream == nil {
-		return CreateAgentSessionResult{}, notImplemented("CreateAgentSession")
+		services, err := CreateAgentSessionServices(ctx, CreateAgentSessionServicesOptions{CWD: config.CWD, AgentDir: config.AgentDir, ModelRuntime: config.ModelRuntime, SettingsManager: config.SettingsManager})
+		if err != nil {
+			return CreateAgentSessionResult{}, err
+		}
+		config.ModelRuntime = services.ModelRuntime
+		config.SettingsManager = services.SettingsManager
+		if config.Model == nil {
+			model, thinking, err := resolveHeadlessModel(ctx, config.ModelRuntime, config.SettingsManager, CreateHeadlessSessionOptions{Thinking: config.ThinkingLevel, SessionManager: config.SessionManager})
+			if err != nil {
+				return CreateAgentSessionResult{}, err
+			}
+			config.Model = &model
+			config.ThinkingLevel = thinking
+			if config.SessionManager != nil {
+				saved := config.SessionManager.BuildSessionContext()
+				if len(saved.Messages) > 0 && saved.Model != nil && (saved.Model.Provider != string(model.Provider) || saved.Model.ModelID != model.ID) {
+					message := fmt.Sprintf("Could not restore model %s/%s. Using %s/%s", saved.Model.Provider, saved.Model.ModelID, model.Provider, model.ID)
+					fallback = &message
+				}
+			}
+		} else {
+			_, thinking, err := resolveHeadlessModel(ctx, config.ModelRuntime, config.SettingsManager, CreateHeadlessSessionOptions{Provider: config.Model.Provider, Model: config.Model.ID, Thinking: config.ThinkingLevel, SessionManager: config.SessionManager})
+			if err != nil {
+				return CreateAgentSessionResult{}, err
+			}
+			config.ThinkingLevel = ai.ClampThinkingLevel(*config.Model, thinking)
+		}
+		if err := checkRuntimeAdapter(*config.Model); err != nil {
+			return CreateAgentSessionResult{}, err
+		}
+		if config.AgentTools == nil {
+			config.AgentTools, err = sessionServiceTools(config.CWD, config.SettingsManager, config.Tools)
+			if err != nil {
+				return CreateAgentSessionResult{}, err
+			}
+		}
+		stream = func(ctx context.Context, model ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+			options.SessionID = nil
+			options.CacheRetention = nil
+			result, _ := config.ModelRuntime.StreamSimple(ctx, model, input, ai.ModelsSimpleStreamOptions{SimpleStreamOptions: options})
+			return result
+		}
+	}
+	if config.Model == nil {
+		return CreateAgentSessionResult{}, fmt.Errorf("an injected stream requires a model")
 	}
 	baseStream := stream
 	stream = func(ctx context.Context, model ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
@@ -135,7 +190,13 @@ func CreateAgentSession(_ context.Context, options ...CreateAgentSessionOptions)
 		SessionStartEvent:      config.SessionStartEvent,
 		SettingsManager:        config.SettingsManager,
 	})
-	return CreateAgentSessionResult{Session: session}, nil
+	if runtimePath {
+		if err := configureSessionPrompt(ctx, session, CreateHeadlessSessionOptions{CWD: config.CWD, AgentDir: config.AgentDir}); err != nil {
+			session.Dispose()
+			return CreateAgentSessionResult{}, err
+		}
+	}
+	return CreateAgentSessionResult{Session: session, ModelFallbackMessage: fallback}, nil
 }
 
 func selectAgentTools(tools []agent.ErasedAgentTool, included, excluded []string, mode NoToolsMode) []agent.ErasedAgentTool {

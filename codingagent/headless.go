@@ -30,6 +30,9 @@ type HeadlessOutcome struct {
 
 // CreateHeadlessSessionOptions contains the explicit Headless product inputs.
 type CreateHeadlessSessionOptions struct {
+	ModelRuntime         *ModelRuntime
+	Models               []string
+	Offline              bool
 	ProjectTrustOverride ProjectTrustDecision
 	NoContextFiles       bool
 	CWD                  string
@@ -80,25 +83,68 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if err := checkHeadlessSettings(settings); err != nil {
 		return nil, err
 	}
-	credentials := options.Credentials
-	if credentials == nil {
-		path := options.AuthPath
-		if path == "" && options.AgentDir != "" {
-			path = filepath.Join(options.AgentDir, "auth.json")
+	models := options.ModelRuntime
+	var err error
+	if models == nil {
+		credentials := options.Credentials
+		if credentials == nil {
+			path := options.AuthPath
+			if path == "" && options.AgentDir != "" {
+				path = filepath.Join(options.AgentDir, "auth.json")
+			}
+			var err error
+			credentials, err = NewAuthStorage(path)
+			if err != nil {
+				return nil, err
+			}
 		}
-		var err error
-		credentials, err = NewAuthStorage(path)
+		environment := options.Environment
+		if environment == nil {
+			environment = ai.ProviderEnv{}
+		}
+		models, err = newModelRuntime(ctx, CreateModelRuntimeOptions{Offline: ResolveOffline(options.Offline), Credentials: headlessCredentials{CredentialStore: credentials, apiKey: options.APIKey}}, environment)
 		if err != nil {
 			return nil, err
 		}
 	}
-	models := ai.BuiltinModels(ai.CreateModelsOptions{
-		AuthContext: headlessAuthContext(options.Environment),
-		Credentials: headlessCredentials{CredentialStore: credentials, apiKey: options.APIKey},
-	})
 	model, thinking, err := resolveHeadlessModel(ctx, models, settings, options)
 	if err != nil {
 		return nil, err
+	}
+	scoped := []ScopedModel{}
+	diagnostics := []AgentSessionRuntimeDiagnostic{}
+	if len(options.Models) > 0 {
+		scope, e := ResolveModelScopeWithDiagnostics(ctx, options.Models, models)
+		if e != nil {
+			return nil, e
+		}
+		scoped = scope.ScopedModels
+		for _, d := range scope.Diagnostics {
+			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
+		}
+		if options.Model == "" && len(scoped) > 0 && (options.SessionManager == nil || len(options.SessionManager.BuildSessionContext().Messages) == 0) {
+			model = scoped[0].Model
+			level := options.Thinking
+			if level == "" {
+				level = scoped[0].ThinkingLevel
+			}
+			if level == "" {
+				level, _ = settings.GetDefaultThinkingLevel()
+			}
+			if level == "" {
+				level = "medium"
+			}
+			thinking = ai.ClampThinkingLevel(model, level)
+		}
+	}
+	if options.Model != "" {
+		resolved, e := ResolveCLIModel(ResolveCliModelOptions{CLIProvider: string(options.Provider), CLIModel: options.Model, CLIThinking: options.Thinking, ModelRuntime: models})
+		if e != nil {
+			return nil, e
+		}
+		if resolved.Warning != nil {
+			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: "warning", Message: *resolved.Warning})
+		}
 	}
 	if options.BaseURL != nil {
 		baseURL := strings.TrimSpace(*options.BaseURL)
@@ -108,42 +154,13 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		model.BaseURL = baseURL
 	}
 
-	availableTools := make([]agent.ErasedAgentTool, 0, 1)
-	readTool, err := CreateReadTool(options.CWD)
+	if err = checkRuntimeAdapter(model); err != nil {
+		return nil, err
+	}
+	availableTools, err := sessionServiceTools(options.CWD, settings, options.Tools)
 	if err != nil {
 		return nil, err
 	}
-	availableTools = append(availableTools, readTool)
-	for _, name := range options.Tools {
-		if name != "read" && name != "write" && name != "bash" {
-			return nil, notImplemented("tool." + name)
-		}
-	}
-
-	if containsTool(options.Tools, "write", false) {
-		writeTool, err := CreateWriteTool(options.CWD)
-		if err != nil {
-			return nil, err
-		}
-		availableTools = append(availableTools, writeTool)
-	}
-
-	if containsTool(options.Tools, "bash", false) {
-		shell, err := settings.GetShellPath()
-		if err != nil {
-			return nil, err
-		}
-		prefix, err := settings.GetShellCommandPrefix()
-		if err != nil {
-			return nil, err
-		}
-		tool, err := CreateBashTool(options.CWD, BashToolOptions{ShellPath: shell, CommandPrefix: prefix})
-		if err != nil {
-			return nil, err
-		}
-		availableTools = append(availableTools, tool)
-	}
-
 	stream := func(runContext context.Context, requestModel ai.Model, input ai.Context, streamOptions ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
 		// AgentSession supplies its identity and the explicit no-cache marker to
 		// every Provider. Chat Completions does not consume either M1 hint.
@@ -153,7 +170,8 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			key := *options.APIKey
 			streamOptions.APIKey = &key
 		}
-		return models.StreamSimple(runContext, requestModel, input, ai.ModelsSimpleStreamOptions{SimpleStreamOptions: streamOptions})
+		result, _ := models.StreamSimple(runContext, requestModel, input, ai.ModelsSimpleStreamOptions{SimpleStreamOptions: streamOptions})
+		return result
 	}
 	manager := options.SessionManager
 	if manager == nil {
@@ -186,6 +204,8 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	}
 	created, err := CreateAgentSession(ctx, CreateAgentSessionOptions{
 		CWD:             options.CWD,
+		ModelRuntime:    models,
+		ScopedModels:    scoped,
 		Model:           &model,
 		StreamFunction:  agent.StreamFunction(stream),
 		ThinkingLevel:   thinking,
@@ -199,9 +219,31 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if err != nil {
 		return nil, err
 	}
-	// Preserve an explicit empty selection: nil means the prompt builder's
-	// default tool set, while Headless has already resolved its actual tools.
-	activeTools := append([]string{}, created.Session.GetActiveToolNames()...)
+	if err = configureSessionPrompt(ctx, created.Session, options); err != nil {
+		created.Session.Dispose()
+		return nil, err
+	}
+	factory := func(ctx context.Context, next CreateAgentSessionRuntimeOptions) (CreateAgentSessionRuntimeResult, error) {
+		config := options
+		config.CWD = next.CWD
+		config.SessionManager = next.SessionManager
+		config.SettingsManager = settings
+		if next.CWD != options.CWD {
+			config.SettingsManager = nil
+		}
+		runtime, err := CreateHeadlessSession(ctx, config)
+		if err != nil {
+			return CreateAgentSessionRuntimeResult{}, err
+		}
+		runtime.session.sessionStartEvent = next.SessionStartEvent
+		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session()}, Services: runtime.Services()}, nil
+	}
+	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD, AgentDir: options.AgentDir, ModelRuntime: models, SettingsManager: settings, Diagnostics: diagnostics}, factory, nil, nil), nil
+}
+
+func configureSessionPrompt(ctx context.Context, session *AgentSession, options CreateHeadlessSessionOptions) error {
+	var err error
+	activeTools := append([]string{}, session.GetActiveToolNames()...)
 	promptOptions := BuildSystemPromptOptions{
 		CWD:           options.CWD,
 		SelectedTools: activeTools,
@@ -229,32 +271,17 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		if dir == "" {
 			dir, err = GetAgentDir()
 			if err != nil {
-				return nil, err
+				return err
 			}
 		}
 		promptOptions.ContextFiles, err = LoadProjectContextFiles(ctx, options.CWD, dir)
 		if err != nil {
-			created.Session.Dispose()
-			return nil, err
+			session.Dispose()
+			return err
 		}
 	}
-	created.Session.Agent().SetSystemPrompt(buildSystemPrompt(promptOptions))
-	factory := func(ctx context.Context, next CreateAgentSessionRuntimeOptions) (CreateAgentSessionRuntimeResult, error) {
-		config := options
-		config.CWD = next.CWD
-		config.SessionManager = next.SessionManager
-		config.SettingsManager = settings
-		if next.CWD != options.CWD {
-			config.SettingsManager = nil
-		}
-		runtime, err := CreateHeadlessSession(ctx, config)
-		if err != nil {
-			return CreateAgentSessionRuntimeResult{}, err
-		}
-		runtime.session.sessionStartEvent = next.SessionStartEvent
-		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session()}, Services: runtime.Services()}, nil
-	}
-	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD, SettingsManager: settings}, factory, nil, nil), nil
+	session.Agent().SetSystemPrompt(buildSystemPrompt(promptOptions))
+	return nil
 }
 
 // HeadlessOutcomeError presents a terminal Provider failure or cancellation

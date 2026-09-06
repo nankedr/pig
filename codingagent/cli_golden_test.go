@@ -71,6 +71,8 @@ func TestIssue33StaticCLISnapshots(t *testing.T) {
 }
 
 func TestIssue33CLIRoutingSnapshot(t *testing.T) {
+	t.Setenv("PIG_CODING_AGENT_DIR", t.TempDir())
+	t.Setenv("DEEPSEEK_API_KEY", "")
 	tests := []struct {
 		name      string
 		arguments []string

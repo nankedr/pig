@@ -72,4 +72,5 @@ Telemetry 文档需要区分两个概念：`telemetry` Supporting Module 是默�
 
 - [M3.3 会话导航](learning/m3-session-navigation.md) 与 [TypeScript → Go](mappings/typescript-to-go/m3-session-navigation.md)
 
+- [M3.7 ModelRuntime](learning/m3-model-runtime.md) 与 [TypeScript → Go](mappings/typescript-to-go/m3-model-runtime.md)
 - [M3.6 canonical 凭证恢复](learning/m3-credentials.md) 与 [TypeScript → Go](mappings/typescript-to-go/m3-credentials.md)

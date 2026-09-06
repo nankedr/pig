@@ -3,7 +3,6 @@ package codingagent
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
@@ -38,89 +37,30 @@ func checkHeadlessSettings(settings *SettingsManager) error {
 	return nil
 }
 
-func resolveHeadlessModel(ctx context.Context, models ai.Models, settings *SettingsManager, options CreateHeadlessSessionOptions) (ai.Model, agent.ThinkingLevel, error) {
-	provider, pattern := options.Provider, options.Model
+func resolveHeadlessModel(ctx context.Context, runtime *ModelRuntime, settings *SettingsManager, options CreateHeadlessSessionOptions) (ai.Model, agent.ThinkingLevel, error) {
 	thinking := options.Thinking
 	var model ai.Model
-	if pattern != "" {
-		if provider != "" {
-			if _, ok := models.GetProvider(provider); !ok {
-				return model, thinking, &CLIArgumentError{Message: fmt.Sprintf("Unknown provider %q", provider)}
-			}
+	if options.Model != "" {
+		resolved, err := ResolveCLIModel(ResolveCliModelOptions{CLIProvider: string(options.Provider), CLIModel: options.Model, CLIThinking: thinking, ModelRuntime: runtime})
+		if err != nil {
+			return model, thinking, err
 		}
-		if prefix, rest, ok := strings.Cut(pattern, "/"); ok {
-			if _, known := models.GetProvider(ai.ProviderID(prefix)); known && (provider == "" || strings.EqualFold(string(provider), prefix)) {
-				provider = ai.ProviderID(prefix)
-				pattern = rest
-			}
+		if resolved.Error != nil {
+			return model, thinking, &CLIArgumentError{Message: *resolved.Error}
 		}
-		candidates := models.GetModels()
-		if provider != "" {
-			candidates = models.GetModels(provider)
+		model = *resolved.Model
+		if thinking == "" && resolved.ThinkingLevel != nil {
+			thinking = *resolved.ThinkingLevel
 		}
-		matches := func(pattern string) []ai.Model {
-			result := []ai.Model{}
-			for _, m := range candidates {
-				if strings.EqualFold(m.ID, pattern) {
-					result = append(result, m)
-				}
-			}
-			return result
-		}
-		found := matches(pattern)
-		if len(found) == 0 {
-			if index := strings.LastIndexByte(pattern, ':'); index >= 0 {
-				level := agent.ThinkingLevel(pattern[index+1:])
-				switch level {
-				case "off", "minimal", "low", "medium", "high", "xhigh", "max":
-					if thinking == "" {
-						thinking = level
-					}
-					pattern = pattern[:index]
-					found = matches(pattern)
-				}
-			}
-		}
-		if len(found) > 1 {
-			available, err := headlessAvailableModels(ctx, models)
-			if err != nil {
-				return model, thinking, err
-			}
-			authenticated := []ai.Model{}
-			for _, m := range found {
-				for _, a := range available {
-					if ai.ModelsAreEqual(&m, &a) {
-						authenticated = append(authenticated, m)
-						break
-					}
-				}
-			}
-			if len(authenticated) == 1 {
-				found = authenticated
-			}
-		}
-		if len(found) > 1 {
-			return model, thinking, &CLIArgumentError{Message: fmt.Sprintf("Model %q is ambiguous; use --provider or provider/model", pattern)}
-		}
-		if len(found) == 0 {
-			return model, thinking, &CLIArgumentError{Message: fmt.Sprintf("Unknown model %q for provider %q", pattern, provider)}
-		}
-		model = found[0]
 	} else {
-		canRestore := func(model ai.Model) bool {
-			if model.ID == "" {
-				return false
-			}
-			if options.APIKey != nil {
-				return true
-			}
-			available, err := models.GetAvailable(ctx, model.Provider)
-			return err == nil && len(available) > 0
+		canRestore := func(m ai.Model) bool {
+			configured, _ := runtime.HasConfiguredAuth(string(m.Provider))
+			return m.ID != "" && configured
 		}
 		if options.SessionManager != nil {
 			saved := options.SessionManager.BuildSessionContext()
 			if len(saved.Messages) > 0 && saved.Model != nil {
-				model, _ = models.GetModel(ai.ProviderID(saved.Model.Provider), saved.Model.ModelID)
+				model, _, _ = runtime.GetModel(saved.Model.Provider, saved.Model.ModelID)
 				if !canRestore(model) {
 					model = ai.Model{}
 				}
@@ -135,15 +75,13 @@ func resolveHeadlessModel(ctx context.Context, models ai.Models, settings *Setti
 			if err != nil {
 				return model, thinking, err
 			}
-			if provider != "" && id != "" {
-				model, _ = models.GetModel(ai.ProviderID(provider), id)
-				if !canRestore(model) {
-					model = ai.Model{}
-				}
+			model, _, _ = runtime.GetModel(provider, id)
+			if !canRestore(model) {
+				model = ai.Model{}
 			}
 		}
 		if model.ID == "" {
-			available, err := headlessAvailableModels(ctx, models)
+			available, err := runtime.GetAvailableSnapshot()
 			if err != nil {
 				return model, thinking, err
 			}
@@ -163,7 +101,11 @@ func resolveHeadlessModel(ctx context.Context, models ai.Models, settings *Setti
 			}
 		}
 		if model.ID == "" {
-			return model, thinking, &CLIArgumentError{Message: "Headless mode requires --provider <provider>"}
+			diagnostic, _ := runtime.GetError()
+			if diagnostic != "" {
+				return model, thinking, fmt.Errorf("%s", diagnostic)
+			}
+			return model, thinking, &CLIArgumentError{Message: "No models available with configured authentication. Use --provider and --model with --api-key, or configure credentials."}
 		}
 	}
 	if thinking == "" && options.SessionManager != nil {
@@ -191,22 +133,7 @@ func resolveHeadlessModel(ctx context.Context, models ai.Models, settings *Setti
 	return model, thinking, nil
 }
 
-var headlessDefaultModels = [][2]string{{"deepseek", "deepseek-v4-pro"}}
-
-func headlessAvailableModels(ctx context.Context, models ai.Models) ([]ai.Model, error) {
-	var available []ai.Model
-	for _, provider := range models.GetProviders() {
-		if len(provider.GetModels()) == 0 {
-			continue
-		}
-		values, err := models.GetAvailable(ctx, provider.ID())
-		if err != nil {
-			return nil, err
-		}
-		available = append(available, values...)
-	}
-	return available, nil
-}
+var headlessDefaultModels = [][2]string{{"amazon-bedrock", "us.anthropic.claude-opus-4-6-v1"}, {"ant-ling", "Ring-2.6-1T"}, {"anthropic", "claude-opus-4-8"}, {"openai", "gpt-5.5"}, {"azure-openai-responses", "gpt-5.4"}, {"openai-codex", "gpt-5.5"}, {"radius", "auto"}, {"nvidia", "nvidia/nemotron-3-super-120b-a12b"}, {"deepseek", "deepseek-v4-pro"}, {"google", "gemini-3.1-pro-preview"}, {"google-vertex", "gemini-3.1-pro-preview"}, {"github-copilot", "gpt-5.4"}, {"openrouter", "moonshotai/kimi-k2.6"}, {"vercel-ai-gateway", "zai/glm-5.1"}, {"xai", "grok-4.5"}, {"groq", "openai/gpt-oss-120b"}, {"cerebras", "zai-glm-4.7"}, {"zai", "glm-5.1"}, {"zai-coding-cn", "glm-5.1"}, {"mistral", "devstral-medium-latest"}, {"minimax", "MiniMax-M2.7"}, {"minimax-cn", "MiniMax-M2.7"}, {"moonshotai", "kimi-k2.6"}, {"moonshotai-cn", "kimi-k2.6"}, {"huggingface", "moonshotai/Kimi-K2.6"}, {"fireworks", "accounts/fireworks/models/kimi-k2p6"}, {"together", "moonshotai/Kimi-K2.6"}, {"baseten", "zai-org/GLM-5.2"}, {"opencode", "kimi-k2.6"}, {"opencode-go", "kimi-k2.6"}, {"kimi-coding", "kimi-for-coding"}, {"cloudflare-workers-ai", "@cf/moonshotai/kimi-k2.6"}, {"cloudflare-ai-gateway", "workers-ai/@cf/moonshotai/kimi-k2.6"}, {"qwen-token-plan", "qwen3.7-max"}, {"qwen-token-plan-cn", "qwen3.7-max"}, {"qwen-token-plan-individual", "qwen3.8-max"}, {"xiaomi", "mimo-v2.5-pro"}, {"xiaomi-token-plan-cn", "mimo-v2.5-pro"}, {"xiaomi-token-plan-ams", "mimo-v2.5-pro"}, {"xiaomi-token-plan-sgp", "mimo-v2.5-pro"}}
 
 func prepareHeadlessProjectSettings(ctx context.Context, cwd, agentDir string, settings *SettingsManager, override ProjectTrustDecision) error {
 	trusted := false

@@ -1,5 +1,8 @@
 type codingagent.CreateHeadlessSessionOptions struct
 fields:
+- ModelRuntime *codingagent.ModelRuntime tag=""
+- Models []string tag=""
+- Offline bool tag=""
 - ProjectTrustOverride *bool tag=""
 - NoContextFiles bool tag=""
 - CWD string tag=""

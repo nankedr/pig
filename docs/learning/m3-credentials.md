@@ -19,4 +19,4 @@ Headless 先得出 Project Trust 结论，再读取会执行命令的凭证。�
 
 合成 secret 检查覆盖请求 body、进程 stdout/stderr、Provider 错误回显、持久化 Session 和显式 Telemetry recorder。当前适配器不产生认证 Telemetry span，默认 telemetry 仍为 NOOP。记录内容只包含非 secret 元数据，示例不打印 key。
 
-OAuth/ambient 登录、ModelRuntime、`pig auth` 和 `pig-ai login/list` 的运行能力仍按 M11 明确失败；本切片不把这些入口改成伪成功。pig-ai 的路径解析与 pig 共用布局。文件执行平台为 Darwin/Linux，其余平台锁等待 M13。对等目录 `contract:config/auth-json` 记录已交付范围和偏离，详见 ADR-0021。
+ModelRuntime 的基础编排由 [M3.7](m3-model-runtime.md) 接入。OAuth/ambient 登录、`pig auth` 和 `pig-ai login/list` 的运行能力仍按 M11 明确失败；本切片不把这些入口改成伪成功。pig-ai 的路径解析与 pig 共用布局。文件执行平台为 Darwin/Linux，其余平台锁等待 M13。对等目录 `contract:config/auth-json` 记录已交付范围和偏离，详见 ADR-0021。

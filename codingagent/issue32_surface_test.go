@@ -1546,6 +1546,8 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 
 func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-runtime.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-registry.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-resolver.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/agent-session-services.ts#"):
+		return issue77RuntimeCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/auth-storage.ts#"):
 		return issue76CredentialCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/bash.ts#"), reference == issue32ReferencePrefix+"utils/shell.ts#getShellConfig":
@@ -1852,7 +1854,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1865,6 +1867,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	switch catalogID {
 	case issue76CredentialCatalogID:
 		descriptors = issue76CredentialEvidence(t)
+	case issue77RuntimeCatalogID:
+		descriptors = issue77RuntimeEvidence(t)
 	case issue80BashCatalogID:
 		descriptors = issue80BashEvidence(t)
 	case issue75TrustCatalogID:
@@ -2225,6 +2229,7 @@ func issue32ModulePartial() *catalog.Partial {
 			"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings",
 			"the public Go SDK runs an injected in-memory AgentSession for text and read Tool continuation with deterministic lifecycle events",
 			"issue #78 adds explicit write/read continuation and shared per-file mutation queues under contract:codingagent/write-tool",
+			"issue #77 adds shared ModelRuntime/ModelRegistry and services, static Catalog Snapshot, model selection/scope and Offline under contract:model-runtime/basic",
 			"issue #80 adds explicit host bash execution, cancellation and retained output under contract:codingagent/bash-tool",
 			"the real pig process runs Headless text with explicit DeepSeek model and credentials, final-text stdout, stable errors, and SIGINT exit 130",
 			"the real pig process runs one-way session-first Headless JSONL with projected ordered events for text, Tool, Provider error, and cancellation",
@@ -2233,7 +2238,7 @@ func issue32ModulePartial() *catalog.Partial {
 			"Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects",
 		},
 		Unsupported: []string{
-			"project writes, full resources, packages, remaining tools, ambient model/auth assembly, interactive mode, and RPC remain explicit Capability Stubs until their roadmap milestones",
+			"project writes, full resources, packages, remaining tools, catalog overlays and OAuth/ambient auth, interactive mode, and RPC remain explicit Capability Stubs until their roadmap milestones",
 			"surface tests prove API coverage and target resolution, not runtime parity",
 		},
 	}

@@ -471,6 +471,8 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	}
 	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
 		CWD:             cwd,
+		Models:          parsed.Models,
+		Offline:         ResolveOffline(parsed.Offline),
 		NoContextFiles:  parsed.NoContextFiles,
 		Provider:        ai.ProviderID(optionalHeadlessString(parsed.Provider)),
 		Model:           optionalHeadlessString(parsed.Model),
@@ -488,6 +490,9 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	if err != nil {
 		return err
 	}
+	for _, d := range runtime.Services().Diagnostics {
+		fmt.Fprintln(os.Stderr, "Warning: "+d.Message)
+	}
 	_, err = RunPrintMode(ctx, runtime, PrintModeOptions{
 		InitialMessage: initialMessage,
 		Messages:       messages,
@@ -504,8 +509,6 @@ func unsupportedHeadlessOperation(parsed Args) string {
 		return "headless.session-persistence"
 	case len(parsed.AppendSystemPrompt) != 0:
 		return "headless.append-system-prompt"
-	case len(parsed.Models) != 0:
-		return "headless.model-scope"
 	case len(parsed.Extensions) != 0 || len(parsed.Skills) != 0 || len(parsed.PromptTemplates) != 0 || len(parsed.Themes) != 0:
 		return "headless.resources"
 	default:

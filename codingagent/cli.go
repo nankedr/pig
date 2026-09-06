@@ -366,7 +366,9 @@ func RunCLI(ctx context.Context, invocation CLIInvocation) (CLIResult, error) {
 		return result, notImplemented("extension.flag." + firstUnknownFlag(invocation.Arguments, parsed.UnknownFlags))
 	}
 	if parsed.ListModels.IsSet() {
-		return result, notImplemented("models.list")
+		output, err := listRuntimeModels(ctx, parsed)
+		result.Stdout = output
+		return result, err
 	}
 	switch {
 	case parsed.Mode == ModeRPC:

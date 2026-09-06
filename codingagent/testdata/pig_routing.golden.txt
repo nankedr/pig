@@ -685,15 +685,15 @@ session export bypasses root constraints
 model list all
   args: ["--list-models"]
   terminals: stdin=false stdout=false
-  exit: 1
-  stdout: ""
-  stderr: "codingagent.models.list: not implemented\n"
+  exit: 0
+  stdout: "No models available. Configure credentials or use --api-key with --provider and --model.\n"
+  stderr: ""
 model list search
   args: ["--list-models" "openai"]
   terminals: stdin=false stdout=false
-  exit: 1
-  stdout: ""
-  stderr: "codingagent.models.list: not implemented\n"
+  exit: 0
+  stdout: "No models available. Configure credentials or use --api-key with --provider and --model.\n"
+  stderr: ""
 invalid mode
   args: ["--mode" "invalid"]
   terminals: stdin=false stdout=false

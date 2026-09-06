@@ -20,6 +20,7 @@ m0-offline:
 	go run ./examples/write-read
 	go run ./examples/bash-read
 	go run ./examples/global-settings
+	go run ./examples/model-runtime
 	go run ./examples/credentials
 	go run ./examples/project-trust
 	go run ./examples/headless-text
@@ -56,6 +57,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/context-overflow.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-navigation.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-tree.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/model-runtime.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/credentials.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/project-trust.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/project-trust-startup.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

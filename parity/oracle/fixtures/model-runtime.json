@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/model-runtime.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "codingagent/model-runtime",
+    "catalog_id": "contract:model-runtime/basic",
+    "surface": "go-sdk",
+    "input": {
+      "queries": [
+        {
+          "cliModel": "DEEPSEEK/deepseek-v4-flash:high"
+        },
+        {
+          "cliProvider": "deepseek",
+          "cliModel": "v4-pro"
+        },
+        {
+          "cliProvider": "deepseek",
+          "cliModel": "future-model:high"
+        },
+        {
+          "cliModel": "does-not-exist"
+        },
+        {
+          "cliProvider": "missing",
+          "cliModel": "x"
+        },
+        {
+          "cliProvider": "deepseek",
+          "cliModel": "deepseek-v4-flash:invalid"
+        }
+      ],
+      "patterns": [
+        "deepseek/*:low",
+        "deepseek-v4-pro:invalid",
+        "absent*"
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "queries": [
+        {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinking": "high",
+          "warning": null,
+          "error": null
+        },
+        {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinking": null,
+          "warning": null,
+          "error": null
+        },
+        {
+          "model": "deepseek/future-model",
+          "thinking": "high",
+          "warning": "Model \"future-model\" not found for provider \"deepseek\". Using custom model id.",
+          "error": null
+        },
+        {
+          "model": null,
+          "thinking": null,
+          "warning": null,
+          "error": "Model \"does-not-exist\" not found. Use --list-models to see available models."
+        },
+        {
+          "model": null,
+          "thinking": null,
+          "warning": null,
+          "error": "Unknown provider \"missing\". Use --list-models to see available providers/models."
+        },
+        {
+          "model": "deepseek/deepseek-v4-flash:invalid",
+          "thinking": null,
+          "warning": "Model \"deepseek-v4-flash:invalid\" not found for provider \"deepseek\". Using custom model id.",
+          "error": null
+        }
+      ],
+      "scope": [
+        {
+          "model": "deepseek/deepseek-v4-flash",
+          "thinking": "low"
+        },
+        {
+          "model": "deepseek/deepseek-v4-pro",
+          "thinking": "low"
+        }
+      ],
+      "diagnostics": [
+        {
+          "type": "warning",
+          "code": "invalid-thinking-level",
+          "message": "Invalid thinking level \"invalid\" in pattern \"deepseek-v4-pro:invalid\". Using default instead.",
+          "pattern": "deepseek-v4-pro:invalid"
+        },
+        {
+          "type": "warning",
+          "code": "no-match",
+          "message": "No models match pattern \"absent*\"",
+          "pattern": "absent*"
+        }
+      ],
+      "status": {
+        "configured": true,
+        "source": "stored"
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:3dabb75570ab50798e04edc3917da8063994faf48793d6344e4ec4a24e59d7c3",
+  "observation_hash": "sha256:98b7e0865abd8bb2d52b3b2ce6573e192d80ea35ee489865799427d5aaebc499",
+  "execution_method": "node --experimental-strip-types parity/oracle/model-runtime.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/model-runtime.ts"
+  }
+}

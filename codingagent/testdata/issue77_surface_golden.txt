@@ -1,0 +1,89 @@
+type codingagent.CreateModelRuntimeOptions
+- Offline bool ""
+- AllowModelNetwork bool ""
+- AuthPath string ""
+- CatalogBaseURL string ""
+- Credentials ai.CredentialStore ""
+- ModelRefreshTimeoutMS int64 ""
+- ModelsPath ai.Optional[string] ""
+- ModelsStore ai.ModelsStore ""
+- ModelsStorePath string ""
+- RefreshOnCreate *bool ""
+type codingagent.ResolveCliModelOptions
+- CLIProvider string ""
+- CLIModel string ""
+- CLIThinking ai.ModelThinkingLevel ""
+- ModelRuntime *codingagent.ModelRuntime ""
+type codingagent.ResolveModelScopeResult
+- ScopedModels []codingagent.ScopedModel ""
+- Diagnostics []codingagent.ModelScopeDiagnostic ""
+type codingagent.AgentSessionServices
+- CWD string ""
+- AgentDir string ""
+- Diagnostics []codingagent.AgentSessionRuntimeDiagnostic ""
+- ModelRuntime *codingagent.ModelRuntime ""
+- ResourceLoader codingagent.ResourceLoader ""
+- SettingsManager *codingagent.SettingsManager ""
+type codingagent.CreateHeadlessSessionOptions
+- ModelRuntime *codingagent.ModelRuntime ""
+- Models []string ""
+- Offline bool ""
+- ProjectTrustOverride *bool ""
+- NoContextFiles bool ""
+- CWD string ""
+- AgentDir string ""
+- AuthPath string ""
+- Credentials ai.CredentialStore ""
+- SettingsManager *codingagent.SettingsManager ""
+- SessionDir *string ""
+- Provider ai.ProviderID ""
+- Model string ""
+- APIKey *string ""
+- Environment ai.ProviderEnv ""
+- BaseURL *string ""
+- Thinking ai.ModelThinkingLevel ""
+- Tools []string ""
+- ExcludeTools []string ""
+- NoTools codingagent.NoToolsMode ""
+- SystemPrompt *string ""
+- SessionManager *codingagent.SessionManager ""
+method CancelDeferred func(*codingagent.ModelRuntime, context.Context, ai.Model, ai.DeferredHandle, ...ai.ModelsDeferredCancelOptions) error
+method CheckAuth func(*codingagent.ModelRuntime, context.Context, string, ...ai.AuthOperationOptions) (ai.Optional[github.com/nankedr/pig/ai.AuthCheck], error)
+method Complete func(*codingagent.ModelRuntime, context.Context, ai.Model, ai.Context, ...ai.ModelsStreamOption) (ai.AssistantMessage, error)
+method CompleteSimple func(*codingagent.ModelRuntime, context.Context, ai.Model, ai.Context, ...ai.ModelsSimpleStreamOptions) (ai.AssistantMessage, error)
+method FetchDeferred func(*codingagent.ModelRuntime, context.Context, ai.Model, ai.DeferredHandle, ...ai.ModelsDeferredFetchOptions) (ai.AssistantMessage, error)
+method GetAuth func(*codingagent.ModelRuntime, context.Context, string, ...codingagent.ModelRuntimeAuthOverrides) (ai.Optional[github.com/nankedr/pig/ai.AuthResult], error)
+method GetAvailable func(*codingagent.ModelRuntime, context.Context, ...string) ([]ai.Model, error)
+method GetAvailableSnapshot func(*codingagent.ModelRuntime) ([]ai.Model, error)
+method GetCompatibilityRequestConfig func(*codingagent.ModelRuntime, ai.Model) (codingagent.CompatibilityRequestConfig, error)
+method GetError func(*codingagent.ModelRuntime) (string, error)
+method GetModel func(*codingagent.ModelRuntime, string, string) (ai.Model, bool, error)
+method GetModelAuth func(*codingagent.ModelRuntime, context.Context, ai.Model, ...codingagent.ModelRuntimeAuthOverrides) (ai.Optional[github.com/nankedr/pig/ai.AuthResult], error)
+method GetModels func(*codingagent.ModelRuntime, ...string) ([]ai.Model, error)
+method GetProvider func(*codingagent.ModelRuntime, string) (ai.Provider, bool, error)
+method GetProviderAuthStatus func(*codingagent.ModelRuntime, string) (codingagent.AuthStatus, error)
+method GetProviders func(*codingagent.ModelRuntime) ([]ai.Provider, error)
+method GetRegisteredNativeProvider func(*codingagent.ModelRuntime, string) (ai.Provider, bool, error)
+method GetRegisteredProviderConfig func(*codingagent.ModelRuntime, string) (codingagent.ProviderConfigInput, bool, error)
+method GetRegisteredProviderIDs func(*codingagent.ModelRuntime) ([]string, error)
+method HasConfiguredAuth func(*codingagent.ModelRuntime, string) (bool, error)
+method IsUsingOAuth func(*codingagent.ModelRuntime, string) (bool, error)
+method IsUsingSubscription func(*codingagent.ModelRuntime, string) (bool, error)
+method ListCredentials func(*codingagent.ModelRuntime, context.Context, ...ai.AuthOperationOptions) ([]ai.CredentialInfo, error)
+method Login func(*codingagent.ModelRuntime, context.Context, string, ai.AuthType, ai.AuthInteraction) (ai.Credential, error)
+method Logout func(*codingagent.ModelRuntime, context.Context, string, ...ai.AuthOperationOptions) error
+method Refresh func(*codingagent.ModelRuntime, context.Context, ...ai.ModelsRefreshOptions) error
+method RegisterNativeProvider func(*codingagent.ModelRuntime, ai.Provider) error
+method RegisterProvider func(*codingagent.ModelRuntime, string, codingagent.ProviderConfigInput) error
+method RemoveRuntimeAPIKey func(*codingagent.ModelRuntime, context.Context, string, ...ai.AuthOperationOptions) error
+method SetRuntimeAPIKey func(*codingagent.ModelRuntime, context.Context, string, string, ...ai.AuthOperationOptions) error
+method Stream func(*codingagent.ModelRuntime, context.Context, ai.Model, ai.Context, ...ai.ModelsStreamOption) (*ai.AssistantMessageEventStream, error)
+method StreamSimple func(*codingagent.ModelRuntime, context.Context, ai.Model, ai.Context, ...ai.ModelsSimpleStreamOptions) (*ai.AssistantMessageEventStream, error)
+method UnregisterProvider func(*codingagent.ModelRuntime, string) error
+func(context.Context, ...codingagent.CreateModelRuntimeOptions) (*codingagent.ModelRuntime, error)
+func(*codingagent.ModelRuntime) *codingagent.ModelRegistry
+func(codingagent.ResolveCliModelOptions) (codingagent.ResolveCLIModelResult, error)
+func(context.Context, []string, *codingagent.ModelRuntime) (codingagent.ResolveModelScopeResult, error)
+func(bool) bool
+func(context.Context, codingagent.CreateAgentSessionServicesOptions) (codingagent.AgentSessionServices, error)
+func(context.Context, codingagent.CreateAgentSessionFromServicesOptions) (codingagent.CreateAgentSessionResult, error)
