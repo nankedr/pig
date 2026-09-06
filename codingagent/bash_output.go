@@ -7,9 +7,14 @@ import (
 	"unicode/utf8"
 
 	"github.com/nankedr/pig/ai"
+	"golang.org/x/text/encoding"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
 
 type bashOutput struct {
+	decoder                          *encoding.Decoder
+	decodedAny                       bool
 	raw, pending                     []byte
 	tail                             string
 	totalBytes, lines, lastLineBytes int
@@ -28,7 +33,7 @@ func (o *bashOutput) append(data []byte) {
 		if _, err := o.file.Write(data); err != nil && o.err == nil {
 			o.err = err
 		}
-	} else {
+	} else if o.err == nil {
 		o.raw = append(o.raw, data...)
 	}
 }
@@ -46,17 +51,21 @@ func (o *bashOutput) persist() {
 }
 func (o *bashOutput) decode(data []byte, final bool) {
 	data = append(o.pending, data...)
-	var decoded strings.Builder
-	for len(data) > 0 {
-		if !final && !utf8.FullRune(data) {
-			break
-		}
-		r, n := utf8.DecodeRune(data)
-		decoded.WriteRune(r)
-		data = data[n:]
+	if o.decoder == nil {
+		o.decoder = unicode.UTF8.NewDecoder()
 	}
-	o.pending = append([]byte(nil), data...)
-	text := decoded.String()
+	decoded := make([]byte, len(data)*3)
+	written, consumed, err := o.decoder.Transform(decoded, data, final)
+	if err != nil && err != transform.ErrShortSrc && o.err == nil {
+		o.err = err
+	}
+	o.pending = append([]byte(nil), data[consumed:]...)
+	text := string(decoded[:written])
+	if !o.decodedAny && text != "" {
+		o.decodedAny = true
+		text = strings.TrimPrefix(text, "\ufeff")
+	}
+
 	o.totalBytes += len(text)
 	o.lines += strings.Count(text, "\n")
 	if i := strings.LastIndexByte(text, '\n'); i >= 0 {
@@ -118,6 +127,9 @@ func (o *bashOutput) finish() (string, ai.JSONValue, error) {
 		return "", nil, o.err
 	}
 	text := trunc.Content
+	if !trunc.Truncated {
+		details = nil
+	}
 	if trunc.Truncated {
 		start, end := trunc.TotalLines-trunc.OutputLines+1, trunc.TotalLines
 		switch {

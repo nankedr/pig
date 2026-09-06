@@ -21,7 +21,7 @@ SDK 通过 `AgentTools` 注入 `CreateBashTool(cwd, BashToolOptions{...})`。She
 
 默认没有 timeout。显式 timeout 是正的有限秒数，最大 2147483.647。非零退出码成为含输出与 `Command exited with code N` 的错误；timeout/取消保留已有输出，并附状态。Abort/Dispose 等待在途执行收尾，已接纳 update 的 listener barrier 完成后才发布 final。Unix CLI 的 SIGINT、SIGTERM、SIGHUP 通过取消上下文终止进程组；被信号杀死的命令遵循 Pi 的 null exit code 表示。单独的 AgentSession.ExecuteBash 用户命令入口仍是后续能力。
 
-尾部预览限制为 2000 行或 50KB，以先到的限制为准；末尾换行不额外计行，超长末行保留 UTF-8 完整字符的尾部。流式更新约每 100ms 合并一次，第一条 update 为空，结束前刷出最后累计快照。shell 退出后仍有输出的继承管道继续读取，每次数据重置 100ms 空闲等待；安静的继承管道不会让执行永远挂住。执行返回后的迟到 operations 回调被忽略。
+尾部预览限制为 2000 行或 50KB，以先到的限制为准；显示解码与 Pi TextDecoder 一致：移除开头 BOM，残缺 UTF-8 子序列使用单个替代字符；完整文件仍保留原始字节。末尾换行不额外计行，超长末行保留 UTF-8 完整字符的尾部。流式更新约每 100ms 合并一次，第一条 update 为空，结束前刷出最后累计快照。shell 退出后仍有输出的继承管道继续读取，每次数据重置 100ms 空闲等待；安静的继承管道不会让执行永远挂住。执行返回后的迟到 operations 回调被忽略。
 
 完整原始 stdout/stderr 在超限时写入 OS 临时目录的 `pig-bash-*.log`，预览内存保持有界。成功结果的 details 和文本提供路径；非零退出、超时和取消的错误文本同样保留截断提示与路径。可用 read 的 offset/limit 分页查看。文件在命令退出、CLI 退出及 Session 清理后仍存在，不注册自动删除；示例也会留下文件并打印路径。用户自行管理这些文件，OS 临时目录仍可能被系统清理。
 

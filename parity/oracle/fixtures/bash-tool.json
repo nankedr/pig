@@ -30,6 +30,18 @@
         {
           "command": "printf 'partial'; exec sleep 5",
           "timeout": 1
+        },
+        {
+          "command": "printf '\\357\\273\\277hello'"
+        },
+        {
+          "command": "printf '\\342\\202'"
+        },
+        {
+          "command": "printf '\\342\\202A'"
+        },
+        {
+          "command": "printf '\\357'; sleep 0.01; printf '\\273\\277hello'"
         }
       ]
     },
@@ -60,13 +72,29 @@
         {
           "text": "partial\n\nCommand timed out after 1 seconds",
           "isError": true
+        },
+        {
+          "text": "hello",
+          "isError": false
+        },
+        {
+          "text": "�",
+          "isError": false
+        },
+        {
+          "text": "�A",
+          "isError": false
+        },
+        {
+          "text": "hello",
+          "isError": false
         }
       ]
     },
     "side_effects": []
   },
-  "input_hash": "sha256:fcaa07ca92e35eaa4bf1814d72cdd02e9b2971316bf9fdc3adefbf6d6b6ffbf0",
-  "observation_hash": "sha256:f9eb30921471b9f9fe729cea35f5da0defe3fb2ba69e9c209b228ed0f403746b",
+  "input_hash": "sha256:44711119b03ed322f4430ac069f242280c4625c6d0a76898e6f9f703eaad06b7",
+  "observation_hash": "sha256:becafbdc76d03688af3e0964d8c8e9431bad108336b94a7c899617425143f0b6",
   "execution_method": "node --experimental-strip-types parity/oracle/bash-tool.mjs <locked-pi-checkout>",
   "platform": "darwin-arm64",
   "environment": {

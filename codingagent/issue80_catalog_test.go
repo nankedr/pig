@@ -10,7 +10,7 @@ const issue80BashCatalogID = "contract:codingagent/bash-tool"
 func issue80BashCatalogEntry() catalog.Entry {
 	return catalog.Entry{
 		SchemaVersion: catalog.SchemaVersion, ID: issue80BashCatalogID,
-		Upstream: catalog.Upstream{Module: "coding-agent", Repository: "https://github.com/badlogic/pi-mono", Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/tools/write.ts"},
+		Upstream: catalog.Upstream{Module: "coding-agent", Repository: "https://github.com/badlogic/pi-mono", Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/tools/bash.ts"},
 		Mapping:  catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".CreateBashTool", Kind: "contract"}, Status: catalog.StatusPartial, Milestone: "M3", Classification: "public-api",
 		Partial:   &catalog.Partial{Supported: []string{"explicit SDK/Headless bash continuation, executable definition and replaceable local operations; host cwd/environment and Pig session metadata", "optional timeout and cancellation terminate Unix process groups; bounded UTF-8 tail snapshots and retained full output files readable after Session disposal and CLI exit", "darwin-arm64 shell, process tree, SIGINT/SIGTERM/SIGHUP and streaming update/final barriers verified"}, Unsupported: []string{"Windows/Termux shell resolution and six-platform behavior gates remain M13", "interactive user bash, extension host/rendering and default complete coding tools assembly remain deferred"}},
 		Deviation: &catalog.Deviation{ADR: "docs/adr/0008-pig-identity-state-and-services.md", Reason: "Session environment uses PIG_* and retained OS temporary output uses pig-bash-*; no PI_* identity is generated. Built-in definition execution follows ADR-0020."},

@@ -280,3 +280,33 @@ func TestBashToolDrainsActiveOutputAfterShellExit(t *testing.T) {
 		t.Fatalf("drain=%v", messages)
 	}
 }
+
+func TestBashToolBOMAtByteLimitPreservesRawOutput(t *testing.T) {
+	tool, err := codingagent.CreateBashToolDefinition(t.TempDir(), codingagent.BashToolOptions{Operations: bashTestOperations(func(_ context.Context, _, _ string, options codingagent.BashExecOptions) (codingagent.BashExecResult, error) {
+		options.OnData([]byte("\ufeff" + strings.Repeat("x", 51200)))
+		zero := 0
+		return codingagent.BashExecResult{ExitCode: &zero}, nil
+	})})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var path string
+	result, err := tool.Execute(context.Background(), "bom", map[string]any{"command": "bom"}, func(update agent.ErasedAgentToolResult) {
+		if details, ok := update.Details.(map[string]any); ok {
+			path, _ = details["fullOutputPath"].(string)
+		}
+	})
+	if path != "" {
+		t.Cleanup(func() { os.Remove(path) })
+	}
+	if err != nil || result.Details != nil || len(result.Content) != 1 {
+		t.Fatalf("result=%v err=%v", result, err)
+	}
+	if text := result.Content[0].(ai.TextContent).Text; len(text) != 51200 || strings.HasPrefix(text, "\ufeff") {
+		t.Fatalf("decoded output length=%d", len(text))
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil || len(raw) != 51203 || !strings.HasPrefix(string(raw), "\ufeff") {
+		t.Fatalf("raw length=%d err=%v", len(raw), err)
+	}
+}

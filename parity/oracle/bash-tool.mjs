@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -57,7 +57,7 @@ async function main() {
  const {createBashTool} = await import(pathToFileURL(join(args.pi, reference)).href);
  const dir = mkdtempSync(join(tmpdir(), "pi-bash-oracle-"));
  try {
-  const input = {commands:[{command:"printf 'hello\\n'"},{command:"true"},{command:"printf 'failure'; exit 7"},{command:"printf 'out'; sleep 0.05; printf 'err'"},{command:"printf 'partial'; exec sleep 5",timeout:1}]};
+  const input = {commands:[{command:"printf 'hello\\n'"},{command:"true"},{command:"printf 'failure'; exit 7"},{command:"printf 'out'; sleep 0.05; printf 'err'"},{command:"printf 'partial'; exec sleep 5",timeout:1},{command:"printf '\\357\\273\\277hello'"},{command:"printf '\\342\\202'"},{command:"printf '\\342\\202A'"},{command:"printf '\\357'; sleep 0.01; printf '\\273\\277hello'"}]};
   const tool=createBashTool(dir);
   const results=[];
   for(const command of input.commands){
@@ -66,7 +66,7 @@ async function main() {
   }
   const observation={outcome:{results},side_effects:[]};
   const caseValue={schema_version:"1.0.0",id:"go-sdk/codingagent/bash-tool",catalog_id:"contract:codingagent/bash-tool",surface:"go-sdk",input,observe:["outcome","side_effects"]};
-  const fixture={schema_version:"1.0.0",deterministic:true,baseline_id:lock.baseline_id,baseline_commit:lock.upstream.commit,upstream:{repository:lock.upstream.repository,commit:lock.upstream.commit,reference},case:caseValue,observation,input_hash:caseDigest(caseValue),observation_hash:observationDigest(observation),execution_method:"node --experimental-strip-types parity/oracle/bash-tool.mjs <locked-pi-checkout>",platform:"darwin-arm64",environment:{node:process.version,oracle_entry:reference}};
+  const fixture={schema_version:"1.0.0",deterministic:true,baseline_id:lock.baseline_id,baseline_commit:lock.upstream.commit,upstream:{repository:lock.upstream.repository,commit:lock.upstream.commit,reference},case:caseValue,observation,input_hash:caseDigest(caseValue),observation_hash:observationDigest(observation),execution_method:"node --experimental-strip-types parity/oracle/bash-tool.mjs <locked-pi-checkout>",platform:`${process.platform}-${process.arch}`,environment:{node:process.version,oracle_entry:reference}};
   if(args.check){const committed=JSON.parse(readFileSync(args.out,"utf8"));fixture.environment.node=committed.environment.node;if(JSON.stringify(fixture)!==JSON.stringify(committed))throw new Error("committed fixture does not reproduce");console.log(`verified ${args.out}`);}else{writeFileSync(args.out,`${JSON.stringify(fixture,null,2)}\n`);console.log(`wrote ${args.out}`);}
  } finally {rmSync(dir,{recursive:true,force:true});}
 }
