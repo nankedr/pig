@@ -154,27 +154,6 @@ func TestAgentSessionUnavailableQueriesReturnStructuredErrors(t *testing.T) {
 			}
 			return err
 		}},
-		{name: "pending message count", operation: "AgentSession.PendingMessageCount", call: func() error {
-			value, err := session.PendingMessageCount()
-			if value != 0 {
-				t.Errorf("PendingMessageCount = %d, want zero with an error", value)
-			}
-			return err
-		}},
-		{name: "steering messages", operation: "AgentSession.GetSteeringMessages", call: func() error {
-			value, err := session.GetSteeringMessages()
-			if value != nil {
-				t.Errorf("GetSteeringMessages = %#v, want nil with an error", value)
-			}
-			return err
-		}},
-		{name: "follow-up messages", operation: "AgentSession.GetFollowUpMessages", call: func() error {
-			value, err := session.GetFollowUpMessages()
-			if value != nil {
-				t.Errorf("GetFollowUpMessages = %#v, want nil with an error", value)
-			}
-			return err
-		}},
 		{name: "thinking levels", operation: "AgentSession.GetAvailableThinkingLevels", call: func() error {
 			value, err := session.GetAvailableThinkingLevels()
 			if value != nil {

@@ -452,6 +452,10 @@ type AgentSession struct {
 	idle                                    chan struct{}
 	activeCancel                            context.CancelCauseFunc
 	unsubscribeAgent                        agent.Unsubscribe
+	steeringMessages, followUpMessages      []sessionQueuedMessage
+	queueEvents                             []AgentSessionQueueUpdateEvent
+	queueDispatchDone                       chan struct{}
+	lastMessageTimestamp                    int64
 }
 
 func NewAgentSession(config AgentSessionConfig) *AgentSession {
@@ -500,9 +504,7 @@ func (*AgentSession) IsBashRunning() (bool, error) {
 func (*AgentSession) HasPendingBashMessages() (bool, error) {
 	return false, notImplemented("AgentSession.HasPendingBashMessages")
 }
-func (s *AgentSession) PendingMessageCount() (int, error) {
-	return 0, notImplemented("AgentSession.PendingMessageCount")
-}
+
 func (s *AgentSession) RetryAttempt() int { return s.retryAttempt }
 func (s *AgentSession) SessionFile() *string {
 	if s.sessionManager == nil {
@@ -548,13 +550,6 @@ func (s *AgentSession) GetAllTools() []agent.ErasedAgentTool {
 	}
 	return s.agent.State().Tools
 }
-func (*AgentSession) GetSteeringMessages() ([]string, error) {
-	return nil, notImplemented("AgentSession.GetSteeringMessages")
-}
-func (*AgentSession) GetFollowUpMessages() ([]string, error) {
-	return nil, notImplemented("AgentSession.GetFollowUpMessages")
-}
-func (s *AgentSession) ClearQueue() error { return notImplemented("AgentSession.ClearQueue") }
 func (s *AgentSession) WaitForIdle(ctx context.Context) error {
 	s.mu.RLock()
 	idle := s.idle
@@ -646,7 +641,7 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 	if len(options) > 0 {
 		option := options[0]
 		switch {
-		case option.ExpandPromptTemplates != nil:
+		case option.ExpandPromptTemplates != nil && *option.ExpandPromptTemplates:
 			return notImplemented("AgentSession.Prompt.ExpandPromptTemplates")
 		case len(option.Images) != 0:
 			return notImplemented("AgentSession.Prompt.Images")
@@ -654,10 +649,14 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 			return notImplemented("AgentSession.Prompt.PreflightResult")
 		case option.Source != "":
 			return notImplemented("AgentSession.Prompt.Source")
-		case option.StreamingBehavior != "":
-			return notImplemented("AgentSession.Prompt.StreamingBehavior")
+		case option.StreamingBehavior != "" && option.StreamingBehavior != "steer" && option.StreamingBehavior != "followUp":
+			return fmt.Errorf("invalid streaming behavior: %q", option.StreamingBehavior)
 		}
 	}
+	return s.prompt(ctx, text, options...)
+}
+
+func (s *AgentSession) prompt(ctx context.Context, text string, options ...PromptOptions) error {
 	runContext, cancel := context.WithCancelCause(ctx)
 	s.mu.Lock()
 	if s.disposed {
@@ -666,15 +665,22 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 		return fmt.Errorf("AgentSession is disposed")
 	}
 	if s.active {
+		var delivery UserMessageDelivery
+		if len(options) > 0 {
+			delivery = UserMessageDelivery(options[0].StreamingBehavior)
+		}
+		err := s.queueMessageLocked(text, delivery)
 		s.mu.Unlock()
 		cancel(nil)
-		return fmt.Errorf("AgentSession is already processing")
+		s.dispatchQueueEvents()
+		return err
 	}
 	if s.agent == nil {
 		s.mu.Unlock()
 		cancel(nil)
 		return fmt.Errorf("AgentSession has no Agent")
 	}
+	message := s.userMessageLocked(text)
 	s.active = true
 	s.idle = make(chan struct{})
 	s.activeCancel = cancel
@@ -696,13 +702,18 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 		cancel(nil)
 	}()
 	defer func() {
+		s.flushQueueEvents()
 		s.emit(AgentSessionAgentSettledEvent{Type: AgentSessionEventTypeAgentSettled})
 	}()
 
-	return s.agent.PromptText(context.WithValue(runContext, bashSessionKey{}, s), text)
+	return s.agent.Prompt(context.WithValue(runContext, bashSessionKey{}, s), message)
 }
 
 func (s *AgentSession) handleAgentEvent(_ context.Context, event agent.AgentEvent) error {
+	if started, ok := event.(agent.MessageStartEvent); ok {
+		s.consumeQueuedMessage(started.Message)
+	}
+	s.flushQueueEvents()
 	if err := s.emitAgentEvent(event); err != nil {
 		return err
 	}
@@ -755,7 +766,13 @@ func (s *AgentSession) emit(event AgentSessionEvent) {
 	}
 	s.mu.RUnlock()
 	for _, listener := range listeners {
-		listener(event)
+		if queue, ok := event.(AgentSessionQueueUpdateEvent); ok {
+			queue.Steering = append([]string{}, queue.Steering...)
+			queue.FollowUp = append([]string{}, queue.FollowUp...)
+			listener(queue)
+		} else {
+			listener(event)
+		}
 	}
 }
 
@@ -785,13 +802,8 @@ func bridgeAgentSessionEvent(event agent.AgentEvent) (AgentSessionEvent, error) 
 		return nil, fmt.Errorf("unsupported Agent event %T", event)
 	}
 }
-func (s *AgentSession) Steer(string) error    { return notImplemented("AgentSession.Steer") }
-func (s *AgentSession) FollowUp(string) error { return notImplemented("AgentSession.FollowUp") }
 func (s *AgentSession) SendCustomMessage(any, ...any) error {
 	return notImplemented("AgentSession.SendCustomMessage")
-}
-func (s *AgentSession) SendUserMessage(ai.UserMessageContent, ...SendUserMessageOptions) error {
-	return notImplemented("AgentSession.SendUserMessage")
 }
 func (s *AgentSession) AbortBash() error { return notImplemented("AgentSession.AbortBash") }
 func (s *AgentSession) AbortBranchSummary() error {
@@ -893,9 +905,6 @@ func (s *AgentSession) SetAutoCompactionEnabled(bool) error {
 func (s *AgentSession) SetAutoRetryEnabled(bool) error {
 	return notImplemented("AgentSession.SetAutoRetryEnabled")
 }
-func (s *AgentSession) SetFollowUpMode(agent.QueueMode) error {
-	return notImplemented("AgentSession.SetFollowUpMode")
-}
 func (s *AgentSession) SetModel(ai.Model) error { return notImplemented("AgentSession.SetModel") }
 func (s *AgentSession) SetScopedModels([]ScopedModel) error {
 	return notImplemented("AgentSession.SetScopedModels")
@@ -906,9 +915,6 @@ func (s *AgentSession) SetSessionName(name string) error {
 	}
 	_, err := s.sessionManager.AppendSessionInfo(name)
 	return err
-}
-func (s *AgentSession) SetSteeringMode(agent.QueueMode) error {
-	return notImplemented("AgentSession.SetSteeringMode")
 }
 func (s *AgentSession) SetThinkingLevel(agent.ThinkingLevel) error {
 	return notImplemented("AgentSession.SetThinkingLevel")

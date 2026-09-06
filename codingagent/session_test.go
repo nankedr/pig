@@ -262,22 +262,19 @@ func TestAgentSessionPromptPropagatesUnconfiguredAgentErrorAndSettles(t *testing
 	}
 }
 
-func TestAgentSessionLifecycleAndUnsupportedQueueMethodsHaveNoQueueSideEffects(t *testing.T) {
+func TestAgentSessionLifecyclePreservesQueuesUntilClear(t *testing.T) {
 	legacy := newLegacyAgentWithQueuedSteering(t, agent.AgentInitialState{})
 	session := codingagent.NewAgentSession(codingagent.AgentSessionConfig{Agent: legacy})
 	before := legacy.State()
 
-	if err := session.ClearQueue(); !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Errorf("ClearQueue() error = %v, want ErrNotImplemented", err)
-	}
 	if err := session.Abort(); err != nil {
 		t.Errorf("Abort() error = %v", err)
 	}
 	if err := session.WaitForIdle(context.Background()); err != nil {
 		t.Errorf("WaitForIdle() error = %v", err)
 	}
-	if count, err := session.PendingMessageCount(); !errors.Is(err, codingagent.ErrNotImplemented) || count != 0 {
-		t.Errorf("PendingMessageCount() = (%d, %v), want (0, ErrNotImplemented)", count, err)
+	if count, err := session.PendingMessageCount(); err != nil || count != 0 {
+		t.Errorf("PendingMessageCount() = (%d, %v), want (0, nil) for messages queued outside Session", count, err)
 	}
 
 	if got := legacy.State(); !reflect.DeepEqual(got, before) {
@@ -285,6 +282,12 @@ func TestAgentSessionLifecycleAndUnsupportedQueueMethodsHaveNoQueueSideEffects(t
 	}
 	if !legacy.HasQueuedMessages() {
 		t.Fatal("session lifecycle methods drained the legacy queue")
+	}
+	if err := session.ClearQueue(); err != nil {
+		t.Fatal(err)
+	}
+	if legacy.HasQueuedMessages() {
+		t.Fatal("ClearQueue did not clear Legacy Agent queues")
 	}
 	if err := session.Dispose(); err != nil {
 		t.Errorf("Dispose() error = %v", err)

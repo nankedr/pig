@@ -7,3 +7,7 @@ Pig 仅在未取消、仍可接收消息的活动 run 中允许 Steer/FollowUp�
 结束 listener 按注册顺序全部执行，以 `errors.Join` 返回错误；不会因为一个结束 listener 失败再次制造 Assistant 失败消息或重复 `agent_end`。其他事件的 listener 错误仍按既有 Go 契约直接传播。该行为延续 ADR-0006 的 partial outcome 与运行结局边界。
 
 两条队列的 FIFO、one/all、工具/steering 优先、follow-up 的下一 turn 以及 Continue 从 assistant 尾部取队列的行为保持基线语义。共同 fixture 证明这些相同部分；`legacy-agent-queues-deviation.json` 单独记录 Pi 的 idle/结束入队和 listener 失败行为，Go 测试分别断言偏离结果，不通过 normalization 隐藏差异。
+
+Issue #85 将同一 admission 决策接到 AgentSession；独立 `session-messages-deviation.json` 通过固定 Pi 的公开 SDK 记录 idle、取消后、agent_end 和 agent_settled 的宽松入队结果。Go 的 Session 不在拒绝后写展示队列或发送成功队列事件。Session 的 ClearQueue 保留已发布的 error-only 签名，清空前内容可通过独立快照查询。
+
+Session 用本次用户消息的单调毫秒时间戳与文本识别消费，避免固定 Pi 按非空文本查找时的空文本残留，以及相同文本在新 Prompt 和保留队列之间误删展示项。时间戳是生成的身份，不要求与 Pi 的 Date.now 字节一致；内容、消费顺序与已消费历史仍须相同。该调整服务于 #85 的并发与历史一致性要求，不改变 Legacy Agent 调度。

@@ -13,6 +13,7 @@ m0-offline:
 	go vet ./...
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build ./...
 	go run ./examples/m0-contracts
+	go run ./examples/session-messages
 	go run ./examples/sdk-agent-session
 	go run ./examples/session-navigation
 	go run ./examples/session-persistence
@@ -57,6 +58,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/telemetry.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/message-handoff.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/context-overflow.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/session-messages.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-navigation.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-tree.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/model-runtime.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

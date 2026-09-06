@@ -118,7 +118,7 @@ func TestAgentSessionExactOperationStubsAreInert(t *testing.T) {
 		operation string
 		call      func() error
 	}{
-		{name: "send user message", operation: "AgentSession.SendUserMessage", call: func() error {
+		{name: "send user message", operation: "AgentSession.SendUserMessage.Images", call: func() error {
 			return session.SendUserMessage(ai.UserBlocks(
 				ai.TextContent{Type: ai.ContentTypeText, Text: "hello"},
 				ai.ImageContent{Type: ai.ContentTypeImage, Data: "aGk=", MIMEType: "image/png"},
