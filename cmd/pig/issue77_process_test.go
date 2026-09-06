@@ -60,6 +60,14 @@ func TestPigModelRuntime77(t *testing.T) {
 	if body["model"] != "future-model" {
 		t.Fatalf("custom model: %v", body)
 	}
+	out, err = run("--model", "deepseek-v4-flash", "--api-key", "override", "--no-session", "--no-tools", "-p", "authenticated bare id")
+	if err != nil {
+		t.Fatalf("authenticated bare model with override: %s %v", out, err)
+	}
+	body = <-requests
+	if body["model"] != "deepseek-v4-flash" {
+		t.Fatal("authenticated provider did not disambiguate bare ID")
+	}
 	out, err = run("--api-key", "fixture", "--no-tools", "--no-session", "-p", "hello")
 	if err == nil || !strings.Contains(out, "--api-key requires a model") {
 		t.Fatalf("unscoped key: %s %v", out, err)

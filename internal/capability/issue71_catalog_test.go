@@ -100,6 +100,7 @@ func issue71PromoteCatalog(t *testing.T, source []catalog.Entry) []catalog.Entry
 		}
 		issue74ExtendProductEntry(t, entry)
 		issue75ExtendProductEntry(t, entry)
+		issue77ExtendProductEntry(t, entry)
 	}
 	for i := range entries {
 		entry := &entries[i]

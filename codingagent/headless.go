@@ -109,6 +109,12 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			return nil, err
 		}
 		if options.APIKey != nil {
+			if options.Provider == "" && options.Model != "" {
+				_, _ = models.GetAvailable(ctx)
+				if err := ctx.Err(); err != nil {
+					return nil, err
+				}
+			}
 			provider := options.Provider
 			if options.Model != "" {
 				resolved, e := ResolveCLIModel(ResolveCliModelOptions{CLIProvider: string(provider), CLIModel: options.Model, CLIThinking: options.Thinking, ModelRuntime: models})
