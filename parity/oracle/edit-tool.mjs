@@ -121,6 +121,11 @@ async function main() {
    ["hangul-composition","\u1100\u1161\u11a8\n","각"],
    ["combining-blocked","Ａ\u0305\u0300\n","A\u0305\u0300"]
   ]) input.cases.push({name,content,args:{edits:[{oldText,newText:"done"}]}});
+  for(const [name,content] of [
+   ["unicode16-preserved-line","\u{1CCD6} A\u{1E5EE}\u{1E5EF} target  \n"],
+   ["long-combining-preserved-line","Ａ"+"\u0315".repeat(35)+"\u0300 target  \n"],
+   ["cgj-preserved-line","Ａ"+"\u0315".repeat(31)+"\u034f\u0300 target  \n"]
+  ]) input.cases.push({name,content,args:{edits:[{oldText:"target\n",newText:"done\n"}]}});
   let seed = 79;
   const next = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0);
   for(let i=0;i<32;i++) {

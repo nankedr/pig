@@ -63,5 +63,5 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
-	fmt.Printf("PASS %d Unicode16 cases through public edit definition\n", count)
+	fmt.Printf("PASS %d Unicode16 equivalence cases through public edit definition\n", count)
 }

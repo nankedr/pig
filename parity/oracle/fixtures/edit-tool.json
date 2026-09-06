@@ -710,6 +710,42 @@
           }
         },
         {
+          "name": "unicode16-preserved-line",
+          "content": "𜳖 A𞗯𞗮 target  \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "target\n",
+                "newText": "done\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "long-combining-preserved-line",
+          "content": "Ａ̀̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕ target  \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "target\n",
+                "newText": "done\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "cgj-preserved-line",
+          "content": "Ａ̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀ target  \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "target\n",
+                "newText": "done\n"
+              }
+            ]
+          }
+        },
+        {
           "name": "diff-path-0",
           "content": "a\nb\na\n\nc\n\nb\nc\n\na\nc\nb\n\nb\nc\n\nc\na\na\n\na\na\nc\n\na\nc\nb\na\nc\na",
           "args": {
@@ -1625,6 +1661,39 @@
         {
           "text": "Successfully replaced 1 block(s) in target.txt.",
           "details": {
+            "diff": "-1 𜳖 A𞗯𞗮 target  \n+1 A A𞗯𞗮 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-𜳖 A𞗯𞗮 target  \n+A A𞗯𞗮 done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "A A𞗯𞗮 done\n",
+          "content": "A A𞗯𞗮 done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 Ａ̀̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕ target  \n+1 À̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕ done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-Ａ̀̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕ target  \n+À̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕ done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "À̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕ done\n",
+          "content": "À̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕ done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 Ａ̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀ target  \n+1 A̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀ done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-Ａ̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀ target  \n+A̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀ done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "A̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀ done\n",
+          "content": "A̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕̕͏̀ done\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
             "diff": "    ...\n 10 a\n 11 c\n 12 b\n 13 \n-14 b\n+14 a\n+15 new\n 15 c\n-16 \n-17 c\n 18 a\n 19 a\n 20 \n 21 a\n    ...",
             "patch": "--- target.txt\n+++ target.txt\n@@ -10,12 +10,11 @@\n a\n c\n b\n \n-b\n+a\n+new\n c\n-\n-c\n a\n a\n \n a\n",
             "firstChangedLine": 14
@@ -2020,8 +2089,8 @@
     },
     "side_effects": []
   },
-  "input_hash": "sha256:9c4654a68620bfed1d773ccb3e405fdbdab32e7bdc9b32bcb2ebd56a1d3df8ff",
-  "observation_hash": "sha256:050cc251f2aec2e02ed242892fcda5e3babacadb3fb773d04c686a988071e6c5",
+  "input_hash": "sha256:39ae35356039f3694ff32606b28b7c2dfb7df04be5bcc41748640f3273fd5f5e",
+  "observation_hash": "sha256:4b3628037eb9469cb3badebf7654e221670c843aa251011a637a2e579d0f5df7",
   "execution_method": "node --experimental-strip-types parity/oracle/edit-tool.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {
