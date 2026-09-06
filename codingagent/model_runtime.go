@@ -42,7 +42,7 @@ func newModelRuntime(ctx context.Context, options CreateModelRuntimeOptions, env
 	if environment != nil {
 		config.AuthContext = headlessAuthContext(environment)
 	}
-	r := &ModelRuntime{models: ai.BuiltinModels(config), credentials: credentials, auth: map[string]AuthStatus{}}
+	r := &ModelRuntime{offline: ResolveOffline(options.Offline), models: ai.BuiltinModels(config), credentials: credentials, auth: map[string]AuthStatus{}}
 	if err := installCatalogSnapshot(r.models); err != nil {
 		return nil, err
 	}
@@ -72,6 +72,11 @@ func (r *ModelRuntime) refreshAvailability(ctx context.Context, providers []stri
 	}
 	infos, err := r.credentials.List(ctx, ai.AuthOperationOptions{})
 	if err != nil {
+		r.mu.Lock()
+		r.availabilityError = "Availability refresh: " + err.Error()
+		r.available = nil
+		r.auth = map[string]AuthStatus{}
+		r.mu.Unlock()
 		return nil, err
 	}
 	stored := map[string]bool{}
@@ -108,6 +113,10 @@ func (r *ModelRuntime) refreshAvailability(ctx context.Context, providers []stri
 		status.Label, _ = auth.Source.Value()
 		if stored[id] {
 			status.Source = "stored"
+			status.Label = ""
+		}
+		if credentials, ok := r.credentials.(*headlessCredentials); ok && credentials.apiKey != nil && credentials.provider == p.ID() {
+			status.Source = "runtime"
 			status.Label = ""
 		}
 		models, err := r.models.GetAvailable(ctx, p.ID())

@@ -83,13 +83,7 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 			}
 			config.Model = &model
 			config.ThinkingLevel = thinking
-			if config.SessionManager != nil {
-				saved := config.SessionManager.BuildSessionContext()
-				if len(saved.Messages) > 0 && saved.Model != nil && (saved.Model.Provider != string(model.Provider) || saved.Model.ModelID != model.ID) {
-					message := fmt.Sprintf("Could not restore model %s/%s. Using %s/%s", saved.Model.Provider, saved.Model.ModelID, model.Provider, model.ID)
-					fallback = &message
-				}
-			}
+			fallback = restoredModelFallback(config.SessionManager, model, false)
 		} else {
 			_, thinking, err := resolveHeadlessModel(ctx, config.ModelRuntime, config.SettingsManager, CreateHeadlessSessionOptions{Provider: config.Model.Provider, Model: config.Model.ID, Thinking: config.ThinkingLevel, SessionManager: config.SessionManager})
 			if err != nil {

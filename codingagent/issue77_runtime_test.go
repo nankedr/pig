@@ -211,6 +211,14 @@ func TestModelRuntime77SnapshotAndRestoration(t *testing.T) {
 	if created.ModelFallbackMessage == nil || *created.ModelFallbackMessage != "Could not restore model missing/removed. Using deepseek/deepseek-v4-pro" || created.Session.ThinkingLevel() != "high" {
 		t.Fatalf("fallback: %s thinking=%s model=%s", *created.ModelFallbackMessage, created.Session.ThinkingLevel(), created.Session.Model().ID)
 	}
+	headless, err := codingagent.CreateHeadlessSession(ctx, codingagent.CreateHeadlessSessionOptions{CWD: t.TempDir(), AgentDir: t.TempDir(), ModelRuntime: runtime, SettingsManager: settings, SessionManager: manager, NoTools: codingagent.NoToolsAll})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer headless.Dispose(ctx)
+	if !reflect.DeepEqual(headless.ModelFallbackMessage(), created.ModelFallbackMessage) {
+		t.Fatalf("SDK/Headless fallback differs: %v %v", headless.ModelFallbackMessage(), created.ModelFallbackMessage)
+	}
 	if err := store.Delete(ctx, "deepseek", ai.AuthOperationOptions{}); err != nil {
 		t.Fatal(err)
 	}
@@ -268,3 +276,25 @@ func TestModelRuntime77EmbeddedSnapshotAndNoControlPlane(t *testing.T) {
 type runtime77Transport func(*http.Request) (*http.Response, error)
 
 func (f runtime77Transport) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
+
+func TestModelRuntime77CorruptCredentialsRemainDiagnostic(t *testing.T) {
+	t.Setenv("DEEPSEEK_API_KEY", "")
+	dir := t.TempDir()
+	auth := filepath.Join(dir, "auth.json")
+	if err := os.WriteFile(auth, []byte("{invalid"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	runtime, err := codingagent.NewModelRuntime(context.Background(), codingagent.CreateModelRuntimeOptions{AuthPath: auth})
+	if err != nil {
+		t.Fatal(err)
+	}
+	diagnostic, err := runtime.GetError()
+	if err != nil || !strings.Contains(diagnostic, "invalid") {
+		t.Fatalf("lost credential failure: %q %v", diagnostic, err)
+	}
+	settings, _ := codingagent.NewInMemorySettingsManager(codingagent.Settings{})
+	_, err = codingagent.CreateAgentSession(context.Background(), codingagent.CreateAgentSessionOptions{CWD: dir, AgentDir: dir, ModelRuntime: runtime, SettingsManager: settings, SessionManager: codingagent.NewInMemorySessionManager(dir)})
+	if err == nil || !strings.Contains(err.Error(), "invalid") {
+		t.Fatalf("SDK hid corrupted credentials: %v", err)
+	}
+}

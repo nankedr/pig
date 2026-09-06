@@ -17,7 +17,7 @@ pig --offline --models 'deepseek/*:high' --no-tools -p 'hello'
 
 CLI 显式模型最优先，支持大小写无关的 `provider/model`、模糊 ID/名称与 thinking 后缀。已知 Provider 下不存在的 ID 按固定 Pi 从默认模型复制元数据，再使用自定义 ID，并返回 warning；未知 Provider 或无法匹配的裸 ID 明确失败。多个 Provider 的裸 ID 相同时，仅唯一已认证的匹配可以自动选中。
 
-新 CLI 会话可用 `--models` 的第一个可用模型；已有 Session 恢复优先于 scope 和 settings。SDK 未指定 Model 时先恢复已有 Session，再读 settings 默认值，最后按固定 Pi 的 Provider 默认顺序 fallback。SDK 的 `ScopedModels` 保留为会话 scope，不改变 SDK 的初始选择。thinking 按显式参数、恢复记录、有效 settings、medium 的顺序解析，最终由 `ai.ClampThinkingLevel` 限制到模型能力。显式 `--thinking` 优先于模型后缀。
+新 CLI 会话可用 `--models` 或全局/可信项目 settings 的 `enabledModels` 中第一个可用模型，显式参数覆盖 settings；已有 Session 恢复优先于 scope 和 settings。SDK 未指定 Model 时先恢复已有 Session，再读 settings 默认值，最后按固定 Pi 的 Provider 默认顺序 fallback。SDK 的 `ScopedModels` 保留为会话 scope，不改变 SDK 的初始选择。thinking 按显式参数、恢复记录、有效 settings、medium 的顺序解析，最终由 `ai.ClampThinkingLevel` 限制到模型能力。显式 `--thinking` 优先于模型后缀。CLI 的 `--api-key` 要求通过模型参数或已解析的 scope 明确选型，key 仅作用于该 Provider，并显示为 runtime 来源；不写入凭证文件。
 
 `CreateAgentSessionServices` 在读取文件凭证前处理 Project Trust；调用者注入 SettingsManager 时拥有它的信任状态。项目被拒绝信任不阻止读取用户全局凭证。`CreateAgentSessionFromServices` 与 `CreateAgentSession` 共用组装路径；现有可执行工具为 read，以及显式选择的 write/bash。默认全套工具和扩展资源加载仍未开放。
 
@@ -25,7 +25,7 @@ CLI 显式模型最优先，支持大小写无关的 `provider/model`、模糊 I
 
 内嵌 `codingagent/data/models.json` 与固定 v0.84.1 Catalog Snapshot 逐字节一致，包含 39 个 Provider 的 1,220 个模型。它只提供查询数据，不启用新的 Provider/API Adapter。运行时对 Provider 的包装仅覆盖静态模型查询，认证与执行复用已有实现。
 
-`GetAvailable` 更新可用性和来源快照，`GetAvailableSnapshot`/`ModelRegistry.GetAvailable` 读取已发布的副本。当前可执行认证范围仍是已有 DeepSeek API key；其他 Provider 的认证和 Adapter 保持明确的 Capability Stub。来源状态仅含 configured/source/label，不含 key；OAuth、ambient auth 和 Provider 注册仍按 M10/M11/M7 推进。查询到模型不等于该模型可执行。
+`GetAvailable` 更新可用性和来源快照，凭证枚举失败会清空失效快照并保留可查询诊断；`GetAvailableSnapshot`/`ModelRegistry.GetAvailable` 读取已发布的副本。当前可执行认证范围仍是已有 DeepSeek API key；其他 Provider 的认证和 Adapter 保持明确的 Capability Stub。来源状态仅含 configured/source/label，不含 key；OAuth、ambient auth 和 Provider 注册仍按 M10/M11/M7 推进。查询到模型不等于该模型可执行。
 
 scope 支持模型模式、thinking 后缀和基础 `*`、`?`、字符组 glob，按输入顺序去重并返回无匹配/无效 thinking 诊断。本阶段不支持 minimatch extglob 和 brace expansion。`--list-models` 显示已认证模型及上下文、输出、thinking、图片元数据，并支持搜索。
 

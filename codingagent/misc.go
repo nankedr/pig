@@ -469,6 +469,36 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	} else if parsed.NoBuiltinTools {
 		noTools = NoToolsBuiltin
 	}
+	if parsed.APIKey != nil && parsed.Model == nil {
+		patterns := parsed.Models
+		if patterns == nil {
+			patterns, err = settings.GetEnabledModels()
+			if err != nil {
+				return err
+			}
+		}
+		if len(patterns) > 0 && len(manager.BuildSessionContext().Messages) == 0 {
+			catalog, e := NewModelRuntime(ctx)
+			if e != nil {
+				return e
+			}
+			scope, e := ResolveModelScopeWithDiagnostics(ctx, patterns, catalog)
+			if e != nil {
+				return e
+			}
+			if len(scope.ScopedModels) > 0 {
+				selected := scope.ScopedModels[0]
+				id := string(selected.Model.Provider) + "/" + selected.Model.ID
+				parsed.Model = &id
+				if parsed.Thinking == "" {
+					parsed.Thinking = selected.ThinkingLevel
+				}
+			}
+		}
+		if parsed.Model == nil {
+			return &CLIArgumentError{Message: "--api-key requires a model to be specified via --model, --provider/--model, or --models"}
+		}
+	}
 	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
 		CWD:             cwd,
 		Models:          parsed.Models,
@@ -489,6 +519,9 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	})
 	if err != nil {
 		return err
+	}
+	if fallback := runtime.ModelFallbackMessage(); fallback != nil {
+		fmt.Fprintln(os.Stderr, "Warning: "+*fallback)
 	}
 	for _, d := range runtime.Services().Diagnostics {
 		fmt.Fprintln(os.Stderr, "Warning: "+d.Message)

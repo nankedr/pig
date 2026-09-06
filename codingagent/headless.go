@@ -102,19 +102,66 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		if environment == nil {
 			environment = ai.ProviderEnv{}
 		}
-		models, err = newModelRuntime(ctx, CreateModelRuntimeOptions{Offline: ResolveOffline(options.Offline), Credentials: headlessCredentials{CredentialStore: credentials, apiKey: options.APIKey}}, environment)
+		requestCredentials := &headlessCredentials{CredentialStore: credentials}
+		refresh := false
+		models, err = newModelRuntime(ctx, CreateModelRuntimeOptions{Offline: ResolveOffline(options.Offline), Credentials: requestCredentials, RefreshOnCreate: &refresh}, environment)
 		if err != nil {
 			return nil, err
 		}
+		if options.APIKey != nil {
+			provider := options.Provider
+			if options.Model != "" {
+				resolved, e := ResolveCLIModel(ResolveCliModelOptions{CLIProvider: string(provider), CLIModel: options.Model, CLIThinking: options.Thinking, ModelRuntime: models})
+				if e != nil {
+					return nil, e
+				}
+				if resolved.Error != nil {
+					return nil, &CLIArgumentError{Message: *resolved.Error}
+				}
+				provider = resolved.Model.Provider
+			}
+			if provider == "" && options.SessionManager != nil {
+				saved := options.SessionManager.BuildSessionContext()
+				if len(saved.Messages) > 0 && saved.Model != nil {
+					if _, ok, _ := models.GetModel(saved.Model.Provider, saved.Model.ModelID); ok {
+						provider = ai.ProviderID(saved.Model.Provider)
+					}
+				}
+			}
+			if provider == "" {
+				p, e := settings.GetDefaultProvider()
+				if e != nil {
+					return nil, e
+				}
+				provider = ai.ProviderID(p)
+			}
+			if provider == "" {
+				provider = ai.ProviderIDDeepSeek
+			}
+			requestCredentials.apiKey = options.APIKey
+			requestCredentials.provider = provider
+		}
+		_, _ = models.GetAvailable(ctx)
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+
 	}
 	model, thinking, err := resolveHeadlessModel(ctx, models, settings, options)
 	if err != nil {
 		return nil, err
 	}
+	patterns := options.Models
+	if patterns == nil {
+		patterns, err = settings.GetEnabledModels()
+		if err != nil {
+			return nil, err
+		}
+	}
 	scoped := []ScopedModel{}
 	diagnostics := []AgentSessionRuntimeDiagnostic{}
-	if len(options.Models) > 0 {
-		scope, e := ResolveModelScopeWithDiagnostics(ctx, options.Models, models)
+	if len(patterns) > 0 {
+		scope, e := ResolveModelScopeWithDiagnostics(ctx, patterns, models)
 		if e != nil {
 			return nil, e
 		}
@@ -236,9 +283,10 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			return CreateAgentSessionRuntimeResult{}, err
 		}
 		runtime.session.sessionStartEvent = next.SessionStartEvent
-		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session()}, Services: runtime.Services()}, nil
+		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session(), ModelFallbackMessage: runtime.ModelFallbackMessage()}, Services: runtime.Services()}, nil
 	}
-	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD, AgentDir: options.AgentDir, ModelRuntime: models, SettingsManager: settings, Diagnostics: diagnostics}, factory, nil, nil), nil
+	fallback := restoredModelFallback(options.SessionManager, model, options.Model != "")
+	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD, AgentDir: options.AgentDir, ModelRuntime: models, SettingsManager: settings, Diagnostics: diagnostics}, factory, diagnostics, fallback), nil
 }
 
 func configureSessionPrompt(ctx context.Context, session *AgentSession, options CreateHeadlessSessionOptions) error {

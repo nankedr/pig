@@ -171,3 +171,15 @@ func prepareHeadlessProjectSettings(ctx context.Context, cwd, agentDir string, s
 	}
 	return settings.SetProjectTrusted(trusted)
 }
+
+func restoredModelFallback(manager *SessionManager, model ai.Model, explicit bool) *string {
+	if explicit || manager == nil {
+		return nil
+	}
+	saved := manager.BuildSessionContext()
+	if len(saved.Messages) == 0 || saved.Model == nil || (saved.Model.Provider == string(model.Provider) && saved.Model.ModelID == model.ID) {
+		return nil
+	}
+	message := fmt.Sprintf("Could not restore model %s/%s. Using %s/%s", saved.Model.Provider, saved.Model.ModelID, model.Provider, model.ID)
+	return &message
+}

@@ -336,9 +336,9 @@ func TestPigProcessReportsStableHeadlessFailures(t *testing.T) {
 		arguments []string
 		want      string
 	}{
-		{name: "missing provider", arguments: []string{"-p", "hello"}, want: "Error: Headless mode requires --provider <provider>\n"},
-		{name: "JSON missing provider", arguments: []string{"--mode", "json", "hello"}, want: "Error: Headless mode requires --provider <provider>\n"},
-		{name: "unknown provider", arguments: []string{"--provider", "unknown", "--model", "model", "--no-session", "-p", "hello"}, want: "Error: Unknown provider \"unknown\"\n"},
+		{name: "missing provider", arguments: []string{"-p", "hello"}, want: "Error: No models available with configured authentication. Use --provider and --model with --api-key, or configure credentials.\n"},
+		{name: "JSON missing provider", arguments: []string{"--mode", "json", "hello"}, want: "Error: No models available with configured authentication. Use --provider and --model with --api-key, or configure credentials.\n"},
+		{name: "unknown provider", arguments: []string{"--provider", "unknown", "--model", "model", "--no-session", "-p", "hello"}, want: "Error: Unknown provider \"unknown\". Use --list-models to see available providers/models.\n"},
 		{name: "provider error", arguments: []string{"--provider", "deepseek", "--model", "deepseek-v4-flash", "--no-session", "-p", "hello"}, want: "auth: Provider is not configured: deepseek\n"},
 		{name: "rpc stub", arguments: []string{"--mode", "rpc", "--provider", "deepseek", "--model", "deepseek-v4-flash"}, want: "codingagent.mode.rpc: not implemented\n"},
 	}

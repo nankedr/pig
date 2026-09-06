@@ -60,6 +60,33 @@ func TestPigModelRuntime77(t *testing.T) {
 	if body["model"] != "future-model" {
 		t.Fatalf("custom model: %v", body)
 	}
+	out, err = run("--api-key", "fixture", "--no-tools", "--no-session", "-p", "hello")
+	if err == nil || !strings.Contains(out, "--api-key requires a model") {
+		t.Fatalf("unscoped key: %s %v", out, err)
+	}
+	settingsDir := filepath.Join(home, ".pig", "agent")
+	if err = os.MkdirAll(settingsDir, 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err = os.WriteFile(filepath.Join(settingsDir, "settings.json"), []byte(`{"defaultProvider":"deepseek","defaultModel":"deepseek-v4-pro","enabledModels":["deepseek/deepseek-v4-flash:high"]}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	out, err = run("--no-session", "--no-tools", "-p", "settings scope")
+	if err != nil {
+		t.Fatalf("settings scope: %s %v", out, err)
+	}
+	body = <-requests
+	if body["model"] != "deepseek-v4-flash" {
+		t.Fatal("enabledModels ignored")
+	}
+	out, err = run("--models", "deepseek-v4-pro", "--no-session", "--no-tools", "-p", "explicit scope")
+	if err != nil {
+		t.Fatalf("explicit scope: %s %v", out, err)
+	}
+	body = <-requests
+	if body["model"] != "deepseek-v4-pro" {
+		t.Fatal("settings overrode explicit scope")
+	}
 	out, err = run("--model", "no-such-model", "--no-tools", "--no-session", "-p", "hello")
 	if err == nil || !strings.Contains(out, "not found") {
 		t.Fatalf("missing model: %s %v", out, err)

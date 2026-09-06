@@ -112,6 +112,7 @@ type CompatibilityRequestConfig struct {
 
 type ModelRuntime struct {
 	models            ai.MutableModels
+	offline           bool
 	credentials       ai.CredentialStore
 	mu                sync.RWMutex
 	refreshMu         sync.Mutex
@@ -294,9 +295,17 @@ func (r *ModelRuntime) Refresh(ctx context.Context, options ...ai.ModelsRefreshO
 		return notImplemented("ModelRuntime.Refresh")
 	}
 	if len(options) > 0 {
-		if allowed, ok := options[0].AllowNetwork.Value(); ok && allowed && !ResolveOffline(false) {
+		if allowed, ok := options[0].AllowNetwork.Value(); ok && allowed && !r.offline && !ResolveOffline(false) {
 			return notImplemented("ModelRuntime.Refresh.Network")
 		}
+	}
+	if len(options) > 0 && options[0].Providers != nil {
+		for _, provider := range options[0].Providers {
+			if _, err := r.GetAvailable(ctx, string(provider)); err != nil {
+				return err
+			}
+		}
+		return nil
 	}
 	_, err := r.GetAvailable(ctx)
 	return err

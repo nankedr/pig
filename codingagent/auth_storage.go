@@ -207,14 +207,15 @@ func (s *AuthStorage) Delete(ctx context.Context, provider ai.ProviderID, _ ai.A
 
 type headlessCredentials struct {
 	ai.CredentialStore
-	apiKey *string
+	apiKey   *string
+	provider ai.ProviderID
 }
 
 func (s headlessCredentials) Read(ctx context.Context, provider ai.ProviderID, options ai.AuthOperationOptions) (ai.Credential, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if s.apiKey != nil {
+	if s.apiKey != nil && (s.provider == "" || s.provider == provider) {
 		if *s.apiKey == "" {
 			return nil, errors.New("explicit API key must not be empty")
 		}
