@@ -1,0 +1,36 @@
+method Prompt func(*codingagent.AgentSession, context.Context, string, ...codingagent.PromptOptions) error
+method AbortRetry func(*codingagent.AgentSession) error
+method IsRetrying func(*codingagent.AgentSession) (bool, error)
+method RetryAttempt func(*codingagent.AgentSession) int
+method AutoRetryEnabled func(*codingagent.AgentSession) bool
+method SetAutoRetryEnabled func(*codingagent.AgentSession, bool) error
+method WaitForIdle func(*codingagent.AgentSession, context.Context) error
+type codingagent.RetrySettings struct
+fields:
+- Enabled *bool tag="json:\"enabled,omitempty\""
+- MaxRetries *int tag="json:\"maxRetries,omitempty\""
+- BaseDelayMS *int64 tag="json:\"baseDelayMs,omitempty\""
+- Provider *codingagent.ProviderRetrySettings tag="json:\"provider,omitempty\""
+type codingagent.ProviderRetrySettings struct
+fields:
+- TimeoutMS *int64 tag="json:\"timeoutMs,omitempty\""
+- MaxRetries *int tag="json:\"maxRetries,omitempty\""
+- MaxRetryDelayMS *int64 tag="json:\"maxRetryDelayMs,omitempty\""
+type codingagent.AgentSessionAutoRetryStartEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Attempt int tag="json:\"attempt\""
+- MaxAttempts int tag="json:\"maxAttempts\""
+- DelayMS int64 tag="json:\"delayMs\""
+- ErrorMessage string tag="json:\"errorMessage\""
+type codingagent.AgentSessionAutoRetryEndEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Success bool tag="json:\"success\""
+- Attempt int tag="json:\"attempt\""
+- FinalError *string tag="json:\"finalError,omitempty\""
+type codingagent.HeadlessOutcome struct
+fields:
+- FinalMessage *ai.AssistantMessage tag=""
+- Text []string tag=""
+- Canceled bool tag=""

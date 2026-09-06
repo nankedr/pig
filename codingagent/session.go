@@ -433,30 +433,36 @@ type AgentSessionConfig struct {
 }
 
 type AgentSession struct {
-	mu                                      sync.RWMutex
-	agent                                   *agent.Agent
-	sessionManager                          *SessionManager
-	settingsManager                         *SettingsManager
-	resourceLoader                          ResourceLoader
-	modelRuntime                            *ModelRuntime
-	extensionRunner                         *ExtensionRunner
-	sessionStartEvent                       *SessionStartEvent
-	scopedModels                            []ScopedModel
-	activeToolNames                         []string
-	autoCompactionEnabled, autoRetryEnabled bool
-	retryAttempt                            int
-	listeners                               map[uint64]AgentSessionEventListener
-	listenerOrder                           []uint64
-	nextListener                            uint64
-	active, disposed                        bool
-	idle                                    chan struct{}
-	activeCancel                            context.CancelCauseFunc
-	unsubscribeAgent                        agent.Unsubscribe
+	mu                    sync.RWMutex
+	agent                 *agent.Agent
+	sessionManager        *SessionManager
+	settingsManager       *SettingsManager
+	resourceLoader        ResourceLoader
+	modelRuntime          *ModelRuntime
+	extensionRunner       *ExtensionRunner
+	sessionStartEvent     *SessionStartEvent
+	scopedModels          []ScopedModel
+	activeToolNames       []string
+	autoCompactionEnabled bool
+	retryAttempt          int
+	retryCancel           context.CancelFunc
+	lastAssistant         *ai.AssistantMessage
+	retryCancelled        bool
+	listeners             map[uint64]AgentSessionEventListener
+	listenerOrder         []uint64
+	nextListener          uint64
+	active, disposed      bool
+	idle                  chan struct{}
+	activeCancel          context.CancelCauseFunc
+	unsubscribeAgent      agent.Unsubscribe
 }
 
 func NewAgentSession(config AgentSessionConfig) *AgentSession {
 	idle := make(chan struct{})
 	close(idle)
+	if config.SettingsManager == nil {
+		config.SettingsManager, _ = NewInMemorySettingsManager(Settings{})
+	}
 	s := &AgentSession{agent: config.Agent, sessionManager: config.SessionManager, settingsManager: config.SettingsManager, resourceLoader: config.ResourceLoader, modelRuntime: config.ModelRuntime, extensionRunner: config.ExtensionRunnerRef, sessionStartEvent: config.SessionStartEvent, scopedModels: cloneScopedModels(config.ScopedModels), activeToolNames: append([]string(nil), config.InitialActiveToolNames...), listeners: make(map[uint64]AgentSessionEventListener), idle: idle}
 	if s.agent != nil {
 		s.unsubscribeAgent = s.agent.Subscribe(s.handleAgentEvent)
@@ -491,8 +497,10 @@ func (s *AgentSession) IsIdle() bool { return !s.IsStreaming() }
 func (*AgentSession) IsCompacting() (bool, error) {
 	return false, notImplemented("AgentSession.IsCompacting")
 }
-func (*AgentSession) IsRetrying() (bool, error) {
-	return false, notImplemented("AgentSession.IsRetrying")
+func (s *AgentSession) IsRetrying() (bool, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.retryCancel != nil, nil
 }
 func (*AgentSession) IsBashRunning() (bool, error) {
 	return false, notImplemented("AgentSession.IsBashRunning")
@@ -503,7 +511,7 @@ func (*AgentSession) HasPendingBashMessages() (bool, error) {
 func (s *AgentSession) PendingMessageCount() (int, error) {
 	return 0, notImplemented("AgentSession.PendingMessageCount")
 }
-func (s *AgentSession) RetryAttempt() int { return s.retryAttempt }
+func (s *AgentSession) RetryAttempt() int { s.mu.RLock(); defer s.mu.RUnlock(); return s.retryAttempt }
 func (s *AgentSession) SessionFile() *string {
 	if s.sessionManager == nil {
 		return nil
@@ -526,7 +534,10 @@ func (s *AgentSession) SessionName() *string {
 	return s.sessionManager.GetSessionName()
 }
 func (s *AgentSession) AutoCompactionEnabled() bool { return s.autoCompactionEnabled }
-func (s *AgentSession) AutoRetryEnabled() bool      { return s.autoRetryEnabled }
+func (s *AgentSession) AutoRetryEnabled() bool {
+	enabled, _ := s.settingsManager.GetRetryEnabled()
+	return enabled
+}
 func (s *AgentSession) SteeringMode() agent.QueueMode {
 	if s.agent == nil {
 		return ""
@@ -676,6 +687,8 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 		return fmt.Errorf("AgentSession has no Agent")
 	}
 	s.active = true
+	s.lastAssistant = nil
+	s.retryCancelled = false
 	s.idle = make(chan struct{})
 	s.activeCancel = cancel
 	s.mu.Unlock()
@@ -683,6 +696,7 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 		s.mu.Lock()
 		s.active = false
 		s.activeCancel = nil
+		s.retryAttempt = 0
 		close(s.idle)
 		var unsubscribe agent.Unsubscribe
 		if s.disposed {
@@ -699,7 +713,24 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 		s.emit(AgentSessionAgentSettledEvent{Type: AgentSessionEventTypeAgentSettled})
 	}()
 
-	return s.agent.PromptText(context.WithValue(runContext, bashSessionKey{}, s), text)
+	runContext = context.WithValue(runContext, bashSessionKey{}, s)
+	err := s.agent.PromptText(runContext, text)
+	for err == nil {
+		retry, retryErr := s.prepareRetry(runContext)
+		if retryErr != nil {
+			err = retryErr
+			break
+		}
+		if !retry {
+			break
+		}
+		err = s.agent.Continue(runContext)
+	}
+	if err != nil {
+		text := err.Error()
+		s.endRetry(false, &text)
+	}
+	return err
 }
 
 func (s *AgentSession) handleAgentEvent(_ context.Context, event agent.AgentEvent) error {
@@ -715,10 +746,25 @@ func (s *AgentSession) handleAgentEvent(_ context.Context, event agent.AgentEven
 			}
 		}
 	}
+	if ended, ok := event.(agent.MessageEndEvent); ok {
+		if message, ok := ended.Message.(ai.AssistantMessage); ok {
+			owned := ai.CloneAssistantMessage(message)
+			s.mu.Lock()
+			s.lastAssistant = &owned
+			s.mu.Unlock()
+			if message.StopReason != ai.StopReasonError {
+				s.endRetry(true, nil)
+			}
+		}
+	}
 	return nil
 }
 
 func (s *AgentSession) emitAgentEvent(event agent.AgentEvent) error {
+	willRetry := false
+	if ended, ok := event.(agent.AgentEndEvent); ok {
+		willRetry = s.willRetry(ended.Messages)
+	}
 	s.mu.RLock()
 	listeners := make([]AgentSessionEventListener, 0, len(s.listeners))
 	for _, id := range s.listenerOrder {
@@ -740,6 +786,10 @@ func (s *AgentSession) emitAgentEvent(event agent.AgentEvent) error {
 		if err != nil {
 			return err
 		}
+		if ended, ok := bridged.(AgentSessionAgentEndEvent); ok {
+			ended.WillRetry = willRetry
+			bridged = ended
+		}
 		listener(bridged)
 	}
 	return nil
@@ -755,7 +805,12 @@ func (s *AgentSession) emit(event AgentSessionEvent) {
 	}
 	s.mu.RUnlock()
 	for _, listener := range listeners {
-		listener(event)
+		snapshot := event
+		if ended, ok := event.(AgentSessionAutoRetryEndEvent); ok {
+			ended.FinalError = cloneStringPointer(ended.FinalError)
+			snapshot = ended
+		}
+		listener(snapshot)
 	}
 }
 
@@ -798,7 +853,14 @@ func (s *AgentSession) AbortBranchSummary() error {
 	return notImplemented("AgentSession.AbortBranchSummary")
 }
 func (s *AgentSession) AbortCompaction() error { return notImplemented("AgentSession.AbortCompaction") }
-func (s *AgentSession) AbortRetry() error      { return notImplemented("AgentSession.AbortRetry") }
+func (s *AgentSession) AbortRetry() error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.retryCancel != nil {
+		s.retryCancel()
+	}
+	return nil
+}
 func (s *AgentSession) BindExtensions(ExtensionBindings) error {
 	return notImplemented("AgentSession.BindExtensions")
 }
@@ -890,8 +952,8 @@ func (s *AgentSession) SetActiveToolsByName([]string) error {
 func (s *AgentSession) SetAutoCompactionEnabled(bool) error {
 	return notImplemented("AgentSession.SetAutoCompactionEnabled")
 }
-func (s *AgentSession) SetAutoRetryEnabled(bool) error {
-	return notImplemented("AgentSession.SetAutoRetryEnabled")
+func (s *AgentSession) SetAutoRetryEnabled(enabled bool) error {
+	return s.settingsManager.SetRetryEnabled(enabled)
 }
 func (s *AgentSession) SetFollowUpMode(agent.QueueMode) error {
 	return notImplemented("AgentSession.SetFollowUpMode")
