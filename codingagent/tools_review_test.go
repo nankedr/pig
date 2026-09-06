@@ -104,7 +104,6 @@ func TestToolDefinitionHasNoHiddenExecutableResource(t *testing.T) {
 }
 
 func TestBuiltinToolDefinitionFactoriesAreCapabilityStubs(t *testing.T) {
-	disabled := false
 	resizeImages := true
 	tests := []struct {
 		name          string
@@ -113,22 +112,6 @@ func TestBuiltinToolDefinitionFactoriesAreCapabilityStubs(t *testing.T) {
 		wantSignature reflect.Type
 		call          func(*int) (codingagent.ToolDefinition, error)
 	}{
-		{
-			name:          "bash",
-			operation:     "CreateBashToolDefinition",
-			factory:       codingagent.CreateBashToolDefinition,
-			wantSignature: reflect.TypeOf((func(string, ...codingagent.BashToolOptions) (codingagent.ToolDefinition, error))(nil)),
-			call: func(calls *int) (codingagent.ToolDefinition, error) {
-				return codingagent.CreateBashToolDefinition("invalid\x00path", codingagent.BashToolOptions{
-					Operations:               countingBashOperations{calls: calls},
-					ExposeSessionEnvironment: &disabled,
-					SpawnHook: func(spawnContext codingagent.BashSpawnContext) codingagent.BashSpawnContext {
-						*calls++
-						return spawnContext
-					},
-				})
-			},
-		},
 		{
 			name:          "edit",
 			operation:     "CreateEditToolDefinition",

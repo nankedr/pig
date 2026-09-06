@@ -18,6 +18,7 @@ m0-offline:
 	go run ./examples/session-persistence
 	go run ./examples/session-interop
 	go run ./examples/write-read
+	go run ./examples/bash-read
 	go run ./examples/global-settings
 	go run ./examples/credentials
 	go run ./examples/project-trust
@@ -59,6 +60,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/project-trust.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/project-trust-startup.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/write-tool.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/bash-tool.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/global-settings.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/settings-startup.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-persistence.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

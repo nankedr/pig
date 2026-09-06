@@ -1,0 +1,47 @@
+func codingagent.CreateBashTool func(string, ...codingagent.BashToolOptions) (agent.ErasedAgentTool, error)
+
+func codingagent.CreateBashToolDefinition func(string, ...codingagent.BashToolOptions) (codingagent.ToolDefinition, error)
+
+func codingagent.CreateLocalBashOperations func(...codingagent.BashToolOptions) codingagent.BashOperations
+
+func codingagent.GetShellConfig func(...string) (codingagent.ShellConfig, error)
+
+type codingagent.BashToolOptions struct
+fields:
+- Operations codingagent.BashOperations tag=""
+- CommandPrefix string tag=""
+- ShellPath string tag=""
+- ExposeSessionEnvironment *bool tag=""
+- SpawnHook codingagent.BashSpawnHook tag=""
+
+type codingagent.BashToolInput struct
+fields:
+- Command string tag=""
+- Timeout *float64 tag=""
+
+type codingagent.BashToolDetails struct
+fields:
+- Truncation *agent.TruncationResult tag=""
+- FullOutputPath string tag=""
+
+type codingagent.BashExecOptions struct
+fields:
+- OnData func([]uint8) tag=""
+- Timeout *float64 tag=""
+- Env map[string]string tag=""
+
+type codingagent.BashExecResult struct
+fields:
+- ExitCode *int tag=""
+
+type codingagent.BashSpawnContext struct
+fields:
+- Command string tag=""
+- CWD string tag=""
+- Env map[string]string tag=""
+
+type codingagent.ShellConfig struct
+fields:
+- Shell string tag=""
+- Args []string tag=""
+- CommandTransport string tag=""
