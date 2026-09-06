@@ -35,8 +35,9 @@ func run() error {
 	model, _ := core.GetModel()
 	execute := func(manager *codingagent.SessionManager, calls ...ai.ToolCall) error {
 		var responses []ai.FauxResponseStep
+		offset := len(manager.BuildSessionContext().Messages)
 		for i, call := range calls {
-			call.Type, call.ID = "toolCall", fmt.Sprintf("%s-%d", manager.GetSessionID(), i)
+			call.Type, call.ID = "toolCall", fmt.Sprintf("%s-%d", manager.GetSessionID(), offset+i)
 			message, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(call), ai.FauxAssistantMessageOptions{StopReason: ai.Some(ai.StopReasonToolUse)})
 			if err != nil {
 				return err

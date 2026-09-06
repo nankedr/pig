@@ -450,9 +450,9 @@ func TestWriteToolSessionAbortWaitsForMutation(t *testing.T) {
 	}
 }
 
-func TestWriteToolHeadlessRequiresExplicitSelection(t *testing.T) {
+func TestWriteToolHeadlessSelection(t *testing.T) {
 	for _, test := range []struct{ names, excluded, want []string }{
-		{want: []string{"read"}}, {names: []string{"write"}, want: []string{"write"}},
+		{want: []string{"read", "bash", "edit", "write"}}, {names: []string{"write"}, want: []string{"write"}},
 		{names: []string{"read", "write"}, excluded: []string{"write"}, want: []string{"read"}},
 	} {
 		settings, err := codingagent.NewInMemorySettingsManager(codingagent.Settings{})

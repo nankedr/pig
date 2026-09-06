@@ -94,7 +94,7 @@ func TestEditToolPreCanceledAndDefinitionValidation(t *testing.T) {
 
 func TestEditToolHeadlessExplicitSelection(t *testing.T) {
 	for _, test := range []struct{ names, excluded, want []string }{
-		{want: []string{"read"}}, {names: []string{"edit"}, want: []string{"edit"}},
+		{want: []string{"read", "bash", "edit", "write"}}, {names: []string{"edit"}, want: []string{"edit"}},
 		{names: []string{"read", "edit", "write"}, want: []string{"read", "edit", "write"}},
 		{names: []string{"read", "edit"}, excluded: []string{"edit"}, want: []string{"read"}},
 	} {

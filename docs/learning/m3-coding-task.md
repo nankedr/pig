@@ -13,7 +13,7 @@ go run ./cmd/pig --fork <session-id-or-file> -p '从已有历史尝试另一种�
 
 `--tools write,read` 显式选择工具，`--exclude-tools bash` 最后排除，`--no-tools` 或 `--no-builtin-tools` 在没有显式选择时禁用默认工具。SDK 的 `Tools: []string{}` 表示空选择；nil 表示默认集合。工具说明和使用建议仅包含最终启用的工具。注入 Provider 的 M1/M2 SDK 路径默认使用内存 settings 与内存 Session；除模型明确调用的文件或 shell 工具外，不产生配置或 Session 持久化副作用。
 
-可信 settings 的 `shellPath`、`shellCommandPrefix` 传入 Bash。拒绝 Project Trust 会忽略项目 settings，仍可使用全局设置和内建工具，因为信任门不是 Tool 审批或 Sandbox。启动时装配 Provider 的 `retry.provider` 重试、超时和最大重试等待参数；未设置 timeout 时使用 `httpIdleTimeoutMs`，该值为 0 时映射为 2147483647ms。Agent 的 transport、steering/follow-up queue mode 和 thinking budgets 同样来自 settings。尚未实现的图片处理、WebSocket 等行为不因此开放。
+可信 settings 的 `shellPath`、`shellCommandPrefix` 传入 Bash。拒绝 Project Trust 会忽略项目 settings，仍可使用全局设置和内建工具，因为信任门不是 Tool 审批或 Sandbox。每次请求读取 Provider 的 `retry.provider` 重试、超时和最大重试等待参数；未设置 timeout 时使用 `httpIdleTimeoutMs`，该值为 0 时映射为 2147483647ms。Agent 的 transport、steering/follow-up queue mode 和 thinking budgets 同样来自 settings。尚未实现的图片处理、WebSocket 等行为不因此开放。
 
 新建、重开和 fork 均以 SessionManager 身份创建 Agent。每次模型调用保留 SessionID，继续显式关闭 Provider 缓存；Chat Completions 的 `CacheRetentionNone` 分支接受身份而不发送缓存键或 affinity header，与固定 Pi 的禁缓存行为一致。Bash 从当前 Session 读取 `PIG_SESSION_ID`、可用时的 `PIG_SESSION_FILE`、Provider/model/thinking；内存 Session 没有文件变量。
 

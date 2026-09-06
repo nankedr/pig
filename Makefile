@@ -20,6 +20,7 @@ m0-offline:
 	go run ./examples/edit-read
 	go run ./examples/write-read
 	go run ./examples/bash-read
+	go run ./examples/coding-task
 	go run ./examples/global-settings
 	go run ./examples/model-runtime
 	go run ./examples/credentials

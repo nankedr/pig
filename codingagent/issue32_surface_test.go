@@ -1457,7 +1457,7 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 	case "symbol:codingagent/src/core/tools/index.ts#createCodingTools":
 		entry.Status = catalog.StatusImplemented
 		entry.Notes = "Issue #81 opens the shared four-Tool factory; behavior and evidence are owned by contract:codingagent/default-coding-tools."
-		entry.Evidence = evidence("codingagent/issue81_tools_test.go#TestDefaultCodingToolsParity", "issue81-coding-tools-factory", "sha256:e47a15bed8b4417f21a297b857b9eda7bed73d8236ddec94fdad5341ce627704", "go test ./codingagent -run '^TestDefaultCodingToolsParity$' -count=1", "default public Session assembly uses CreateCodingTools and matches locked Pi selection/prompt", "PASS; four default tools and selection modes match Pi", "any")
+		entry.Evidence = evidence("codingagent/issue81_tools_test.go#TestDefaultCodingToolsParity", "issue81-coding-tools-factory", "sha256:497906865cd909e767a3982895fdb7c3cbe6bc6760401ae600e1b068df8486e3", "go test ./codingagent -run '^TestDefaultCodingToolsParity$' -count=1", "default public Session assembly uses CreateCodingTools and matches locked Pi selection/prompt", "PASS; four default tools and selection modes match Pi", "any")
 	case "symbol:codingagent/src/main.ts#main":
 		entry.Status = catalog.StatusPartial
 		entry.Evidence = append(append(evidence(

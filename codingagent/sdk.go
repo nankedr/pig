@@ -3,6 +3,7 @@ package codingagent
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
@@ -122,32 +123,16 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 			return CreateAgentSessionResult{}, err
 		}
 	}
-	retry, err := config.SettingsManager.GetProviderRetrySettings()
-	if err != nil {
+	if _, err := sessionStreamOptions(config.SettingsManager, ai.SimpleStreamOptions{}); err != nil {
 		return CreateAgentSessionResult{}, err
-	}
-	timeout, err := config.SettingsManager.GetHTTPIdleTimeoutMS()
-	if err != nil {
-		return CreateAgentSessionResult{}, err
-	}
-	if timeout == 0 {
-		timeout = 2147483647
-	}
-	if retry.TimeoutMS != nil {
-		timeout = *retry.TimeoutMS
 	}
 	baseStream := stream
 	stream = func(ctx context.Context, model ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
-		cacheRetention := ai.CacheRetentionNone
-		options.CacheRetention = &cacheRetention
-		if options.TimeoutMS == nil {
-			options.TimeoutMS = &timeout
-		}
-		if options.MaxRetries == nil {
-			options.MaxRetries = retry.MaxRetries
-		}
-		if options.MaxRetryDelayMS == nil {
-			options.MaxRetryDelayMS = retry.MaxRetryDelayMS
+		options, err := sessionStreamOptions(config.SettingsManager, options)
+		if err != nil {
+			result := ai.NewAssistantMessageEventStream()
+			result.Push(ai.AssistantMessageErrorEvent{Type: ai.AssistantMessageEventTypeError, Reason: ai.StopReasonError, Error: ai.AssistantMessage{Role: ai.MessageRoleAssistant, Content: []ai.AssistantContent{}, API: model.API, Provider: model.Provider, Model: model.ID, StopReason: ai.StopReasonError, ErrorMessage: ai.Some(err.Error()), Timestamp: time.Now().UnixMilli()}})
+			return result
 		}
 		return baseStream(ctx, model, input, options)
 	}
@@ -295,4 +280,33 @@ func isBuiltinAgentTool(name string) bool {
 	default:
 		return false
 	}
+}
+
+func sessionStreamOptions(settings *SettingsManager, options ai.SimpleStreamOptions) (ai.SimpleStreamOptions, error) {
+	retry, err := settings.GetProviderRetrySettings()
+	if err != nil {
+		return options, err
+	}
+	timeout, err := settings.GetHTTPIdleTimeoutMS()
+	if err != nil {
+		return options, err
+	}
+	if timeout == 0 {
+		timeout = 2147483647
+	}
+	if retry.TimeoutMS != nil {
+		timeout = *retry.TimeoutMS
+	}
+	cacheRetention := ai.CacheRetentionNone
+	options.CacheRetention = &cacheRetention
+	if options.TimeoutMS == nil {
+		options.TimeoutMS = &timeout
+	}
+	if options.MaxRetries == nil {
+		options.MaxRetries = retry.MaxRetries
+	}
+	if options.MaxRetryDelayMS == nil {
+		options.MaxRetryDelayMS = retry.MaxRetryDelayMS
+	}
+	return options, nil
 }
