@@ -1,5 +1,7 @@
 # Pig 文档导航
 
+M4.1 已支持显式 grep 搜索并继续编码任务，见 [grep 学习材料](learning/m4-grep-tool.md)和 [TypeScript → Go](mappings/typescript-to-go/m4-grep-tool.md)。
+
 M3/v0.3.0 的发布范围、安装和门禁见 [M3 集成与冻结](learning/m3-freeze.md)、[TypeScript → Go 导航](mappings/typescript-to-go/m3-freeze.md)及 [发布说明](releases/v0.3.0.md)。
 
 M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回读](learning/m3-write-tool.md)。

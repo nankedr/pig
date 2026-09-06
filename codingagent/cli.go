@@ -168,7 +168,7 @@ Built-in Tool Names:
   bash   - Execute host shell commands (opt in with --tools bash)
   edit   - Edit files with find/replace (not implemented)
   write  - Write files (creates/overwrites; opt in with --tools write)
-  grep   - Search file contents (not implemented)
+  grep   - Search file contents
   find   - Find files by glob pattern (not implemented)
   ls     - List directory contents (not implemented)
 

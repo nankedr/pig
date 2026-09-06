@@ -122,15 +122,6 @@ func TestBuiltinToolDefinitionFactoriesAreCapabilityStubs(t *testing.T) {
 			},
 		},
 		{
-			name:          "grep",
-			operation:     "CreateGrepToolDefinition",
-			factory:       codingagent.CreateGrepToolDefinition,
-			wantSignature: reflect.TypeOf((func(string, ...codingagent.GrepToolOptions) (codingagent.ToolDefinition, error))(nil)),
-			call: func(calls *int) (codingagent.ToolDefinition, error) {
-				return codingagent.CreateGrepToolDefinition("invalid\x00path", codingagent.GrepToolOptions{Operations: countingGrepOperations{calls: calls}})
-			},
-		},
-		{
 			name:          "ls",
 			operation:     "CreateLsToolDefinition",
 			factory:       codingagent.CreateLsToolDefinition,

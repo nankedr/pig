@@ -1550,6 +1550,8 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 
 func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/grep.ts#"):
+		return issue83GrepCatalogID
 	case reference == issue32ReferencePrefix+"core/tools/index.ts#createCodingTools":
 		return issue81ToolsCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-runtime.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-registry.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-resolver.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/agent-session-services.ts#"):
@@ -1862,7 +1864,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1873,6 +1875,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	t.Helper()
 	var descriptors []issue32ModuleEvidenceDescriptor
 	switch catalogID {
+	case issue83GrepCatalogID:
+		descriptors = issue83GrepEvidence(t)
 	case issue76CredentialCatalogID:
 		descriptors = issue76CredentialEvidence(t)
 	case issue77RuntimeCatalogID:

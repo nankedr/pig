@@ -423,19 +423,19 @@ type FindOperations interface {
 type FindToolOptions struct{ Operations FindOperations }
 
 type GrepToolInput struct {
-	Pattern    string
-	Path       string
-	Glob       string
-	IgnoreCase bool
-	Literal    bool
-	Context    *int
-	Limit      *int
+	Pattern    string   `json:"pattern"`
+	Path       string   `json:"path,omitempty"`
+	Glob       string   `json:"glob,omitempty"`
+	IgnoreCase bool     `json:"ignoreCase,omitempty"`
+	Literal    bool     `json:"literal,omitempty"`
+	Context    *float64 `json:"context,omitempty"`
+	Limit      *float64 `json:"limit,omitempty"`
 }
 
 type GrepToolDetails struct {
-	Truncation        *TruncationResult
-	MatchLimitReached *int
-	LinesTruncated    bool
+	Truncation        *TruncationResult `json:"truncation,omitempty"`
+	MatchLimitReached *float64          `json:"matchLimitReached,omitempty"`
+	LinesTruncated    bool              `json:"linesTruncated,omitempty"`
 }
 
 type GrepOperations interface {
@@ -535,10 +535,6 @@ func CreateFindToolDefinition(string, ...FindToolOptions) (ToolDefinition, error
 	return ToolDefinition{}, notImplemented("CreateFindToolDefinition")
 }
 
-func CreateGrepToolDefinition(string, ...GrepToolOptions) (ToolDefinition, error) {
-	return ToolDefinition{}, notImplemented("CreateGrepToolDefinition")
-}
-
 func CreateLsToolDefinition(string, ...LsToolOptions) (ToolDefinition, error) {
 	return ToolDefinition{}, notImplemented("CreateLsToolDefinition")
 }
@@ -550,10 +546,6 @@ func CreateReadToolDefinition(string, ...ReadToolOptions) (ToolDefinition, error
 func CreateFindTool(cwd string, options ...FindToolOptions) (agent.ErasedAgentTool, error) {
 	_, _ = cwd, options
 	return agent.ErasedAgentTool{}, notImplemented("CreateFindTool")
-}
-func CreateGrepTool(cwd string, options ...GrepToolOptions) (agent.ErasedAgentTool, error) {
-	_, _ = cwd, options
-	return agent.ErasedAgentTool{}, notImplemented("CreateGrepTool")
 }
 func CreateLsTool(cwd string, options ...LsToolOptions) (agent.ErasedAgentTool, error) {
 	_, _ = cwd, options

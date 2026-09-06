@@ -310,6 +310,7 @@ func configureSessionPrompt(ctx context.Context, session *AgentSession, options 
 			"bash":  "Execute bash commands (ls, grep, find, etc.)",
 			"write": "Create or overwrite files",
 			"edit":  editPromptSnippet,
+			"grep":  grepPromptSnippet,
 		},
 	}
 	if containsTool(activeTools, "read", false) {
