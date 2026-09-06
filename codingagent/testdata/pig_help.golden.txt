@@ -160,8 +160,8 @@ Built-in Tool Names:
   edit   - Edit files with find/replace (not implemented)
   write  - Write files (creates/overwrites; opt in with --tools write)
   grep   - Search file contents (not implemented)
-  find   - Find files by glob pattern (not implemented)
-  ls     - List directory contents (not implemented)
+  find   - Find files by glob pattern (requires fd; opt in with --tools find)
+  ls     - List directory contents (opt in with --tools ls)
 
 Exit Status:
   0    Static success, successful Headless run, or JSON-encoded Provider failure

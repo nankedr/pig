@@ -1,0 +1,53 @@
+func codingagent.CreateFindTool func(string, ...codingagent.FindToolOptions) (agent.ErasedAgentTool, error)
+
+func codingagent.CreateFindToolDefinition func(string, ...codingagent.FindToolOptions) (codingagent.ToolDefinition, error)
+
+func codingagent.CreateLsTool func(string, ...codingagent.LsToolOptions) (agent.ErasedAgentTool, error)
+
+func codingagent.CreateLsToolDefinition func(string, ...codingagent.LsToolOptions) (codingagent.ToolDefinition, error)
+
+type codingagent.FindToolOptions struct
+fields:
+- Operations codingagent.FindOperations tag=""
+
+type codingagent.FindToolInput struct
+fields:
+- Pattern string tag=""
+- Path string tag=""
+- Limit *int tag=""
+
+type codingagent.FindToolDetails struct
+fields:
+- Truncation *agent.TruncationResult tag=""
+- ResultLimitReached *int tag=""
+
+type codingagent.FindGlobOptions struct
+fields:
+- Ignore []string tag=""
+- Limit int tag=""
+
+type codingagent.FindOperations interface
+  Exists func(context.Context, string) (bool, error)
+  Glob func(context.Context, string, string, codingagent.FindGlobOptions) ([]string, error)
+
+type codingagent.LsToolOptions struct
+fields:
+- Operations codingagent.LsOperations tag=""
+
+type codingagent.LsToolInput struct
+fields:
+- Path string tag=""
+- Limit *int tag=""
+
+type codingagent.LsToolDetails struct
+fields:
+- Truncation *agent.TruncationResult tag=""
+- EntryLimitReached *int tag=""
+
+type codingagent.LsOperations interface
+  Exists func(context.Context, string) (bool, error)
+  Readdir func(context.Context, string) ([]string, error)
+  Stat func(context.Context, string) (codingagent.LsFileInfo, error)
+
+type codingagent.LsFileInfo interface
+  IsDirectory func() bool
