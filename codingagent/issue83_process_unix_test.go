@@ -141,7 +141,19 @@ wait
 				t.Fatal("search process did not start")
 			}
 			t.Cleanup(func() { syscall.Kill(parent, syscall.SIGKILL); syscall.Kill(child, syscall.SIGKILL) })
-			if phase == "search" || phase == "probe" {
+			if phase == "orphan" {
+				deadline := time.Now().Add(2 * time.Second)
+				for syscall.Kill(parent, 0) == nil && time.Now().Before(deadline) {
+					time.Sleep(5 * time.Millisecond)
+				}
+				if err := syscall.Kill(parent, 0); err != syscall.ESRCH {
+					t.Fatalf("parent did not exit before cancellation: %v", err)
+				}
+				if err := syscall.Kill(child, 0); err != nil {
+					t.Fatalf("child did not retain output pipe: %v", err)
+				}
+			}
+			if phase != "limit" {
 				if err := created.Session.Abort(); err != nil {
 					t.Fatal(err)
 				}
@@ -170,7 +182,7 @@ wait
 					if result.IsError != (phase != "limit") {
 						t.Fatalf("wrong outcome: %+v", result)
 					}
-					if (phase == "search" || phase == "probe") && readToolResultText(t, result) != "Operation aborted" {
+					if phase != "limit" && readToolResultText(t, result) != "Operation aborted" {
 						t.Fatal(result)
 					}
 				}

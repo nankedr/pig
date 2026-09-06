@@ -12,7 +12,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 	"unicode/utf16"
 
 	"github.com/nankedr/pig/agent"
@@ -94,8 +93,8 @@ func executeGrep(ctx context.Context, cwd string, ops GrepOperations, pattern st
 		commandArgs = append(commandArgs, "--glob", glob)
 	}
 	commandArgs = append(commandArgs, "--", pattern, path)
-	cmd := exec.CommandContext(ctx, binary, commandArgs...)
-	if err := configureGrepProcess(cmd); err != nil {
+	cmd := exec.Command(binary, commandArgs...)
+	if err := configureBashProcess(cmd); err != nil {
 		return agent.ErasedAgentToolResult{}, err
 	}
 	type match struct {
@@ -131,17 +130,14 @@ func executeGrep(ctx context.Context, cwd string, ops GrepOperations, pattern st
 	}}
 	var stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = writer, &stderr
-	err = cmd.Run()
-	if errors.Is(err, exec.ErrWaitDelay) {
-		killBashProcess(cmd.Process)
-	}
+	err = runGrepProcess(ctx, cmd)
 	running = false
 	writer.flush()
 	if ctx.Err() != nil {
 		return agent.ErasedAgentToolResult{}, grepAbortError{context.Cause(ctx)}
 	}
 	if err != nil && !limitReached && (cmd.ProcessState == nil || cmd.ProcessState.ExitCode() != 1) {
-		if cmd.ProcessState == nil || errors.Is(err, exec.ErrWaitDelay) {
+		if cmd.ProcessState == nil {
 			return agent.ErasedAgentToolResult{}, fmt.Errorf("Failed to run ripgrep: %w", err)
 		}
 		message := strings.TrimSpace(stderr.String())
@@ -244,13 +240,20 @@ func executeGrep(ctx context.Context, cwd string, ops GrepOperations, pattern st
 	return result, nil
 }
 
-func configureGrepProcess(cmd *exec.Cmd) error {
-	if err := configureBashProcess(cmd); err != nil {
+func runGrepProcess(ctx context.Context, cmd *exec.Cmd) error {
+	if err := ctx.Err(); err != nil {
 		return err
 	}
-	cmd.Cancel = func() error { killBashProcess(cmd.Process); return nil }
-	cmd.WaitDelay = 100 * time.Millisecond
-	return nil
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	canceled := make(chan struct{})
+	stop := context.AfterFunc(ctx, func() { killBashProcess(cmd.Process); close(canceled) })
+	err := cmd.Wait()
+	if !stop() {
+		<-canceled
+	}
+	return err
 }
 
 func grepBinary(ctx context.Context) (string, error) {
@@ -262,15 +265,12 @@ func grepBinary(ctx context.Context) (string, error) {
 	if _, err := os.Stat(local); err == nil {
 		return local, nil
 	}
-	probe := exec.CommandContext(ctx, "rg", "--version")
-	if err := configureGrepProcess(probe); err != nil {
+	probe := exec.Command("rg", "--version")
+	if err := configureBashProcess(probe); err != nil {
 		return "", err
 	}
 	probe.Stdout, probe.Stderr = io.Discard, io.Discard
-	err = probe.Run()
-	if errors.Is(err, exec.ErrWaitDelay) {
-		killBashProcess(probe.Process)
-	}
+	err = runGrepProcess(ctx, probe)
 	if ctx.Err() != nil {
 		return "", grepAbortError{context.Cause(ctx)}
 	}
