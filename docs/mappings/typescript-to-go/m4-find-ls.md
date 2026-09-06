@@ -9,7 +9,7 @@
 | `FindOperations`、`LsOperations` | `codingagent/tools.go` 已发布接口 | `TestIssue84FindLsAPISnapshot` |
 | `find.ts#relativizeFindResultPath` | find definition 中的 `filepath.Rel` / `filepath.ToSlash` | Oracle 的 `/` 根目录、自定义相对/绝对路径与目录后缀 |
 | `utils/tools-manager.ts#getToolPath/ensureTool` | `find_tool.go#findBinary` | `TestFindLsFDPlatformContract`，缺失时禁止下载 |
-| `child_process.spawn` / AbortSignal | `exec.CommandContext` / context + Wait | `TestFindLsFDCancellationWaitsForExit` |
+| `child_process.spawn` / AbortSignal | `exec.CommandContext` / context + Wait | `TestFindLsFDCancellationKillsTree` |
 | `core/tools/index.ts`、SDK 显式选择 | `session_services.go#createCodingTools`、`sdk.go` | `TestFindLsExplicitSDKReadContinuation`、`TestPigFindLsReadContinuation` |
 | `tools.test.ts`、regressions #3302/#3303/#6104 | `parity/oracle/find-ls.mjs` / fixture | `TestFindLsSessionParity` 经公开 Session 继续生成 |
 

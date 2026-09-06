@@ -77,6 +77,9 @@ func CreateFindToolDefinition(cwd string, options ...FindToolOptions) (ToolDefin
 				trailing := strings.HasSuffix(p, string(filepath.Separator)) || runtime.GOOS == "windows" && strings.HasSuffix(p, "/")
 				if filepath.IsAbs(p) {
 					p, err = filepath.Rel(path, p)
+					if p == "." {
+						p = ""
+					}
 					if err != nil {
 						return agent.ErasedAgentToolResult{}, err
 					}
@@ -109,7 +112,7 @@ func CreateFindTool(cwd string, options ...FindToolOptions) (agent.ErasedAgentTo
 	return eraseDirectoryTool(definition)
 }
 
-func findBinary() (string, error) {
+func findBinary(ctx context.Context) (string, error) {
 	dir, err := GetAgentDir()
 	if err != nil {
 		return "", err
@@ -124,14 +127,25 @@ func findBinary() (string, error) {
 	}
 	for _, name := range []string{"fd", "fdfind"} {
 		if path, err := exec.LookPath(name); err == nil {
-			return path, nil
+			command, err := findCommand(ctx, path, "--version")
+			if err != nil {
+				return "", err
+			}
+			err = command.Run()
+			if cause := context.Cause(ctx); cause != nil {
+				return "", cause
+			}
+			var exit *exec.ExitError
+			if err == nil || errors.As(err, &exit) {
+				return path, nil
+			}
 		}
 	}
 	return "", fmt.Errorf("fd is not available; install fd (or fdfind) on PATH or in %s; automatic downloads are disabled", filepath.Join(dir, "bin"))
 }
 
 func runFind(ctx context.Context, pattern, path string, limit float64) ([]string, error) {
-	binary, err := findBinary()
+	binary, err := findBinary(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -163,8 +177,10 @@ func runFind(ctx context.Context, pattern, path string, limit float64) ([]string
 		}
 	}
 	args = append(args, "--", pattern, path)
-	command := exec.CommandContext(ctx, binary, args...)
-	command.WaitDelay = time.Second
+	command, err := findCommand(ctx, binary, args...)
+	if err != nil {
+		return nil, err
+	}
 	var stdout, stderr bytes.Buffer
 	command.Stdout, command.Stderr = &stdout, &stderr
 	err = command.Run()
@@ -191,4 +207,14 @@ func runFind(ctx context.Context, pattern, path string, limit float64) ([]string
 		}
 	}
 	return lines, nil
+}
+
+func findCommand(ctx context.Context, binary string, args ...string) (*exec.Cmd, error) {
+	command := exec.CommandContext(ctx, binary, args...)
+	if err := configureBashProcess(command); err != nil {
+		return nil, notImplemented("FindOperations.platform")
+	}
+	command.Cancel = func() error { killBashProcess(command.Process); return nil }
+	command.WaitDelay = time.Second
+	return command, nil
 }

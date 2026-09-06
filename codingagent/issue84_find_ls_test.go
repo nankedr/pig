@@ -314,3 +314,14 @@ func TestFindLsPathsAndByteTruncation(t *testing.T) {
 		t.Fatalf("truncation: %s", raw)
 	}
 }
+
+func TestFindLsRootDirectoryResult(t *testing.T) {
+	tool, err := codingagent.CreateFindTool("/", codingagent.FindToolOptions{Operations: find84Operations{results: []string{"/", "."}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := runFindLsSession(t, context.Background(), "/", []agent.ErasedAgentTool{tool}, []ai.ToolCall{{Type: "toolCall", ID: "find", Name: "find", Arguments: map[string]any{"pattern": "**"}}})[0]
+	if got.IsError || readToolResultText(t, got) != "/\n." {
+		t.Fatalf("root directory result: %q", readToolResultText(t, got))
+	}
+}

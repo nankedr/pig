@@ -1,4 +1,4 @@
-//go:build !windows
+//go:build darwin || linux
 
 package codingagent_test
 
@@ -13,6 +13,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
 	"github.com/nankedr/pig/codingagent"
 )
@@ -56,7 +57,7 @@ func TestFindLsFDPlatformContract(t *testing.T) {
 		t.Fatalf("fallback: %q %v", got, err)
 	}
 	fd := fd84Script(t, bin, "fd", "printf '%s\\n' \"$@\"\n")
-	for _, test := range []struct{ pattern, want string }{{"--help", "--glob\n--color=never\n--hidden\n--no-require-git\n--max-results\n1000\n--\n--help\n."}, {"src/**/*.spec.ts", "--glob\n--color=never\n--hidden\n--no-require-git\n--max-results\n1000\n--full-path\n--\n**/src/**/*.spec.ts\n."}} {
+	for _, test := range []struct{ pattern, want string }{{"--help", "--glob\n--color=never\n--hidden\n--no-require-git\n--max-results\n1000\n--\n--help\n"}, {"src/**/*.spec.ts", "--glob\n--color=never\n--hidden\n--no-require-git\n--max-results\n1000\n--full-path\n--\n**/src/**/*.spec.ts\n"}} {
 		got, err := run(test.pattern)
 		if err != nil || got != test.want {
 			t.Fatalf("arguments %q: %q %v", test.pattern, got, err)
@@ -89,7 +90,13 @@ func TestFindLsFDPlatformContract(t *testing.T) {
 			t.Fatalf("output: %q %v want %q", got, err, test.want)
 		}
 	}
-	if err := os.WriteFile(fd, []byte("not executable format"), 0700); err != nil {
+	if err := os.WriteFile(fd, []byte("#!/missing/interpreter\n"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if got, err := run("*"); err != nil || got != "fallback.txt" {
+		t.Fatalf("broken fd must fall back: %q %v", got, err)
+	}
+	if err := os.WriteFile(local, []byte("not executable format"), 0700); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := run("*"); err == nil || !strings.HasPrefix(err.Error(), "Failed to run fd:") {
@@ -97,7 +104,7 @@ func TestFindLsFDPlatformContract(t *testing.T) {
 	}
 }
 
-func TestFindLsFDCancellationWaitsForExit(t *testing.T) {
+func TestFindLsFDProbeCancellationWaitsForExit(t *testing.T) {
 	cwd, bin := t.TempDir(), t.TempDir()
 	t.Setenv("PATH", bin)
 	t.Setenv("PIG_CODING_AGENT_DIR", t.TempDir())
@@ -133,6 +140,118 @@ func TestFindLsFDCancellationWaitsForExit(t *testing.T) {
 		}
 	case <-time.After(3 * time.Second):
 		t.Fatal("fd cancellation did not settle")
+	}
+	if err := syscall.Kill(pid, 0); !errors.Is(err, syscall.ESRCH) {
+		t.Fatalf("fd remains after execution settled: pid=%d err=%v", pid, err)
+	}
+}
+
+func TestFindLsSessionAbortReapsFD(t *testing.T) {
+	cwd, bin := t.TempDir(), t.TempDir()
+	t.Setenv("PATH", bin)
+	t.Setenv("PIG_CODING_AGENT_DIR", t.TempDir())
+	ready := filepath.Join(cwd, "ready")
+	t.Setenv("FD_READY", ready)
+	fd84Script(t, bin, "fd", "if [ \"$1\" = --version ]; then exit 0; fi\necho $$ > \"$FD_READY\"\nexec /bin/sleep 30\n")
+	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	step, err := ai.FauxAssistantMessage(ai.FauxAssistantBlocks(ai.ToolCall{Type: "toolCall", ID: "find", Name: "find", Arguments: map[string]any{"pattern": "*"}}), ai.FauxAssistantMessageOptions{StopReason: ai.Some(ai.StopReasonToolUse)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	core.SetResponses([]ai.FauxResponseStep{step})
+	model, _ := core.GetModel()
+	created, err := codingagent.CreateAgentSession(context.Background(), codingagent.CreateAgentSessionOptions{CWD: cwd, AgentDir: t.TempDir(), Model: &model, Tools: []string{"find"}, StreamFunction: agent.StreamFunction(core.StreamSimple)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer created.Session.Dispose()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- created.Session.Prompt(ctx, "find files") }()
+	var pid int
+	for pid == 0 {
+		select {
+		case err := <-done:
+			t.Fatalf("early session end: %v", err)
+		case <-ctx.Done():
+			t.Fatal(ctx.Err())
+		case <-time.After(time.Millisecond):
+			data, _ := os.ReadFile(ready)
+			pid, _ = strconv.Atoi(strings.TrimSpace(string(data)))
+		}
+	}
+	created.Session.Abort()
+	select {
+	case err := <-done:
+		if err != nil && !errors.Is(err, context.Canceled) {
+			t.Fatal(err)
+		}
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	}
+	if err := created.Session.WaitForIdle(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err := syscall.Kill(pid, 0); !errors.Is(err, syscall.ESRCH) {
+		t.Fatalf("fd still alive after session settled: %v", err)
+	}
+	found := false
+	for _, message := range created.Session.Messages() {
+		if result, ok := message.(ai.ToolResultMessage); ok {
+			found = true
+			if !result.IsError {
+				t.Fatalf("successful canceled result: %v", result)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("aborted tool result missing")
+	}
+}
+
+func TestFindLsFDCancellationKillsTree(t *testing.T) {
+	cwd, bin := t.TempDir(), t.TempDir()
+	t.Setenv("PATH", bin)
+	t.Setenv("PIG_CODING_AGENT_DIR", t.TempDir())
+	ready := filepath.Join(cwd, "ready")
+	t.Setenv("FD_READY", ready)
+	fd84Script(t, bin, "fd", "if [ \"$1\" = --version ]; then exit 0; fi\n/bin/sleep 30 &\necho $! > \"$FD_READY\"\nwait\n")
+	def, err := codingagent.CreateFindToolDefinition(cwd)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { _, err := def.Execute(ctx, "find", map[string]any{"pattern": "*"}, nil); done <- err }()
+	deadline := time.After(5 * time.Second)
+	var pid int
+	for pid == 0 {
+		select {
+		case err := <-done:
+			t.Fatalf("early exit: %v", err)
+		case <-deadline:
+			t.Fatal("fd did not start")
+		case <-time.After(time.Millisecond):
+			data, _ := os.ReadFile(ready)
+			pid, _ = strconv.Atoi(strings.TrimSpace(string(data)))
+		}
+	}
+	cancel()
+	select {
+	case err := <-done:
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("cancel: %v", err)
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("fd cancellation did not settle")
+	}
+	for deadline := time.Now().Add(2 * time.Second); syscall.Kill(pid, 0) == nil && time.Now().Before(deadline); {
+		time.Sleep(time.Millisecond)
 	}
 	if err := syscall.Kill(pid, 0); !errors.Is(err, syscall.ESRCH) {
 		t.Fatalf("fd remains after execution settled: pid=%d err=%v", pid, err)
