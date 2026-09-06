@@ -63,6 +63,14 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
+	if options.CWD == "" && options.SessionManager != nil {
+		options.CWD = options.SessionManager.GetCWD()
+	}
+	cwd, pathErr := resolveSessionPath(options.CWD)
+	if pathErr != nil {
+		return nil, pathErr
+	}
+	options.CWD = cwd
 	settings := options.SettingsManager
 	if settings == nil {
 		var dir *string
@@ -215,10 +223,6 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return nil, err
 	}
 	stream := func(runContext context.Context, requestModel ai.Model, input ai.Context, streamOptions ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
-		// AgentSession supplies its identity and the explicit no-cache marker to
-		// every Provider. Chat Completions does not consume either M1 hint.
-		streamOptions.SessionID = nil
-		streamOptions.CacheRetention = nil
 		if options.APIKey != nil && *options.APIKey != "" {
 			key := *options.APIKey
 			streamOptions.APIKey = &key

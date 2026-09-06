@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1851, catalog.StatusInventoried: 744, catalog.StatusPartial: 2, catalog.StatusImplemented: 3}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1850, catalog.StatusInventoried: 744, catalog.StatusPartial: 2, catalog.StatusImplemented: 4}); !reflect.DeepEqual(gotByStatus, want) {
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
 	if *updateIssue32Catalog {
@@ -1454,6 +1454,10 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 		}}
 	}
 	switch entry.ID {
+	case "symbol:codingagent/src/core/tools/index.ts#createCodingTools":
+		entry.Status = catalog.StatusImplemented
+		entry.Notes = "Issue #81 opens the shared four-Tool factory; behavior and evidence are owned by contract:codingagent/default-coding-tools."
+		entry.Evidence = evidence("codingagent/issue81_tools_test.go#TestDefaultCodingToolsParity", "issue81-coding-tools-factory", "sha256:e47a15bed8b4417f21a297b857b9eda7bed73d8236ddec94fdad5341ce627704", "go test ./codingagent -run '^TestDefaultCodingToolsParity$' -count=1", "default public Session assembly uses CreateCodingTools and matches locked Pi selection/prompt", "PASS; four default tools and selection modes match Pi", "any")
 	case "symbol:codingagent/src/main.ts#main":
 		entry.Status = catalog.StatusPartial
 		entry.Evidence = append(append(evidence(
@@ -1546,6 +1550,8 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 
 func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
+	case reference == issue32ReferencePrefix+"core/tools/index.ts#createCodingTools":
+		return issue81ToolsCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-runtime.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-registry.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-resolver.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/agent-session-services.ts#"):
 		return issue77RuntimeCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/auth-storage.ts#"):
@@ -1856,7 +1862,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1871,6 +1877,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = issue76CredentialEvidence(t)
 	case issue77RuntimeCatalogID:
 		descriptors = issue77RuntimeEvidence(t)
+	case issue81ToolsCatalogID:
+		descriptors = issue81ToolsEvidence(t)
 	case issue80BashCatalogID:
 		descriptors = issue80BashEvidence(t)
 	case issue75TrustCatalogID:

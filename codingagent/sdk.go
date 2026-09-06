@@ -63,6 +63,14 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 	if len(config.CustomTools) != 0 {
 		return CreateAgentSessionResult{}, notImplemented("CreateAgentSession.CustomTools")
 	}
+	if config.CWD == "" && config.SessionManager != nil {
+		config.CWD = config.SessionManager.GetCWD()
+	}
+	cwd, err := resolveSessionPath(config.CWD)
+	if err != nil {
+		return CreateAgentSessionResult{}, err
+	}
+	config.CWD = cwd
 	stream := config.StreamFunction
 	if stream == nil && config.Provider != nil {
 		stream = agent.StreamFunction(config.Provider.StreamSimple)
@@ -94,15 +102,7 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 		if err := checkRuntimeAdapter(*config.Model); err != nil {
 			return CreateAgentSessionResult{}, err
 		}
-		if config.AgentTools == nil {
-			config.AgentTools, err = sessionServiceTools(config.CWD, config.SettingsManager, config.Tools)
-			if err != nil {
-				return CreateAgentSessionResult{}, err
-			}
-		}
 		stream = func(ctx context.Context, model ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
-			options.SessionID = nil
-			options.CacheRetention = nil
 			result, _ := config.ModelRuntime.StreamSimple(ctx, model, input, ai.ModelsSimpleStreamOptions{SimpleStreamOptions: options})
 			return result
 		}
@@ -110,12 +110,45 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 	if config.Model == nil {
 		return CreateAgentSessionResult{}, fmt.Errorf("an injected stream requires a model")
 	}
+	if config.SettingsManager == nil {
+		config.SettingsManager, err = NewInMemorySettingsManager(Settings{})
+		if err != nil {
+			return CreateAgentSessionResult{}, err
+		}
+	}
+	if config.AgentTools == nil {
+		config.AgentTools, err = sessionServiceTools(config.CWD, config.SettingsManager, config.Tools)
+		if err != nil {
+			return CreateAgentSessionResult{}, err
+		}
+	}
+	retry, err := config.SettingsManager.GetProviderRetrySettings()
+	if err != nil {
+		return CreateAgentSessionResult{}, err
+	}
+	timeout, err := config.SettingsManager.GetHTTPIdleTimeoutMS()
+	if err != nil {
+		return CreateAgentSessionResult{}, err
+	}
+	if timeout == 0 {
+		timeout = 2147483647
+	}
+	if retry.TimeoutMS != nil {
+		timeout = *retry.TimeoutMS
+	}
 	baseStream := stream
 	stream = func(ctx context.Context, model ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
-		// M1 propagates the session identity but does not activate Provider
-		// prompt-cache retention, which belongs to a later option surface.
 		cacheRetention := ai.CacheRetentionNone
 		options.CacheRetention = &cacheRetention
+		if options.TimeoutMS == nil {
+			options.TimeoutMS = &timeout
+		}
+		if options.MaxRetries == nil {
+			options.MaxRetries = retry.MaxRetries
+		}
+		if options.MaxRetryDelayMS == nil {
+			options.MaxRetryDelayMS = retry.MaxRetryDelayMS
+		}
 		return baseStream(ctx, model, input, options)
 	}
 
@@ -131,6 +164,38 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 	}
 
 	tools := selectAgentTools(config.AgentTools, config.Tools, config.ExcludeTools, config.NoTools)
+	steering, err := config.SettingsManager.GetSteeringMode()
+	if err != nil {
+		return CreateAgentSessionResult{}, err
+	}
+	followUp, err := config.SettingsManager.GetFollowUpMode()
+	if err != nil {
+		return CreateAgentSessionResult{}, err
+	}
+	transport, err := config.SettingsManager.GetTransport()
+	if err != nil {
+		return CreateAgentSessionResult{}, err
+	}
+	budgets, err := config.SettingsManager.GetThinkingBudgets()
+	if err != nil {
+		return CreateAgentSessionResult{}, err
+	}
+	var thinkingBudgets *ai.ThinkingBudgets
+	if budgets != nil {
+		thinkingBudgets = &ai.ThinkingBudgets{}
+		for level, budget := range budgets {
+			switch level {
+			case ai.ModelThinkingLevelMinimal:
+				thinkingBudgets.Minimal = &budget
+			case ai.ModelThinkingLevelLow:
+				thinkingBudgets.Low = &budget
+			case ai.ModelThinkingLevelMedium:
+				thinkingBudgets.Medium = &budget
+			case ai.ModelThinkingLevelHigh:
+				thinkingBudgets.High = &budget
+			}
+		}
+	}
 	created, err := agent.NewAgent(agent.AgentOptions{
 		InitialState: &agent.AgentInitialState{
 			Model:         *config.Model,
@@ -141,8 +206,12 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 		ConvertToLLM: func(_ context.Context, messages []agent.AgentMessage) ([]ai.Message, error) {
 			return ConvertToLLM(messages), nil
 		},
-		StreamFunction: stream,
-		SessionID:      manager.GetSessionID(),
+		StreamFunction:  stream,
+		SessionID:       manager.GetSessionID(),
+		SteeringMode:    steering,
+		FollowUpMode:    followUp,
+		Transport:       transport,
+		ThinkingBudgets: thinkingBudgets,
 	})
 	if err != nil {
 		return CreateAgentSessionResult{}, err
@@ -184,11 +253,9 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 		SessionStartEvent:      config.SessionStartEvent,
 		SettingsManager:        config.SettingsManager,
 	})
-	if runtimePath {
-		if err := configureSessionPrompt(ctx, session, CreateHeadlessSessionOptions{CWD: config.CWD, AgentDir: config.AgentDir}); err != nil {
-			session.Dispose()
-			return CreateAgentSessionResult{}, err
-		}
+	if err := configureSessionPrompt(ctx, session, CreateHeadlessSessionOptions{CWD: config.CWD, AgentDir: config.AgentDir, NoContextFiles: !runtimePath}); err != nil {
+		session.Dispose()
+		return CreateAgentSessionResult{}, err
 	}
 	return CreateAgentSessionResult{Session: session, ModelFallbackMessage: fallback}, nil
 }

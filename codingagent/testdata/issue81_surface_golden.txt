@@ -1,0 +1,62 @@
+func codingagent.CreateCodingTools func(string, ...codingagent.ToolsOptions) ([]agent.ErasedAgentTool, error)
+
+func codingagent.CreateAgentSession func(context.Context, ...codingagent.CreateAgentSessionOptions) (codingagent.CreateAgentSessionResult, error)
+
+func codingagent.CreateHeadlessSession func(context.Context, codingagent.CreateHeadlessSessionOptions) (*codingagent.AgentSessionRuntime, error)
+
+func codingagent.CreateAgentSessionFromServices func(context.Context, codingagent.CreateAgentSessionFromServicesOptions) (codingagent.CreateAgentSessionResult, error)
+
+type codingagent.ToolsOptions struct
+fields:
+- Bash codingagent.BashToolOptions tag=""
+- Edit codingagent.EditToolOptions tag=""
+- Find codingagent.FindToolOptions tag=""
+- Grep codingagent.GrepToolOptions tag=""
+- Ls codingagent.LsToolOptions tag=""
+- Read codingagent.ReadToolOptions tag=""
+- Write codingagent.WriteToolOptions tag=""
+
+type codingagent.CreateAgentSessionOptions struct
+fields:
+- CWD string tag=""
+- AgentDir string tag=""
+- ModelRuntime *codingagent.ModelRuntime tag=""
+- Model *ai.Model tag=""
+- Provider codingagent.AgentSessionProvider tag=""
+- StreamFunction agent.StreamFunction tag=""
+- ThinkingLevel ai.ModelThinkingLevel tag=""
+- ScopedModels []codingagent.ScopedModel tag=""
+- NoTools codingagent.NoToolsMode tag=""
+- Tools []string tag=""
+- ExcludeTools []string tag=""
+- AgentTools []agent.ErasedAgentTool tag=""
+- CustomTools []codingagent.ToolDefinition tag=""
+- ResourceLoader codingagent.ResourceLoader tag=""
+- SessionManager *codingagent.SessionManager tag=""
+- SettingsManager *codingagent.SettingsManager tag=""
+- SessionStartEvent *codingagent.SessionStartEvent tag=""
+
+type codingagent.CreateHeadlessSessionOptions struct
+fields:
+- ModelRuntime *codingagent.ModelRuntime tag=""
+- Models []string tag=""
+- Offline bool tag=""
+- ProjectTrustOverride *bool tag=""
+- NoContextFiles bool tag=""
+- CWD string tag=""
+- AgentDir string tag=""
+- AuthPath string tag=""
+- Credentials ai.CredentialStore tag=""
+- SettingsManager *codingagent.SettingsManager tag=""
+- SessionDir *string tag=""
+- Provider ai.ProviderID tag=""
+- Model string tag=""
+- APIKey *string tag=""
+- Environment ai.ProviderEnv tag=""
+- BaseURL *string tag=""
+- Thinking ai.ModelThinkingLevel tag=""
+- Tools []string tag=""
+- ExcludeTools []string tag=""
+- NoTools codingagent.NoToolsMode tag=""
+- SystemPrompt *string tag=""
+- SessionManager *codingagent.SessionManager tag=""

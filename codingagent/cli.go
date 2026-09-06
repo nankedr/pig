@@ -74,8 +74,9 @@ Modes:
 
 Current Headless Availability:
   Requires --provider deepseek and an exact --model ID. Credentials come from
-  --api-key or DEEPSEEK_API_KEY. read is enabled by default; bash and write are
-  available with --tools. v3 Sessions are supported; other Tools, extensions, and RPC
+  --api-key or DEEPSEEK_API_KEY. read, bash, edit and write are enabled
+  by default; --tools, --exclude-tools and --no-tools control selection. v3 Sessions
+  support resume and fork; other Tools, extensions, and RPC
   remain explicit Capability Stubs. Text output contains only final Assistant text. JSON output
   writes a v3 Session header followed by AgentSessionEvent records, one value per
   line; stdin is prompt input, not RPC commands. SIGINT exits 130.

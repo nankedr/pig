@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9655
+- Total entries: 9656
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5168 |
-| scaffolded | 4020 |
-| partial | 244 |
-| implemented | 54 |
+| scaffolded | 4019 |
+| partial | 245 |
+| implemented | 55 |
 | verified | 167 |
 | deferred | 2 |
 
@@ -7917,7 +7917,6 @@
 | symbol:codingagent/src/core/tools/grep.ts#createGrepTool | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | symbol:codingagent/src/core/tools/grep.ts#createGrepToolDefinition | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CreateGrepToolDefinition | coding-agent |
 | symbol:codingagent/src/core/tools/index.ts#ToolsOptions | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.ToolsOptions | coding-agent |
-| symbol:codingagent/src/core/tools/index.ts#createCodingTools | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CreateCodingTools | coding-agent |
 | symbol:codingagent/src/core/tools/index.ts#createReadOnlyTools | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CreateReadOnlyTools | coding-agent |
 | symbol:codingagent/src/core/tools/ls.ts#LsOperations | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.LsOperations | coding-agent |
 | symbol:codingagent/src/core/tools/ls.ts#LsToolDetails | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.LsToolDetails | coding-agent |
@@ -8022,6 +8021,7 @@
 | contract:codingagent/agent-session | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateAgentSession | coding-agent |
 | contract:codingagent/bash-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateBashTool | coding-agent |
 | contract:codingagent/compaction | partial | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| contract:codingagent/default-coding-tools | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateAgentSession | coding-agent |
 | contract:codingagent/edit-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateEditTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
@@ -8037,6 +8037,7 @@
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
 | symbol:codingagent/src/core/agent-session-runtime.ts#createAgentSessionRuntime | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntime | coding-agent |
+| symbol:codingagent/src/core/tools/index.ts#createCodingTools | implemented | M4 | symbol | github.com/nankedr/pig/codingagent.CreateCodingTools | coding-agent |
 | symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.JSONAgentSessionEvent | coding-agent |
 | contract:cli/pig/auth-help | verified | M0 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | contract:session/migration | verified | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |

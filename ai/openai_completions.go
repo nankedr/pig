@@ -1456,7 +1456,7 @@ func validateOpenAICompletions(model Model, input Context, options OpenAIComplet
 	if model.API != APIOpenAICompletions {
 		return fmt.Errorf("%w: model API %q is not %q", ErrEventStreamInvariant, model.API, APIOpenAICompletions)
 	}
-	if model.SamplingParams != nil || options.SamplingParams != nil || options.CacheRetention != nil || options.SessionID != nil || options.Env != nil {
+	if model.SamplingParams != nil || options.SamplingParams != nil || (options.CacheRetention != nil && *options.CacheRetention != CacheRetentionNone) || (options.SessionID != nil && (options.CacheRetention == nil || *options.CacheRetention != CacheRetentionNone)) || options.Env != nil {
 		return newNotImplemented("OpenAICompletions.AdvancedOptions")
 	}
 	_, err := resolveOpenAICompletionsCompat(model)

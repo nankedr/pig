@@ -659,8 +659,12 @@ func readToolNumber(value any) (float64, bool) {
 	}
 }
 
-func CreateCodingTools(string, ...ToolsOptions) ([]agent.ErasedAgentTool, error) {
-	return nil, notImplemented("CreateCodingTools")
+func CreateCodingTools(cwd string, options ...ToolsOptions) ([]agent.ErasedAgentTool, error) {
+	var config ToolsOptions
+	if len(options) > 0 {
+		config = options[0]
+	}
+	return createCodingTools(cwd, nil, config)
 }
 
 func CreateReadOnlyTools(string, ...ToolsOptions) ([]agent.ErasedAgentTool, error) {

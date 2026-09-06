@@ -7,11 +7,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/nankedr/pig/ai"
+	"github.com/nankedr/pig/codingagent"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"testing"
@@ -23,13 +26,28 @@ func TestPigBashShutdownSignalsKillProcessTree(t *testing.T) {
 	for _, signal := range []os.Signal{os.Interrupt, syscall.SIGTERM, syscall.SIGHUP} {
 		t.Run(signal.String(), func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				var request struct {
+					Messages []struct {
+						Role    string
+						Content any
+					}
+				}
+				if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+					t.Error(err)
+					return
+				}
 				w.Header().Set("Content-Type", "text/event-stream")
+				if last := request.Messages[len(request.Messages)-1]; last.Role == "user" && codingTaskText(last.Content) == "resume" {
+					fmt.Fprint(w, "data: {\"choices\":[{\"delta\":{\"content\":\"resumed\"},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n")
+					return
+				}
 				args, _ := json.Marshal(map[string]any{"command": `sleep 30 & child=$!; printf '%s %s\n' $$ $child; wait`})
 				data, _ := json.Marshal(map[string]any{"id": "tree", "choices": []any{map[string]any{"delta": map[string]any{"tool_calls": []any{map[string]any{"index": 0, "id": "bash", "type": "function", "function": map[string]any{"name": "bash", "arguments": string(args)}}}}, "finish_reason": "tool_calls"}}})
 				fmt.Fprintf(w, "data: %s\n\ndata: [DONE]\n\n", data)
 			}))
 			defer server.Close()
-			cmd := exec.Command(binary, "--provider", "deepseek", "--model", "deepseek-v4-flash", "--no-session", "--tools", "bash", "--mode", "json", "-p", "run")
+			dir := t.TempDir()
+			cmd := exec.Command(binary, "--provider", "deepseek", "--model", "deepseek-v4-flash", "--session-dir", dir, "--mode", "json", "-p", "run")
 			cmd.Dir = t.TempDir()
 			home := t.TempDir()
 			cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + home, "PIG_CODING_AGENT_DIR=" + home, "DEEPSEEK_API_KEY=fixture", "PIG_DEEPSEEK_BASE_URL=" + server.URL}
@@ -104,6 +122,29 @@ func TestPigBashShutdownSignalsKillProcessTree(t *testing.T) {
 				}
 			}
 			io.Copy(io.Discard, reader)
+			files, _ := filepath.Glob(filepath.Join(dir, "*.jsonl"))
+			if len(files) != 1 {
+				t.Fatal(files)
+			}
+			manager, err := codingagent.OpenSessionManager(files[0], nil, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			aborted := false
+			for _, m := range manager.BuildSessionContext().Messages {
+				if result, ok := m.(ai.ToolResultMessage); ok && result.IsError {
+					aborted = true
+				}
+			}
+			if !aborted {
+				t.Fatal("cancelled Tool result was not persisted")
+			}
+			resumed := exec.Command(binary, "--provider", "deepseek", "--model", "deepseek-v4-flash", "--session", files[0], "-p", "resume")
+			resumed.Env, resumed.Dir = cmd.Env, cmd.Dir
+			data, err := resumed.CombinedOutput()
+			if err != nil || string(data) != "resumed\n" {
+				t.Fatalf("reopen cancelled session: %q %v", data, err)
+			}
 		})
 	}
 }

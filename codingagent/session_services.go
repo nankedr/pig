@@ -104,30 +104,44 @@ func CreateAgentSessionFromServices(ctx context.Context, options CreateAgentSess
 }
 
 func sessionServiceTools(cwd string, settings *SettingsManager, names []string) ([]agent.ErasedAgentTool, error) {
+	var options ToolsOptions
+	var err error
+	options.Bash.ShellPath, err = settings.GetShellPath()
+	if err != nil {
+		return nil, err
+	}
+	options.Bash.CommandPrefix, err = settings.GetShellCommandPrefix()
+	if err != nil {
+		return nil, err
+	}
 	if names == nil {
-		names = []string{"read"}
+		return CreateCodingTools(cwd, options)
+	}
+	return createCodingTools(cwd, names, options)
+}
+
+func createCodingTools(cwd string, names []string, options ToolsOptions) ([]agent.ErasedAgentTool, error) {
+	if names == nil {
+		names = []string{"read", "bash", "edit", "write"}
 	}
 	tools := []agent.ErasedAgentTool{}
+	seen := map[string]bool{}
 	for _, name := range names {
+		if seen[name] {
+			continue
+		}
+		seen[name] = true
 		var tool agent.ErasedAgentTool
 		var err error
 		switch name {
 		case "read":
-			tool, err = CreateReadTool(cwd)
-		case "edit":
-			tool, err = CreateEditTool(cwd)
-		case "write":
-			tool, err = CreateWriteTool(cwd)
+			tool, err = CreateReadTool(cwd, options.Read)
 		case "bash":
-			shell, e := settings.GetShellPath()
-			if e != nil {
-				return nil, e
-			}
-			prefix, e := settings.GetShellCommandPrefix()
-			if e != nil {
-				return nil, e
-			}
-			tool, err = CreateBashTool(cwd, BashToolOptions{ShellPath: shell, CommandPrefix: prefix})
+			tool, err = CreateBashTool(cwd, options.Bash)
+		case "edit":
+			tool, err = CreateEditTool(cwd, options.Edit)
+		case "write":
+			tool, err = CreateWriteTool(cwd, options.Write)
 		default:
 			return nil, notImplemented("tool." + name)
 		}

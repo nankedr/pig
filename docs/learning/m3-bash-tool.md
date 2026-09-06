@@ -8,7 +8,7 @@
 go run ./examples/bash-read
 ```
 
-Headless 显式选择 bash，默认仍只有 read：
+本节演示显式选择 bash；M3.11 起默认已启用四工具，见 [可恢复编码任务](m3-coding-task.md)：
 
 ```sh
 go run ./cmd/pig --provider deepseek --model deepseek-v4-flash --tools bash,read -p '执行 pwd，然后检查当前目录'
