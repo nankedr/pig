@@ -461,7 +461,7 @@ func runOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStre
 		if requestCtx.Err() != nil {
 			output.StopReason = StopReasonAborted
 		}
-		output.ErrorMessage = Some(openAIErrorMessage(err))
+		output.ErrorMessage = Some(redactOpenAIRequestSecrets(openAIErrorMessage(err), options))
 		stream.Push(AssistantMessageErrorEvent{
 			Type: AssistantMessageEventTypeError, Reason: output.StopReason, Error: output,
 		})
@@ -743,10 +743,10 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 			output.Usage = mapOpenAIUsage(*choice.Usage, model)
 		}
 		if choice.FinishReason != nil && *choice.FinishReason != "" {
-			output.RawStopReason = Some(*choice.FinishReason)
+			output.RawStopReason = Some(redactOpenAIRequestSecrets(*choice.FinishReason, options))
 			output.StopReason, err = mapOpenAIStopReason(*choice.FinishReason)
 			if err != nil {
-				output.ErrorMessage = Some(err.Error())
+				output.ErrorMessage = Some(redactOpenAIRequestSecrets(err.Error(), options))
 			}
 			hasFinishReason = true
 		}
@@ -800,7 +800,7 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	if ctx.Err() != nil {
 		cause := context.Cause(ctx)
 		output.StopReason = StopReasonAborted
-		output.ErrorMessage = Some(openAIErrorMessage(cause))
+		output.ErrorMessage = Some(redactOpenAIRequestSecrets(openAIErrorMessage(cause), options))
 		finishOpenAIContent(stream, output)
 		return cause
 	}
@@ -1503,4 +1503,24 @@ func openAIErrorMessage(err error) string {
 		return "Request timed out"
 	}
 	return err.Error()
+}
+
+func redactOpenAIRequestSecrets(message string, options OpenAICompletionsOptions) string {
+	secrets := []string{}
+	if options.APIKey != nil {
+		secrets = append(secrets, *options.APIKey)
+	}
+	for name, value := range options.Headers {
+		name = strings.ToLower(name)
+		if value != nil && (strings.Contains(name, "authorization") || strings.Contains(name, "cookie") || strings.Contains(name, "token") || strings.Contains(name, "key")) {
+			secrets = append(secrets, *value, strings.TrimPrefix(*value, "Bearer "))
+		}
+	}
+	sort.Slice(secrets, func(i, j int) bool { return len(secrets[i]) > len(secrets[j]) })
+	for _, secret := range secrets {
+		if secret != "" {
+			message = strings.ReplaceAll(message, secret, "[REDACTED]")
+		}
+	}
+	return message
 }

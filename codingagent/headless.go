@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/nankedr/pig/agent"
@@ -33,6 +34,8 @@ type CreateHeadlessSessionOptions struct {
 	NoContextFiles       bool
 	CWD                  string
 	AgentDir             string
+	AuthPath             string
+	Credentials          ai.CredentialStore
 	SettingsManager      *SettingsManager
 	SessionDir           *string
 	Provider             ai.ProviderID
@@ -77,7 +80,22 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if err := checkHeadlessSettings(settings); err != nil {
 		return nil, err
 	}
-	models := ai.BuiltinModels(ai.CreateModelsOptions{AuthContext: headlessAuthContext(options.Environment)})
+	credentials := options.Credentials
+	if credentials == nil {
+		path := options.AuthPath
+		if path == "" && options.AgentDir != "" {
+			path = filepath.Join(options.AgentDir, "auth.json")
+		}
+		var err error
+		credentials, err = NewAuthStorage(path)
+		if err != nil {
+			return nil, err
+		}
+	}
+	models := ai.BuiltinModels(ai.CreateModelsOptions{
+		AuthContext: headlessAuthContext(options.Environment),
+		Credentials: headlessCredentials{CredentialStore: credentials, apiKey: options.APIKey},
+	})
 	model, thinking, err := resolveHeadlessModel(ctx, models, settings, options)
 	if err != nil {
 		return nil, err
@@ -115,7 +133,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		// every Provider. Chat Completions does not consume either M1 hint.
 		streamOptions.SessionID = nil
 		streamOptions.CacheRetention = nil
-		if options.APIKey != nil {
+		if options.APIKey != nil && *options.APIKey != "" {
 			key := *options.APIKey
 			streamOptions.APIKey = &key
 		}

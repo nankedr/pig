@@ -696,6 +696,7 @@ func (m *modelsImpl) resolveRefreshCredential(ctx context.Context, provider Prov
 	if storedAPIKey, ok := apiKeyCredentialValue(stored); ok {
 		copy := storedAPIKey
 		copy.Env = cloneProviderEnv(copy.Env)
+		copy.Extra = cloneRawMessageMap(copy.Extra)
 		credential = &copy
 	} else if stored != nil {
 		return nil, nil
@@ -1210,6 +1211,7 @@ func (m *modelsImpl) checkProviderAuth(ctx context.Context, provider Provider, c
 		if hasAPIKeyCredential {
 			copy := apiKeyCredential
 			copy.Env = cloneProviderEnv(copy.Env)
+			copy.Extra = cloneRawMessageMap(copy.Extra)
 			stored = &copy
 		}
 		check, err := auth.APIKey.Check(ctx, APIKeyCheckInput{Context: m.authContext, Credential: stored})
@@ -1355,6 +1357,7 @@ func oauthCredentialValue(credential Credential) (OAuthCredential, bool) {
 func cloneCredential(credential Credential) Credential {
 	if value, ok := apiKeyCredentialValue(credential); ok {
 		value.Env = cloneProviderEnv(value.Env)
+		value.Extra = cloneRawMessageMap(value.Extra)
 		return value
 	}
 	if value, ok := oauthCredentialValue(credential); ok {

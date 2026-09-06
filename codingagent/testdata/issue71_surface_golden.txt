@@ -4,6 +4,8 @@ fields:
 - NoContextFiles bool tag=""
 - CWD string tag=""
 - AgentDir string tag=""
+- AuthPath string tag=""
+- Credentials ai.CredentialStore tag=""
 - SettingsManager *codingagent.SettingsManager tag=""
 - SessionDir *string tag=""
 - Provider ai.ProviderID tag=""

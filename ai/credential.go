@@ -37,9 +37,48 @@ type Credential interface {
 // provider-scoped environment/config values such as Cloudflare account/gateway
 // ids and is preserved verbatim.
 type APIKeyCredential struct {
-	Type AuthType         `json:"type"`
-	Key  Optional[string] `json:"key,omitzero"`
-	Env  ProviderEnv      `json:"env,omitempty"`
+	Type  AuthType                   `json:"type"`
+	Key   Optional[string]           `json:"key,omitzero"`
+	Env   ProviderEnv                `json:"env,omitempty"`
+	Extra map[string]json.RawMessage `json:"-"`
+}
+
+func (c APIKeyCredential) MarshalJSON() ([]byte, error) {
+	type wire APIKeyCredential
+	data, err := json.Marshal(wire(c))
+	if err != nil {
+		return nil, err
+	}
+	fields := make(map[string]json.RawMessage, len(c.Extra)+3)
+	for key, value := range c.Extra {
+		if key != "type" && key != "key" && key != "env" {
+			fields[key] = value
+		}
+	}
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return nil, err
+	}
+	return json.Marshal(fields)
+}
+
+func (c *APIKeyCredential) UnmarshalJSON(data []byte) error {
+	type wire APIKeyCredential
+	var value wire
+	if err := json.Unmarshal(data, &value); err != nil {
+		return err
+	}
+	var fields map[string]json.RawMessage
+	if err := json.Unmarshal(data, &fields); err != nil {
+		return err
+	}
+	for _, key := range []string{"type", "key", "env"} {
+		delete(fields, key)
+	}
+	if len(fields) > 0 {
+		value.Extra = fields
+	}
+	*c = APIKeyCredential(value)
+	return nil
 }
 
 func (APIKeyCredential) credential() {}

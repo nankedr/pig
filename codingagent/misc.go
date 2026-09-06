@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
+	"github.com/nankedr/pig/internal/statepath"
 	"github.com/nankedr/pig/tui"
 )
 
@@ -530,20 +530,7 @@ func isNotImplementedOperation(err error, operation string) bool {
 }
 
 // GetAgentDir resolves Pig's canonical user-owned state directory.
-func GetAgentDir() (string, error) {
-	if value := strings.TrimSpace(os.Getenv("PIG_CODING_AGENT_DIR")); value != "" {
-		path, err := resolveSessionPath(value)
-		if err != nil {
-			return "", fmt.Errorf("resolve PIG_CODING_AGENT_DIR: %w", err)
-		}
-		return path, nil
-	}
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("resolve user home: %w", err)
-	}
-	return filepath.Join(home, ConfigDirName, "agent"), nil
-}
+func GetAgentDir() (string, error) { return statepath.AgentDir() }
 func GetDocsPath() (string, error) { return "", notImplemented("GetDocsPath") }
 func GetExamplesPath() (string, error) {
 	return "", notImplemented("GetExamplesPath")

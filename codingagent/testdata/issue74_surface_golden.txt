@@ -55,6 +55,8 @@ type codingagent.CreateHeadlessSessionOptions
 - NoContextFiles bool ""
 - CWD string ""
 - AgentDir string ""
+- AuthPath string ""
+- Credentials ai.CredentialStore ""
 - SettingsManager *codingagent.SettingsManager ""
 - SessionDir *string ""
 - Provider ai.ProviderID ""

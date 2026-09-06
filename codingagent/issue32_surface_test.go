@@ -355,7 +355,7 @@ func TestIssue32CodingAgentDependencyPolicy(t *testing.T) {
 	allowed := map[string]bool{
 		"github.com/nankedr/pig/ai": true, "github.com/nankedr/pig/agent": true,
 		"github.com/nankedr/pig/tui": true, "github.com/nankedr/pig/protocol": true,
-		"github.com/nankedr/pig/client": true, "github.com/nankedr/pig/internal/capability": true,
+		"github.com/nankedr/pig/client": true, "github.com/nankedr/pig/internal/capability": true, "github.com/nankedr/pig/internal/statepath": true,
 	}
 	for _, pkg := range pkgs {
 		for name, file := range pkg.Files {
@@ -1546,6 +1546,8 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 
 func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/auth-storage.ts#"):
+		return issue76CredentialCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/trust-manager.ts#"), reference == issue32ReferencePrefix+"core/resource-loader.ts#loadProjectContextFiles":
 		return issue75TrustCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/write.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/file-mutation-queue.ts#"):
@@ -1848,7 +1850,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1859,6 +1861,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	t.Helper()
 	var descriptors []issue32ModuleEvidenceDescriptor
 	switch catalogID {
+	case issue76CredentialCatalogID:
+		descriptors = issue76CredentialEvidence(t)
 	case issue75TrustCatalogID:
 		descriptors = issue75TrustEvidence(t)
 	case issue78WriteCatalogID:

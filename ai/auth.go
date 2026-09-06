@@ -670,6 +670,7 @@ func resolveAPIKey(
 	if credential != nil {
 		copy := *credential
 		copy.Env = cloneProviderEnv(copy.Env)
+		copy.Extra = cloneRawMessageMap(copy.Extra)
 		callbackCredential = &copy
 	}
 	result, err := apiKey.Resolve(ctx, APIKeyResolveInput{Context: authContext, Credential: callbackCredential})

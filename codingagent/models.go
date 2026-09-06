@@ -295,6 +295,10 @@ func (*ModelRegistry) UnregisterProvider(string) error {
 	return notImplemented("ModelRegistry.UnregisterProvider")
 }
 
-func ReadStoredCredential(context.Context, string, ...string) (ai.Credential, error) {
-	return nil, notImplemented("ReadStoredCredential")
+func ReadStoredCredential(ctx context.Context, provider string, path ...string) (ai.Credential, error) {
+	store, err := NewAuthStorage(path...)
+	if err != nil {
+		return nil, err
+	}
+	return store.readRaw(ctx, ai.ProviderID(provider))
 }

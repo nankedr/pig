@@ -70,3 +70,5 @@ Telemetry 文档需要区分两个概念：`telemetry` Supporting Module 是默�
 开始实现一个 Capability 前，应先阅读对应 Pi 实现与测试，建立失败的 Parity Case，再编写 Go 实现；不能从文档摘要反推或猜测上游行为。
 
 - [M3.3 会话导航](learning/m3-session-navigation.md) 与 [TypeScript → Go](mappings/typescript-to-go/m3-session-navigation.md)
+
+- [M3.6 canonical 凭证恢复](learning/m3-credentials.md) 与 [TypeScript → Go](mappings/typescript-to-go/m3-credentials.md)

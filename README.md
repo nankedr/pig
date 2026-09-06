@@ -5,6 +5,8 @@ Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking
 M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回读](docs/learning/m3-write-tool.md)。
 
 - [文档导航](docs/README.md)
+- [M3.6 canonical 凭证恢复](docs/learning/m3-credentials.md)
+- [M3.6 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m3-credentials.md)
 - [M3.5 Project Trust](docs/learning/m3-project-trust.md)
 - [M3.5 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m3-project-trust.md)
 - [M2 集成与冻结](docs/learning/m2-freeze.md)

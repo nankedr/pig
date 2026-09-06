@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/nankedr/pig/ai"
+	"github.com/nankedr/pig/internal/statepath"
 )
 
 const commandHelp = `Usage: pig-ai <command> [provider]
@@ -47,16 +48,20 @@ func (*ArgumentError) Unwrap() error {
 	return ErrInvalidArgument
 }
 
-// Run dispatches a pig-ai invocation without reading process-global state.
+// Run dispatches help and retains explicit M11 failures for credential commands.
 func Run(args []string, stdout, stderr io.Writer) error {
-	var err error
-	args, err = withoutAuthPath(args)
+	args, authPath, err := parseAuthPath(args)
 	if err != nil {
 		return err
 	}
 	if len(args) == 0 || args[0] == "help" || args[0] == "--help" || args[0] == "-h" {
 		_, err := fmt.Fprint(stdout, commandHelp)
 		return err
+	}
+	if args[0] == "list" || args[0] == "login" {
+		if _, err := ResolveAuthPath(authPath); err != nil {
+			return err
+		}
 	}
 	if args[0] == "list" {
 		return &ai.NotImplementedError{Module: "ai", Operation: "CLI.List"}
@@ -81,7 +86,8 @@ func isCommandProvider(id string) bool {
 	return false
 }
 
-func withoutAuthPath(args []string) ([]string, error) {
+func parseAuthPath(args []string) ([]string, string, error) {
+	authPath := ""
 	remaining := make([]string, 0, len(args))
 	found := false
 	for i := 0; i < len(args); i++ {
@@ -91,13 +97,16 @@ func withoutAuthPath(args []string) ([]string, error) {
 		}
 		if i+1 < len(args) && !strings.HasPrefix(args[i+1], "-") {
 			if found {
-				return nil, &ArgumentError{Message: "--auth-path may only be specified once"}
+				return nil, "", &ArgumentError{Message: "--auth-path may only be specified once"}
 			}
 			found = true
+			authPath = args[i+1]
 			i++
 			continue
 		}
-		return nil, &ArgumentError{Message: "--auth-path requires a value"}
+		return nil, "", &ArgumentError{Message: "--auth-path requires a value"}
 	}
-	return remaining, nil
+	return remaining, authPath, nil
 }
+
+func ResolveAuthPath(path string) (string, error) { return statepath.AuthPath(path) }

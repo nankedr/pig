@@ -1,0 +1,32 @@
+type ai.APIKeyCredential
+- Type ai.AuthType "json:\"type\""
+- Key ai.Optional[string] "json:\"key,omitzero\""
+- Env ai.ProviderEnv "json:\"env,omitempty\""
+- Extra map[string]json.RawMessage "json:\"-\""
+type codingagent.CreateHeadlessSessionOptions
+- ProjectTrustOverride *bool ""
+- NoContextFiles bool ""
+- CWD string ""
+- AgentDir string ""
+- AuthPath string ""
+- Credentials ai.CredentialStore ""
+- SettingsManager *codingagent.SettingsManager ""
+- SessionDir *string ""
+- Provider ai.ProviderID ""
+- Model string ""
+- APIKey *string ""
+- Environment ai.ProviderEnv ""
+- BaseURL *string ""
+- Thinking ai.ModelThinkingLevel ""
+- Tools []string ""
+- ExcludeTools []string ""
+- NoTools codingagent.NoToolsMode ""
+- SystemPrompt *string ""
+- SessionManager *codingagent.SessionManager ""
+method Delete func(*codingagent.AuthStorage, context.Context, ai.ProviderID, ai.AuthOperationOptions) error
+method List func(*codingagent.AuthStorage, context.Context, ai.AuthOperationOptions) ([]ai.CredentialInfo, error)
+method Modify func(*codingagent.AuthStorage, context.Context, ai.ProviderID, ai.CredentialModifyFunc, ai.AuthOperationOptions) (ai.Credential, error)
+method Read func(*codingagent.AuthStorage, context.Context, ai.ProviderID, ai.AuthOperationOptions) (ai.Credential, error)
+func(...string) (*codingagent.AuthStorage, error)
+func(string) (string, error)
+func(context.Context, string, ...string) (ai.Credential, error)
