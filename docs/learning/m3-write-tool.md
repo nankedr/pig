@@ -21,7 +21,7 @@ SDK 使用 `CreateWriteTool(cwd)`，将返回值注入 `CreateAgentSessionOption
 
 文件队列在单个进程内共享。注册时对存在路径执行 realpath，已有 symlink 别名共享同一 FIFO；ENOENT/ENOTDIR 回退到绝对词法路径。因此不存在的路径经过 symlink 父目录时，并不保证不同别名会合并，这与固定 Pi 一致。队列不是跨进程文件锁。
 
-取消在每个文件操作之间检查。若 mkdir/write 已经开始，必须等操作结束后再释放队列；否则迟到的写入可能覆盖下一次操作。排队中的取消也保持 FIFO 位置，轮到时返回取消错误。取消不承诺撤销已经发生的磁盘修改。权限、目录或其他 I/O 错误均不会输出成功结果。后续 edit 可直接复用 `WithFileMutationQueue`。
+取消在每个文件操作之间检查。若 mkdir/write 已经开始，必须等操作结束后再释放队列；否则迟到的写入可能覆盖下一次操作。排队中的取消也保持 FIFO 位置，轮到时返回取消错误。取消不承诺撤销已经发生的磁盘修改。权限、目录或其他 I/O 错误均不会输出成功结果。M3.9 的 edit 与 write 复用 `WithFileMutationQueue`。
 
 成功文案沿用 Pi：`Successfully wrote N bytes to PATH`。N 实际是 JavaScript UTF-16 code unit 数；`你好🙂` 为 4，而磁盘 UTF-8 为 10 字节。内容不改换行或补末尾换行。
 
@@ -35,4 +35,4 @@ go test ./cmd/pig -run '^TestPigWriteReadContinuation$' -count=1
 
 Oracle 直接运行固定 Pi write/read，Pig 从公开 AgentSession 重放相同输入，比较 ToolResult、read 回读和 definition 元数据。`detailsEmpty` 只比较无 details payload，保留已有 Go nil/null 与 Pi undefined 的表示差异，见 ADR-0020。并发测试通过注入文件系统操作的完成屏障验证同文件阻塞、不同文件独立、symlink 别名、取消及失败恢复；CLI 测试启动本地 Provider fixture，经真实进程验证 text/JSON 和模型上下文。
 
-扩展宿主、交互渲染、edit 和默认完整 coding tools 集合仍以各自后续切片为准。能力状态及证据见 Parity Catalog 的 `contract:codingagent/write-tool`。
+扩展宿主、交互渲染和默认完整 coding tools 集合仍以各自后续切片为准。能力状态及证据见 Parity Catalog 的 `contract:codingagent/write-tool`。

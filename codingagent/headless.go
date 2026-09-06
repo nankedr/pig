@@ -305,10 +305,14 @@ func configureSessionPrompt(ctx context.Context, session *AgentSession, options 
 			"read":  "Read file contents",
 			"bash":  "Execute bash commands (ls, grep, find, etc.)",
 			"write": "Create or overwrite files",
+			"edit":  editPromptSnippet,
 		},
 	}
 	if containsTool(activeTools, "read", false) {
 		promptOptions.PromptGuidelines = []string{"Use read to examine files instead of cat or sed."}
+	}
+	if containsTool(activeTools, "edit", false) {
+		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, editPromptGuidelines...)
 	}
 	if containsTool(activeTools, "write", false) {
 		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, "Use write only for new files or complete rewrites.")

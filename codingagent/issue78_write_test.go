@@ -62,7 +62,7 @@ func TestWriteToolSessionParity(t *testing.T) {
 		}
 		results := []map[string]any{}
 		for _, item := range input.Writes {
-			messages := runWriteSession(t, ctx, cwd, []agent.ErasedAgentTool{write, read}, []ai.ToolCall{
+			messages := runFileToolSession(t, ctx, cwd, []agent.ErasedAgentTool{write, read}, []ai.ToolCall{
 				{Type: "toolCall", ID: "write", Name: "write", Arguments: map[string]any{"path": item.Path, "content": item.Content}},
 				{Type: "toolCall", ID: "read", Name: "read", Arguments: map[string]any{"path": item.Path}},
 			})
@@ -84,7 +84,7 @@ func TestWriteToolSessionParity(t *testing.T) {
 			if err != nil {
 				return parity.Observation{}, err
 			}
-			messages := runWriteSession(t, ctx, cwd, []agent.ErasedAgentTool{tool, read}, []ai.ToolCall{
+			messages := runFileToolSession(t, ctx, cwd, []agent.ErasedAgentTool{tool, read}, []ai.ToolCall{
 				{Type: "toolCall", ID: "write", Name: "write", Arguments: map[string]any{"path": "cwd.txt", "content": form}},
 				{Type: "toolCall", ID: "read", Name: "read", Arguments: map[string]any{"path": "cwd.txt"}},
 			})
@@ -109,11 +109,15 @@ func TestWriteToolSessionParity(t *testing.T) {
 	}
 }
 
-func runWriteSession(t *testing.T, ctx context.Context, cwd string, tools []agent.ErasedAgentTool, calls []ai.ToolCall) []ai.ToolResultMessage {
+func runFileToolSession(t *testing.T, ctx context.Context, cwd string, tools []agent.ErasedAgentTool, calls []ai.ToolCall) []ai.ToolResultMessage {
 	t.Helper()
 	core, err := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
 	if err != nil {
 		t.Fatal(err)
+	}
+	var names []string
+	for _, tool := range tools {
+		names = append(names, tool.Name)
 	}
 	var responses []ai.FauxResponseStep
 	var got []ai.ToolResultMessage
@@ -124,14 +128,14 @@ func runWriteSession(t *testing.T, ctx context.Context, cwd string, tools []agen
 		}
 		responses = append(responses, response)
 	}
-	final, err := ai.FauxAssistantMessage(ai.FauxAssistantText("write/read complete"))
+	final, err := ai.FauxAssistantMessage(ai.FauxAssistantText("file operations complete"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	responses = append(responses, final)
 	core.SetResponses(responses)
 	model, _ := core.GetModel()
-	created, err := codingagent.CreateAgentSession(ctx, codingagent.CreateAgentSessionOptions{CWD: cwd, Model: &model, AgentTools: tools, Tools: []string{"write", "read"}, StreamFunction: func(ctx context.Context, model ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+	created, err := codingagent.CreateAgentSession(ctx, codingagent.CreateAgentSessionOptions{CWD: cwd, Model: &model, AgentTools: tools, Tools: names, StreamFunction: func(ctx context.Context, model ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
 		if len(input.Messages) > 0 {
 			if result, ok := input.Messages[len(input.Messages)-1].(ai.ToolResultMessage); ok {
 				got = append(got, result)
@@ -143,7 +147,7 @@ func runWriteSession(t *testing.T, ctx context.Context, cwd string, tools []agen
 		t.Fatal(err)
 	}
 	defer created.Session.Dispose()
-	if err := created.Session.Prompt(ctx, "write and read back"); err != nil {
+	if err := created.Session.Prompt(ctx, "modify and read back"); err != nil {
 		t.Fatal(err)
 	}
 	var persisted []ai.ToolResultMessage
@@ -177,7 +181,7 @@ func TestWriteToolRejectsInvalidArgumentsAndHostErrors(t *testing.T) {
 		if err := os.WriteFile(filepath.Join(cwd, "block"), []byte("unchanged"), 0600); err != nil {
 			t.Fatal(err)
 		}
-		results := runWriteSession(t, context.Background(), cwd, []agent.ErasedAgentTool{write}, []ai.ToolCall{{Type: "toolCall", ID: "invalid", Name: "write", Arguments: args}})
+		results := runFileToolSession(t, context.Background(), cwd, []agent.ErasedAgentTool{write}, []ai.ToolCall{{Type: "toolCall", ID: "invalid", Name: "write", Arguments: args}})
 		if !results[0].IsError || strings.Contains(readToolResultText(t, results[0]), "Successfully wrote") {
 			t.Fatalf("false success: %#v", results)
 		}
@@ -362,7 +366,7 @@ func TestWriteToolSessionPermissionErrorContinues(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	results := runWriteSession(t, context.Background(), cwd, []agent.ErasedAgentTool{write}, []ai.ToolCall{{Type: "toolCall", ID: "denied", Name: "write", Arguments: map[string]any{"path": "denied", "content": "bad"}}})
+	results := runFileToolSession(t, context.Background(), cwd, []agent.ErasedAgentTool{write}, []ai.ToolCall{{Type: "toolCall", ID: "denied", Name: "write", Arguments: map[string]any{"path": "denied", "content": "bad"}}})
 	if !results[0].IsError || !strings.Contains(readToolResultText(t, results[0]), "permission denied") {
 		t.Fatalf("permission result: %#v", results)
 	}

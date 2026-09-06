@@ -114,6 +114,8 @@ func sessionServiceTools(cwd string, settings *SettingsManager, names []string) 
 		switch name {
 		case "read":
 			tool, err = CreateReadTool(cwd)
+		case "edit":
+			tool, err = CreateEditTool(cwd)
 		case "write":
 			tool, err = CreateWriteTool(cwd)
 		case "bash":

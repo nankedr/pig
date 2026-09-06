@@ -1,8 +1,15 @@
-type codingagent.WriteToolInput
-- Path string ""
-- Content string ""
-type codingagent.WriteToolOptions
-- Operations codingagent.WriteOperations ""
+type codingagent.Edit
+- OldText string "json:\"oldText\""
+- NewText string "json:\"newText\""
+type codingagent.EditToolInput
+- Path string "json:\"path\""
+- Edits []codingagent.Edit "json:\"edits\""
+type codingagent.EditToolDetails
+- Diff string "json:\"diff\""
+- Patch string "json:\"patch\""
+- FirstChangedLine int "json:\"firstChangedLine,omitempty\""
+type codingagent.EditToolOptions
+- Operations codingagent.EditOperations ""
 type codingagent.ToolDefinition
 - ConstrainedSampling ai.ConstrainedSampling ""
 - Description string ""
@@ -17,8 +24,8 @@ type codingagent.ToolDefinition
 - RenderCall codingagent.ExtensionHandler ""
 - RenderResult codingagent.ExtensionHandler ""
 - RenderShell string ""
-func(string, ...codingagent.WriteToolOptions) (agent.ErasedAgentTool, error)
-func(string, ...codingagent.WriteToolOptions) (codingagent.ToolDefinition, error)
+func(string, ...codingagent.EditToolOptions) (agent.ErasedAgentTool, error)
+func(string, ...codingagent.EditToolOptions) (codingagent.ToolDefinition, error)
 codingagent.ToolExecuteFunc
 func(context.Context, string, func(context.Context) (string, error)) (string, error)
 Execute input 0 context.Context
@@ -27,5 +34,6 @@ Execute input 2 interface {}
 Execute input 3 agent.AgentToolUpdateCallback[interface {}]
 Execute output 0 agent.AgentToolResult[interface {}]
 Execute output 1 error
-method Mkdir func(context.Context, string) error
+method Access func(context.Context, string) error
+method ReadFile func(context.Context, string) ([]uint8, error)
 method WriteFile func(context.Context, string, []uint8) error

@@ -75,3 +75,23 @@ schemas. The retained license text is in
 Pig receives x/text transitively through jsonschema. The retained license and
 patent grant are in `THIRD_PARTY_LICENSES/golang-x-text-BSD-3-Clause.txt` and
 `THIRD_PARTY_LICENSES/golang-x-text-PATENTS.txt`.
+
+## jsdiff
+
+- Source: https://github.com/kpdecker/jsdiff
+- Version: 8.0.4 (the fixed Pi baseline dependency)
+- License: BSD-3-Clause
+
+`codingagent/edit_diff.go` ports the line diff paths, tie breaking and unified
+patch construction used by Pi. The retained license text is in
+`THIRD_PARTY_LICENSES/jsdiff-BSD-3-Clause.txt`.
+
+## Unicode Character Database
+
+- Source: https://www.unicode.org/Public/16.0.0/ucd/UnicodeData.txt
+- Version: 16.0.0
+- License: Unicode-3.0
+
+`codingagent/edit_unicode_data.go` contains the generated normalization delta
+over x/text's Unicode 15 tables. The retained license is
+`THIRD_PARTY_LICENSES/Unicode-3.0.txt`.
