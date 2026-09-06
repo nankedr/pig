@@ -113,24 +113,6 @@ func TestBuiltinToolDefinitionFactoriesAreCapabilityStubs(t *testing.T) {
 		call          func(*int) (codingagent.ToolDefinition, error)
 	}{
 		{
-			name:          "find",
-			operation:     "CreateFindToolDefinition",
-			factory:       codingagent.CreateFindToolDefinition,
-			wantSignature: reflect.TypeOf((func(string, ...codingagent.FindToolOptions) (codingagent.ToolDefinition, error))(nil)),
-			call: func(calls *int) (codingagent.ToolDefinition, error) {
-				return codingagent.CreateFindToolDefinition("invalid\x00path", codingagent.FindToolOptions{Operations: countingFindOperations{calls: calls}})
-			},
-		},
-		{
-			name:          "ls",
-			operation:     "CreateLsToolDefinition",
-			factory:       codingagent.CreateLsToolDefinition,
-			wantSignature: reflect.TypeOf((func(string, ...codingagent.LsToolOptions) (codingagent.ToolDefinition, error))(nil)),
-			call: func(calls *int) (codingagent.ToolDefinition, error) {
-				return codingagent.CreateLsToolDefinition("invalid\x00path", codingagent.LsToolOptions{Operations: countingLsOperations{calls: calls}})
-			},
-		},
-		{
 			name:          "read",
 			operation:     "CreateReadToolDefinition",
 			factory:       codingagent.CreateReadToolDefinition,

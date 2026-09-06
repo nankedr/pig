@@ -1552,6 +1552,8 @@ func issue32BehaviorOwnerForReference(reference string) string {
 	switch {
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/grep.ts#"):
 		return issue83GrepCatalogID
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/find.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/ls.ts#"):
+		return issue84FindLsCatalogID
 	case reference == issue32ReferencePrefix+"core/tools/index.ts#createCodingTools":
 		return issue81ToolsCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-runtime.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-registry.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/model-resolver.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/agent-session-services.ts#"):
@@ -1864,7 +1866,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1881,6 +1883,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = issue76CredentialEvidence(t)
 	case issue77RuntimeCatalogID:
 		descriptors = issue77RuntimeEvidence(t)
+	case issue84FindLsCatalogID:
+		descriptors = issue84FindLsEvidence(t)
 	case issue81ToolsCatalogID:
 		descriptors = issue81ToolsEvidence(t)
 	case issue80BashCatalogID:
@@ -2244,6 +2248,7 @@ func issue32ModulePartial() *catalog.Partial {
 		Supported: []string{
 			"all fixed-snapshot Coding Agent symbols, instance/type members, static members, and public constructors have compile-usable Go mappings",
 			"the public Go SDK runs an injected in-memory AgentSession for text and read Tool continuation with deterministic lifecycle events",
+			"issue #84 adds explicit find/ls/read and fd platform behavior under contract:codingagent/find-ls",
 			"issue #78 adds explicit write/read continuation and shared per-file mutation queues under contract:codingagent/write-tool",
 			"issue #77 adds shared ModelRuntime/ModelRegistry and services, static Catalog Snapshot, model selection/scope and Offline under contract:model-runtime/basic",
 			"issue #80 adds explicit host bash execution, cancellation and retained output under contract:codingagent/bash-tool",

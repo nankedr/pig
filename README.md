@@ -67,3 +67,5 @@ M1 冻结门禁在 `m0-freeze` 之上追加受保护的真实 DeepSeek live smok
 M2 完整冻结使用 `make m2-freeze`：要求干净 Pig checkout，追加全部 M2 Oracle、source drift 与真实 DeepSeek 冒烟。准备方式与 Catalog 剩余边界见 [M2 集成与冻结](docs/learning/m2-freeze.md)。
 
 M3 完整冻结使用 `make m3-freeze`，包含 M1/M2 回归和 M3 的真实子进程恢复、四工具、信任与凭证验收。安装 CLI：`go install github.com/nankedr/pig/cmd/pig@v0.3.0`；SDK：`go get github.com/nankedr/pig@v0.3.0`。复现与制品说明见 [M3 集成与冻结](docs/learning/m3-freeze.md)。
+
+Issue #84：显式选择 find/ls/read 完成文件定位与回读，详见 [M4.2 学习材料](docs/learning/m4-find-ls.md) 和 [Go 示例](examples/find-ls-read/main.go)。find 需要预装 fd，不自动下载。

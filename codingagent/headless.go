@@ -307,6 +307,8 @@ func configureSessionPrompt(ctx context.Context, session *AgentSession, options 
 		SelectedTools: activeTools,
 		ToolSnippets: map[string]string{
 			"read":  "Read file contents",
+			"find":  "Find files by glob pattern (respects .gitignore)",
+			"ls":    "List directory contents",
 			"bash":  "Execute bash commands (ls, grep, find, etc.)",
 			"write": "Create or overwrite files",
 			"edit":  editPromptSnippet,

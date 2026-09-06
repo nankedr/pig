@@ -275,7 +275,7 @@ func selectAgentTools(tools []agent.ErasedAgentTool, included, excluded []string
 
 func isBuiltinAgentTool(name string) bool {
 	switch name {
-	case "read", "bash", "edit", "write", "grep":
+	case "read", "bash", "edit", "write", "grep", "find", "ls":
 		return true
 	default:
 		return false

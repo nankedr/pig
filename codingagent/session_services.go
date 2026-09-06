@@ -142,6 +142,10 @@ func createCodingTools(cwd string, names []string, options ToolsOptions) ([]agen
 			tool, err = CreateEditTool(cwd, options.Edit)
 		case "grep":
 			tool, err = CreateGrepTool(cwd, options.Grep)
+		case "find":
+			tool, err = CreateFindTool(cwd, options.Find)
+		case "ls":
+			tool, err = CreateLsTool(cwd, options.Ls)
 		case "write":
 			tool, err = CreateWriteTool(cwd, options.Write)
 		default:

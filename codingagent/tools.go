@@ -531,26 +531,10 @@ type ToolDefinition struct {
 	RenderShell         string
 }
 
-func CreateFindToolDefinition(string, ...FindToolOptions) (ToolDefinition, error) {
-	return ToolDefinition{}, notImplemented("CreateFindToolDefinition")
-}
-
-func CreateLsToolDefinition(string, ...LsToolOptions) (ToolDefinition, error) {
-	return ToolDefinition{}, notImplemented("CreateLsToolDefinition")
-}
-
 func CreateReadToolDefinition(string, ...ReadToolOptions) (ToolDefinition, error) {
 	return ToolDefinition{}, notImplemented("CreateReadToolDefinition")
 }
 
-func CreateFindTool(cwd string, options ...FindToolOptions) (agent.ErasedAgentTool, error) {
-	_, _ = cwd, options
-	return agent.ErasedAgentTool{}, notImplemented("CreateFindTool")
-}
-func CreateLsTool(cwd string, options ...LsToolOptions) (agent.ErasedAgentTool, error) {
-	_, _ = cwd, options
-	return agent.ErasedAgentTool{}, notImplemented("CreateLsTool")
-}
 func CreateReadTool(cwd string, options ...ReadToolOptions) (agent.ErasedAgentTool, error) {
 	configured := ReadToolOptions{}
 	if len(options) != 0 {
