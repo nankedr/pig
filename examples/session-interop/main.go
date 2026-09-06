@@ -49,10 +49,11 @@ func run() error {
 	}
 	provider.SetResponses([]ai.FauxResponseStep{reply})
 	model, _ := provider.GetModel()
-	created, err := codingagent.CreateAgentSession(context.Background(), codingagent.CreateAgentSessionOptions{CWD: dir, Model: &model, Provider: provider.Provider, SessionManager: manager})
+	created, err := codingagent.CreateAgentSession(context.Background(), codingagent.CreateAgentSessionOptions{CWD: dir, Model: &model, Provider: provider.Provider, SessionManager: manager, Tools: []string{}})
 	if err != nil {
 		return err
 	}
+	created.Session.Agent().SetSystemPrompt("")
 	if err := created.Session.Prompt(context.Background(), "continue"); err != nil {
 		return err
 	}

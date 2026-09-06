@@ -120,3 +120,7 @@ Issue #65 让 compat 与全部 deprecated aliases 复用同一注册表，验证
 `make m2-gate` 提供全部已交付链路的离线回归、race、vet、darwin/arm64 无 CGO 构建、示例与 20 次随机顺序并发验证。`make m2-freeze` 必须从干净 Pig checkout 运行，再校验固定 Pi Oracle、source drift 和要求真实凭证的 M1 DeepSeek 冒烟。M2 Catalog ID、执行证据、明确的 partial 范围与 CLI/SDK 版本由 `internal/m2gate` 检查。
 
 详细范围与发布顺序见 [M2 集成与冻结](learning/m2-freeze.md)。本票只收口 #60–#69，不改变后续 Adapter、认证、图片和 broad contract 的未实现边界。
+
+## M3 集成验收
+
+`make m3-gate` 继承 M1/M2 离线回归并重复验证 M3 的跨进程持久化、锁、四工具恢复/fork 与取消。`make m3-freeze` 在干净 checkout 上追加固定 Oracle、source/API drift、v3 双向互操作和受保护 DeepSeek 冒烟。Catalog 静态映射与已交付行为分别验收，后续里程碑缺口继续保持可见。发布范围及制品见 [M3 集成与冻结](learning/m3-freeze.md)和 [v0.3.0](releases/v0.3.0.md)。父 Issue 和里程碑前沿由阶段维护流程另行推进。

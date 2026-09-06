@@ -1,7 +1,6 @@
 package m2gate_test
 
 import (
-	"context"
 	"crypto/sha256"
 	"fmt"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/nankedr/pig/codingagent"
 	"github.com/nankedr/pig/internal/catalog"
 )
 
@@ -80,17 +78,5 @@ func TestM2CatalogEvidence(t *testing.T) {
 	}
 	if strings.Join(ids, "\n")+"\n" != string(want) {
 		t.Error("M2 Catalog scope changed; review the frozen ID snapshot before changing milestone assignments")
-	}
-}
-
-func TestM2ReleaseVersion(t *testing.T) {
-	if codingagent.Version != "0.2.0" {
-		t.Fatalf("SDK version = %s, want 0.2.0", codingagent.Version)
-	}
-	for _, flag := range []string{"--version", "-v"} {
-		result, err := codingagent.RunCLI(context.Background(), codingagent.CLIInvocation{Arguments: []string{flag}})
-		if err != nil || result.Stdout != "0.2.0\n" || result.Stderr != "" {
-			t.Fatalf("%s: result=%+v, err=%v", flag, result, err)
-		}
 	}
 }

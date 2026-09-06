@@ -1,5 +1,7 @@
 # Pig 文档导航
 
+M3/v0.3.0 的发布范围、安装和门禁见 [M3 集成与冻结](learning/m3-freeze.md)、[TypeScript → Go 导航](mappings/typescript-to-go/m3-freeze.md)及 [发布说明](releases/v0.3.0.md)。
+
 M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回读](learning/m3-write-tool.md)。
 M3.9 支持显式 edit 精确/模糊多区域替换、准确 diff 和回读，见 [edit 与回读](learning/m3-edit-tool.md)及 [TypeScript → Go](mappings/typescript-to-go/m3-edit-tool.md)。
 M3.10 支持显式 bash 执行宿主命令、进程树取消与完整输出保留，见 [bash 与回读](learning/m3-bash-tool.md)及 [TypeScript → Go](mappings/typescript-to-go/m3-bash-tool.md)。

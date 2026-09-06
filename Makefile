@@ -1,6 +1,6 @@
-.PHONY: m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze m1-live-smoke m1-freeze m2-gate m2-repeat m2-oracle m2-freeze m2-clean
+.PHONY: m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze m1-live-smoke m1-freeze m2-gate m2-repeat m2-oracle m2-freeze m2-clean m3-gate m3-repeat m3-oracle m3-clean m3-freeze m3-node-preflight
 
-.NOTPARALLEL: m0-offline m0-freeze m1-freeze m2-gate m2-freeze
+.NOTPARALLEL: m0-offline m0-freeze m1-freeze m2-gate m2-freeze m3-gate m3-freeze m3-oracle
 
 PI_CODE_COMMIT := 936aff00918de1187f085f123c2812d8f2d67745
 PI_TYPESCRIPT_VERSION := 5.9.3
@@ -117,3 +117,21 @@ m2-clean:
 		test -z "$$state" || (echo "M2 freeze requires a clean Pig checkout" >&2; exit 2)
 
 m2-freeze: m2-clean m2-gate m2-oracle m0-source-drift m1-live-smoke
+
+m3-gate: m2-gate m3-repeat
+
+m3-repeat:
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test(WriteToolQueueCancellationAndFailure|WriteToolSessionAbortWaitsForMutation|EditToolMixedMutationQueue|EditToolSessionAbortWaitsForMutation|BashToolSessionAbortKillsProcessTree|BashToolTimeoutKillsProcessTree|SessionRuntimeReplacementLifecycle|SessionDiscoveryDefaultDirectoriesAndCancellation)$$' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent ./cmd/pig -run 'Test(SettingsConcurrentProcessesPreserveUnrelatedFields|ProjectTrustStoreConcurrentProcessesAndPermissions|Credential76CrossProcess|PigDefaultCodingTaskResumeAndFork|PigBashShutdownSignalsKillProcessTree|PigUntrustedProjectHasNoSensitiveReadsOrEffects)$$' -count=5 -shuffle=on
+
+m3-node-preflight: m0-node-preflight
+	@test "$$(node -p 'process.versions.unicode')" = "16.0" || (echo "M3 freeze requires Node with Unicode 16.0 (for example Node 24.4.1)" >&2; exit 2)
+
+m3-oracle: m3-node-preflight m2-oracle
+
+m3-clean:
+	@set -eu; state=$$(git status --porcelain=v1 --untracked-files=all); \
+		test -z "$$state" || (echo "M3 freeze requires a clean Pig checkout" >&2; exit 2)
+
+m3-freeze: m3-clean m3-node-preflight m3-gate m3-oracle m0-source-drift m1-live-smoke
+	@$(MAKE) --no-print-directory m3-clean
