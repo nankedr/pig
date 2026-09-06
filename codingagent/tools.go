@@ -749,6 +749,21 @@ func resolveToolPath(input, cwd string) (string, error) {
 	if strings.HasPrefix(normalized, "@") {
 		normalized = normalized[1:]
 	}
+	normalized, err := normalizeToolHostPath(normalized)
+	if err != nil {
+		return "", err
+	}
+	base, err := normalizeToolHostPath(cwd)
+	if err != nil {
+		return "", err
+	}
+	if !filepath.IsAbs(normalized) {
+		normalized = filepath.Join(base, normalized)
+	}
+	return filepath.Abs(normalized)
+}
+
+func normalizeToolHostPath(normalized string) (string, error) {
 	if normalized == "~" || strings.HasPrefix(normalized, "~/") || runtime.GOOS == "windows" && strings.HasPrefix(normalized, `~\`) {
 		home, err := os.UserHomeDir()
 		if err != nil {
@@ -770,10 +785,7 @@ func resolveToolPath(input, cwd string) (string, error) {
 		}
 		normalized = filePath
 	}
-	if !filepath.IsAbs(normalized) {
-		normalized = filepath.Join(cwd, normalized)
-	}
-	return filepath.Abs(normalized)
+	return normalized, nil
 }
 
 func resolveReadPath(input, cwd string) (string, error) {

@@ -17,7 +17,7 @@ go run ./cmd/pig --provider deepseek --model deepseek-v4-flash --tools read,writ
 
 SDK 使用 `CreateWriteTool(cwd)`，将返回值注入 `CreateAgentSessionOptions.AgentTools`，并在 `Tools` 中选择 `write`。模型给出的参数按 JSON Schema 校验；缺少 path/content 不会隐式写入空文件。空字符串 content 则是合法的清空操作。直接调用 definition 的 `Execute` 传入 `map[string]any{"path": ..., "content": ...}`，返回 Go error；通过 Session 调用时错误成为 ToolResult，模型可继续处理。
 
-路径继承宿主权限，无 workspace containment 或逐次审批。支持相对、绝对、`..`、`~`、`@` 前缀、file URL 与 Pi 规定的 Unicode 空格规范化。write 不使用 read 的 macOS 截图/NFD 文件名回退。已有 symlink 按宿主语义写入目标。
+路径继承宿主权限，无 workspace containment 或逐次审批。支持相对、绝对、`..`、`~`、`@` 前缀、file URL 与 Pi 规定的 Unicode 空格规范化。write 不使用 read 的 macOS 截图/NFD 文件名回退。已有 symlink 按宿主语义写入目标。SDK 的 cwd 也按 Pi 处理 `~`、file URL 和 Windows shell 路径；cwd 不去除 `@` 或替换 Unicode 空格。
 
 文件队列在单个进程内共享。注册时对存在路径执行 realpath，已有 symlink 别名共享同一 FIFO；ENOENT/ENOTDIR 回退到绝对词法路径。因此不存在的路径经过 symlink 父目录时，并不保证不同别名会合并，这与固定 Pi 一致。队列不是跨进程文件锁。
 

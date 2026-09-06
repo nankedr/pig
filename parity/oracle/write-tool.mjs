@@ -58,7 +58,7 @@ async function main() {
  const {createReadTool} = await import(pathToFileURL(join(args.pi, "packages/coding-agent/src/core/tools/read.ts")).href);
  const dir = mkdtempSync(join(tmpdir(), "pi-write-tool-"));
  try {
-  const input = {writes:[
+  const input = {cwdForms:["tilde","file-url"],writes:[
    {path:"nested/dir/result.txt",content:"Hello\n"},
    {path:"nested/dir/result.txt",content:"你好🙂\r\n"},
    {path:"@space\u202fname.txt",content:"space"},
@@ -73,9 +73,20 @@ async function main() {
    const back=await read.execute("read",{path:args.path});
    results.push({text:result.content[0].text,detailsEmpty:result.details==null,read:back.content[0].text});
   }
+  const cwdResults=[];
+  const savedHome=process.env.HOME, savedProfile=process.env.USERPROFILE;
+  process.env.HOME=dir; process.env.USERPROFILE=dir;
+  try {
+   for(const form of input.cwdForms){
+    const tool=createWriteTool(form==="tilde"?"~/workspace":pathToFileURL(cwd).href);
+    const result=await tool.execute("cwd",{path:"cwd.txt",content:form});
+    const back=await read.execute("read",{path:"cwd.txt"});
+    cwdResults.push({text:result.content[0].text,read:back.content[0].text});
+   }
+  } finally {if(savedHome===undefined)delete process.env.HOME;else process.env.HOME=savedHome;if(savedProfile===undefined)delete process.env.USERPROFILE;else process.env.USERPROFILE=savedProfile;}
   const definition=createWriteToolDefinition(cwd);
   const metadata={name:definition.name,label:definition.label,description:definition.description,parameters:definition.parameters,promptSnippet:definition.promptSnippet,promptGuidelines:definition.promptGuidelines};
-  const observation={outcome:{results,metadata},side_effects:[]};
+  const observation={outcome:{results,metadata,cwdResults},side_effects:[]};
   const caseValue={schema_version:"1.0.0",id:"go-sdk/codingagent/write-tool",catalog_id:"contract:codingagent/write-tool",surface:"go-sdk",input,observe:["outcome","side_effects"]};
   const fixture={schema_version:"1.0.0",deterministic:true,baseline_id:lock.baseline_id,baseline_commit:lock.upstream.commit,upstream:{repository:lock.upstream.repository,commit:lock.upstream.commit,reference},case:caseValue,observation,input_hash:caseDigest(caseValue),observation_hash:observationDigest(observation),execution_method:"node --experimental-strip-types parity/oracle/write-tool.mjs <locked-pi-checkout>",platform:"any",environment:{node:process.version,oracle_entry:reference}};
   if(args.check){const committed=JSON.parse(readFileSync(args.out,"utf8"));fixture.environment.node=committed.environment.node;if(JSON.stringify(fixture)!==JSON.stringify(committed))throw new Error("committed fixture does not reproduce");console.log(`verified ${args.out}`);}else{writeFileSync(args.out,`${JSON.stringify(fixture,null,2)}\n`);console.log(`wrote ${args.out}`);}

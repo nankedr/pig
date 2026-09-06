@@ -41,12 +41,14 @@ func TestWriteToolSessionParity(t *testing.T) {
 	}
 	result, err := parity.RunCase(context.Background(), fixture.Case, oracle, parity.DriverFunc{SurfaceName: parity.SurfaceGoSDK, ObserveFunc: func(ctx context.Context, c parity.Case) (parity.Observation, error) {
 		var input struct {
-			Writes []struct{ Path, Content string }
+			CWDForms []string `json:"cwdForms"`
+			Writes   []struct{ Path, Content string }
 		}
 		if err := json.Unmarshal(c.Input, &input); err != nil {
 			return parity.Observation{}, err
 		}
 		cwd := filepath.Join(t.TempDir(), "workspace")
+		t.Chdir(filepath.Dir(cwd))
 		if err := os.Mkdir(cwd, 0700); err != nil {
 			return parity.Observation{}, err
 		}
@@ -69,12 +71,34 @@ func TestWriteToolSessionParity(t *testing.T) {
 			}
 			results = append(results, map[string]any{"text": readToolResultText(t, messages[0]), "detailsEmpty": messages[0].Details.IsNull() || !messages[0].Details.IsSet(), "read": readToolResultText(t, messages[1])})
 		}
+
+		var cwdResults []map[string]any
+		t.Setenv("HOME", filepath.Dir(cwd))
+		t.Setenv("USERPROFILE", filepath.Dir(cwd))
+		for _, form := range input.CWDForms {
+			base := "~/workspace"
+			if form == "file-url" {
+				base = (&url.URL{Scheme: "file", Path: cwd}).String()
+			}
+			tool, err := codingagent.CreateWriteTool(base)
+			if err != nil {
+				return parity.Observation{}, err
+			}
+			messages := runWriteSession(t, ctx, cwd, []agent.ErasedAgentTool{tool, read}, []ai.ToolCall{
+				{Type: "toolCall", ID: "write", Name: "write", Arguments: map[string]any{"path": "cwd.txt", "content": form}},
+				{Type: "toolCall", ID: "read", Name: "read", Arguments: map[string]any{"path": "cwd.txt"}},
+			})
+			if messages[0].IsError || messages[1].IsError {
+				t.Fatalf("cwd results: %#v", messages)
+			}
+			cwdResults = append(cwdResults, map[string]any{"text": readToolResultText(t, messages[0]), "read": readToolResultText(t, messages[1])})
+		}
 		definition, err := codingagent.CreateWriteToolDefinition(cwd)
 		if err != nil {
 			return parity.Observation{}, err
 		}
 		metadata := map[string]any{"name": definition.Name, "label": definition.Label, "description": definition.Description, "parameters": definition.Parameters, "promptSnippet": definition.PromptSnippet, "promptGuidelines": definition.PromptGuidelines}
-		outcome, err := json.Marshal(map[string]any{"results": results, "metadata": metadata})
+		outcome, err := json.Marshal(map[string]any{"results": results, "metadata": metadata, "cwdResults": cwdResults})
 		return parity.Observation{Outcome: outcome, SideEffects: &[]parity.SideEffect{}}, err
 	}})
 	if err != nil {
