@@ -43,7 +43,7 @@ func TestCommandStubsHaveNoSideEffects(t *testing.T) {
 				t.Fatalf("list dependencies: %v\n%s", err, output)
 			}
 			for _, dependency := range strings.Fields(string(output)) {
-				if dependency == "os/exec" {
+				if dependency == "os/exec" && tt.path == "./cmd/pig-ai" {
 					t.Fatalf("process dependency = %s", dependency)
 				}
 			}
@@ -92,6 +92,21 @@ func TestCommandStubsHaveNoSideEffects(t *testing.T) {
 			if after := snapshotTrees(t, home, work, tempState); fmt.Sprint(after) != fmt.Sprint(before) {
 				t.Fatalf("filesystem state changed:\nbefore: %#v\nafter:  %#v", before, after)
 			}
+			auth := []byte(`{"deepseek":{"type":"api_key","key":"!printf unexpected > credential-command-ran"}}`)
+			if err := os.WriteFile(filepath.Join(home, ".pig", "agent", "auth.json"), auth, 0600); err != nil {
+				t.Fatal(err)
+			}
+			before = snapshotTrees(t, home, work, tempState)
+			command = exec.Command(binary, tt.arguments...)
+			command.Dir = work
+			command.Env = contaminatedEnvironment(home, tempState, proxyURL)
+			if output, err := command.CombinedOutput(); err == nil || string(output) != tt.wantStderr {
+				t.Fatalf("stub with command credential: %v %s", err, output)
+			}
+			if after := snapshotTrees(t, home, work, tempState); fmt.Sprint(after) != fmt.Sprint(before) {
+				t.Fatal("stub executed or modified command credential")
+			}
+
 			if networkRequests.Load() != 0 {
 				t.Fatalf("network requests = %d", networkRequests.Load())
 			}

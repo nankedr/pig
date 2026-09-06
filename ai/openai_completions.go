@@ -461,7 +461,7 @@ func runOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStre
 		if requestCtx.Err() != nil {
 			output.StopReason = StopReasonAborted
 		}
-		output.ErrorMessage = Some(redactOpenAIRequestSecrets(openAIErrorMessage(err), options))
+		output.ErrorMessage = Some(redactOpenAIRequestSecrets(openAIErrorMessage(err), model, options))
 		stream.Push(AssistantMessageErrorEvent{
 			Type: AssistantMessageEventTypeError, Reason: output.StopReason, Error: output,
 		})
@@ -743,10 +743,10 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 			output.Usage = mapOpenAIUsage(*choice.Usage, model)
 		}
 		if choice.FinishReason != nil && *choice.FinishReason != "" {
-			output.RawStopReason = Some(redactOpenAIRequestSecrets(*choice.FinishReason, options))
+			output.RawStopReason = Some(redactOpenAIRequestSecrets(*choice.FinishReason, model, options))
 			output.StopReason, err = mapOpenAIStopReason(*choice.FinishReason)
 			if err != nil {
-				output.ErrorMessage = Some(redactOpenAIRequestSecrets(err.Error(), options))
+				output.ErrorMessage = Some(redactOpenAIRequestSecrets(err.Error(), model, options))
 			}
 			hasFinishReason = true
 		}
@@ -800,7 +800,7 @@ func sendOpenAICompletions(ctx context.Context, stream *AssistantMessageEventStr
 	if ctx.Err() != nil {
 		cause := context.Cause(ctx)
 		output.StopReason = StopReasonAborted
-		output.ErrorMessage = Some(redactOpenAIRequestSecrets(openAIErrorMessage(cause), options))
+		output.ErrorMessage = Some(redactOpenAIRequestSecrets(openAIErrorMessage(cause), model, options))
 		finishOpenAIContent(stream, output)
 		return cause
 	}
@@ -1505,15 +1505,25 @@ func openAIErrorMessage(err error) string {
 	return err.Error()
 }
 
-func redactOpenAIRequestSecrets(message string, options OpenAICompletionsOptions) string {
+func redactOpenAIRequestSecrets(message string, model Model, options OpenAICompletionsOptions) string {
 	secrets := []string{}
 	if options.APIKey != nil {
 		secrets = append(secrets, *options.APIKey)
 	}
-	for name, value := range options.Headers {
+	for name, value := range openAIRequestHeaders(model.Headers, options.Headers, "") {
 		name = strings.ToLower(name)
-		if value != nil && (strings.Contains(name, "authorization") || strings.Contains(name, "cookie") || strings.Contains(name, "token") || strings.Contains(name, "key")) {
-			secrets = append(secrets, *value, strings.TrimPrefix(*value, "Bearer "))
+		if strings.Contains(name, "authorization") || strings.Contains(name, "cookie") || strings.Contains(name, "token") || strings.Contains(name, "key") {
+			secrets = append(secrets, value)
+			if fields := strings.Fields(value); strings.Contains(name, "authorization") && len(fields) == 2 {
+				secrets = append(secrets, fields[1])
+			}
+			if strings.Contains(name, "cookie") {
+				for _, cookie := range strings.Split(value, ";") {
+					if _, secret, ok := strings.Cut(cookie, "="); ok {
+						secrets = append(secrets, strings.TrimSpace(secret))
+					}
+				}
+			}
 		}
 	}
 	sort.Slice(secrets, func(i, j int) bool { return len(secrets[i]) > len(secrets[j]) })

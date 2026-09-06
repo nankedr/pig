@@ -11,9 +11,9 @@
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5169 |
+| inventoried | 5168 |
 | scaffolded | 4020 |
-| partial | 240 |
+| partial | 241 |
 | implemented | 54 |
 | verified | 167 |
 | deferred | 2 |
@@ -5446,7 +5446,6 @@
 | constructor:codingagent/src/modes/interactive/components/user-message-selector.ts#UserMessageSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/theme/theme.ts#Theme | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.Theme | coding-agent |
-| contract:config/auth-json | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:config/models-json | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:migration/auth-and-layout | inventoried | M5 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:rpc/command-union | inventoried | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
@@ -8025,6 +8024,7 @@
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
 | contract:codingagent/write-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateWriteTool | coding-agent |
+| contract:config/auth-json | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewAuthStorage | coding-agent |
 | contract:config/settings | partial | M3 | contract | github.com/nankedr/pig/codingagent.SettingsManager | coding-agent |
 | contract:security/project-trust | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateHeadlessSession | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |

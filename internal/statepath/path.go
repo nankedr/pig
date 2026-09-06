@@ -7,12 +7,12 @@ import (
 )
 
 func Resolve(path string) (string, error) {
-	if path == "~" || strings.HasPrefix(path, "~/") {
+	if path == "~" || strings.HasPrefix(path, "~/") || strings.HasPrefix(path, `~\`) {
 		home, err := os.UserHomeDir()
 		if err != nil {
 			return "", err
 		}
-		path = filepath.Join(home, strings.TrimPrefix(path, "~"))
+		path = filepath.Join(home, strings.TrimLeft(path[1:], `/\`))
 	}
 	return filepath.Abs(path)
 }

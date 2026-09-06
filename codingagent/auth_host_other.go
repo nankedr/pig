@@ -8,7 +8,8 @@ import (
 	"os/exec"
 )
 
-func lockAuthFile(context.Context, *os.File) error { return notImplemented("credential.host") }
+func credentialHostAvailable() error               { return notImplemented("credential.host") }
+func lockAuthFile(context.Context, *os.File) error { return credentialHostAvailable() }
 func unlockAuthFile(*os.File)                      {}
 func credentialCommand(ctx context.Context, command string) *exec.Cmd {
 	return exec.CommandContext(ctx, "cmd.exe", "/c", command)

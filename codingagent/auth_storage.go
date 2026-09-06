@@ -36,6 +36,9 @@ func (s *AuthStorage) withLock(ctx context.Context, write bool, fn func(map[stri
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+	if err := credentialHostAvailable(); err != nil {
+		return err
+	}
 	if !write {
 		if _, err := os.Stat(s.path); errors.Is(err, os.ErrNotExist) {
 			_, err = fn(map[string]json.RawMessage{})

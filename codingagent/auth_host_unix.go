@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+func credentialHostAvailable() error { return nil }
+
 func lockAuthFile(ctx context.Context, f *os.File) error {
 	for {
 		if err := ctx.Err(); err != nil {

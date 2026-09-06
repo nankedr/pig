@@ -25,6 +25,7 @@ func issue76CredentialEvidence(t *testing.T) []issue32ModuleEvidenceDescriptor {
 		{"oracle", "parity/oracle/fixtures/credentials.json", "issue76-credential-oracle", "node --experimental-strip-types parity/oracle/credentials.mjs <locked-pi-checkout> --check"},
 		{"go-test", "internal/parity/credentials_test.go", "issue76-credential-parity", "go test ./internal/parity -run '^TestCredentialStorageParity$' -count=1"},
 		{"go-test", "codingagent/issue76_credentials_test.go", "issue76-credential-storage", "go test -race ./codingagent -run '^TestCredential76' -count=1"},
+		{"go-test", "ai/issue76_redaction_test.go", "issue76-model-header-redaction", "go test ./ai -run '^TestCredential76ModelHeaderRedaction$' -count=1"},
 		{"go-test", "codingagent/issue76_headless_test.go", "issue76-credential-sdk", "go test ./codingagent -run '^TestCredential76(Explicit|Models)' -count=1"},
 		{"go-test", "cmd/pig/issue76_process_test.go", "issue76-credential-process", "go test ./cmd/pig -run '^TestPigCanonicalCredentials$' -count=1"},
 		{"go-test", "internal/pigaicli/issue76_path_test.go", "issue76-credential-path", "go test ./internal/pigaicli -run '^TestCredential76' -count=1"},
