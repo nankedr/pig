@@ -518,7 +518,7 @@ type ToolsOptions struct {
 type ToolDefinition struct {
 	ConstrainedSampling ai.ConstrainedSampling
 	Description         string
-	Execute             ExtensionHandler
+	Execute             ToolExecuteFunc
 	ExecutionMode       agent.ToolExecutionMode
 	Label               string
 	Name                string
@@ -553,10 +553,6 @@ func CreateLsToolDefinition(string, ...LsToolOptions) (ToolDefinition, error) {
 
 func CreateReadToolDefinition(string, ...ReadToolOptions) (ToolDefinition, error) {
 	return ToolDefinition{}, notImplemented("CreateReadToolDefinition")
-}
-
-func CreateWriteToolDefinition(string, ...WriteToolOptions) (ToolDefinition, error) {
-	return ToolDefinition{}, notImplemented("CreateWriteToolDefinition")
 }
 
 func CreateBashTool(cwd string, options ...BashToolOptions) (agent.ErasedAgentTool, error) {
@@ -678,10 +674,6 @@ func readToolNumber(value any) (float64, bool) {
 		return 0, false
 	}
 }
-func CreateWriteTool(cwd string, options ...WriteToolOptions) (agent.ErasedAgentTool, error) {
-	_, _ = cwd, options
-	return agent.ErasedAgentTool{}, notImplemented("CreateWriteTool")
-}
 
 func CreateCodingTools(string, ...ToolsOptions) ([]agent.ErasedAgentTool, error) {
 	return nil, notImplemented("CreateCodingTools")
@@ -745,7 +737,7 @@ var (
 	readToolEncodedWinSeparator  = regexp.MustCompile(`(?i)%5c`)
 )
 
-func resolveReadPath(input, cwd string) (string, error) {
+func resolveToolPath(input, cwd string) (string, error) {
 	normalized := strings.Map(func(character rune) rune {
 		switch {
 		case character == '\u00a0', character >= '\u2000' && character <= '\u200a', character == '\u202f', character == '\u205f', character == '\u3000':
@@ -781,7 +773,11 @@ func resolveReadPath(input, cwd string) (string, error) {
 	if !filepath.IsAbs(normalized) {
 		normalized = filepath.Join(cwd, normalized)
 	}
-	resolved, err := filepath.Abs(normalized)
+	return filepath.Abs(normalized)
+}
+
+func resolveReadPath(input, cwd string) (string, error) {
+	resolved, err := resolveToolPath(input, cwd)
 	if err != nil {
 		return "", err
 	}
@@ -1048,12 +1044,6 @@ func (localBashOperations) Exec(context.Context, string, string, BashExecOptions
 }
 
 func CreateLocalBashOperations(...BashToolOptions) BashOperations { return localBashOperations{} }
-
-func WithFileMutationQueue[T any](ctx context.Context, filePath string, fn func(context.Context) (T, error)) (T, error) {
-	_, _, _ = ctx, filePath, fn
-	var zero T
-	return zero, notImplemented("WithFileMutationQueue")
-}
 
 func SortedToolNames(definitions []ToolDefinition) []string {
 	names := make([]string, len(definitions))

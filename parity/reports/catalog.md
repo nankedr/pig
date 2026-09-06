@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9650
+- Total entries: 9651
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5169 |
 | scaffolded | 4020 |
-| partial | 238 |
+| partial | 239 |
 | implemented | 54 |
 | verified | 167 |
 | deferred | 2 |
@@ -8024,6 +8024,7 @@
 | contract:codingagent/compaction | partial | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
+| contract:codingagent/write-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateWriteTool | coding-agent |
 | contract:config/settings | partial | M3 | contract | github.com/nankedr/pig/codingagent.SettingsManager | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |

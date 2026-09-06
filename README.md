@@ -1,5 +1,7 @@
 # Pig
 
+M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回读](docs/learning/m3-write-tool.md)。
+
 Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口；当前 M3 已支持 v3 Session 创建、持久化、显式路径重开和全局 settings 驱动的 Headless 启动。
 
 - [文档导航](docs/README.md)

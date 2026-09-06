@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/tools/write.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/write-tool",
+    "catalog_id": "contract:codingagent/write-tool",
+    "surface": "go-sdk",
+    "input": {
+      "writes": [
+        {
+          "path": "nested/dir/result.txt",
+          "content": "Hello\n"
+        },
+        {
+          "path": "nested/dir/result.txt",
+          "content": "你好🙂\r\n"
+        },
+        {
+          "path": "@space name.txt",
+          "content": "space"
+        },
+        {
+          "path": "empty.txt",
+          "content": ""
+        },
+        {
+          "path": "../parent.txt",
+          "content": "parent"
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "results": [
+        {
+          "text": "Successfully wrote 6 bytes to nested/dir/result.txt",
+          "detailsEmpty": true,
+          "read": "Hello\n"
+        },
+        {
+          "text": "Successfully wrote 6 bytes to nested/dir/result.txt",
+          "detailsEmpty": true,
+          "read": "你好🙂\r\n"
+        },
+        {
+          "text": "Successfully wrote 5 bytes to @space name.txt",
+          "detailsEmpty": true,
+          "read": "space"
+        },
+        {
+          "text": "Successfully wrote 0 bytes to empty.txt",
+          "detailsEmpty": true,
+          "read": ""
+        },
+        {
+          "text": "Successfully wrote 6 bytes to ../parent.txt",
+          "detailsEmpty": true,
+          "read": "parent"
+        }
+      ],
+      "metadata": {
+        "name": "write",
+        "label": "write",
+        "description": "Write content to a file. Creates the file if it doesn't exist, overwrites if it does. Automatically creates parent directories.",
+        "parameters": {
+          "type": "object",
+          "required": [
+            "path",
+            "content"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to the file to write (relative or absolute)"
+            },
+            "content": {
+              "type": "string",
+              "description": "Content to write to the file"
+            }
+          }
+        },
+        "promptSnippet": "Create or overwrite files",
+        "promptGuidelines": [
+          "Use write only for new files or complete rewrites."
+        ]
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:1d2cf7de49fe71f8118da5a699354a6148847d9730d14ddf19a2e89d800281d5",
+  "observation_hash": "sha256:786e3727cb986874eaa1e184c8257881c4d956d2911c5a52efad16442f3e6f30",
+  "execution_method": "node --experimental-strip-types parity/oracle/write-tool.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/tools/write.ts"
+  }
+}

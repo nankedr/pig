@@ -19,13 +19,13 @@ import (
 	"github.com/nankedr/pig/codingagent"
 )
 
-func TestToolDefinitionExecutionSlotsRemainOpaqueUntilM7(t *testing.T) {
+func TestToolDefinitionKeepsExtensionSlotsOpaque(t *testing.T) {
 	definitionType := reflect.TypeOf(codingagent.ToolDefinition{})
 	handlerType := reflect.TypeOf((*codingagent.ExtensionHandler)(nil)).Elem()
 	wantFields := map[string]reflect.Type{
 		"ConstrainedSampling": reflect.TypeOf((*ai.ConstrainedSampling)(nil)).Elem(),
 		"Description":         reflect.TypeOf(""),
-		"Execute":             handlerType,
+		"Execute":             reflect.TypeOf(codingagent.ToolExecuteFunc(nil)),
 		"ExecutionMode":       reflect.TypeOf(agent.ToolExecutionMode("")),
 		"Label":               reflect.TypeOf(""),
 		"Name":                reflect.TypeOf(""),
@@ -49,7 +49,7 @@ func TestToolDefinitionExecutionSlotsRemainOpaqueUntilM7(t *testing.T) {
 		if field.Type != want {
 			t.Errorf("ToolDefinition.%s type = %v, want %v", name, field.Type, want)
 		}
-		if field.Type.Kind() == reflect.Func {
+		if field.Type.Kind() == reflect.Func && name != "Execute" {
 			t.Errorf("ToolDefinition.%s remains executable before M7", name)
 		}
 	}
@@ -175,15 +175,6 @@ func TestBuiltinToolDefinitionFactoriesAreCapabilityStubs(t *testing.T) {
 					AutoResizeImages: &resizeImages,
 					Operations:       countingReadOperations{calls: calls},
 				})
-			},
-		},
-		{
-			name:          "write",
-			operation:     "CreateWriteToolDefinition",
-			factory:       codingagent.CreateWriteToolDefinition,
-			wantSignature: reflect.TypeOf((func(string, ...codingagent.WriteToolOptions) (codingagent.ToolDefinition, error))(nil)),
-			call: func(calls *int) (codingagent.ToolDefinition, error) {
-				return codingagent.CreateWriteToolDefinition("invalid\x00path", codingagent.WriteToolOptions{Operations: countingWriteOperations{calls: calls}})
 			},
 		},
 	}
@@ -472,18 +463,14 @@ func TestGenerateDiffString(t *testing.T) {
 	}
 }
 
-func TestWithFileMutationQueueIsCapabilityStub(t *testing.T) {
+func TestWithFileMutationQueueRejectsInvalidPath(t *testing.T) {
 	called := false
 	got, err := codingagent.WithFileMutationQueue(context.Background(), "invalid\x00path", func(context.Context) (string, error) {
 		called = true
 		return "unexpected", nil
 	})
-	if got != "" || called || !errors.Is(err, codingagent.ErrNotImplemented) {
+	if got != "" || called || err == nil {
 		t.Fatalf("WithFileMutationQueue() = (%q, %v), callback called=%v; want zero, ErrNotImplemented, false", got, err, called)
-	}
-	var unavailable *codingagent.NotImplementedError
-	if !errors.As(err, &unavailable) || unavailable.Module != "codingagent" || unavailable.Operation != "WithFileMutationQueue" {
-		t.Fatalf("structured error = %#v, want codingagent.WithFileMutationQueue", unavailable)
 	}
 }
 
