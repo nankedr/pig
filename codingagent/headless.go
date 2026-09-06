@@ -115,9 +115,17 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	}
 	availableTools = append(availableTools, readTool)
 	for _, name := range options.Tools {
-		if name != "read" && name != "write" && name != "bash" {
+		if name != "read" && name != "write" && name != "bash" && name != "edit" {
 			return nil, notImplemented("tool." + name)
 		}
+	}
+
+	if containsTool(options.Tools, "edit", false) {
+		editTool, err := CreateEditTool(options.CWD)
+		if err != nil {
+			return nil, err
+		}
+		availableTools = append(availableTools, editTool)
 	}
 
 	if containsTool(options.Tools, "write", false) {
@@ -209,10 +217,14 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			"read":  "Read file contents",
 			"bash":  "Execute bash commands (ls, grep, find, etc.)",
 			"write": "Create or overwrite files",
+			"edit":  editPromptSnippet,
 		},
 	}
 	if containsTool(activeTools, "read", false) {
 		promptOptions.PromptGuidelines = []string{"Use read to examine files instead of cat or sed."}
+	}
+	if containsTool(activeTools, "edit", false) {
+		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, editPromptGuidelines...)
 	}
 	if containsTool(activeTools, "write", false) {
 		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, "Use write only for new files or complete rewrites.")

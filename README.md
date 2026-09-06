@@ -3,6 +3,7 @@
 Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口；当前 M3 已支持 v3 Session 创建、持久化、显式路径重开和全局 settings 驱动的 Headless 启动，并在 Project Trust 通过后加载项目设置。
 
 M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回读](docs/learning/m3-write-tool.md)。
+M3.9 支持显式 edit 精确/模糊多区域替换、准确 diff 和回读，见 [edit 与回读](docs/learning/m3-edit-tool.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m3-edit-tool.md)。
 M3.10 支持显式 bash 执行宿主命令、进程树取消与完整输出保留，见 [bash 与回读](docs/learning/m3-bash-tool.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m3-bash-tool.md)。
 
 - [文档导航](docs/README.md)

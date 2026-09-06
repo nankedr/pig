@@ -30,7 +30,7 @@ func TestToolDefinitionKeepsExtensionSlotsOpaque(t *testing.T) {
 		"Label":               reflect.TypeOf(""),
 		"Name":                reflect.TypeOf(""),
 		"Parameters":          reflect.TypeOf(json.RawMessage(nil)),
-		"PrepareArguments":    handlerType,
+		"PrepareArguments":    reflect.TypeOf(agent.PrepareArgumentsFunc(nil)),
 		"PromptGuidelines":    reflect.TypeOf([]string(nil)),
 		"PromptSnippet":       reflect.TypeOf(""),
 		"RenderCall":          handlerType,
@@ -49,7 +49,7 @@ func TestToolDefinitionKeepsExtensionSlotsOpaque(t *testing.T) {
 		if field.Type != want {
 			t.Errorf("ToolDefinition.%s type = %v, want %v", name, field.Type, want)
 		}
-		if field.Type.Kind() == reflect.Func && name != "Execute" {
+		if field.Type.Kind() == reflect.Func && name != "Execute" && name != "PrepareArguments" {
 			t.Errorf("ToolDefinition.%s remains executable before M7", name)
 		}
 	}
@@ -112,15 +112,6 @@ func TestBuiltinToolDefinitionFactoriesAreCapabilityStubs(t *testing.T) {
 		wantSignature reflect.Type
 		call          func(*int) (codingagent.ToolDefinition, error)
 	}{
-		{
-			name:          "edit",
-			operation:     "CreateEditToolDefinition",
-			factory:       codingagent.CreateEditToolDefinition,
-			wantSignature: reflect.TypeOf((func(string, ...codingagent.EditToolOptions) (codingagent.ToolDefinition, error))(nil)),
-			call: func(calls *int) (codingagent.ToolDefinition, error) {
-				return codingagent.CreateEditToolDefinition("invalid\x00path", codingagent.EditToolOptions{Operations: countingEditOperations{calls: calls}})
-			},
-		},
 		{
 			name:          "find",
 			operation:     "CreateFindToolDefinition",

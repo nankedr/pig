@@ -376,19 +376,19 @@ type BashToolOptions struct {
 }
 
 type Edit struct {
-	OldText string
-	NewText string
+	OldText string `json:"oldText"`
+	NewText string `json:"newText"`
 }
 
 type EditToolInput struct {
-	Path  string
-	Edits []Edit
+	Path  string `json:"path"`
+	Edits []Edit `json:"edits"`
 }
 
 type EditToolDetails struct {
-	Diff             string
-	Patch            string
-	FirstChangedLine int
+	Diff             string `json:"diff"`
+	Patch            string `json:"patch"`
+	FirstChangedLine int    `json:"firstChangedLine,omitempty"`
 }
 
 type EditOperations interface {
@@ -523,16 +523,12 @@ type ToolDefinition struct {
 	Label               string
 	Name                string
 	Parameters          json.RawMessage
-	PrepareArguments    ExtensionHandler
+	PrepareArguments    agent.PrepareArgumentsFunc
 	PromptGuidelines    []string
 	PromptSnippet       string
 	RenderCall          ExtensionHandler
 	RenderResult        ExtensionHandler
 	RenderShell         string
-}
-
-func CreateEditToolDefinition(string, ...EditToolOptions) (ToolDefinition, error) {
-	return ToolDefinition{}, notImplemented("CreateEditToolDefinition")
 }
 
 func CreateFindToolDefinition(string, ...FindToolOptions) (ToolDefinition, error) {
@@ -551,10 +547,6 @@ func CreateReadToolDefinition(string, ...ReadToolOptions) (ToolDefinition, error
 	return ToolDefinition{}, notImplemented("CreateReadToolDefinition")
 }
 
-func CreateEditTool(cwd string, options ...EditToolOptions) (agent.ErasedAgentTool, error) {
-	_, _ = cwd, options
-	return agent.ErasedAgentTool{}, notImplemented("CreateEditTool")
-}
 func CreateFindTool(cwd string, options ...FindToolOptions) (agent.ErasedAgentTool, error) {
 	_, _ = cwd, options
 	return agent.ErasedAgentTool{}, notImplemented("CreateFindTool")

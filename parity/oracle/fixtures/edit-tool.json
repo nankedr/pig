@@ -1,0 +1,1847 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/tools/edit.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/edit-tool",
+    "catalog_id": "contract:codingagent/edit-tool",
+    "surface": "go-sdk",
+    "input": {
+      "cases": [
+        {
+          "name": "legacy",
+          "content": "before\n",
+          "args": {
+            "oldText": "before",
+            "newText": "after"
+          }
+        },
+        {
+          "name": "legacy-appended",
+          "content": "a\nc\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a",
+                "newText": "b"
+              }
+            ],
+            "oldText": "c",
+            "newText": "d"
+          }
+        },
+        {
+          "name": "stringified",
+          "content": "before\n",
+          "args": {
+            "edits": "[{\"oldText\": \"before\", \"newText\": \"after\"}]"
+          }
+        },
+        {
+          "name": "stringified-legacy",
+          "content": "a\nc\n",
+          "args": {
+            "edits": "[{\"oldText\": \"a\", \"newText\": \"b\"}]",
+            "oldText": "c",
+            "newText": "d"
+          }
+        },
+        {
+          "name": "exact",
+          "content": "Hello, world!",
+          "args": {
+            "edits": [
+              {
+                "oldText": "world",
+                "newText": "testing"
+              }
+            ]
+          }
+        },
+        {
+          "name": "multi-original",
+          "content": "foo\nbar\nbaz\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "foo\n",
+                "newText": "foo bar\n"
+              },
+              {
+                "oldText": "bar\n",
+                "newText": "BAR\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "multi-reverse",
+          "content": "alpha\nbeta\ngamma\ndelta\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "gamma\n",
+                "newText": "GAMMA\n"
+              },
+              {
+                "oldText": "alpha\n",
+                "newText": "ALPHA\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "missing",
+          "content": "hello\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "absent",
+                "newText": "new"
+              }
+            ]
+          }
+        },
+        {
+          "name": "duplicate",
+          "content": "foo foo foo",
+          "args": {
+            "edits": [
+              {
+                "oldText": "foo",
+                "newText": "bar"
+              }
+            ]
+          }
+        },
+        {
+          "name": "empty-edits",
+          "content": "hello\n",
+          "args": {
+            "edits": []
+          }
+        },
+        {
+          "name": "empty-old",
+          "content": "hello\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "",
+                "newText": "x"
+              }
+            ]
+          }
+        },
+        {
+          "name": "empty-file",
+          "content": "",
+          "args": {
+            "edits": [
+              {
+                "oldText": "hello",
+                "newText": "x"
+              }
+            ]
+          }
+        },
+        {
+          "name": "empty-file-old",
+          "content": "",
+          "args": {
+            "edits": [
+              {
+                "oldText": "",
+                "newText": "x"
+              }
+            ]
+          }
+        },
+        {
+          "name": "no-change",
+          "content": "hello\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "hello",
+                "newText": "hello"
+              }
+            ]
+          }
+        },
+        {
+          "name": "multi-no-change",
+          "content": "foo\nbar\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "foo",
+                "newText": "foo"
+              },
+              {
+                "oldText": "bar",
+                "newText": "bar"
+              }
+            ]
+          }
+        },
+        {
+          "name": "multi-empty-old",
+          "content": "foo\nbar\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "foo",
+                "newText": "x"
+              },
+              {
+                "oldText": "",
+                "newText": "x"
+              }
+            ]
+          }
+        },
+        {
+          "name": "overlap",
+          "content": "one\ntwo\nthree\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "one\ntwo\n",
+                "newText": "ONE\nTWO\n"
+              },
+              {
+                "oldText": "two\nthree\n",
+                "newText": "TWO\nTHREE\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nested-reverse",
+          "content": "one two three",
+          "args": {
+            "edits": [
+              {
+                "oldText": "two",
+                "newText": "TWO"
+              },
+              {
+                "oldText": "one two",
+                "newText": "ONE TWO"
+              }
+            ]
+          }
+        },
+        {
+          "name": "multi-failure-no-partial",
+          "content": "alpha\nbeta\ngamma\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "alpha\n",
+                "newText": "ALPHA\n"
+              },
+              {
+                "oldText": "missing\n",
+                "newText": "MISSING\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "multi-duplicate",
+          "content": "alpha\nbeta beta\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "alpha",
+                "newText": "ALPHA"
+              },
+              {
+                "oldText": "beta",
+                "newText": "BETA"
+              }
+            ]
+          }
+        },
+        {
+          "name": "non-overlap-count",
+          "content": "aaa",
+          "args": {
+            "edits": [
+              {
+                "oldText": "aa",
+                "newText": "x"
+              }
+            ]
+          }
+        },
+        {
+          "name": "delete-entire-file",
+          "content": "hello\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "hello\n",
+                "newText": ""
+              }
+            ]
+          }
+        },
+        {
+          "name": "remove-final-newline",
+          "content": "hello\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "hello\n",
+                "newText": "hello"
+              }
+            ]
+          }
+        },
+        {
+          "name": "add-final-newline",
+          "content": "hello",
+          "args": {
+            "edits": [
+              {
+                "oldText": "hello",
+                "newText": "hello\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "crlf-bom",
+          "content": "﻿first\r\nsecond\r\nthird\r\nfourth\r\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "second\n",
+                "newText": "SECOND\n"
+              },
+              {
+                "oldText": "fourth\n",
+                "newText": "FOURTH\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mixed-first-crlf",
+          "content": "one\r\ntwo\nthree\r",
+          "args": {
+            "edits": [
+              {
+                "oldText": "two",
+                "newText": "TWO"
+              }
+            ]
+          }
+        },
+        {
+          "name": "mixed-first-lf",
+          "content": "one\ntwo\r\nthree\r",
+          "args": {
+            "edits": [
+              {
+                "oldText": "two\r",
+                "newText": "TWO\r"
+              }
+            ]
+          }
+        },
+        {
+          "name": "cr-only",
+          "content": "one\rtwo\r",
+          "args": {
+            "edits": [
+              {
+                "oldText": "two\r",
+                "newText": "TWO\r"
+              }
+            ]
+          }
+        },
+        {
+          "name": "newline-duplicate",
+          "content": "hello\r\nworld\r\n---\r\nhello\nworld\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "hello\nworld\n",
+                "newText": "x\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "whitespace",
+          "content": "line one   \nline two  \nline three\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "line one\nline two\n",
+                "newText": "replaced\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nfkc",
+          "content": "你好，世界\n你好（世界）\nＡＢＣ１２３\ncafé\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "你好,世界\n你好(世界)\nABC123\ncafé\n",
+                "newText": "你好，pi\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "quotes-dashes-spaces",
+          "content": "keep “smart”  \nconsole.log(‘hello’);\n“world”\nrange: 1–5\nbreak—here\nhello world\nkeep after  \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "console.log('hello');\n\"world\"\nrange: 1-5\nbreak-here\nhello world\n",
+                "newText": "replaced\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "exact-preserves-line",
+          "content": "smart “quotes” and target   \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "target",
+                "newText": "changed"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuzzy-duplicates",
+          "content": "hello world   \nhello world\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "hello world",
+                "newText": "replaced"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuzzy-multi",
+          "content": "keep before  \nfirst target  \nfirst after\nkeep middle   \nsecond target  \nsecond after\nkeep after  \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "first target\nfirst after",
+                "newText": "FIRST\nFIRST2"
+              },
+              {
+                "oldText": "second target\nsecond after",
+                "newText": "SECOND\nSECOND2"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuzzy-duplicate-neighbor",
+          "content": "replace me   \nafter   \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "replace me\n",
+                "newText": "after\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuzzy-shared-line",
+          "content": "Ａ foo   \nbar  \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "A",
+                "newText": "Z"
+              },
+              {
+                "oldText": "foo",
+                "newText": "FOO"
+              }
+            ]
+          }
+        },
+        {
+          "name": "emoji-offsets",
+          "content": "🙂你好\nＡＢＣ target\nend\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "ABC",
+                "newText": "XYZ"
+              },
+              {
+                "oldText": "🙂你好",
+                "newText": "🙃世界"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuzzy-empty-old",
+          "content": "a  \n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "  ",
+                "newText": "b"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fuzzy-all-whitespace",
+          "content": "   ",
+          "args": {
+            "edits": [
+              {
+                "oldText": " \t",
+                "newText": "x"
+              }
+            ]
+          }
+        },
+        {
+          "name": "trim-ecmascript",
+          "content": "first\nsecond﻿\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "first\nsecond\n",
+                "newText": "done\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-large-gap",
+          "content": "line 001\nline 002\nline 003\nline 004\nline 005\nline 006\nline 007\nline 008\nline 009\nline 010\nline 011\nline 012\nline 013\nline 014\nline 015\nline 016\nline 017\nline 018\nline 019\nline 020\nline 021\nline 022\nline 023\nline 024\nline 025\nline 026\nline 027\nline 028\nline 029\nline 030\nline 031\nline 032\nline 033\nline 034\nline 035\nline 036\nline 037\nline 038\nline 039\nline 040\nline 041\nline 042\nline 043\nline 044\nline 045\nline 046\nline 047\nline 048\nline 049\nline 050\nline 051\nline 052\nline 053\nline 054\nline 055\nline 056\nline 057\nline 058\nline 059\nline 060\nline 061\nline 062\nline 063\nline 064\nline 065\nline 066\nline 067\nline 068\nline 069\nline 070\nline 071\nline 072\nline 073\nline 074\nline 075\nline 076\nline 077\nline 078\nline 079\nline 080\nline 081\nline 082\nline 083\nline 084\nline 085\nline 086\nline 087\nline 088\nline 089\nline 090\nline 091\nline 092\nline 093\nline 094\nline 095\nline 096\nline 097\nline 098\nline 099\nline 100\nline 101\nline 102\nline 103\nline 104\nline 105\nline 106\nline 107\nline 108\nline 109\nline 110\nline 111\nline 112\nline 113\nline 114\nline 115\nline 116\nline 117\nline 118\nline 119\nline 120\nline 121\nline 122\nline 123\nline 124\nline 125\nline 126\nline 127\nline 128\nline 129\nline 130\nline 131\nline 132\nline 133\nline 134\nline 135\nline 136\nline 137\nline 138\nline 139\nline 140\nline 141\nline 142\nline 143\nline 144\nline 145\nline 146\nline 147\nline 148\nline 149\nline 150\nline 151\nline 152\nline 153\nline 154\nline 155\nline 156\nline 157\nline 158\nline 159\nline 160\nline 161\nline 162\nline 163\nline 164\nline 165\nline 166\nline 167\nline 168\nline 169\nline 170\nline 171\nline 172\nline 173\nline 174\nline 175\nline 176\nline 177\nline 178\nline 179\nline 180\nline 181\nline 182\nline 183\nline 184\nline 185\nline 186\nline 187\nline 188\nline 189\nline 190\nline 191\nline 192\nline 193\nline 194\nline 195\nline 196\nline 197\nline 198\nline 199\nline 200\nline 201\nline 202\nline 203\nline 204\nline 205\nline 206\nline 207\nline 208\nline 209\nline 210\nline 211\nline 212\nline 213\nline 214\nline 215\nline 216\nline 217\nline 218\nline 219\nline 220\nline 221\nline 222\nline 223\nline 224\nline 225\nline 226\nline 227\nline 228\nline 229\nline 230\nline 231\nline 232\nline 233\nline 234\nline 235\nline 236\nline 237\nline 238\nline 239\nline 240\nline 241\nline 242\nline 243\nline 244\nline 245\nline 246\nline 247\nline 248\nline 249\nline 250\nline 251\nline 252\nline 253\nline 254\nline 255\nline 256\nline 257\nline 258\nline 259\nline 260\nline 261\nline 262\nline 263\nline 264\nline 265\nline 266\nline 267\nline 268\nline 269\nline 270\nline 271\nline 272\nline 273\nline 274\nline 275\nline 276\nline 277\nline 278\nline 279\nline 280\nline 281\nline 282\nline 283\nline 284\nline 285\nline 286\nline 287\nline 288\nline 289\nline 290\nline 291\nline 292\nline 293\nline 294\nline 295\nline 296\nline 297\nline 298\nline 299\nline 300\nline 301\nline 302\nline 303\nline 304\nline 305\nline 306\nline 307\nline 308\nline 309\nline 310\nline 311\nline 312\nline 313\nline 314\nline 315\nline 316\nline 317\nline 318\nline 319\nline 320\nline 321\nline 322\nline 323\nline 324\nline 325\nline 326\nline 327\nline 328\nline 329\nline 330\nline 331\nline 332\nline 333\nline 334\nline 335\nline 336\nline 337\nline 338\nline 339\nline 340\nline 341\nline 342\nline 343\nline 344\nline 345\nline 346\nline 347\nline 348\nline 349\nline 350\nline 351\nline 352\nline 353\nline 354\nline 355\nline 356\nline 357\nline 358\nline 359\nline 360\nline 361\nline 362\nline 363\nline 364\nline 365\nline 366\nline 367\nline 368\nline 369\nline 370\nline 371\nline 372\nline 373\nline 374\nline 375\nline 376\nline 377\nline 378\nline 379\nline 380\nline 381\nline 382\nline 383\nline 384\nline 385\nline 386\nline 387\nline 388\nline 389\nline 390\nline 391\nline 392\nline 393\nline 394\nline 395\nline 396\nline 397\nline 398\nline 399\nline 400\nline 401\nline 402\nline 403\nline 404\nline 405\nline 406\nline 407\nline 408\nline 409\nline 410\nline 411\nline 412\nline 413\nline 414\nline 415\nline 416\nline 417\nline 418\nline 419\nline 420\nline 421\nline 422\nline 423\nline 424\nline 425\nline 426\nline 427\nline 428\nline 429\nline 430\nline 431\nline 432\nline 433\nline 434\nline 435\nline 436\nline 437\nline 438\nline 439\nline 440\nline 441\nline 442\nline 443\nline 444\nline 445\nline 446\nline 447\nline 448\nline 449\nline 450\nline 451\nline 452\nline 453\nline 454\nline 455\nline 456\nline 457\nline 458\nline 459\nline 460\nline 461\nline 462\nline 463\nline 464\nline 465\nline 466\nline 467\nline 468\nline 469\nline 470\nline 471\nline 472\nline 473\nline 474\nline 475\nline 476\nline 477\nline 478\nline 479\nline 480\nline 481\nline 482\nline 483\nline 484\nline 485\nline 486\nline 487\nline 488\nline 489\nline 490\nline 491\nline 492\nline 493\nline 494\nline 495\nline 496\nline 497\nline 498\nline 499\nline 500\nline 501\nline 502\nline 503\nline 504\nline 505\nline 506\nline 507\nline 508\nline 509\nline 510\nline 511\nline 512\nline 513\nline 514\nline 515\nline 516\nline 517\nline 518\nline 519\nline 520\nline 521\nline 522\nline 523\nline 524\nline 525\nline 526\nline 527\nline 528\nline 529\nline 530\nline 531\nline 532\nline 533\nline 534\nline 535\nline 536\nline 537\nline 538\nline 539\nline 540\nline 541\nline 542\nline 543\nline 544\nline 545\nline 546\nline 547\nline 548\nline 549\nline 550\nline 551\nline 552\nline 553\nline 554\nline 555\nline 556\nline 557\nline 558\nline 559\nline 560\nline 561\nline 562\nline 563\nline 564\nline 565\nline 566\nline 567\nline 568\nline 569\nline 570\nline 571\nline 572\nline 573\nline 574\nline 575\nline 576\nline 577\nline 578\nline 579\nline 580\nline 581\nline 582\nline 583\nline 584\nline 585\nline 586\nline 587\nline 588\nline 589\nline 590\nline 591\nline 592\nline 593\nline 594\nline 595\nline 596\nline 597\nline 598\nline 599\nline 600\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "line 100\n",
+                "newText": "LINE 100\n"
+              },
+              {
+                "oldText": "line 300\n",
+                "newText": "LINE 300\n"
+              },
+              {
+                "oldText": "line 500\n",
+                "newText": "LINE 500\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-repeated-lines",
+          "content": "a\nb\na\nb\nz\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nb\na\nb\nz\n",
+                "newText": "b\na\nb\na\nz\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-gap-eight",
+          "content": "start\n0\n1\n2\n3\n4\n5\n6\n7\nend\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "start",
+                "newText": "START\nextra"
+              },
+              {
+                "oldText": "end",
+                "newText": "END"
+              }
+            ]
+          }
+        },
+        {
+          "name": "invalid-utf8",
+          "bytes": [
+            239,
+            187,
+            191,
+            226,
+            130,
+            10,
+            116,
+            97,
+            114,
+            103,
+            101,
+            116
+          ],
+          "args": {
+            "edits": [
+              {
+                "oldText": "target",
+                "newText": "done"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-0",
+          "content": "a\nb\na\n\nc\n\nb\nc\n\na\nc\nb\n\nb\nc\n\nc\na\na\n\na\na\nc\n\na\nc\nb\na\nc\na",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nb\na\n\nc\n\nb\nc\n\na\nc\nb\n\nb\nc\n\nc\na\na\n\na\na\nc\n\na\nc\nb\na\nc\na",
+                "newText": "a\nb\na\n\nc\n\nb\nc\n\na\nc\nb\n\na\nnew\nc\na\na\n\na\na\nc\n\na\nc\nb\na\nc\na"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-1",
+          "content": "b\n\n\nb\na\nc\n\n你好🙂\na\na\nb\nc\n\nc\nb\n\n\na\nb\n\nc\n你好🙂\nb\na\nb\nc\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "b\n\n\nb\na\nc\n\n你好🙂\na\na\nb\nc\n\nc\nb\n\n\na\nb\n\nc\n你好🙂\nb\na\nb\nc\n",
+                "newText": "b\na\nnew\na\nc\n\n你好🙂\na\na\nb\nc\n\nc\nb\n\n\na\nb\n\nc\n你好🙂\nb\na\nb\nc\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-2",
+          "content": "\nc\n你好🙂\n\nc\nb\nb\n你好🙂\n\na\nb\nc\nc\nb\na\nb\nb\nb\n你好🙂\na\nb\n\nc\nb\nb\n你好🙂",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\nc\n你好🙂\n\nc\nb\nb\n你好🙂\n\na\nb\nc\nc\nb\na\nb\nb\nb\n你好🙂\na\nb\n\nc\nb\nb\n你好🙂",
+                "newText": "\nc\n你好🙂\n\nc\nb\nb\na\nb\nc\nc\nb\na\nb\nb\nb\n你好🙂\na\nb\n\nc\nb\nb\n你好🙂\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-3",
+          "content": "c\n你好🙂\nc\n你好🙂\na\n\na\nb\na\nc\n\nb\nb\na\n\n你好🙂\na\nb\nc\n你好🙂\na\na\nc\nc\n\nb\n\na\n你好🙂\n你好🙂\nc\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "c\n你好🙂\nc\n你好🙂\na\n\na\nb\na\nc\n\nb\nb\na\n\n你好🙂\na\nb\nc\n你好🙂\na\na\nc\nc\n\nb\n\na\n你好🙂\n你好🙂\nc\n",
+                "newText": "c\n你好🙂\nc\n你好🙂\na\n\na\nb\na\nc\na\nnew\na\n\n你好🙂\na\nb\nc\n你好🙂\na\na\nc\nc\n\nb\n\na\n你好🙂\n你好🙂\nc"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-4",
+          "content": "\n\na\na\na\nb\nc\nc\na\nc\na\n你好🙂\n\n你好🙂\nc\nb\n\n你好🙂\n\na\nb\n你好🙂\n\nc\nc\n\n你好🙂\n\nc\na",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\n\na\na\na\nb\nc\nc\na\nc\na\n你好🙂\n\n你好🙂\nc\nb\n\n你好🙂\n\na\nb\n你好🙂\n\nc\nc\n\n你好🙂\n\nc\na",
+                "newText": "\n\na\na\na\nb\nc\nc\na\nc\na\n你好🙂\n\n你好🙂\nc\nb\n\n你好🙂\n\na\nb\n你好🙂\n\nc\nc\n\n你好🙂\n\nc\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-5",
+          "content": "b\nc\nc\na\n\nc\nc\nb\n\n\nb\nc\n\na\n你好🙂\n\nb\na\na\nc\n\na\n\n\n你好🙂\nc\n\nb\n你好🙂\na\nc\na\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "b\nc\nc\na\n\nc\nc\nb\n\n\nb\nc\n\na\n你好🙂\n\nb\na\na\nc\n\na\n\n\n你好🙂\nc\n\nb\n你好🙂\na\nc\na\n",
+                "newText": "b\nc\nc\na\n\nc\nc\nb\n\n\nb\nc\n\na\n你好🙂\n\nb\na\na\nc\n\na\n\n\n你好🙂\nc\n\nc\na\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-6",
+          "content": "a\nc\n\na\nc\na\na\nb\nb\nb\nb\nb\n\na\n\na\na\na\n你好🙂\n你好🙂\n\nc\nb\n\n你好🙂\n你好🙂\nc\nb",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nc\n\na\nc\na\na\nb\nb\nb\nb\nb\n\na\n\na\na\na\n你好🙂\n你好🙂\n\nc\nb\n\n你好🙂\n你好🙂\nc\nb",
+                "newText": "a\nc\n\na\nb\nb\nb\nb\nb\n\na\n\na\na\na\n你好🙂\n你好🙂\n\nc\nb\n\n你好🙂\n你好🙂\nc\nb"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-7",
+          "content": "a\nb\nc\na\nc\na\nc\nc\n你好🙂\nb\nb\nc\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nb\nc\na\nc\na\nc\nc\n你好🙂\nb\nb\nc\n",
+                "newText": "a\nb\nc\na\nnew\n\nb\nc\nc\n你好🙂\nb\nb\nc\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-8",
+          "content": "b\na\n\n\n你好🙂\n你好🙂\nc\n\nc\na\n\na\n\n你好🙂\na\nb",
+          "args": {
+            "edits": [
+              {
+                "oldText": "b\na\n\n\n你好🙂\n你好🙂\nc\n\nc\na\n\na\n\n你好🙂\na\nb",
+                "newText": "b\na\n\na\nnew\n\nc\n\nc\na\n\na\n\n你好🙂\na\nb\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-9",
+          "content": "c\nb\nb\n\n你好🙂\n\n你好🙂\na\nb\na\n\nb\na\n你好🙂\nb\n你好🙂\nb\na\n\nb\n你好🙂\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "c\nb\nb\n\n你好🙂\n\n你好🙂\na\nb\na\n\nb\na\n你好🙂\nb\n你好🙂\nb\na\n\nb\n你好🙂\n",
+                "newText": "c\nb\nb\n\n你好🙂\n\n你好🙂\na\nb\na\n\nb\na\n你好🙂\nb\n你好🙂\na\nb\n你好🙂"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-10",
+          "content": "\nc\na\nc\nc\n\nb\n\nc\nb\na\n你好🙂\nb\n你好🙂\nc\n你好🙂\n\n你好🙂\nc\nb\nb\n你好🙂\nc\nc\na\nc\nb\n\n你好🙂\nb\na",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\nc\na\nc\nc\n\nb\n\nc\nb\na\n你好🙂\nb\n你好🙂\nc\n你好🙂\n\n你好🙂\nc\nb\nb\n你好🙂\nc\nc\na\nc\nb\n\n你好🙂\nb\na",
+                "newText": "\nc\na\nc\nc\n\nb\n\nc\nb\na\n你好🙂\nb\na\nnew\n\n你好🙂\nc\nb\nb\n你好🙂\nc\nc\na\nc\nb\n\n你好🙂\nb\na\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-11",
+          "content": "c\na\n你好🙂\n\nb\n你好🙂\nc\nc\n你好🙂\nb\n\na\nb\na\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "c\na\n你好🙂\n\nb\n你好🙂\nc\nc\n你好🙂\nb\n\na\nb\na\n",
+                "newText": "c\na\n你好🙂\n\nb\n你好🙂\nc\n\na\nb\na\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-12",
+          "content": "b\nc\n\nb\n你好🙂\na\nb\n你好🙂\n\nc\n你好🙂\na\nc\n你好🙂\nc\nc\n\n\n\nb\nc\nc\n你好🙂\n你好🙂\n你好🙂\n你好🙂\n\nb\nc\nb\na\n你好🙂",
+          "args": {
+            "edits": [
+              {
+                "oldText": "b\nc\n\nb\n你好🙂\na\nb\n你好🙂\n\nc\n你好🙂\na\nc\n你好🙂\nc\nc\n\n\n\nb\nc\nc\n你好🙂\n你好🙂\n你好🙂\n你好🙂\n\nb\nc\nb\na\n你好🙂",
+                "newText": "b\nc\n\nb\n你好🙂\na\nb\n你好🙂\n\nc\n你好🙂\na\nc\n你好🙂\nc\nc\n\n\n\nb\nc\nc\n你好🙂\n你好🙂\n你好🙂\n你好🙂\n\na\n你好🙂"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-13",
+          "content": "a\nb\nb\nb\n\nb\nc\na\n\n你好🙂\na\n你好🙂\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nb\nb\nb\n\nb\nc\na\n\n你好🙂\na\n你好🙂\n",
+                "newText": "a\nb\nb\nb\n\nb\nc\na\nnew\n\nb\na\n你好🙂\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-14",
+          "content": "你好🙂\n你好🙂\n\nc\na\nc\nc\nc\nc\nc\nc\n你好🙂\n\na\na\nb\n\nb\n你好🙂\na\nc\nc\na\na\na\na\na\n\n你好🙂\nb\na\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "你好🙂\n你好🙂\n\nc\na\nc\nc\nc\nc\nc\nc\n你好🙂\n\na\na\nb\n\nb\n你好🙂\na\nc\nc\na\na\na\na\na\n\n你好🙂\nb\na\n",
+                "newText": "你好🙂\n你好🙂\n\nc\na\nc\nc\nc\nc\nc\nc\n你好🙂\n\na\na\nb\n\nb\n你好🙂\na\nnew\na\na\na\na\na\n\n你好🙂\nb\na\n\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-15",
+          "content": "你好🙂\na\nb\nc\nb\na\na\nb\n你好🙂\na\nb\n你好🙂\na\n\n你好🙂\n你好🙂\n\nb\n\nc\n你好🙂\n你好🙂\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "你好🙂\na\nb\nc\nb\na\na\nb\n你好🙂\na\nb\n你好🙂\na\n\n你好🙂\n你好🙂\n\nb\n\nc\n你好🙂\n你好🙂\n",
+                "newText": "你好🙂\na\nb\nc\nb\na\na\nb\n你好🙂\na\nb\n你好🙂\na\n\n你好🙂\n你好🙂\n\nb\n\nc\n你好🙂\na\nnew\n\nb"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-16",
+          "content": "\nb\nc\nc\n你好🙂\n\n\na\n你好🙂\nb\nb\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\nb\nc\nc\n你好🙂\n\n\na\n你好🙂\nb\nb\n",
+                "newText": "\nb\nc\nc\n你好🙂\n\n\na\n你好🙂\nb\nb\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-17",
+          "content": "\na\nb\na\na\nc\na\na\n你好🙂\na\n\n你好🙂\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\na\nb\na\na\nc\na\na\n你好🙂\na\n\n你好🙂\n",
+                "newText": "\na\nb\na\na\nc\na\na\n你好🙂\na\n\na\nnew\n\nb\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-18",
+          "content": "a\nc\nc\na\n\n\n\na\n\n你好🙂\nb\na\nb\nc\nb\n\n\nb\nc\na\n你好🙂\n你好🙂\n\n你好🙂\n你好🙂\n\nc\n\nc\na\na\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nc\nc\na\n\n\n\na\n\n你好🙂\nb\na\nb\nc\nb\n\n\nb\nc\na\n你好🙂\n你好🙂\n\n你好🙂\n你好🙂\n\nc\n\nc\na\na\n",
+                "newText": "a\nc\nc\na\n\n\n\na\n\n你好🙂\nb\na\nb\nc\nb\n\n\nb\nc\na\n你好🙂\n你好🙂\n\n你好🙂\n你好🙂\n\nc\na\na\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-19",
+          "content": "\nc\nb\na\na\nb\n\nb\nb\n你好🙂\n你好🙂\n\n\nb\n\na\nb\n\n\n\n\n\nc\n\nc\nb\nc\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\nc\nb\na\na\nb\n\nb\nb\n你好🙂\n你好🙂\n\n\nb\n\na\nb\n\n\n\n\n\nc\n\nc\nb\nc\n",
+                "newText": "\nc\nb\na\na\nb\n\nb\nb\n你好🙂\n你好🙂\n\n\nb\n\na\nb\n\n\n\n\n\nc\n\na\nnew\n\nb\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-20",
+          "content": "a\n\n\n你好🙂\nb\na\na\n\nc\n\nc\nb\na\n你好🙂\n你好🙂\nb\na\n你好🙂\nc\nb\n\n你好🙂\n你好🙂\nc\na\n\n\n你好🙂\n你好🙂\n你好🙂\nc\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\n\n\n你好🙂\nb\na\na\n\nc\n\nc\nb\na\n你好🙂\n你好🙂\nb\na\n你好🙂\nc\nb\n\n你好🙂\n你好🙂\nc\na\n\n\n你好🙂\n你好🙂\n你好🙂\nc\n",
+                "newText": "a\n\n\na\nnew\n\nb\na\n\nc\n\nc\nb\na\n你好🙂\n你好🙂\nb\na\n你好🙂\nc\nb\n\n你好🙂\n你好🙂\nc\na\n\n\n你好🙂\n你好🙂\n你好🙂\nc\n\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-21",
+          "content": "\n你好🙂\n你好🙂\nb\na\n你好🙂\na\n你好🙂\n你好🙂\nc\nc\n你好🙂\n你好🙂\na\n\nc\nc\n\nc\nc\nc\nc\na\n你好🙂\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\n你好🙂\n你好🙂\nb\na\n你好🙂\na\n你好🙂\n你好🙂\nc\nc\n你好🙂\n你好🙂\na\n\nc\nc\n\nc\nc\nc\nc\na\n你好🙂\n",
+                "newText": "\n你好🙂\n你好🙂\nb\na\n你好🙂\na\n你好🙂\n你好🙂\nc\nc\n你好🙂\n你好🙂\na\n\nc\nc\n\nc\na\nnew\na\n你好🙂"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-22",
+          "content": "a\nc\nb\n你好🙂\n\na\n你好🙂\n\n你好🙂\n\na\n\na\n你好🙂\na\nb\nc\nb\n\n\na\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nc\nb\n你好🙂\n\na\n你好🙂\n\n你好🙂\n\na\n\na\n你好🙂\na\nb\nc\nb\n\n\na\n",
+                "newText": "a\nc\nb\n你好🙂\n\na\n你好🙂\n\n你好🙂\n\na\n\na\n你好🙂\na\nb\nc\nb\n\na\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-23",
+          "content": "b\na\nb\n\nc\nc\nb\n\na\n你好🙂\na\na\nc\nb\n你好🙂\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "b\na\nb\n\nc\nc\nb\n\na\n你好🙂\na\na\nc\nb\n你好🙂\n",
+                "newText": "b\na\nb\n\nc\nc\nb\n\na\n你好🙂\na\na\nc\nb\na\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-24",
+          "content": "a\nc\nc\n你好🙂\n你好🙂\na\na\nc\nc\nb\n你好🙂\na\na\nc\na\n你好🙂\n你好🙂\n\na",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nc\nc\n你好🙂\n你好🙂\na\na\nc\nc\nb\n你好🙂\na\na\nc\na\n你好🙂\n你好🙂\n\na",
+                "newText": "a\nc\nc\n你好🙂\n你好🙂\na\na\nc\nc\nb\n你好🙂\na\na\nc\na\na\na"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-25",
+          "content": "c\n\nc\n你好🙂\nb\n你好🙂\n\n\nc\nb\nc\na\na\n你好🙂\n\nc\nb\nc\nc\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "c\n\nc\n你好🙂\nb\n你好🙂\n\n\nc\nb\nc\na\na\n你好🙂\n\nc\nb\nc\nc\n",
+                "newText": "c\n\nc\n你好🙂\nb\na\nnew\n\nb\nc\nb\nc\na\na\n你好🙂\n\nc\nb\nc\nc\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-26",
+          "content": "\n你好🙂\n你好🙂\nb\n\n你好🙂\nc\na\n你好🙂\na\n你好🙂\na\n\n你好🙂\nc\n\n\nb\n\n\na\nc\na\nb",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\n你好🙂\n你好🙂\nb\n\n你好🙂\nc\na\n你好🙂\na\n你好🙂\na\n\n你好🙂\nc\n\n\nb\n\n\na\nc\na\nb",
+                "newText": "\n你好🙂\n你好🙂\nb\n\n你好🙂\nc\na\n你好🙂\na\n你好🙂\nc\n\n\nb\n\n\na\nc\na\nb\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-27",
+          "content": "a\n\na\n你好🙂\nb\n你好🙂\nb\nc\n\n你好🙂\nc\nb\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\n\na\n你好🙂\nb\n你好🙂\nb\nc\n\n你好🙂\nc\nb\n",
+                "newText": "a\n\na\n你好🙂\nb\n你好🙂\nb\na\nnew\nc\nb"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-28",
+          "content": "a\nb\nb\n你好🙂\n\nc\n你好🙂\nc\nc\nb\n你好🙂\n你好🙂\n\n你好🙂",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\nb\nb\n你好🙂\n\nc\n你好🙂\nc\nc\nb\n你好🙂\n你好🙂\n\n你好🙂",
+                "newText": "a\nb\nb\n你好🙂\n\na\nnew\n\nb\nc\nb\n你好🙂\n你好🙂\n\n你好🙂\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-29",
+          "content": "你好🙂\nb\na\nc\nb\n你好🙂\nb\nb\na\nc\nb\nc\nc\n\n你好🙂\na\nb\n你好🙂\nc\nb\na\nb\n你好🙂\nb\nc\n你好🙂\n\n\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "你好🙂\nb\na\nc\nb\n你好🙂\nb\nb\na\nc\nb\nc\nc\n\n你好🙂\na\nb\n你好🙂\nc\nb\na\nb\n你好🙂\nb\nc\n你好🙂\n\n\n",
+                "newText": "你好🙂\nb\na\na\nnew\n\nb\nb\nb\na\nc\nb\nc\nc\n\n你好🙂\na\nb\n你好🙂\nc\nb\na\nb\n你好🙂\nb\nc\n你好🙂\n\n\n"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-30",
+          "content": "\nc\n你好🙂\nb\n\n\n\nc\n\n你好🙂\n你好🙂\nb\na\nb\nc\n你好🙂\na\n你好🙂\n你好🙂\n\n你好🙂\nb\n你好🙂\n\n你好🙂\na\nc\nc\n你好🙂\nc\nb\n你好🙂",
+          "args": {
+            "edits": [
+              {
+                "oldText": "\nc\n你好🙂\nb\n\n\n\nc\n\n你好🙂\n你好🙂\nb\na\nb\nc\n你好🙂\na\n你好🙂\n你好🙂\n\n你好🙂\nb\n你好🙂\n\n你好🙂\na\nc\nc\n你好🙂\nc\nb\n你好🙂",
+                "newText": "\nc\n你好🙂\nb\n\n\n\nc\n\n你好🙂\n你好🙂\nb\na\nb\nc\n你好🙂\na\n你好🙂\n你好🙂\na\nnew\n\nb\n你好🙂\n\n你好🙂\na\nc\nc\n你好🙂\nc\nb\n你好🙂"
+              }
+            ]
+          }
+        },
+        {
+          "name": "diff-path-31",
+          "content": "a\n你好🙂\nb\nb\nc\nb\n你好🙂\nb\nb\n你好🙂\na\n\n你好🙂\nb\na\n\n你好🙂\nc\nc\n\n\n你好🙂\n\nb\na\nc\nb\nc\na\nb\n\n\n",
+          "args": {
+            "edits": [
+              {
+                "oldText": "a\n你好🙂\nb\nb\nc\nb\n你好🙂\nb\nb\n你好🙂\na\n\n你好🙂\nb\na\n\n你好🙂\nc\nc\n\n\n你好🙂\n\nb\na\nc\nb\nc\na\nb\n\n\n",
+                "newText": "a\n你好🙂\nb\nb\nc\nb\n你好🙂\nb\nb\n你好🙂\na\n\n你好🙂\nb\na\n\n你好🙂\nc\nc\n\n\n你好🙂\n\nb\na\nc\nb\n\n\n"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "results": [
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 before\n+1 after",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-before\n+after\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "after\n",
+          "content": "after\n"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 a\n-2 c\n+1 b\n+2 d",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,2 +1,2 @@\n-a\n-c\n+b\n+d\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "b\nd\n",
+          "content": "b\nd\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 before\n+1 after",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-before\n+after\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "after\n",
+          "content": "after\n"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 a\n-2 c\n+1 b\n+2 d",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,2 +1,2 @@\n-a\n-c\n+b\n+d\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "b\nd\n",
+          "content": "b\nd\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 Hello, world!\n+1 Hello, testing!",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-Hello, world!\n\\ No newline at end of file\n+Hello, testing!\n\\ No newline at end of file\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "Hello, testing!",
+          "content": "Hello, testing!"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 foo\n-2 bar\n+1 foo bar\n+2 BAR\n 3 baz",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,3 +1,3 @@\n-foo\n-bar\n+foo bar\n+BAR\n baz\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "foo bar\nBAR\nbaz\n",
+          "content": "foo bar\nBAR\nbaz\n"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 alpha\n+1 ALPHA\n 2 beta\n-3 gamma\n+3 GAMMA\n 4 delta",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,4 +1,4 @@\n-alpha\n+ALPHA\n beta\n-gamma\n+GAMMA\n delta\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "ALPHA\nbeta\nGAMMA\ndelta\n",
+          "content": "ALPHA\nbeta\nGAMMA\ndelta\n"
+        },
+        {
+          "text": "Could not find the exact text in target.txt. The old text must match exactly including all whitespace and newlines.",
+          "details": {},
+          "isError": true,
+          "read": "hello\n",
+          "content": "hello\n"
+        },
+        {
+          "text": "Found 3 occurrences of the text in target.txt. The text must be unique. Please provide more context to make it unique.",
+          "details": {},
+          "isError": true,
+          "read": "foo foo foo",
+          "content": "foo foo foo"
+        },
+        {
+          "text": "Edit tool input is invalid. edits must contain at least one replacement.",
+          "details": {},
+          "isError": true,
+          "read": "hello\n",
+          "content": "hello\n"
+        },
+        {
+          "text": "oldText must not be empty in target.txt.",
+          "details": {},
+          "isError": true,
+          "read": "hello\n",
+          "content": "hello\n"
+        },
+        {
+          "text": "Could not find the exact text in target.txt. The old text must match exactly including all whitespace and newlines.",
+          "details": {},
+          "isError": true,
+          "read": "",
+          "content": ""
+        },
+        {
+          "text": "oldText must not be empty in target.txt.",
+          "details": {},
+          "isError": true,
+          "read": "",
+          "content": ""
+        },
+        {
+          "text": "No changes made to target.txt. The replacement produced identical content. This might indicate an issue with special characters or the text not existing as expected.",
+          "details": {},
+          "isError": true,
+          "read": "hello\n",
+          "content": "hello\n"
+        },
+        {
+          "text": "No changes made to target.txt. The replacements produced identical content.",
+          "details": {},
+          "isError": true,
+          "read": "foo\nbar\n",
+          "content": "foo\nbar\n"
+        },
+        {
+          "text": "edits[1].oldText must not be empty in target.txt.",
+          "details": {},
+          "isError": true,
+          "read": "foo\nbar\n",
+          "content": "foo\nbar\n"
+        },
+        {
+          "text": "edits[0] and edits[1] overlap in target.txt. Merge them into one edit or target disjoint regions.",
+          "details": {},
+          "isError": true,
+          "read": "one\ntwo\nthree\n",
+          "content": "one\ntwo\nthree\n"
+        },
+        {
+          "text": "edits[1] and edits[0] overlap in target.txt. Merge them into one edit or target disjoint regions.",
+          "details": {},
+          "isError": true,
+          "read": "one two three",
+          "content": "one two three"
+        },
+        {
+          "text": "Could not find edits[1] in target.txt. The oldText must match exactly including all whitespace and newlines.",
+          "details": {},
+          "isError": true,
+          "read": "alpha\nbeta\ngamma\n",
+          "content": "alpha\nbeta\ngamma\n"
+        },
+        {
+          "text": "Found 2 occurrences of edits[1] in target.txt. Each oldText must be unique. Please provide more context to make it unique.",
+          "details": {},
+          "isError": true,
+          "read": "alpha\nbeta beta\n",
+          "content": "alpha\nbeta beta\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 aaa\n+1 xa",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-aaa\n\\ No newline at end of file\n+xa\n\\ No newline at end of file\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "xa",
+          "content": "xa"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 hello",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +0,0 @@\n-hello\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "",
+          "content": ""
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 hello\n+1 hello",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-hello\n+hello\n\\ No newline at end of file\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "hello",
+          "content": "hello"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 hello\n+1 hello",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-hello\n\\ No newline at end of file\n+hello\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "hello\n",
+          "content": "hello\n"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": " 1 first\n-2 second\n+2 SECOND\n 3 third\n-4 fourth\n+4 FOURTH",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,4 +1,4 @@\n first\n-second\n+SECOND\n third\n-fourth\n+FOURTH\n",
+            "firstChangedLine": 2
+          },
+          "isError": false,
+          "read": "﻿first\r\nSECOND\r\nthird\r\nFOURTH\r\n",
+          "content": "﻿first\r\nSECOND\r\nthird\r\nFOURTH\r\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": " 1 one\n-2 two\n+2 TWO\n 3 three",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,3 +1,3 @@\n one\n-two\n+TWO\n three\n",
+            "firstChangedLine": 2
+          },
+          "isError": false,
+          "read": "one\r\nTWO\r\nthree\r\n",
+          "content": "one\r\nTWO\r\nthree\r\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": " 1 one\n-2 two\n+2 TWO\n 3 three",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,3 +1,3 @@\n one\n-two\n+TWO\n three\n",
+            "firstChangedLine": 2
+          },
+          "isError": false,
+          "read": "one\nTWO\nthree\n",
+          "content": "one\nTWO\nthree\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": " 1 one\n-2 two\n+2 TWO",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,2 +1,2 @@\n one\n-two\n+TWO\n",
+            "firstChangedLine": 2
+          },
+          "isError": false,
+          "read": "one\nTWO\n",
+          "content": "one\nTWO\n"
+        },
+        {
+          "text": "Found 2 occurrences of the text in target.txt. The text must be unique. Please provide more context to make it unique.",
+          "details": {},
+          "isError": true,
+          "read": "hello\r\nworld\r\n---\r\nhello\nworld\n",
+          "content": "hello\r\nworld\r\n---\r\nhello\nworld\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 line one   \n-2 line two  \n+1 replaced\n 3 line three",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,3 +1,2 @@\n-line one   \n-line two  \n+replaced\n line three\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "replaced\nline three\n",
+          "content": "replaced\nline three\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 你好，世界\n-2 你好（世界）\n-3 ＡＢＣ１２３\n-4 café\n+1 你好，pi",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,4 +1,1 @@\n-你好，世界\n-你好（世界）\n-ＡＢＣ１２３\n-café\n+你好，pi\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "你好，pi\n",
+          "content": "你好，pi\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": " 1 keep “smart”  \n-2 console.log(‘hello’);\n-3 “world”\n-4 range: 1–5\n-5 break—here\n-6 hello world\n+2 replaced\n 7 keep after  ",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,7 +1,3 @@\n keep “smart”  \n-console.log(‘hello’);\n-“world”\n-range: 1–5\n-break—here\n-hello world\n+replaced\n keep after  \n",
+            "firstChangedLine": 2
+          },
+          "isError": false,
+          "read": "keep “smart”  \nreplaced\nkeep after  \n",
+          "content": "keep “smart”  \nreplaced\nkeep after  \n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 smart “quotes” and target   \n+1 smart “quotes” and changed   ",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-smart “quotes” and target   \n+smart “quotes” and changed   \n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "smart “quotes” and changed   \n",
+          "content": "smart “quotes” and changed   \n"
+        },
+        {
+          "text": "Found 2 occurrences of the text in target.txt. The text must be unique. Please provide more context to make it unique.",
+          "details": {},
+          "isError": true,
+          "read": "hello world   \nhello world\n",
+          "content": "hello world   \nhello world\n"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": " 1 keep before  \n-2 first target  \n-3 first after\n+2 FIRST\n+3 FIRST2\n 4 keep middle   \n-5 second target  \n-6 second after\n+5 SECOND\n+6 SECOND2\n 7 keep after  ",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,7 +1,7 @@\n keep before  \n-first target  \n-first after\n+FIRST\n+FIRST2\n keep middle   \n-second target  \n-second after\n+SECOND\n+SECOND2\n keep after  \n",
+            "firstChangedLine": 2
+          },
+          "isError": false,
+          "read": "keep before  \nFIRST\nFIRST2\nkeep middle   \nSECOND\nSECOND2\nkeep after  \n",
+          "content": "keep before  \nFIRST\nFIRST2\nkeep middle   \nSECOND\nSECOND2\nkeep after  \n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 replace me   \n+1 after\n 2 after   ",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,2 +1,2 @@\n-replace me   \n+after\n after   \n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "after\nafter   \n",
+          "content": "after\nafter   \n"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 Ａ foo   \n+1 Z FOO\n 2 bar  ",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,2 +1,2 @@\n-Ａ foo   \n+Z FOO\n bar  \n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "Z FOO\nbar  \n",
+          "content": "Z FOO\nbar  \n"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 🙂你好\n-2 ＡＢＣ target\n+1 🙃世界\n+2 XYZ target\n 3 end",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,3 +1,3 @@\n-🙂你好\n-ＡＢＣ target\n+🙃世界\n+XYZ target\n end\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "🙃世界\nXYZ target\nend\n",
+          "content": "🙃世界\nXYZ target\nend\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 a  \n+1 ab",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,1 +1,1 @@\n-a  \n+ab\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "ab\n",
+          "content": "ab\n"
+        },
+        {
+          "text": "Cannot preserve unchanged lines because the base content has a different line count.",
+          "details": {},
+          "isError": true,
+          "read": "   ",
+          "content": "   "
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 first\n-2 second﻿\n+1 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,2 +1,1 @@\n-first\n-second﻿\n+done\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "done\n",
+          "content": "done\n"
+        },
+        {
+          "text": "Successfully replaced 3 block(s) in target.txt.",
+          "details": {
+            "diff": "     ...\n  96 line 096\n  97 line 097\n  98 line 098\n  99 line 099\n-100 line 100\n+100 LINE 100\n 101 line 101\n 102 line 102\n 103 line 103\n 104 line 104\n     ...\n 296 line 296\n 297 line 297\n 298 line 298\n 299 line 299\n-300 line 300\n+300 LINE 300\n 301 line 301\n 302 line 302\n 303 line 303\n 304 line 304\n     ...\n 496 line 496\n 497 line 497\n 498 line 498\n 499 line 499\n-500 line 500\n+500 LINE 500\n 501 line 501\n 502 line 502\n 503 line 503\n 504 line 504\n     ...",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -96,9 +96,9 @@\n line 096\n line 097\n line 098\n line 099\n-line 100\n+LINE 100\n line 101\n line 102\n line 103\n line 104\n@@ -296,9 +296,9 @@\n line 296\n line 297\n line 298\n line 299\n-line 300\n+LINE 300\n line 301\n line 302\n line 303\n line 304\n@@ -496,9 +496,9 @@\n line 496\n line 497\n line 498\n line 499\n-line 500\n+LINE 500\n line 501\n line 502\n line 503\n line 504\n",
+            "firstChangedLine": 100
+          },
+          "isError": false,
+          "read": "line 001\nline 002\nline 003\nline 004\nline 005\nline 006\nline 007\nline 008\nline 009\nline 010\nline 011\nline 012\nline 013\nline 014\nline 015\nline 016\nline 017\nline 018\nline 019\nline 020\nline 021\nline 022\nline 023\nline 024\nline 025\nline 026\nline 027\nline 028\nline 029\nline 030\nline 031\nline 032\nline 033\nline 034\nline 035\nline 036\nline 037\nline 038\nline 039\nline 040\nline 041\nline 042\nline 043\nline 044\nline 045\nline 046\nline 047\nline 048\nline 049\nline 050\nline 051\nline 052\nline 053\nline 054\nline 055\nline 056\nline 057\nline 058\nline 059\nline 060\nline 061\nline 062\nline 063\nline 064\nline 065\nline 066\nline 067\nline 068\nline 069\nline 070\nline 071\nline 072\nline 073\nline 074\nline 075\nline 076\nline 077\nline 078\nline 079\nline 080\nline 081\nline 082\nline 083\nline 084\nline 085\nline 086\nline 087\nline 088\nline 089\nline 090\nline 091\nline 092\nline 093\nline 094\nline 095\nline 096\nline 097\nline 098\nline 099\nLINE 100\nline 101\nline 102\nline 103\nline 104\nline 105\nline 106\nline 107\nline 108\nline 109\nline 110\nline 111\nline 112\nline 113\nline 114\nline 115\nline 116\nline 117\nline 118\nline 119\nline 120\nline 121\nline 122\nline 123\nline 124\nline 125\nline 126\nline 127\nline 128\nline 129\nline 130\nline 131\nline 132\nline 133\nline 134\nline 135\nline 136\nline 137\nline 138\nline 139\nline 140\nline 141\nline 142\nline 143\nline 144\nline 145\nline 146\nline 147\nline 148\nline 149\nline 150\nline 151\nline 152\nline 153\nline 154\nline 155\nline 156\nline 157\nline 158\nline 159\nline 160\nline 161\nline 162\nline 163\nline 164\nline 165\nline 166\nline 167\nline 168\nline 169\nline 170\nline 171\nline 172\nline 173\nline 174\nline 175\nline 176\nline 177\nline 178\nline 179\nline 180\nline 181\nline 182\nline 183\nline 184\nline 185\nline 186\nline 187\nline 188\nline 189\nline 190\nline 191\nline 192\nline 193\nline 194\nline 195\nline 196\nline 197\nline 198\nline 199\nline 200\nline 201\nline 202\nline 203\nline 204\nline 205\nline 206\nline 207\nline 208\nline 209\nline 210\nline 211\nline 212\nline 213\nline 214\nline 215\nline 216\nline 217\nline 218\nline 219\nline 220\nline 221\nline 222\nline 223\nline 224\nline 225\nline 226\nline 227\nline 228\nline 229\nline 230\nline 231\nline 232\nline 233\nline 234\nline 235\nline 236\nline 237\nline 238\nline 239\nline 240\nline 241\nline 242\nline 243\nline 244\nline 245\nline 246\nline 247\nline 248\nline 249\nline 250\nline 251\nline 252\nline 253\nline 254\nline 255\nline 256\nline 257\nline 258\nline 259\nline 260\nline 261\nline 262\nline 263\nline 264\nline 265\nline 266\nline 267\nline 268\nline 269\nline 270\nline 271\nline 272\nline 273\nline 274\nline 275\nline 276\nline 277\nline 278\nline 279\nline 280\nline 281\nline 282\nline 283\nline 284\nline 285\nline 286\nline 287\nline 288\nline 289\nline 290\nline 291\nline 292\nline 293\nline 294\nline 295\nline 296\nline 297\nline 298\nline 299\nLINE 300\nline 301\nline 302\nline 303\nline 304\nline 305\nline 306\nline 307\nline 308\nline 309\nline 310\nline 311\nline 312\nline 313\nline 314\nline 315\nline 316\nline 317\nline 318\nline 319\nline 320\nline 321\nline 322\nline 323\nline 324\nline 325\nline 326\nline 327\nline 328\nline 329\nline 330\nline 331\nline 332\nline 333\nline 334\nline 335\nline 336\nline 337\nline 338\nline 339\nline 340\nline 341\nline 342\nline 343\nline 344\nline 345\nline 346\nline 347\nline 348\nline 349\nline 350\nline 351\nline 352\nline 353\nline 354\nline 355\nline 356\nline 357\nline 358\nline 359\nline 360\nline 361\nline 362\nline 363\nline 364\nline 365\nline 366\nline 367\nline 368\nline 369\nline 370\nline 371\nline 372\nline 373\nline 374\nline 375\nline 376\nline 377\nline 378\nline 379\nline 380\nline 381\nline 382\nline 383\nline 384\nline 385\nline 386\nline 387\nline 388\nline 389\nline 390\nline 391\nline 392\nline 393\nline 394\nline 395\nline 396\nline 397\nline 398\nline 399\nline 400\nline 401\nline 402\nline 403\nline 404\nline 405\nline 406\nline 407\nline 408\nline 409\nline 410\nline 411\nline 412\nline 413\nline 414\nline 415\nline 416\nline 417\nline 418\nline 419\nline 420\nline 421\nline 422\nline 423\nline 424\nline 425\nline 426\nline 427\nline 428\nline 429\nline 430\nline 431\nline 432\nline 433\nline 434\nline 435\nline 436\nline 437\nline 438\nline 439\nline 440\nline 441\nline 442\nline 443\nline 444\nline 445\nline 446\nline 447\nline 448\nline 449\nline 450\nline 451\nline 452\nline 453\nline 454\nline 455\nline 456\nline 457\nline 458\nline 459\nline 460\nline 461\nline 462\nline 463\nline 464\nline 465\nline 466\nline 467\nline 468\nline 469\nline 470\nline 471\nline 472\nline 473\nline 474\nline 475\nline 476\nline 477\nline 478\nline 479\nline 480\nline 481\nline 482\nline 483\nline 484\nline 485\nline 486\nline 487\nline 488\nline 489\nline 490\nline 491\nline 492\nline 493\nline 494\nline 495\nline 496\nline 497\nline 498\nline 499\nLINE 500\nline 501\nline 502\nline 503\nline 504\nline 505\nline 506\nline 507\nline 508\nline 509\nline 510\nline 511\nline 512\nline 513\nline 514\nline 515\nline 516\nline 517\nline 518\nline 519\nline 520\nline 521\nline 522\nline 523\nline 524\nline 525\nline 526\nline 527\nline 528\nline 529\nline 530\nline 531\nline 532\nline 533\nline 534\nline 535\nline 536\nline 537\nline 538\nline 539\nline 540\nline 541\nline 542\nline 543\nline 544\nline 545\nline 546\nline 547\nline 548\nline 549\nline 550\nline 551\nline 552\nline 553\nline 554\nline 555\nline 556\nline 557\nline 558\nline 559\nline 560\nline 561\nline 562\nline 563\nline 564\nline 565\nline 566\nline 567\nline 568\nline 569\nline 570\nline 571\nline 572\nline 573\nline 574\nline 575\nline 576\nline 577\nline 578\nline 579\nline 580\nline 581\nline 582\nline 583\nline 584\nline 585\nline 586\nline 587\nline 588\nline 589\nline 590\nline 591\nline 592\nline 593\nline 594\nline 595\nline 596\nline 597\nline 598\nline 599\nline 600\n",
+          "content": "line 001\nline 002\nline 003\nline 004\nline 005\nline 006\nline 007\nline 008\nline 009\nline 010\nline 011\nline 012\nline 013\nline 014\nline 015\nline 016\nline 017\nline 018\nline 019\nline 020\nline 021\nline 022\nline 023\nline 024\nline 025\nline 026\nline 027\nline 028\nline 029\nline 030\nline 031\nline 032\nline 033\nline 034\nline 035\nline 036\nline 037\nline 038\nline 039\nline 040\nline 041\nline 042\nline 043\nline 044\nline 045\nline 046\nline 047\nline 048\nline 049\nline 050\nline 051\nline 052\nline 053\nline 054\nline 055\nline 056\nline 057\nline 058\nline 059\nline 060\nline 061\nline 062\nline 063\nline 064\nline 065\nline 066\nline 067\nline 068\nline 069\nline 070\nline 071\nline 072\nline 073\nline 074\nline 075\nline 076\nline 077\nline 078\nline 079\nline 080\nline 081\nline 082\nline 083\nline 084\nline 085\nline 086\nline 087\nline 088\nline 089\nline 090\nline 091\nline 092\nline 093\nline 094\nline 095\nline 096\nline 097\nline 098\nline 099\nLINE 100\nline 101\nline 102\nline 103\nline 104\nline 105\nline 106\nline 107\nline 108\nline 109\nline 110\nline 111\nline 112\nline 113\nline 114\nline 115\nline 116\nline 117\nline 118\nline 119\nline 120\nline 121\nline 122\nline 123\nline 124\nline 125\nline 126\nline 127\nline 128\nline 129\nline 130\nline 131\nline 132\nline 133\nline 134\nline 135\nline 136\nline 137\nline 138\nline 139\nline 140\nline 141\nline 142\nline 143\nline 144\nline 145\nline 146\nline 147\nline 148\nline 149\nline 150\nline 151\nline 152\nline 153\nline 154\nline 155\nline 156\nline 157\nline 158\nline 159\nline 160\nline 161\nline 162\nline 163\nline 164\nline 165\nline 166\nline 167\nline 168\nline 169\nline 170\nline 171\nline 172\nline 173\nline 174\nline 175\nline 176\nline 177\nline 178\nline 179\nline 180\nline 181\nline 182\nline 183\nline 184\nline 185\nline 186\nline 187\nline 188\nline 189\nline 190\nline 191\nline 192\nline 193\nline 194\nline 195\nline 196\nline 197\nline 198\nline 199\nline 200\nline 201\nline 202\nline 203\nline 204\nline 205\nline 206\nline 207\nline 208\nline 209\nline 210\nline 211\nline 212\nline 213\nline 214\nline 215\nline 216\nline 217\nline 218\nline 219\nline 220\nline 221\nline 222\nline 223\nline 224\nline 225\nline 226\nline 227\nline 228\nline 229\nline 230\nline 231\nline 232\nline 233\nline 234\nline 235\nline 236\nline 237\nline 238\nline 239\nline 240\nline 241\nline 242\nline 243\nline 244\nline 245\nline 246\nline 247\nline 248\nline 249\nline 250\nline 251\nline 252\nline 253\nline 254\nline 255\nline 256\nline 257\nline 258\nline 259\nline 260\nline 261\nline 262\nline 263\nline 264\nline 265\nline 266\nline 267\nline 268\nline 269\nline 270\nline 271\nline 272\nline 273\nline 274\nline 275\nline 276\nline 277\nline 278\nline 279\nline 280\nline 281\nline 282\nline 283\nline 284\nline 285\nline 286\nline 287\nline 288\nline 289\nline 290\nline 291\nline 292\nline 293\nline 294\nline 295\nline 296\nline 297\nline 298\nline 299\nLINE 300\nline 301\nline 302\nline 303\nline 304\nline 305\nline 306\nline 307\nline 308\nline 309\nline 310\nline 311\nline 312\nline 313\nline 314\nline 315\nline 316\nline 317\nline 318\nline 319\nline 320\nline 321\nline 322\nline 323\nline 324\nline 325\nline 326\nline 327\nline 328\nline 329\nline 330\nline 331\nline 332\nline 333\nline 334\nline 335\nline 336\nline 337\nline 338\nline 339\nline 340\nline 341\nline 342\nline 343\nline 344\nline 345\nline 346\nline 347\nline 348\nline 349\nline 350\nline 351\nline 352\nline 353\nline 354\nline 355\nline 356\nline 357\nline 358\nline 359\nline 360\nline 361\nline 362\nline 363\nline 364\nline 365\nline 366\nline 367\nline 368\nline 369\nline 370\nline 371\nline 372\nline 373\nline 374\nline 375\nline 376\nline 377\nline 378\nline 379\nline 380\nline 381\nline 382\nline 383\nline 384\nline 385\nline 386\nline 387\nline 388\nline 389\nline 390\nline 391\nline 392\nline 393\nline 394\nline 395\nline 396\nline 397\nline 398\nline 399\nline 400\nline 401\nline 402\nline 403\nline 404\nline 405\nline 406\nline 407\nline 408\nline 409\nline 410\nline 411\nline 412\nline 413\nline 414\nline 415\nline 416\nline 417\nline 418\nline 419\nline 420\nline 421\nline 422\nline 423\nline 424\nline 425\nline 426\nline 427\nline 428\nline 429\nline 430\nline 431\nline 432\nline 433\nline 434\nline 435\nline 436\nline 437\nline 438\nline 439\nline 440\nline 441\nline 442\nline 443\nline 444\nline 445\nline 446\nline 447\nline 448\nline 449\nline 450\nline 451\nline 452\nline 453\nline 454\nline 455\nline 456\nline 457\nline 458\nline 459\nline 460\nline 461\nline 462\nline 463\nline 464\nline 465\nline 466\nline 467\nline 468\nline 469\nline 470\nline 471\nline 472\nline 473\nline 474\nline 475\nline 476\nline 477\nline 478\nline 479\nline 480\nline 481\nline 482\nline 483\nline 484\nline 485\nline 486\nline 487\nline 488\nline 489\nline 490\nline 491\nline 492\nline 493\nline 494\nline 495\nline 496\nline 497\nline 498\nline 499\nLINE 500\nline 501\nline 502\nline 503\nline 504\nline 505\nline 506\nline 507\nline 508\nline 509\nline 510\nline 511\nline 512\nline 513\nline 514\nline 515\nline 516\nline 517\nline 518\nline 519\nline 520\nline 521\nline 522\nline 523\nline 524\nline 525\nline 526\nline 527\nline 528\nline 529\nline 530\nline 531\nline 532\nline 533\nline 534\nline 535\nline 536\nline 537\nline 538\nline 539\nline 540\nline 541\nline 542\nline 543\nline 544\nline 545\nline 546\nline 547\nline 548\nline 549\nline 550\nline 551\nline 552\nline 553\nline 554\nline 555\nline 556\nline 557\nline 558\nline 559\nline 560\nline 561\nline 562\nline 563\nline 564\nline 565\nline 566\nline 567\nline 568\nline 569\nline 570\nline 571\nline 572\nline 573\nline 574\nline 575\nline 576\nline 577\nline 578\nline 579\nline 580\nline 581\nline 582\nline 583\nline 584\nline 585\nline 586\nline 587\nline 588\nline 589\nline 590\nline 591\nline 592\nline 593\nline 594\nline 595\nline 596\nline 597\nline 598\nline 599\nline 600\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "-1 a\n 2 b\n 3 a\n 4 b\n+4 a\n 5 z",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,5 +1,5 @@\n-a\n b\n a\n b\n+a\n z\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "b\na\nb\na\nz\n",
+          "content": "b\na\nb\na\nz\n"
+        },
+        {
+          "text": "Successfully replaced 2 block(s) in target.txt.",
+          "details": {
+            "diff": "- 1 start\n+ 1 START\n+ 2 extra\n  2 0\n  3 1\n  4 2\n  5 3\n  6 4\n  7 5\n  8 6\n  9 7\n-10 end\n+11 END",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,10 +1,11 @@\n-start\n+START\n+extra\n 0\n 1\n 2\n 3\n 4\n 5\n 6\n 7\n-end\n+END\n",
+            "firstChangedLine": 1
+          },
+          "isError": false,
+          "read": "START\nextra\n0\n1\n2\n3\n4\n5\n6\n7\nEND\n",
+          "content": "START\nextra\n0\n1\n2\n3\n4\n5\n6\n7\nEND\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": " 1 �\n-2 target\n+2 done",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,2 +1,2 @@\n �\n-target\n\\ No newline at end of file\n+done\n\\ No newline at end of file\n",
+            "firstChangedLine": 2
+          },
+          "isError": false,
+          "read": "﻿�\ndone",
+          "content": "﻿�\ndone"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 10 a\n 11 c\n 12 b\n 13 \n-14 b\n+14 a\n+15 new\n 15 c\n-16 \n-17 c\n 18 a\n 19 a\n 20 \n 21 a\n    ...",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -10,12 +10,11 @@\n a\n c\n b\n \n-b\n+a\n+new\n c\n-\n-c\n a\n a\n \n a\n",
+            "firstChangedLine": 14
+          },
+          "isError": false,
+          "read": "a\nb\na\n\nc\n\nb\nc\n\na\nc\nb\n\na\nnew\nc\na\na\n\na\na\nc\n\na\nc\nb\na\nc\na",
+          "content": "a\nb\na\n\nc\n\nb\nc\n\na\nc\nb\n\na\nnew\nc\na\na\n\na\na\nc\n\na\nc\nb\na\nc\na"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "  1 b\n- 2 \n- 3 \n- 4 b\n  5 a\n+ 3 new\n+ 4 a\n  6 c\n  7 \n  8 你好🙂\n  9 a\n    ...",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,9 +1,8 @@\n b\n-\n-\n-b\n a\n+new\n+a\n c\n \n 你好🙂\n a\n",
+            "firstChangedLine": 2
+          },
+          "isError": false,
+          "read": "b\na\nnew\na\nc\n\n你好🙂\na\na\nb\nc\n\nc\nb\n\n\na\nb\n\nc\n你好🙂\nb\na\nb\nc\n",
+          "content": "b\na\nnew\na\nc\n\n你好🙂\na\na\nb\nc\n\nc\nb\n\n\na\nb\n\nc\n你好🙂\nb\na\nb\nc\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  4 \n  5 c\n  6 b\n  7 b\n- 8 你好🙂\n- 9 \n 10 a\n 11 b\n 12 c\n 13 c\n    ...\n 22 \n 23 c\n 24 b\n 25 b\n-26 你好🙂\n+24 你好🙂",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -4,10 +4,8 @@\n \n c\n b\n b\n-你好🙂\n-\n a\n b\n c\n c\n@@ -22,5 +20,5 @@\n \n c\n b\n b\n-你好🙂\n\\ No newline at end of file\n+你好🙂\n",
+            "firstChangedLine": 8
+          },
+          "isError": false,
+          "read": "\nc\n你好🙂\n\nc\nb\nb\na\nb\nc\nc\nb\na\nb\nb\nb\n你好🙂\na\nb\n\nc\nb\nb\n你好🙂\n",
+          "content": "\nc\n你好🙂\n\nc\nb\nb\na\nb\nc\nc\nb\na\nb\nb\nb\n你好🙂\na\nb\n\nc\nb\nb\n你好🙂\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  7 a\n  8 b\n  9 a\n 10 c\n-11 \n-12 b\n-13 b\n 14 a\n+12 new\n+13 a\n 15 \n 16 你好🙂\n 17 a\n 18 b\n    ...\n 27 \n 28 a\n 29 你好🙂\n 30 你好🙂\n-31 c\n+30 c",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -7,12 +7,11 @@\n a\n b\n a\n c\n-\n-b\n-b\n a\n+new\n+a\n \n 你好🙂\n a\n b\n@@ -27,5 +26,5 @@\n \n a\n 你好🙂\n 你好🙂\n-c\n+c\n\\ No newline at end of file\n",
+            "firstChangedLine": 11
+          },
+          "isError": false,
+          "read": "c\n你好🙂\nc\n你好🙂\na\n\na\nb\na\nc\na\nnew\na\n\n你好🙂\na\nb\nc\n你好🙂\na\na\nc\nc\n\nb\n\na\n你好🙂\n你好🙂\nc",
+          "content": "c\n你好🙂\nc\n你好🙂\na\n\na\nb\na\nc\na\nnew\na\n\n你好🙂\na\nb\nc\n你好🙂\na\na\nc\nc\n\nb\n\na\n你好🙂\n你好🙂\nc"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 26 \n 27 你好🙂\n 28 \n 29 c\n-30 a",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -26,5 +26,4 @@\n \n 你好🙂\n \n c\n-a\n\\ No newline at end of file\n",
+            "firstChangedLine": 30
+          },
+          "isError": false,
+          "read": "\n\na\na\na\nb\nc\nc\na\nc\na\n你好🙂\n\n你好🙂\nc\nb\n\n你好🙂\n\na\nb\n你好🙂\n\nc\nc\n\n你好🙂\n\nc\n",
+          "content": "\n\na\na\na\nb\nc\nc\na\nc\na\n你好🙂\n\n你好🙂\nc\nb\n\n你好🙂\n\na\nb\n你好🙂\n\nc\nc\n\n你好🙂\n\nc\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 24 \n 25 你好🙂\n 26 c\n 27 \n-28 b\n-29 你好🙂\n-30 a\n 31 c\n 32 a",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -24,9 +24,6 @@\n \n 你好🙂\n c\n \n-b\n-你好🙂\n-a\n c\n a\n",
+            "firstChangedLine": 28
+          },
+          "isError": false,
+          "read": "b\nc\nc\na\n\nc\nc\nb\n\n\nb\nc\n\na\n你好🙂\n\nb\na\na\nc\n\na\n\n\n你好🙂\nc\n\nc\na\n",
+          "content": "b\nc\nc\na\n\nc\nc\nb\n\n\nb\nc\n\na\n你好🙂\n\nb\na\na\nc\n\na\n\n\n你好🙂\nc\n\nc\na\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "  1 a\n  2 c\n  3 \n  4 a\n- 5 c\n- 6 a\n- 7 a\n  8 b\n  9 b\n 10 b\n 11 b\n    ...",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,11 +1,8 @@\n a\n c\n \n a\n-c\n-a\n-a\n b\n b\n b\n b\n",
+            "firstChangedLine": 5
+          },
+          "isError": false,
+          "read": "a\nc\n\na\nb\nb\nb\nb\nb\n\na\n\na\na\na\n你好🙂\n你好🙂\n\nc\nb\n\n你好🙂\n你好🙂\nc\nb",
+          "content": "a\nc\n\na\nb\nb\nb\nb\nb\n\na\n\na\na\na\n你好🙂\n你好🙂\n\nc\nb\n\n你好🙂\n你好🙂\nc\nb"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "  1 a\n  2 b\n  3 c\n  4 a\n+ 5 new\n+ 6 \n+ 7 b\n  5 c\n- 6 a\n  7 c\n- 8 c\n  9 你好🙂\n 10 b\n 11 b\n 12 c",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,12 +1,13 @@\n a\n b\n c\n a\n+new\n+\n+b\n c\n-a\n c\n-c\n 你好🙂\n b\n b\n c\n",
+            "firstChangedLine": 5
+          },
+          "isError": false,
+          "read": "a\nb\nc\na\nnew\n\nb\nc\nc\n你好🙂\nb\nb\nc\n",
+          "content": "a\nb\nc\na\nnew\n\nb\nc\nc\n你好🙂\nb\nb\nc\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "  1 b\n  2 a\n  3 \n+ 4 a\n+ 5 new\n  4 \n- 5 你好🙂\n- 6 你好🙂\n  7 c\n  8 \n  9 c\n 10 a\n    ...\n 12 a\n 13 \n 14 你好🙂\n 15 a\n-16 b\n+16 b",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,10 +1,10 @@\n b\n a\n \n+a\n+new\n \n-你好🙂\n-你好🙂\n c\n \n c\n a\n@@ -12,5 +12,5 @@\n a\n \n 你好🙂\n a\n-b\n\\ No newline at end of file\n+b\n",
+            "firstChangedLine": 4
+          },
+          "isError": false,
+          "read": "b\na\n\na\nnew\n\nc\n\nc\na\n\na\n\n你好🙂\na\nb\n",
+          "content": "b\na\n\na\nnew\n\nc\n\nc\na\n\na\n\n你好🙂\na\nb\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 13 a\n 14 你好🙂\n 15 b\n 16 你好🙂\n-17 b\n 18 a\n-19 \n 20 b\n-21 你好🙂\n+19 你好🙂",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -13,9 +13,7 @@\n a\n 你好🙂\n b\n 你好🙂\n-b\n a\n-\n b\n-你好🙂\n+你好🙂\n\\ No newline at end of file\n",
+            "firstChangedLine": 17
+          },
+          "isError": false,
+          "read": "c\nb\nb\n\n你好🙂\n\n你好🙂\na\nb\na\n\nb\na\n你好🙂\nb\n你好🙂\na\nb\n你好🙂",
+          "content": "c\nb\nb\n\n你好🙂\n\n你好🙂\na\nb\na\n\nb\na\n你好🙂\nb\n你好🙂\na\nb\n你好🙂"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 10 b\n 11 a\n 12 你好🙂\n 13 b\n-14 你好🙂\n-15 c\n-16 你好🙂\n+14 a\n+15 new\n 17 \n 18 你好🙂\n 19 c\n 20 b\n    ...\n 27 b\n 28 \n 29 你好🙂\n 30 b\n-31 a\n+30 a",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -10,11 +10,10 @@\n b\n a\n 你好🙂\n b\n-你好🙂\n-c\n-你好🙂\n+a\n+new\n \n 你好🙂\n c\n b\n@@ -27,5 +26,5 @@\n b\n \n 你好🙂\n b\n-a\n\\ No newline at end of file\n+a\n",
+            "firstChangedLine": 14
+          },
+          "isError": false,
+          "read": "\nc\na\nc\nc\n\nb\n\nc\nb\na\n你好🙂\nb\na\nnew\n\n你好🙂\nc\nb\nb\n你好🙂\nc\nc\na\nc\nb\n\n你好🙂\nb\na\n",
+          "content": "\nc\na\nc\nc\n\nb\n\nc\nb\na\n你好🙂\nb\na\nnew\n\n你好🙂\nc\nb\nb\n你好🙂\nc\nc\na\nc\nb\n\n你好🙂\nb\na\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  4 \n  5 b\n  6 你好🙂\n  7 c\n- 8 c\n- 9 你好🙂\n-10 b\n 11 \n 12 a\n 13 b\n 14 a",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -4,11 +4,8 @@\n \n b\n 你好🙂\n c\n-c\n-你好🙂\n-b\n \n a\n b\n a\n",
+            "firstChangedLine": 8
+          },
+          "isError": false,
+          "read": "c\na\n你好🙂\n\nb\n你好🙂\nc\n\na\nb\na\n",
+          "content": "c\na\n你好🙂\n\nb\n你好🙂\nc\n\na\nb\na\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 24 你好🙂\n 25 你好🙂\n 26 你好🙂\n 27 \n-28 b\n-29 c\n-30 b\n 31 a\n 32 你好🙂",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -24,9 +24,6 @@\n 你好🙂\n 你好🙂\n 你好🙂\n \n-b\n-c\n-b\n a\n 你好🙂\n\\ No newline at end of file\n",
+            "firstChangedLine": 28
+          },
+          "isError": false,
+          "read": "b\nc\n\nb\n你好🙂\na\nb\n你好🙂\n\nc\n你好🙂\na\nc\n你好🙂\nc\nc\n\n\n\nb\nc\nc\n你好🙂\n你好🙂\n你好🙂\n你好🙂\n\na\n你好🙂",
+          "content": "b\nc\n\nb\n你好🙂\na\nb\n你好🙂\n\nc\n你好🙂\na\nc\n你好🙂\nc\nc\n\n\n\nb\nc\nc\n你好🙂\n你好🙂\n你好🙂\n你好🙂\n\na\n你好🙂"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  5 \n  6 b\n  7 c\n  8 a\n+ 9 new\n  9 \n-10 你好🙂\n+11 b\n 11 a\n 12 你好🙂",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -5,8 +5,9 @@\n \n b\n c\n a\n+new\n \n-你好🙂\n+b\n a\n 你好🙂\n",
+            "firstChangedLine": 9
+          },
+          "isError": false,
+          "read": "a\nb\nb\nb\n\nb\nc\na\nnew\n\nb\na\n你好🙂\n",
+          "content": "a\nb\nb\nb\n\nb\nc\na\nnew\n\nb\na\n你好🙂\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 17 \n 18 b\n 19 你好🙂\n 20 a\n-21 c\n-22 c\n+21 new\n 23 a\n 24 a\n 25 a\n 26 a\n    ...\n 28 \n 29 你好🙂\n 30 b\n 31 a\n+31 ",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -17,10 +17,9 @@\n \n b\n 你好🙂\n a\n-c\n-c\n+new\n a\n a\n a\n a\n@@ -28,4 +27,5 @@\n \n 你好🙂\n b\n a\n+\n",
+            "firstChangedLine": 21
+          },
+          "isError": false,
+          "read": "你好🙂\n你好🙂\n\nc\na\nc\nc\nc\nc\nc\nc\n你好🙂\n\na\na\nb\n\nb\n你好🙂\na\nnew\na\na\na\na\na\n\n你好🙂\nb\na\n\n",
+          "content": "你好🙂\n你好🙂\n\nc\na\nc\nc\nc\nc\nc\nc\n你好🙂\n\na\na\nb\n\nb\n你好🙂\na\nnew\na\na\na\na\na\n\n你好🙂\nb\na\n\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 18 b\n 19 \n 20 c\n 21 你好🙂\n-22 你好🙂\n+22 a\n+23 new\n+24 \n+25 b",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -18,5 +18,8 @@\n b\n \n c\n 你好🙂\n-你好🙂\n+a\n+new\n+\n+b\n\\ No newline at end of file\n",
+            "firstChangedLine": 22
+          },
+          "isError": false,
+          "read": "你好🙂\na\nb\nc\nb\na\na\nb\n你好🙂\na\nb\n你好🙂\na\n\n你好🙂\n你好🙂\n\nb\n\nc\n你好🙂\na\nnew\n\nb",
+          "content": "你好🙂\na\nb\nc\nb\na\na\nb\n你好🙂\na\nb\n你好🙂\na\n\n你好🙂\n你好🙂\n\nb\n\nc\n你好🙂\na\nnew\n\nb"
+        },
+        {
+          "text": "No changes made to target.txt. The replacement produced identical content. This might indicate an issue with special characters or the text not existing as expected.",
+          "details": {},
+          "isError": true,
+          "read": "\nb\nc\nc\n你好🙂\n\n\na\n你好🙂\nb\nb\n",
+          "content": "\nb\nc\nc\n你好🙂\n\n\na\n你好🙂\nb\nb\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  8 a\n  9 你好🙂\n 10 a\n 11 \n-12 你好🙂\n+12 a\n+13 new\n+14 \n+15 b",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -8,5 +8,8 @@\n a\n 你好🙂\n a\n \n-你好🙂\n+a\n+new\n+\n+b\n",
+            "firstChangedLine": 12
+          },
+          "isError": false,
+          "read": "\na\nb\na\na\nc\na\na\n你好🙂\na\n\na\nnew\n\nb\n",
+          "content": "\na\nb\na\na\nc\na\na\n你好🙂\na\n\na\nnew\n\nb\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 24 你好🙂\n 25 你好🙂\n 26 \n 27 c\n-28 \n-29 c\n 30 a\n 31 a",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -24,8 +24,6 @@\n 你好🙂\n 你好🙂\n \n c\n-\n-c\n a\n a\n",
+            "firstChangedLine": 28
+          },
+          "isError": false,
+          "read": "a\nc\nc\na\n\n\n\na\n\n你好🙂\nb\na\nb\nc\nb\n\n\nb\nc\na\n你好🙂\n你好🙂\n\n你好🙂\n你好🙂\n\nc\na\na\n",
+          "content": "a\nc\nc\na\n\n\n\na\n\n你好🙂\nb\na\nb\nc\nb\n\n\nb\nc\na\n你好🙂\n你好🙂\n\n你好🙂\n你好🙂\n\nc\na\na\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 21 \n 22 \n 23 c\n 24 \n-25 c\n+25 a\n+26 new\n+27 \n 26 b\n-27 c",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -21,7 +21,8 @@\n \n \n c\n \n-c\n+a\n+new\n+\n b\n-c\n",
+            "firstChangedLine": 25
+          },
+          "isError": false,
+          "read": "\nc\nb\na\na\nb\n\nb\nb\n你好🙂\n你好🙂\n\n\nb\n\na\nb\n\n\n\n\n\nc\n\na\nnew\n\nb\n",
+          "content": "\nc\nb\na\na\nb\n\nb\nb\n你好🙂\n你好🙂\n\n\nb\n\na\nb\n\n\n\n\n\nc\n\na\nnew\n\nb\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "  1 a\n  2 \n  3 \n- 4 你好🙂\n+ 4 a\n+ 5 new\n+ 6 \n  5 b\n  6 a\n- 7 a\n  8 \n  9 c\n 10 \n 11 c\n    ...\n 28 你好🙂\n 29 你好🙂\n 30 你好🙂\n 31 c\n+33 ",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,11 +1,12 @@\n a\n \n \n-你好🙂\n+a\n+new\n+\n b\n a\n-a\n \n c\n \n c\n@@ -28,4 +29,5 @@\n 你好🙂\n 你好🙂\n 你好🙂\n c\n+\n",
+            "firstChangedLine": 4
+          },
+          "isError": false,
+          "read": "a\n\n\na\nnew\n\nb\na\n\nc\n\nc\nb\na\n你好🙂\n你好🙂\nb\na\n你好🙂\nc\nb\n\n你好🙂\n你好🙂\nc\na\n\n\n你好🙂\n你好🙂\n你好🙂\nc\n\n",
+          "content": "a\n\n\na\nnew\n\nb\na\n\nc\n\nc\nb\na\n你好🙂\n你好🙂\nb\na\n你好🙂\nc\nb\n\n你好🙂\n你好🙂\nc\na\n\n\n你好🙂\n你好🙂\n你好🙂\nc\n\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 16 c\n 17 c\n 18 \n 19 c\n-20 c\n-21 c\n-22 c\n 23 a\n-24 你好🙂\n+21 new\n+22 a\n+23 你好🙂",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -16,9 +16,8 @@\n c\n c\n \n c\n-c\n-c\n-c\n a\n-你好🙂\n+new\n+a\n+你好🙂\n\\ No newline at end of file\n",
+            "firstChangedLine": 20
+          },
+          "isError": false,
+          "read": "\n你好🙂\n你好🙂\nb\na\n你好🙂\na\n你好🙂\n你好🙂\nc\nc\n你好🙂\n你好🙂\na\n\nc\nc\n\nc\na\nnew\na\n你好🙂",
+          "content": "\n你好🙂\n你好🙂\nb\na\n你好🙂\na\n你好🙂\n你好🙂\nc\nc\n你好🙂\n你好🙂\na\n\nc\nc\n\nc\na\nnew\na\n你好🙂"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 16 b\n 17 c\n 18 b\n 19 \n-20 \n 21 a",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -16,6 +16,5 @@\n b\n c\n b\n \n-\n a\n",
+            "firstChangedLine": 20
+          },
+          "isError": false,
+          "read": "a\nc\nb\n你好🙂\n\na\n你好🙂\n\n你好🙂\n\na\n\na\n你好🙂\na\nb\nc\nb\n\na\n",
+          "content": "a\nc\nb\n你好🙂\n\na\n你好🙂\n\n你好🙂\n\na\n\na\n你好🙂\na\nb\nc\nb\n\na\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 11 a\n 12 a\n 13 c\n 14 b\n-15 你好🙂\n+15 a",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -11,5 +11,5 @@\n a\n a\n c\n b\n-你好🙂\n+a\n",
+            "firstChangedLine": 15
+          },
+          "isError": false,
+          "read": "b\na\nb\n\nc\nc\nb\n\na\n你好🙂\na\na\nc\nb\na\n",
+          "content": "b\na\nb\n\nc\nc\nb\n\na\n你好🙂\na\na\nc\nb\na\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 12 a\n 13 a\n 14 c\n 15 a\n-16 你好🙂\n-17 你好🙂\n-18 \n+16 a\n 19 a",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -12,8 +12,6 @@\n a\n a\n c\n a\n-你好🙂\n-你好🙂\n-\n+a\n a\n\\ No newline at end of file\n",
+            "firstChangedLine": 16
+          },
+          "isError": false,
+          "read": "a\nc\nc\n你好🙂\n你好🙂\na\na\nc\nc\nb\n你好🙂\na\na\nc\na\na\na",
+          "content": "a\nc\nc\n你好🙂\n你好🙂\na\na\nc\nc\nb\n你好🙂\na\na\nc\na\na\na"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  2 \n  3 c\n  4 你好🙂\n  5 b\n- 6 你好🙂\n+ 6 a\n+ 7 new\n  7 \n- 8 \n+ 9 b\n  9 c\n 10 b\n 11 c\n 12 a\n    ...",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -2,11 +2,12 @@\n \n c\n 你好🙂\n b\n-你好🙂\n+a\n+new\n \n-\n+b\n c\n b\n c\n a\n",
+            "firstChangedLine": 6
+          },
+          "isError": false,
+          "read": "c\n\nc\n你好🙂\nb\na\nnew\n\nb\nc\nb\nc\na\na\n你好🙂\n\nc\nb\nc\nc\n",
+          "content": "c\n\nc\n你好🙂\nb\na\nnew\n\nb\nc\nb\nc\na\na\n你好🙂\n\nc\nb\nc\nc\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  8 a\n  9 你好🙂\n 10 a\n 11 你好🙂\n-12 a\n-13 \n-14 你好🙂\n 15 c\n 16 \n 17 \n 18 b\n    ...\n 20 \n 21 a\n 22 c\n 23 a\n-24 b\n+21 b",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -8,11 +8,8 @@\n a\n 你好🙂\n a\n 你好🙂\n-a\n-\n-你好🙂\n c\n \n \n b\n@@ -20,5 +17,5 @@\n \n a\n c\n a\n-b\n\\ No newline at end of file\n+b\n",
+            "firstChangedLine": 12
+          },
+          "isError": false,
+          "read": "\n你好🙂\n你好🙂\nb\n\n你好🙂\nc\na\n你好🙂\na\n你好🙂\nc\n\n\nb\n\n\na\nc\na\nb\n",
+          "content": "\n你好🙂\n你好🙂\nb\n\n你好🙂\nc\na\n你好🙂\na\n你好🙂\nc\n\n\nb\n\n\na\nc\na\nb\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  4 你好🙂\n  5 b\n  6 你好🙂\n  7 b\n+ 8 a\n+ 9 new\n  8 c\n- 9 \n-10 你好🙂\n-11 c\n-12 b\n+11 b",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -4,9 +4,8 @@\n 你好🙂\n b\n 你好🙂\n b\n+a\n+new\n c\n-\n-你好🙂\n-c\n-b\n+b\n\\ No newline at end of file\n",
+            "firstChangedLine": 8
+          },
+          "isError": false,
+          "read": "a\n\na\n你好🙂\nb\n你好🙂\nb\na\nnew\nc\nb",
+          "content": "a\n\na\n你好🙂\nb\n你好🙂\nb\na\nnew\nc\nb"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n  2 b\n  3 b\n  4 你好🙂\n  5 \n+ 6 a\n+ 7 new\n+ 8 \n+ 9 b\n  6 c\n- 7 你好🙂\n- 8 c\n- 9 c\n 10 b\n 11 你好🙂\n 12 你好🙂\n 13 \n-14 你好🙂\n+15 你好🙂",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -2,13 +2,14 @@\n b\n b\n 你好🙂\n \n+a\n+new\n+\n+b\n c\n-你好🙂\n-c\n-c\n b\n 你好🙂\n 你好🙂\n \n-你好🙂\n\\ No newline at end of file\n+你好🙂\n",
+            "firstChangedLine": 6
+          },
+          "isError": false,
+          "read": "a\nb\nb\n你好🙂\n\na\nnew\n\nb\nc\nb\n你好🙂\n你好🙂\n\n你好🙂\n",
+          "content": "a\nb\nb\n你好🙂\n\na\nnew\n\nb\nc\nb\n你好🙂\n你好🙂\n\n你好🙂\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "  1 你好🙂\n  2 b\n  3 a\n- 4 c\n+ 4 a\n+ 5 new\n+ 6 \n  5 b\n- 6 你好🙂\n  7 b\n  8 b\n  9 a\n 10 c\n    ...",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -1,10 +1,11 @@\n 你好🙂\n b\n a\n-c\n+a\n+new\n+\n b\n-你好🙂\n b\n b\n a\n c\n",
+            "firstChangedLine": 4
+          },
+          "isError": false,
+          "read": "你好🙂\nb\na\na\nnew\n\nb\nb\nb\na\nc\nb\nc\nc\n\n你好🙂\na\nb\n你好🙂\nc\nb\na\nb\n你好🙂\nb\nc\n你好🙂\n\n\n",
+          "content": "你好🙂\nb\na\na\nnew\n\nb\nb\nb\na\nc\nb\nc\nc\n\n你好🙂\na\nb\n你好🙂\nc\nb\na\nb\n你好🙂\nb\nc\n你好🙂\n\n\n"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 16 你好🙂\n 17 a\n 18 你好🙂\n 19 你好🙂\n+20 a\n+21 new\n 20 \n-21 你好🙂\n 22 b\n 23 你好🙂\n 24 \n 25 你好🙂\n    ...",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -16,10 +16,11 @@\n 你好🙂\n a\n 你好🙂\n 你好🙂\n+a\n+new\n \n-你好🙂\n b\n 你好🙂\n \n 你好🙂\n",
+            "firstChangedLine": 20
+          },
+          "isError": false,
+          "read": "\nc\n你好🙂\nb\n\n\n\nc\n\n你好🙂\n你好🙂\nb\na\nb\nc\n你好🙂\na\n你好🙂\n你好🙂\na\nnew\n\nb\n你好🙂\n\n你好🙂\na\nc\nc\n你好🙂\nc\nb\n你好🙂",
+          "content": "\nc\n你好🙂\nb\n\n\n\nc\n\n你好🙂\n你好🙂\nb\na\nb\nc\n你好🙂\na\n你好🙂\n你好🙂\na\nnew\n\nb\n你好🙂\n\n你好🙂\na\nc\nc\n你好🙂\nc\nb\n你好🙂"
+        },
+        {
+          "text": "Successfully replaced 1 block(s) in target.txt.",
+          "details": {
+            "diff": "    ...\n 24 b\n 25 a\n 26 c\n 27 b\n-28 c\n-29 a\n-30 b\n 31 \n 32 ",
+            "patch": "--- target.txt\n+++ target.txt\n@@ -24,9 +24,6 @@\n b\n a\n c\n b\n-c\n-a\n-b\n \n \n",
+            "firstChangedLine": 28
+          },
+          "isError": false,
+          "read": "a\n你好🙂\nb\nb\nc\nb\n你好🙂\nb\nb\n你好🙂\na\n\n你好🙂\nb\na\n\n你好🙂\nc\nc\n\n\n你好🙂\n\nb\na\nc\nb\n\n\n",
+          "content": "a\n你好🙂\nb\nb\nc\nb\n你好🙂\nb\nb\n你好🙂\na\n\n你好🙂\nb\na\n\n你好🙂\nc\nc\n\n\n你好🙂\n\nb\na\nc\nb\n\n\n"
+        }
+      ],
+      "metadata": {
+        "name": "edit",
+        "label": "edit",
+        "description": "Edit a single file using exact text replacement. Every edits[].oldText must match a unique, non-overlapping region of the original file. If two changes affect the same block or nearby lines, merge them into one edit instead of emitting overlapping edits. Do not include large unchanged regions just to connect distant changes.",
+        "parameters": {
+          "type": "object",
+          "required": [
+            "path",
+            "edits"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to the file to edit (relative or absolute)"
+            },
+            "edits": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "oldText",
+                  "newText"
+                ],
+                "properties": {
+                  "oldText": {
+                    "type": "string",
+                    "description": "Exact text for one targeted replacement. It must be unique in the original file and must not overlap with any other edits[].oldText in the same call."
+                  },
+                  "newText": {
+                    "type": "string",
+                    "description": "Replacement text for this targeted edit."
+                  }
+                }
+              },
+              "description": "One or more targeted replacements. Each edit is matched against the original file, not incrementally. Do not include overlapping or nested edits. If two changes touch the same block or nearby lines, merge them into one edit instead."
+            }
+          }
+        },
+        "promptSnippet": "Make precise file edits with exact text replacement, including multiple disjoint edits in one call",
+        "promptGuidelines": [
+          "Use edit for precise changes (edits[].oldText must match exactly)",
+          "When changing multiple separate locations in one file, use one edit call with multiple entries in edits[] instead of multiple edit calls",
+          "Each edits[].oldText is matched against the original file, not after earlier edits are applied. Do not emit overlapping or nested edits. Merge nearby changes into one edit.",
+          "Keep edits[].oldText as small as possible while still being unique in the file. Do not pad with large unchanged regions."
+        ]
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:f40508aa40584970750cef6ce491ad0acbff420ec94a95b84170352e29dc725f",
+  "observation_hash": "sha256:4ad25b5eba3329f776f4a082b0b27e4b2c8840ce8b7f161c8455a38eaa1521f2",
+  "execution_method": "node --experimental-strip-types parity/oracle/edit-tool.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/tools/edit.ts"
+  }
+}
