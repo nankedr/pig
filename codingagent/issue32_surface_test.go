@@ -1382,7 +1382,11 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 			memberTarget, reason := issue32MemberTarget(symbol, target, member)
 			memberKey := symbol.Name + "." + member
 			memberReference := symbol.Upstream.Reference + "." + member
-			e := catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: id, Upstream: catalog.Upstream{Module: "coding-agent", Repository: symbol.Upstream.Repository, Commit: symbol.Upstream.Commit, Reference: memberReference}, Mapping: catalog.Mapping{Module: "codingagent", Target: memberTarget, Kind: "contract"}, Status: catalog.StatusScaffolded, Milestone: milestone, Classification: "public-api", Notes: fmt.Sprintf("Issue #32 concrete %s member mapping authority. Behavioral status remains on %s.", symbol.Name, behaviorOwner)}
+			memberOwner := behaviorOwner
+			if owner := issue32BehaviorOwnerForReference(memberReference); owner == issue85MessagesCatalogID {
+				memberOwner = owner
+			}
+			e := catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: id, Upstream: catalog.Upstream{Module: "coding-agent", Repository: symbol.Upstream.Repository, Commit: symbol.Upstream.Commit, Reference: memberReference}, Mapping: catalog.Mapping{Module: "codingagent", Target: memberTarget, Kind: "contract"}, Status: catalog.StatusScaffolded, Milestone: milestone, Classification: "public-api", Notes: fmt.Sprintf("Issue #32 concrete %s member mapping authority. Behavioral status remains on %s.", symbol.Name, memberOwner)}
 			if reason != "" {
 				e.Status = catalog.StatusInventoried
 				if projection, ok := issue32MemberProjectionFor(symbol.Name, member); ok {
@@ -1549,6 +1553,11 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 }
 
 func issue32BehaviorOwnerForReference(reference string) string {
+	for _, name := range []string{"AgentSession.sendUserMessage", "AgentSession.steer", "AgentSession.followUp", "AgentSession.setSteeringMode", "AgentSession.setFollowUpMode", "AgentSession.steeringMode", "AgentSession.followUpMode", "AgentSession.getSteeringMessages", "AgentSession.getFollowUpMessages", "AgentSession.pendingMessageCount", "AgentSession.clearQueue", "PromptOptions.streamingBehavior", "PromptOptions.expandPromptTemplates"} {
+		if reference == issue32ReferencePrefix+"core/agent-session.ts#"+name {
+			return issue85MessagesCatalogID
+		}
+	}
 	switch {
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/grep.ts#"):
 		return issue83GrepCatalogID
@@ -1788,11 +1797,12 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				Supported: []string{
 					"callers can inject a model, narrow Provider or StreamFunction, and executable Agent Tools into a pure in-memory AgentSession",
 					"text and read Tool continuation, AgentSession event bridging, in-memory transcript append, cancellation, settlement, disposal, header identity, and nil SessionFile are implemented",
+					"Issue #85: text Session user-message delivery and queues are implemented under contract:codingagent/session-messages",
 					"callers can inject a persisted v3 SessionManager, reopen its history in a new runtime, and continue without rewriting prior entries",
 				},
 				Unsupported: []string{
 					"ambient model, credential, settings, trust, resource, and package assembly remain explicit Capability Stubs",
-					"queues, extension ToolDefinition execution, branches, compaction, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
+					"extension ToolDefinition execution, branches, compaction, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
 				},
 			},
 			Notes: "Issue #55 delivers the narrow M1 Go SDK AgentSession slice and issue #71 adds explicit M3 v3 persistence injection and reopen. Session event listeners are ordered barriers, agent_settled follows transcript updates, and in-memory creation plus execution perform no ambient disk writes.",
@@ -1866,7 +1876,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1879,6 +1889,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 	switch catalogID {
 	case issue83GrepCatalogID:
 		descriptors = issue83GrepEvidence(t)
+	case issue85MessagesCatalogID:
+		descriptors = issue85MessagesEvidence(t)
 	case issue76CredentialCatalogID:
 		descriptors = issue76CredentialEvidence(t)
 	case issue77RuntimeCatalogID:
@@ -2104,9 +2116,9 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 				Ref:             "codingagent/session_test.go#TestAgentSessionComposesLegacyAgentAndV3Session",
 				Baseline:        issue32BaselineCommit,
 				CaseID:          "issue32-codingagent-production-v3-session",
-				ExecutionMethod: "go test ./codingagent -run '^(TestParseSessionEntriesDecodesV3MessageDiscriminators|TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings|TestMigrateSessionEntriesMigratesV1ToV3InPlace|TestMigrateSessionEntriesRenamesV2HookMessageRole|TestAgentSessionComposesLegacyAgentAndV3Session|TestAgentSessionPromptPropagatesUnconfiguredAgentErrorAndSettles|TestAgentSessionLifecycleAndUnsupportedQueueMethodsHaveNoQueueSideEffects)$' -count=1",
-				Expected:        "production AgentSession composes the legacy agent.Agent with the v3 SessionManager, preserves v3 parsing and migration semantics, settles failed prompts, and leaves unsupported queue operations inert",
-				Actual:          "PASS; focused production-session tests decoded and migrated v3 entries, retained the legacy Agent and v3 SessionManager, settled failed prompts, and observed no queue mutation from lifecycle or unsupported operations",
+				ExecutionMethod: "go test ./codingagent -run '^(TestParseSessionEntriesDecodesV3MessageDiscriminators|TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings|TestMigrateSessionEntriesMigratesV1ToV3InPlace|TestMigrateSessionEntriesRenamesV2HookMessageRole|TestAgentSessionComposesLegacyAgentAndV3Session|TestAgentSessionPromptPropagatesUnconfiguredAgentErrorAndSettles|TestAgentSessionLifecyclePreservesQueuesUntilClear)$' -count=1",
+				Expected:        "production AgentSession composes the legacy agent.Agent with the v3 SessionManager, preserves v3 parsing and migration semantics, settles failed prompts, and preserves queues across lifecycle calls until explicit ClearQueue",
+				Actual:          "PASS; focused production-session tests decoded and migrated v3 entries, retained the legacy Agent and v3 SessionManager, settled failed prompts, and preserved queues across lifecycle calls and cleared them explicitly",
 				Platform:        "any",
 				CatalogID:       issue32ModuleCatalogID,
 			},

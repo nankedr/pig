@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/sdk.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/session-messages-deviation",
+    "catalog_id": "contract:codingagent/session-messages",
+    "surface": "go-sdk",
+    "input": {
+      "phases": [
+        "idle",
+        "cancelled",
+        "agent_end",
+        "agent_settled"
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "phase": "idle",
+        "accepted": [
+          "steer",
+          "followUp"
+        ],
+        "steering": [
+          "late-steer"
+        ],
+        "followUp": [
+          "late-follow"
+        ]
+      },
+      {
+        "phase": "cancelled",
+        "accepted": [
+          "steer",
+          "followUp"
+        ],
+        "steering": [],
+        "followUp": []
+      },
+      {
+        "phase": "agent_end",
+        "accepted": [
+          "steer",
+          "followUp"
+        ],
+        "steering": [],
+        "followUp": []
+      },
+      {
+        "phase": "agent_settled",
+        "accepted": [
+          "steer",
+          "followUp"
+        ],
+        "steering": [
+          "late-steer"
+        ],
+        "followUp": [
+          "late-follow"
+        ]
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:f0bdab0d935e6db49f95b71a945366bbafe879ac072d7997aa726bec58101ac3",
+  "observation_hash": "sha256:73ffe1ee7251df37f9e9d5f5ba22071bdc22c16e8a60f182798ba0aef2a3baad",
+  "execution_method": "node --experimental-strip-types parity/oracle/session-messages.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "oracle_entry": "packages/coding-agent/src/core/sdk.ts"
+  }
+}

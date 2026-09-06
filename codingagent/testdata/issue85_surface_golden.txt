@@ -1,0 +1,45 @@
+SendUserMessage func(*codingagent.AgentSession, ai.UserMessageContent, ...codingagent.SendUserMessageOptions) error
+
+Prompt func(*codingagent.AgentSession, context.Context, string, ...codingagent.PromptOptions) error
+
+Steer func(*codingagent.AgentSession, string) error
+
+FollowUp func(*codingagent.AgentSession, string) error
+
+SetSteeringMode func(*codingagent.AgentSession, agent.QueueMode) error
+
+SetFollowUpMode func(*codingagent.AgentSession, agent.QueueMode) error
+
+SteeringMode func(*codingagent.AgentSession) agent.QueueMode
+
+FollowUpMode func(*codingagent.AgentSession) agent.QueueMode
+
+GetSteeringMessages func(*codingagent.AgentSession) ([]string, error)
+
+GetFollowUpMessages func(*codingagent.AgentSession) ([]string, error)
+
+PendingMessageCount func(*codingagent.AgentSession) (int, error)
+
+ClearQueue func(*codingagent.AgentSession) error
+
+Abort func(*codingagent.AgentSession) error
+
+WaitForIdle func(*codingagent.AgentSession, context.Context) error
+
+type codingagent.SendUserMessageOptions struct
+fields:
+- DeliverAs codingagent.UserMessageDelivery tag=""
+
+type codingagent.PromptOptions struct
+fields:
+- ExpandPromptTemplates *bool tag=""
+- Images []ai.ImageContent tag=""
+- PreflightResult func(bool) tag=""
+- Source string tag=""
+- StreamingBehavior string tag=""
+
+type codingagent.AgentSessionQueueUpdateEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Steering []string tag="json:\"steering\""
+- FollowUp []string tag="json:\"followUp\""

@@ -1,0 +1,687 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/sdk.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/session-messages",
+    "catalog_id": "contract:codingagent/session-messages",
+    "surface": "go-sdk",
+    "input": {
+      "modes": [
+        "one-at-a-time",
+        "all"
+      ],
+      "prompt": [
+        {
+          "type": "text",
+          "text": "first"
+        },
+        {
+          "type": "text",
+          "text": "second"
+        }
+      ],
+      "steering": [
+        "s1",
+        "s2"
+      ],
+      "followUp": [
+        "f1",
+        "f2"
+      ],
+      "reply": "reply"
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "one-at-a-time",
+        "requests": [
+          [
+            "user:first\nsecond"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "assistant:reply",
+            "user:s2"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "assistant:reply",
+            "user:s2",
+            "assistant:reply",
+            "user:f1"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "assistant:reply",
+            "user:s2",
+            "assistant:reply",
+            "user:f1",
+            "assistant:reply",
+            "user:f2"
+          ]
+        ],
+        "queues": [
+          {
+            "steering": [
+              "cleared"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "cleared"
+            ],
+            "followUp": [
+              "cleared"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": [
+              "f1"
+            ]
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [
+              "s2"
+            ],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": [
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": []
+          }
+        ],
+        "events": [
+          "start:first\nsecond",
+          "queue:1:0",
+          "queue:1:1",
+          "queue:0:0",
+          "queue:1:0",
+          "queue:2:0",
+          "queue:2:1",
+          "queue:2:2",
+          "queue:1:2",
+          "start:s1",
+          "queue:0:2",
+          "start:s2",
+          "queue:0:1",
+          "start:f1",
+          "queue:0:0",
+          "start:f2",
+          "settled"
+        ],
+        "history": [
+          "user:first\nsecond",
+          "assistant:reply",
+          "user:s1",
+          "assistant:reply",
+          "user:s2",
+          "assistant:reply",
+          "user:f1",
+          "assistant:reply",
+          "user:f2",
+          "assistant:reply"
+        ],
+        "reopened": [
+          "user:first\nsecond",
+          "assistant:reply",
+          "user:s1",
+          "assistant:reply",
+          "user:s2",
+          "assistant:reply",
+          "user:f1",
+          "assistant:reply",
+          "user:f2",
+          "assistant:reply"
+        ],
+        "rejected": true,
+        "pending": 0,
+        "settings": [
+          "one-at-a-time",
+          "one-at-a-time"
+        ]
+      },
+      {
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "all",
+        "requests": [
+          [
+            "user:first\nsecond"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "assistant:reply",
+            "user:s2"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "assistant:reply",
+            "user:s2",
+            "assistant:reply",
+            "user:f1",
+            "user:f2"
+          ]
+        ],
+        "queues": [
+          {
+            "steering": [
+              "cleared"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "cleared"
+            ],
+            "followUp": [
+              "cleared"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": [
+              "f1"
+            ]
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [
+              "s2"
+            ],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": [
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": []
+          }
+        ],
+        "events": [
+          "start:first\nsecond",
+          "queue:1:0",
+          "queue:1:1",
+          "queue:0:0",
+          "queue:1:0",
+          "queue:2:0",
+          "queue:2:1",
+          "queue:2:2",
+          "queue:1:2",
+          "start:s1",
+          "queue:0:2",
+          "start:s2",
+          "queue:0:1",
+          "start:f1",
+          "queue:0:0",
+          "start:f2",
+          "settled"
+        ],
+        "history": [
+          "user:first\nsecond",
+          "assistant:reply",
+          "user:s1",
+          "assistant:reply",
+          "user:s2",
+          "assistant:reply",
+          "user:f1",
+          "user:f2",
+          "assistant:reply"
+        ],
+        "reopened": [
+          "user:first\nsecond",
+          "assistant:reply",
+          "user:s1",
+          "assistant:reply",
+          "user:s2",
+          "assistant:reply",
+          "user:f1",
+          "user:f2",
+          "assistant:reply"
+        ],
+        "rejected": true,
+        "pending": 0,
+        "settings": [
+          "one-at-a-time",
+          "all"
+        ]
+      },
+      {
+        "steeringMode": "all",
+        "followUpMode": "one-at-a-time",
+        "requests": [
+          [
+            "user:first\nsecond"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "user:s2"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "user:s2",
+            "assistant:reply",
+            "user:f1"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "user:s2",
+            "assistant:reply",
+            "user:f1",
+            "assistant:reply",
+            "user:f2"
+          ]
+        ],
+        "queues": [
+          {
+            "steering": [
+              "cleared"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "cleared"
+            ],
+            "followUp": [
+              "cleared"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": [
+              "f1"
+            ]
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [
+              "s2"
+            ],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": [
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": []
+          }
+        ],
+        "events": [
+          "start:first\nsecond",
+          "queue:1:0",
+          "queue:1:1",
+          "queue:0:0",
+          "queue:1:0",
+          "queue:2:0",
+          "queue:2:1",
+          "queue:2:2",
+          "queue:1:2",
+          "start:s1",
+          "queue:0:2",
+          "start:s2",
+          "queue:0:1",
+          "start:f1",
+          "queue:0:0",
+          "start:f2",
+          "settled"
+        ],
+        "history": [
+          "user:first\nsecond",
+          "assistant:reply",
+          "user:s1",
+          "user:s2",
+          "assistant:reply",
+          "user:f1",
+          "assistant:reply",
+          "user:f2",
+          "assistant:reply"
+        ],
+        "reopened": [
+          "user:first\nsecond",
+          "assistant:reply",
+          "user:s1",
+          "user:s2",
+          "assistant:reply",
+          "user:f1",
+          "assistant:reply",
+          "user:f2",
+          "assistant:reply"
+        ],
+        "rejected": true,
+        "pending": 0,
+        "settings": [
+          "all",
+          "one-at-a-time"
+        ]
+      },
+      {
+        "steeringMode": "all",
+        "followUpMode": "all",
+        "requests": [
+          [
+            "user:first\nsecond"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "user:s2"
+          ],
+          [
+            "user:first\nsecond",
+            "assistant:reply",
+            "user:s1",
+            "user:s2",
+            "assistant:reply",
+            "user:f1",
+            "user:f2"
+          ]
+        ],
+        "queues": [
+          {
+            "steering": [
+              "cleared"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "cleared"
+            ],
+            "followUp": [
+              "cleared"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": []
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": [
+              "f1"
+            ]
+          },
+          {
+            "steering": [
+              "s1",
+              "s2"
+            ],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [
+              "s2"
+            ],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": [
+              "f1",
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": [
+              "f2"
+            ]
+          },
+          {
+            "steering": [],
+            "followUp": []
+          }
+        ],
+        "events": [
+          "start:first\nsecond",
+          "queue:1:0",
+          "queue:1:1",
+          "queue:0:0",
+          "queue:1:0",
+          "queue:2:0",
+          "queue:2:1",
+          "queue:2:2",
+          "queue:1:2",
+          "start:s1",
+          "queue:0:2",
+          "start:s2",
+          "queue:0:1",
+          "start:f1",
+          "queue:0:0",
+          "start:f2",
+          "settled"
+        ],
+        "history": [
+          "user:first\nsecond",
+          "assistant:reply",
+          "user:s1",
+          "user:s2",
+          "assistant:reply",
+          "user:f1",
+          "user:f2",
+          "assistant:reply"
+        ],
+        "reopened": [
+          "user:first\nsecond",
+          "assistant:reply",
+          "user:s1",
+          "user:s2",
+          "assistant:reply",
+          "user:f1",
+          "user:f2",
+          "assistant:reply"
+        ],
+        "rejected": true,
+        "pending": 0,
+        "settings": [
+          "all",
+          "all"
+        ]
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:b810b2ee389bf6b942d819450cbb9d83434e349de38de20e0f855cea1bf2f2cb",
+  "observation_hash": "sha256:e5bfa42a8ba9edff267e909398e8ebfe000dfdd11c1a7b276e411a71fb83e32a",
+  "execution_method": "node --experimental-strip-types parity/oracle/session-messages.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "oracle_entry": "packages/coding-agent/src/core/sdk.ts"
+  }
+}
