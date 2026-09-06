@@ -133,13 +133,6 @@ func TestAgentSessionUnavailableQueriesReturnStructuredErrors(t *testing.T) {
 			}
 			return err
 		}},
-		{name: "is retrying", operation: "AgentSession.IsRetrying", call: func() error {
-			value, err := session.IsRetrying()
-			if value {
-				t.Error("IsRetrying returned true with an error")
-			}
-			return err
-		}},
 		{name: "is bash running", operation: "AgentSession.IsBashRunning", call: func() error {
 			value, err := session.IsBashRunning()
 			if value {

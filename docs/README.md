@@ -8,6 +8,7 @@ M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回�
 M3.9 支持显式 edit 精确/模糊多区域替换、准确 diff 和回读，见 [edit 与回读](learning/m3-edit-tool.md)及 [TypeScript → Go](mappings/typescript-to-go/m3-edit-tool.md)。
 M3.10 支持显式 bash 执行宿主命令、进程树取消与完整输出保留，见 [bash 与回读](learning/m3-bash-tool.md)及 [TypeScript → Go](mappings/typescript-to-go/m3-bash-tool.md)。
 M3.11 默认启用 read/bash/edit/write，支持跨进程恢复和 fork 编码任务，见 [可恢复编码任务](learning/m3-coding-task.md)及 [TypeScript → Go](mappings/typescript-to-go/m3-coding-task.md)。
+M4.4 支持 Provider 错误后的整轮重试，见 [重试与取消](learning/m4-turn-retry.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-turn-retry.md)。
 
 Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学习与证据”组织。阅读代码或设计任务前，先确认固定 Parity Baseline 和当前 Milestone Frontier。
 

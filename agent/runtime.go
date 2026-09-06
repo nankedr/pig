@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/nankedr/pig/ai"
@@ -305,7 +306,7 @@ func runAgentTurn(ctx context.Context, agentContext AgentContext, newMessages []
 		}
 		waitContext := context.WithoutCancel(ctx)
 		started := false
-		var message ai.AssistantMessage
+		var message, lastPartial ai.AssistantMessage
 		messageReady := false
 		for {
 			event, ok, err := response.Next(waitContext)
@@ -316,6 +317,9 @@ func runAgentTurn(ctx context.Context, agentContext AgentContext, newMessages []
 				break
 			}
 			partial, hasPartial := assistantEventPartial(event)
+			if hasPartial {
+				lastPartial = partial
+			}
 			switch event.AssistantMessageEventType() {
 			case ai.AssistantMessageEventTypeStart:
 				started = true
@@ -344,7 +348,16 @@ func runAgentTurn(ctx context.Context, agentContext AgentContext, newMessages []
 		if !messageReady {
 			message, err = response.Result(waitContext)
 			if err != nil {
-				return nil, err
+				if !started || !errors.Is(err, ai.ErrOpenAISSETruncated) || !strings.HasSuffix(err.Error(), "\nstream ended without finish_reason") {
+					return nil, err
+				}
+				message = ai.CloneAssistantMessage(lastPartial)
+				message.StopReason = ai.StopReasonError
+				message.ErrorMessage = ai.Some("Stream ended without finish_reason")
+				if ctx.Err() != nil {
+					message.StopReason = ai.StopReasonAborted
+					message.ErrorMessage = ai.Some("Request aborted")
+				}
 			}
 		}
 

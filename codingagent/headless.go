@@ -433,22 +433,22 @@ func RunHeadless(ctx context.Context, runtime *AgentSessionRuntime, options Head
 
 	for _, prompt := range prompts {
 		if err := session.Prompt(ctx, prompt); err != nil {
-			outcome := headlessOutcome(session.Messages())
+			outcome := session.headlessOutcome()
 			if cause := context.Cause(ctx); (cause != nil && errors.Is(err, cause)) || errors.Is(err, context.Canceled) {
 				outcome.Canceled = true
 				return outcome, nil
 			}
 			return outcome, err
 		}
-		if outcome := headlessOutcome(session.Messages()); outcome.FinalMessage != nil &&
+		if outcome := session.headlessOutcome(); outcome.FinalMessage != nil &&
 			(outcome.FinalMessage.StopReason == ai.StopReasonError || outcome.Canceled) {
 			return outcome, nil
 		}
 	}
 	if err := session.WaitForIdle(context.WithoutCancel(ctx)); err != nil {
-		return headlessOutcome(session.Messages()), err
+		return session.headlessOutcome(), err
 	}
-	return headlessOutcome(session.Messages()), nil
+	return session.headlessOutcome(), nil
 }
 
 func headlessOutcome(messages []agent.AgentMessage) HeadlessOutcome {
@@ -475,4 +475,16 @@ func headlessOutcome(messages []agent.AgentMessage) HeadlessOutcome {
 		return outcome
 	}
 	return HeadlessOutcome{}
+}
+
+func (s *AgentSession) headlessOutcome() HeadlessOutcome {
+	s.mu.RLock()
+	message, canceled := s.lastAssistant, s.retryCancelled
+	s.mu.RUnlock()
+	if canceled && message != nil {
+		outcome := headlessOutcome([]agent.AgentMessage{*message})
+		outcome.Canceled = true
+		return outcome
+	}
+	return headlessOutcome(s.Messages())
 }
