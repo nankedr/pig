@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/cli.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/pig/project-trust-startup",
+    "catalog_id": "contract:security/project-trust",
+    "surface": "cli",
+    "input": {
+      "projection": "Real locked Pi Headless CLI: project trust ask/approve/deny, project model override and Context File exception. Explicit session directory excludes the ADR-0010 pre-trust path deviation. SYSTEM.md execution belongs to M5."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "cases": [
+        {
+          "name": "ask",
+          "model": "deepseek-v4-flash",
+          "context": true,
+          "shadowed": false
+        },
+        {
+          "name": "approve",
+          "model": "deepseek-v4-pro",
+          "context": true,
+          "shadowed": false
+        },
+        {
+          "name": "deny",
+          "model": "deepseek-v4-flash",
+          "context": true,
+          "shadowed": false
+        },
+        {
+          "name": "no-context",
+          "model": "deepseek-v4-flash",
+          "context": false,
+          "shadowed": false
+        }
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:c9c6209e862ffc284b9019be4d76be498b60959e51d227cb0e779914a91026ff",
+  "observation_hash": "sha256:04b0ef5ccb06022ace5048a41fce18b97cfc7f097980466a07fc8d315ace53e7",
+  "execution_method": "node --experimental-strip-types parity/oracle/project-trust-startup.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/cli.ts"
+  }
+}

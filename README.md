@@ -1,8 +1,10 @@
 # Pig
 
-Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口；当前 M3 已支持 v3 Session 创建、持久化、显式路径重开和全局 settings 驱动的 Headless 启动。
+Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.2.0 集成 M2 的 thinking/signature、usage/cost/cache、deferred、handoff、overflow、Agent 队列、proxy、Telemetry 与兼容入口；当前 M3 已支持 v3 Session 创建、持久化、显式路径重开和全局 settings 驱动的 Headless 启动，并在 Project Trust 通过后加载项目设置。
 
 - [文档导航](docs/README.md)
+- [M3.5 Project Trust](docs/learning/m3-project-trust.md)
+- [M3.5 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m3-project-trust.md)
 - [M2 集成与冻结](docs/learning/m2-freeze.md)
 - [M2 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m2-freeze.md)
 - [v0.2.0 发布说明](docs/releases/v0.2.0.md)

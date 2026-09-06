@@ -400,6 +400,9 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	if err != nil {
 		return err
 	}
+	if err = prepareHeadlessProjectSettings(ctx, cwd, "", settings, parsed.ProjectTrustOverride); err != nil {
+		return err
+	}
 	diagnostics, err := settings.DrainErrors()
 	if err != nil {
 		return err
@@ -433,7 +436,16 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	if manager == nil {
 		return nil
 	}
-	cwd = manager.GetCWD()
+	if nextCWD := manager.GetCWD(); nextCWD != cwd {
+		cwd = nextCWD
+		settings, err = NewSettingsManager(cwd, nil)
+		if err != nil {
+			return err
+		}
+		if err = prepareHeadlessProjectSettings(ctx, cwd, "", settings, parsed.ProjectTrustOverride); err != nil {
+			return err
+		}
+	}
 	if parsed.Name != nil {
 		if _, err := manager.AppendSessionInfo(*parsed.Name); err != nil {
 			return err
@@ -459,6 +471,7 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	}
 	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
 		CWD:             cwd,
+		NoContextFiles:  parsed.NoContextFiles,
 		Provider:        ai.ProviderID(optionalHeadlessString(parsed.Provider)),
 		Model:           optionalHeadlessString(parsed.Model),
 		APIKey:          parsed.APIKey,

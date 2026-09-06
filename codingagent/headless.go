@@ -29,21 +29,23 @@ type HeadlessOutcome struct {
 
 // CreateHeadlessSessionOptions contains the explicit Headless product inputs.
 type CreateHeadlessSessionOptions struct {
-	CWD             string
-	AgentDir        string
-	SettingsManager *SettingsManager
-	SessionDir      *string
-	Provider        ai.ProviderID
-	Model           string
-	APIKey          *string
-	Environment     ai.ProviderEnv
-	BaseURL         *string
-	Thinking        agent.ThinkingLevel
-	Tools           []string
-	ExcludeTools    []string
-	NoTools         NoToolsMode
-	SystemPrompt    *string
-	SessionManager  *SessionManager
+	ProjectTrustOverride ProjectTrustDecision
+	NoContextFiles       bool
+	CWD                  string
+	AgentDir             string
+	SettingsManager      *SettingsManager
+	SessionDir           *string
+	Provider             ai.ProviderID
+	Model                string
+	APIKey               *string
+	Environment          ai.ProviderEnv
+	BaseURL              *string
+	Thinking             agent.ThinkingLevel
+	Tools                []string
+	ExcludeTools         []string
+	NoTools              NoToolsMode
+	SystemPrompt         *string
+	SessionManager       *SessionManager
 }
 
 // CreateHeadlessSession assembles an AgentSession from explicit inputs and the
@@ -64,6 +66,11 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		var err error
 		settings, err = NewSettingsManager(options.CWD, dir)
 		if err != nil {
+			return nil, err
+		}
+	}
+	if options.SettingsManager == nil || options.ProjectTrustOverride != nil {
+		if err := prepareHeadlessProjectSettings(ctx, options.CWD, options.AgentDir, settings, options.ProjectTrustOverride); err != nil {
 			return nil, err
 		}
 	}
@@ -166,12 +173,29 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if options.SystemPrompt != nil {
 		promptOptions.CustomPrompt = *options.SystemPrompt
 	}
+	if !options.NoContextFiles {
+		dir := options.AgentDir
+		if dir == "" {
+			dir, err = GetAgentDir()
+			if err != nil {
+				return nil, err
+			}
+		}
+		promptOptions.ContextFiles, err = LoadProjectContextFiles(ctx, options.CWD, dir)
+		if err != nil {
+			created.Session.Dispose()
+			return nil, err
+		}
+	}
 	created.Session.Agent().SetSystemPrompt(buildSystemPrompt(promptOptions))
 	factory := func(ctx context.Context, next CreateAgentSessionRuntimeOptions) (CreateAgentSessionRuntimeResult, error) {
 		config := options
 		config.CWD = next.CWD
 		config.SessionManager = next.SessionManager
 		config.SettingsManager = settings
+		if next.CWD != options.CWD {
+			config.SettingsManager = nil
+		}
 		runtime, err := CreateHeadlessSession(ctx, config)
 		if err != nil {
 			return CreateAgentSessionRuntimeResult{}, err

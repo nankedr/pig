@@ -14,14 +14,32 @@ import (
 type SettingsManager struct{ *settingsManagerState }
 
 type settingsManagerState struct {
-	mu                      sync.Mutex
-	storage                 SettingsStorage
-	global, settings, dirty map[string]json.RawMessage
-	loadError               error
-	errors                  []error
+	mu                               sync.Mutex
+	storage                          SettingsStorage
+	global, project, settings, dirty map[string]json.RawMessage
+	projectTrusted                   bool
+	loadError                        error
+	errors                           []error
 }
 
 type fileSettingsStorage struct{ path string }
+
+type projectSettingsStorage struct {
+	global fileSettingsStorage
+	cwd    string
+}
+
+func (s projectSettingsStorage) WithLock(scope SettingsScope, fn func(*string) *string) {
+	if scope == SettingsScopeGlobal {
+		s.global.WithLock(scope, fn)
+		return
+	}
+	cwd, err := resolveSessionPath(s.cwd)
+	if err != nil {
+		panic(err)
+	}
+	fileSettingsStorage{path: filepath.Join(cwd, ".pig", "settings.json")}.WithLock(scope, fn)
+}
 
 func (s fileSettingsStorage) WithLock(_ SettingsScope, fn func(*string) *string) {
 	// Read-only construction must not create the state directory.
@@ -73,13 +91,17 @@ func (s fileSettingsStorage) WithLock(_ SettingsScope, fn func(*string) *string)
 
 type memorySettingsStorage struct{ value *string }
 
-func (s *memorySettingsStorage) WithLock(_ SettingsScope, fn func(*string) *string) {
+func (s *memorySettingsStorage) WithLock(scope SettingsScope, fn func(*string) *string) {
+	if scope == SettingsScopeProject {
+		fn(nil)
+		return
+	}
 	if next := fn(s.value); next != nil {
 		s.value = next
 	}
 }
 
-func NewSettingsManager(_ string, agentDir *string, options ...SettingsManagerCreateOptions) (*SettingsManager, error) {
+func NewSettingsManager(cwd string, agentDir *string, options ...SettingsManagerCreateOptions) (*SettingsManager, error) {
 	var dir string
 	var err error
 	if agentDir == nil {
@@ -90,19 +112,20 @@ func NewSettingsManager(_ string, agentDir *string, options ...SettingsManagerCr
 	if err != nil {
 		return nil, err
 	}
-	return NewSettingsManagerFromStorage(fileSettingsStorage{filepath.Join(dir, "settings.json")}, options...)
+	return NewSettingsManagerFromStorage(projectSettingsStorage{global: fileSettingsStorage{path: filepath.Join(dir, "settings.json")}, cwd: cwd}, options...)
 }
 func NewSettingsManagerFromStorage(storage SettingsStorage, options ...SettingsManagerCreateOptions) (*SettingsManager, error) {
 	if len(options) > 1 {
 		return nil, fmt.Errorf("expected at most one SettingsManagerCreateOptions")
 	}
-	if len(options) == 1 && options[0].ProjectTrusted != nil && *options[0].ProjectTrusted {
-		return nil, notImplemented("SettingsManager.ProjectTrusted")
-	}
+
 	if storage == nil {
 		return nil, fmt.Errorf("settings storage must not be nil")
 	}
 	m := &SettingsManager{&settingsManagerState{storage: storage, global: map[string]json.RawMessage{}, dirty: map[string]json.RawMessage{}}}
+	if len(options) == 1 && options[0].ProjectTrusted != nil {
+		m.projectTrusted = *options[0].ProjectTrusted
+	}
 	m.reload()
 	return m, nil
 }
@@ -114,7 +137,10 @@ func NewInMemorySettingsManager(settings Settings, options ...SettingsManagerCre
 	text := string(data)
 	return NewSettingsManagerFromStorage(&memorySettingsStorage{value: &text}, options...)
 }
-func settingsWithLock(storage SettingsStorage, fn func(*string) *string) (err error) {
+func settingsWithLock(storage SettingsStorage, fn func(*string) *string) error {
+	return settingsScopeWithLock(storage, SettingsScopeGlobal, fn)
+}
+func settingsScopeWithLock(storage SettingsStorage, scope SettingsScope, fn func(*string) *string) (err error) {
 	defer func() {
 		if failure := recover(); failure != nil {
 			if e, ok := failure.(error); ok {
@@ -124,7 +150,7 @@ func settingsWithLock(storage SettingsStorage, fn func(*string) *string) (err er
 			}
 		}
 	}()
-	storage.WithLock(SettingsScopeGlobal, fn)
+	storage.WithLock(scope, fn)
 	return nil
 }
 func parseSettings(current *string) map[string]json.RawMessage {
@@ -215,7 +241,8 @@ func (m SettingsManager) reload() {
 		m.record(m.loadError)
 	}
 	m.dirty = map[string]json.RawMessage{}
-	m.settings = mergeSettings(m.global, nil)
+	m.loadProject()
+	m.settings = mergeSettings(m.global, m.project)
 }
 func (m SettingsManager) Reload(ctx context.Context) error {
 	if err := m.ready(); err != nil {
@@ -289,13 +316,54 @@ func (m SettingsManager) GetGlobalSettings() (Settings, error) {
 	err = json.Unmarshal(data, &settings)
 	return settings, err
 }
-func (m SettingsManager) GetProjectSettings() (Settings, error) { return Settings{}, m.ready() }
-func (m SettingsManager) IsProjectTrusted() (bool, error)       { return false, m.ready() }
-func (m SettingsManager) SetProjectTrusted(trusted bool) error {
-	if trusted {
-		return notImplemented("SettingsManager.SetProjectTrusted")
+func (m SettingsManager) GetProjectSettings() (Settings, error) {
+	if err := m.ready(); err != nil {
+		return Settings{}, err
 	}
-	return m.ready()
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	data, err := json.Marshal(m.project)
+	if err != nil {
+		return Settings{}, err
+	}
+	var result Settings
+	err = json.Unmarshal(data, &result)
+	return result, err
+}
+func (m SettingsManager) IsProjectTrusted() (bool, error) {
+	if err := m.ready(); err != nil {
+		return false, err
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.projectTrusted, nil
+}
+func (m SettingsManager) loadProject() {
+	if !m.projectTrusted {
+		m.project = map[string]json.RawMessage{}
+		return
+	}
+	var loaded map[string]json.RawMessage
+	err := settingsScopeWithLock(m.storage, SettingsScopeProject, func(current *string) *string { loaded = parseSettings(current); return nil })
+	if err != nil {
+		m.errors = append(m.errors, fmt.Errorf("project settings: %w", err))
+	} else {
+		m.project = loaded
+	}
+}
+func (m SettingsManager) SetProjectTrusted(trusted bool) error {
+	if err := m.ready(); err != nil {
+		return err
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.projectTrusted == trusted {
+		return nil
+	}
+	m.projectTrusted = trusted
+	m.loadProject()
+	m.settings = mergeSettings(m.global, m.project)
+	return nil
 }
 func (m SettingsManager) set(fields map[string]json.RawMessage, nested bool) error {
 	if err := m.ready(); err != nil {
@@ -312,7 +380,7 @@ func (m SettingsManager) set(fields map[string]json.RawMessage, nested bool) err
 			m.dirty[key] = value
 		}
 	}
-	m.settings = mergeSettings(m.global, nil)
+	m.settings = mergeSettings(m.global, m.project)
 	if m.loadError != nil {
 		return nil
 	}

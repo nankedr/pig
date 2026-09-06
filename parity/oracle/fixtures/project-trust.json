@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/trust-manager.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/codingagent/project-trust",
+    "catalog_id": "contract:security/project-trust",
+    "surface": "go-sdk",
+    "input": {
+      "projection": "Locked Pi trust resource existence and nearest ancestor persistent decisions; Pig identity replaces .pi with .pig."
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "resources": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "decisions": [
+        null,
+        true,
+        false,
+        true
+      ],
+      "nearestParent": true
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:b092a4b04c166b03ebd494ac71f1594a1d7c8405d3970758dfd4322e58ba7d39",
+  "observation_hash": "sha256:890b66160fdba8152872bfb43645b0f51a29f829a054bf2b50603e3a6cde1e3f",
+  "execution_method": "node --experimental-strip-types parity/oracle/project-trust.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/trust-manager.ts"
+  }
+}

@@ -114,10 +114,6 @@ func NewDefaultResourceLoader(DefaultResourceLoaderOptions) (*DefaultResourceLoa
 	return nil, notImplemented("NewDefaultResourceLoader")
 }
 
-func LoadProjectContextFiles(context.Context, string, string) ([]AgentsFile, error) {
-	return nil, notImplemented("LoadProjectContextFiles")
-}
-
 func (DefaultResourceLoader) GetExtensions() (LoadExtensionsResult, error) {
 	return LoadExtensionsResult{}, notImplemented("DefaultResourceLoader.GetExtensions")
 }

@@ -207,3 +207,40 @@ func headlessAvailableModels(ctx context.Context, models ai.Models) ([]ai.Model,
 	}
 	return available, nil
 }
+
+func prepareHeadlessProjectSettings(ctx context.Context, cwd, agentDir string, settings *SettingsManager, override ProjectTrustDecision) error {
+	trusted := false
+	if override != nil {
+		trusted = *override
+	} else {
+		resources, err := HasTrustRequiringProjectResources(ctx, cwd)
+		if err != nil {
+			return err
+		}
+		if !resources {
+			trusted = true
+		} else {
+			if agentDir == "" {
+				var err error
+				agentDir, err = GetAgentDir()
+				if err != nil {
+					return err
+				}
+			}
+			decision, err := NewProjectTrustStore(agentDir).Get(ctx, cwd)
+			if err != nil {
+				return err
+			}
+			if decision != nil {
+				trusted = *decision
+			} else {
+				global, err := settings.GetGlobalSettings()
+				if err != nil {
+					return err
+				}
+				trusted = global.DefaultProjectTrust != nil && *global.DefaultProjectTrust == DefaultProjectTrustAlways
+			}
+		}
+	}
+	return settings.SetProjectTrusted(trusted)
+}

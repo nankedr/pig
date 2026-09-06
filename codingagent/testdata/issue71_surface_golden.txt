@@ -1,5 +1,7 @@
 type codingagent.CreateHeadlessSessionOptions struct
 fields:
+- ProjectTrustOverride *bool tag=""
+- NoContextFiles bool tag=""
 - CWD string tag=""
 - AgentDir string tag=""
 - SettingsManager *codingagent.SettingsManager tag=""

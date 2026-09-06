@@ -1,0 +1,33 @@
+type codingagent.ProjectTrustStoreEntry
+- Path string ""
+- Decision bool ""
+type codingagent.ProjectTrustUpdate
+- Path string ""
+- Decision *bool ""
+type codingagent.SettingsManagerCreateOptions
+- ProjectTrusted *bool ""
+type codingagent.CreateHeadlessSessionOptions
+- ProjectTrustOverride *bool ""
+- NoContextFiles bool ""
+- CWD string ""
+- AgentDir string ""
+- SettingsManager *codingagent.SettingsManager ""
+- SessionDir *string ""
+- Provider ai.ProviderID ""
+- Model string ""
+- APIKey *string ""
+- Environment ai.ProviderEnv ""
+- BaseURL *string ""
+- Thinking ai.ModelThinkingLevel ""
+- Tools []string ""
+- ExcludeTools []string ""
+- NoTools codingagent.NoToolsMode ""
+- SystemPrompt *string ""
+- SessionManager *codingagent.SessionManager ""
+method Get func(codingagent.ProjectTrustStore, context.Context, string) (*bool, error)
+method GetEntry func(codingagent.ProjectTrustStore, context.Context, string) (*codingagent.ProjectTrustStoreEntry, error)
+method Set func(codingagent.ProjectTrustStore, context.Context, string, *bool) error
+method SetMany func(codingagent.ProjectTrustStore, context.Context, []codingagent.ProjectTrustUpdate) error
+func(string) *codingagent.ProjectTrustStore
+func(context.Context, string) (bool, error)
+func(context.Context, string, string) ([]codingagent.AgentsFile, error)

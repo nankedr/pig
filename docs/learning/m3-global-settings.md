@@ -33,7 +33,7 @@ setter 在目录锁内重读配置，只写回修改字段，并保留外部进�
 
 ## 当前边界
 
-本切片完全不探测项目 settings，包括 sessionDir、httpProxy、默认 trust 等字段。`ProjectTrusted: true` 和项目写入返回 Capability Stub；默认只读全局设置。全局 `defaultProjectTrust: "always"` 也不会打开项目读取，遵循 ADR-0010。
+M3.5 已加入 [Project Trust](m3-project-trust.md)：默认 SettingsManager 只读全局设置，Headless 判定信任后才读取项目 settings，包括 sessionDir。显式 `ProjectTrusted: true` 可允许读取；项目写入仍是 Capability Stub。全局 `defaultProjectTrust: "always"` 参与判定，项目中的同名字段不能自我授权。
 
 未来的 UI、compaction、retry、shell、analytics 等配置只保留数据语义，不启动相关行为。需要资源或代理运行时的非空 packages、extensions、skills、prompts、themes、httpProxy 配置会明确报 Capability Stub。保存 analytics 开关不会启动外联。
 

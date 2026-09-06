@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9650
+- Total entries: 9651
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5169 |
 | scaffolded | 4020 |
-| partial | 238 |
+| partial | 239 |
 | implemented | 54 |
 | verified | 167 |
 | deferred | 2 |
@@ -7949,7 +7949,7 @@
 | symbol:codingagent/src/core/trust-manager.ts#ProjectTrustStore | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.ProjectTrustStore | coding-agent |
 | symbol:codingagent/src/core/trust-manager.ts#ProjectTrustStoreEntry | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.ProjectTrustStoreEntry | coding-agent |
 | symbol:codingagent/src/core/trust-manager.ts#ProjectTrustUpdate | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.ProjectTrustUpdate | coding-agent |
-| symbol:codingagent/src/core/trust-manager.ts#hasTrustRequiringProjectResources | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.HasTrustRequiringProjectResources | coding-agent |
+| symbol:codingagent/src/core/trust-manager.ts#hasTrustRequiringProjectResources | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.HasTrustRequiringProjectResources | coding-agent |
 | symbol:codingagent/src/main.ts#MainOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.MainOptions | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/armin.ts#ArminComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ArminComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.AssistantMessageComponent | coding-agent |
@@ -8025,6 +8025,7 @@
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
 | contract:config/settings | partial | M3 | contract | github.com/nankedr/pig/codingagent.SettingsManager | coding-agent |
+| contract:security/project-trust | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateHeadlessSession | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |

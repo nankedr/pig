@@ -51,6 +51,8 @@ type codingagent.Settings
 type codingagent.SettingsManagerCreateOptions
 - ProjectTrusted *bool ""
 type codingagent.CreateHeadlessSessionOptions
+- ProjectTrustOverride *bool ""
+- NoContextFiles bool ""
 - CWD string ""
 - AgentDir string ""
 - SettingsManager *codingagent.SettingsManager ""

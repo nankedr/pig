@@ -131,12 +131,6 @@ func TestSettingsResourcePackageAndTrustStubsDoNotTouchHostState(t *testing.T) {
 	env := newSDKSentinelEnvironment(t)
 	ctx := context.Background()
 
-	trusted := true
-	settings, err := codingagent.NewSettingsManager(env.cwd, &env.agentDir, codingagent.SettingsManagerCreateOptions{ProjectTrusted: &trusted})
-	assertCodingAgentNotImplemented(t, err, "SettingsManager.ProjectTrusted")
-	if settings != nil {
-		t.Fatalf("NewSettingsManager result = %#v, want nil", settings)
-	}
 	var zeroSettings codingagent.SettingsManager
 	if zeroSettings.Reload(ctx) == nil {
 		t.Fatal("uninitialized settings reload succeeded")
@@ -152,14 +146,6 @@ func TestSettingsResourcePackageAndTrustStubsDoNotTouchHostState(t *testing.T) {
 	if !reflect.DeepEqual(resolved, codingagent.ResolvedPaths{}) {
 		t.Fatalf("Resolve result = %#v, want zero value", resolved)
 	}
-
-	store := codingagent.NewProjectTrustStore(env.agentDir)
-	decision, err := store.Get(ctx, env.cwd)
-	assertCodingAgentNotImplemented(t, err, "ProjectTrustStore.Get")
-	if decision != nil {
-		t.Fatalf("Get decision = %#v, want nil", decision)
-	}
-	assertCodingAgentNotImplemented(t, store.Set(ctx, env.cwd, codingagent.ProjectTrustDecisionTrusted()), "ProjectTrustStore.Set")
 
 	env.assertUnchanged(t)
 }
@@ -245,7 +231,6 @@ func TestAmbientStateCapabilityStubsCannotImportHostIO(t *testing.T) {
 		"sdk.go",
 		"session_services.go",
 		"settings.go",
-		"trust.go",
 	} {
 		file, err := parser.ParseFile(token.NewFileSet(), filepath.Join(packageDir, name), nil, parser.ImportsOnly)
 		if err != nil {

@@ -189,8 +189,15 @@ func TestSettingsLoadWriteFailuresAndUntrustedBoundary(t *testing.T) {
 	if _, err := os.Stat(dir); !os.IsNotExist(err) {
 		t.Fatalf("read created directory: %v", err)
 	}
-	if err = manager.SetProjectTrusted(true); err == nil {
-		t.Fatal("future project loading succeeded")
+	if err = manager.SetProjectTrusted(true); err != nil {
+		t.Fatal(err)
+	}
+	diagnostics, err := manager.DrainErrors()
+	if err != nil || len(diagnostics) != 1 || !strings.HasPrefix(diagnostics[0].Error(), "project settings:") {
+		t.Fatalf("invalid project diagnostic: %v %v", diagnostics, err)
+	}
+	if err = manager.SetProjectTrusted(false); err != nil {
+		t.Fatal(err)
 	}
 	if err = manager.SetProjectPackages([]codingagent.PackageSource{codingagent.StringPackageSource("npm:never")}); err == nil {
 		t.Fatal("project save succeeded")
