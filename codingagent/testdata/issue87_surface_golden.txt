@@ -1,0 +1,24 @@
+method SetModel func(*codingagent.AgentSession, ai.Model) error
+method CycleModel func(*codingagent.AgentSession, context.Context, ...codingagent.ModelCycleDirection) (*codingagent.ModelCycleResult, error)
+method ScopedModels func(*codingagent.AgentSession) []codingagent.ScopedModel
+method SetScopedModels func(*codingagent.AgentSession, []codingagent.ScopedModel) error
+method SetThinkingLevel func(*codingagent.AgentSession, ai.ModelThinkingLevel) error
+method CycleThinkingLevel func(*codingagent.AgentSession) (ai.ModelThinkingLevel, error)
+method GetAvailableThinkingLevels func(*codingagent.AgentSession) ([]ai.ModelThinkingLevel, error)
+method SupportsThinking func(*codingagent.AgentSession) (bool, error)
+method SetActiveToolsByName func(*codingagent.AgentSession, []string) error
+method GetActiveToolNames func(*codingagent.AgentSession) []string
+method GetAllTools func(*codingagent.AgentSession) []agent.ErasedAgentTool
+type codingagent.ScopedModel struct
+fields:
+- Model ai.Model tag=""
+- ThinkingLevel ai.ModelThinkingLevel tag=""
+type codingagent.ModelCycleResult struct
+fields:
+- IsScoped bool tag=""
+- Model ai.Model tag=""
+- ThinkingLevel ai.ModelThinkingLevel tag=""
+type codingagent.AgentSessionThinkingLevelChangedEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Level ai.ModelThinkingLevel tag="json:\"level\""

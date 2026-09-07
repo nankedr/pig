@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9660
+- Total entries: 9661
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5168 |
-| scaffolded | 4012 |
-| partial | 251 |
+| scaffolded | 4001 |
+| partial | 263 |
 | implemented | 60 |
 | verified | 167 |
 | deferred | 2 |
@@ -6296,8 +6296,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.clearQueue | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ClearQueue | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.compact | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Compact | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.createReplacedSessionContext | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CreateReplacedSessionContext | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.cycleModel | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleModel | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.cycleThinkingLevel | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.dispose | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Dispose | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.executeBash | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.exportToHtml | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExportToHTML | coding-agent |
@@ -6305,9 +6303,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.extensionRunner | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExtensionRunner | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.followUp | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.FollowUp | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.followUpMode | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.FollowUpMode | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.getActiveToolNames | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetActiveToolNames | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.getAllTools | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAllTools | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.getAvailableThinkingLevels | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAvailableThinkingLevels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getContextUsage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetContextUsage | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getFollowUpMessages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetFollowUpMessages | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getLastAssistantText | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetLastAssistantText | coding-agent |
@@ -6331,27 +6326,21 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.recordBashResult | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.RecordBashResult | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.reload | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Reload | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.resourceLoader | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ResourceLoader | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.scopedModels | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ScopedModels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.sendCustomMessage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SendCustomMessage | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.sendUserMessage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SendUserMessage | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.sessionFile | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SessionFile | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.sessionId | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SessionID | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.sessionManager | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SessionManager | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.sessionName | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SessionName | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.setActiveToolsByName | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetActiveToolsByName | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setAutoCompactionEnabled | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetAutoCompactionEnabled | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setFollowUpMode | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetFollowUpMode | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.setModel | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.setScopedModels | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetScopedModels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setSessionName | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetSessionName | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setSteeringMode | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetSteeringMode | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.setThinkingLevel | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.settingsManager | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SettingsManager | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.state | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.State | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.steer | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Steer | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.steeringMode | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SteeringMode | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.subscribe | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Subscribe | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.supportsThinking | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SupportsThinking | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.systemPrompt | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SystemPrompt | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.thinkingLevel | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.waitForIdle | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.WaitForIdle | coding-agent |
@@ -8022,6 +8011,7 @@
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
+| contract:codingagent/session-configuration | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
 | contract:codingagent/session-messages | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession | coding-agent |
 | contract:codingagent/turn-retry | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
 | contract:codingagent/write-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateWriteTool | coding-agent |
@@ -8030,6 +8020,17 @@
 | contract:model-runtime/basic | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewModelRuntime | coding-agent |
 | contract:security/project-trust | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateHeadlessSession | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.cycleModel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleModel | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.cycleThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleThinkingLevel | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.getActiveToolNames | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetActiveToolNames | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.getAllTools | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAllTools | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.getAvailableThinkingLevels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAvailableThinkingLevels | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.scopedModels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ScopedModels | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.setActiveToolsByName | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetActiveToolsByName | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.setModel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.setScopedModels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetScopedModels | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.setThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetThinkingLevel | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.supportsThinking | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SupportsThinking | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |

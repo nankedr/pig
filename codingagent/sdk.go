@@ -227,10 +227,16 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 	for i := range tools {
 		activeToolNames[i] = tools[i].Name
 	}
+	allowedTools := config.Tools
+	if allowedTools == nil && config.NoTools == NoToolsAll {
+		allowedTools = []string{}
+	}
 	session := NewAgentSession(AgentSessionConfig{
 		Agent:                  created,
 		CWD:                    config.CWD,
 		InitialActiveToolNames: activeToolNames,
+		AllowedToolNames:       allowedTools,
+		ExcludedToolNames:      config.ExcludeTools,
 		ModelRuntime:           config.ModelRuntime,
 		ResourceLoader:         config.ResourceLoader,
 		ScopedModels:           config.ScopedModels,
@@ -238,6 +244,8 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 		SessionStartEvent:      config.SessionStartEvent,
 		SettingsManager:        config.SettingsManager,
 	})
+	session.allTools = cloneSessionTools(selectAgentTools(config.AgentTools, allowedTools, config.ExcludeTools, ""))
+	session.runtimeStream = runtimePath
 	if err := configureSessionPrompt(ctx, session, CreateHeadlessSessionOptions{CWD: config.CWD, AgentDir: config.AgentDir, NoContextFiles: !runtimePath}); err != nil {
 		session.Dispose()
 		return CreateAgentSessionResult{}, err

@@ -83,3 +83,5 @@ Telemetry 文档需要区分两个概念：`telemetry` Supporting Module 是默�
 - [M3.6 canonical 凭证恢复](learning/m3-credentials.md) 与 [TypeScript → Go](mappings/typescript-to-go/m3-credentials.md)
 
 - [M4.2 find/ls 定位与回读](learning/m4-find-ls.md) · [TypeScript→Go](mappings/typescript-to-go/m4-find-ls.md) · [Go 示例](../examples/find-ls-read/main.go)
+
+M4.5 支持会话模型、thinking 和工具集切换，见 [配置切换](learning/m4-session-configuration.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-session-configuration.md)。

@@ -276,6 +276,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if err != nil {
 		return nil, err
 	}
+	created.Session.runtimeStream = true
 	if err = configureSessionPrompt(ctx, created.Session, options); err != nil {
 		created.Session.Dispose()
 		return nil, err
@@ -315,18 +316,7 @@ func configureSessionPrompt(ctx context.Context, session *AgentSession, options 
 			"grep":  grepPromptSnippet,
 		},
 	}
-	if containsTool(activeTools, "read", false) {
-		promptOptions.PromptGuidelines = []string{"Use read to examine files instead of cat or sed."}
-	}
-	if containsTool(activeTools, "edit", false) {
-		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, editPromptGuidelines...)
-	}
-	if containsTool(activeTools, "write", false) {
-		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, "Use write only for new files or complete rewrites.")
-	}
-	if containsTool(activeTools, "bash", false) {
-		promptOptions.PromptGuidelines = append(promptOptions.PromptGuidelines, "You can inspect PIG_* environment variables for current model and session details.")
-	}
+	promptOptions.PromptGuidelines = sessionToolGuidelines(activeTools)
 
 	if options.SystemPrompt != nil {
 		promptOptions.CustomPrompt = *options.SystemPrompt
@@ -345,7 +335,10 @@ func configureSessionPrompt(ctx context.Context, session *AgentSession, options 
 			return err
 		}
 	}
+	session.mu.Lock()
+	session.promptOptions = promptOptions
 	session.Agent().SetSystemPrompt(buildSystemPrompt(promptOptions))
+	session.mu.Unlock()
 	return nil
 }
 
@@ -487,4 +480,22 @@ func (s *AgentSession) headlessOutcome() HeadlessOutcome {
 		return outcome
 	}
 	return headlessOutcome(s.Messages())
+}
+
+func sessionToolGuidelines(names []string) []string {
+	var guidelines []string
+	if containsTool(names, "read", false) {
+		guidelines = []string{"Use read to examine files instead of cat or sed."}
+	}
+	if containsTool(names, "edit", false) {
+		guidelines = append(guidelines, editPromptGuidelines...)
+	}
+	if containsTool(names, "write", false) {
+		guidelines = append(guidelines, "Use write only for new files or complete rewrites.")
+	}
+	if containsTool(names, "bash", false) {
+		guidelines = append(guidelines, "You can inspect PIG_* environment variables for current model and session details.")
+	}
+
+	return guidelines
 }

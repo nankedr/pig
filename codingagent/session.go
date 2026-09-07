@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 
@@ -443,6 +444,10 @@ type AgentSession struct {
 	sessionStartEvent                  *SessionStartEvent
 	scopedModels                       []ScopedModel
 	activeToolNames                    []string
+	allTools                           []agent.ErasedAgentTool
+	promptOptions                      BuildSystemPromptOptions
+	runtimeStream                      bool
+	configurationNotifying             bool
 	autoCompactionEnabled              bool
 	retryAttempt                       int
 	retryCancel                        context.CancelFunc
@@ -469,6 +474,15 @@ func NewAgentSession(config AgentSessionConfig) *AgentSession {
 	}
 	s := &AgentSession{agent: config.Agent, sessionManager: config.SessionManager, settingsManager: config.SettingsManager, resourceLoader: config.ResourceLoader, modelRuntime: config.ModelRuntime, extensionRunner: config.ExtensionRunnerRef, sessionStartEvent: config.SessionStartEvent, scopedModels: cloneScopedModels(config.ScopedModels), activeToolNames: append([]string(nil), config.InitialActiveToolNames...), listeners: make(map[uint64]AgentSessionEventListener), idle: idle}
 	if s.agent != nil {
+		tools := s.agent.State().Tools
+		if config.BaseToolsOverride != nil {
+			tools = nil
+			for _, tool := range config.BaseToolsOverride {
+				tools = append(tools, tool)
+			}
+			sort.Slice(tools, func(i, j int) bool { return tools[i].Name < tools[j].Name })
+		}
+		s.allTools = cloneSessionTools(selectAgentTools(tools, config.AllowedToolNames, config.ExcludedToolNames, ""))
 		s.unsubscribeAgent = s.agent.Subscribe(s.handleAgentEvent)
 	}
 	return s
@@ -480,9 +494,13 @@ func (s *AgentSession) ResourceLoader() ResourceLoader    { return s.resourceLoa
 func (s *AgentSession) ModelRuntime() *ModelRuntime       { return s.modelRuntime }
 func (s *AgentSession) ExtensionRunner() *ExtensionRunner { return s.extensionRunner }
 func (s *AgentSession) ScopedModels() []ScopedModel {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	return cloneScopedModels(s.scopedModels)
 }
 func (s *AgentSession) State() agent.AgentState {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	if s.agent == nil {
 		return agent.AgentState{}
 	}
@@ -552,13 +570,14 @@ func (s *AgentSession) FollowUpMode() agent.QueueMode {
 	return s.agent.FollowUpMode()
 }
 func (s *AgentSession) GetActiveToolNames() []string {
-	return append([]string(nil), s.activeToolNames...)
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return append([]string{}, s.activeToolNames...)
 }
 func (s *AgentSession) GetAllTools() []agent.ErasedAgentTool {
-	if s.agent == nil {
-		return nil
-	}
-	return s.agent.State().Tools
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return cloneSessionTools(s.allTools)
 }
 func (s *AgentSession) WaitForIdle(ctx context.Context) error {
 	s.mu.RLock()
@@ -673,6 +692,11 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		s.mu.Unlock()
 		cancel(nil)
 		return fmt.Errorf("AgentSession is disposed")
+	}
+	if s.configurationNotifying {
+		s.mu.Unlock()
+		cancel(nil)
+		return fmt.Errorf("AgentSession is delivering configuration notifications")
 	}
 	if s.active {
 		var delivery UserMessageDelivery
@@ -885,12 +909,6 @@ func (s *AgentSession) Compact(context.Context, ...string) (CompactionResult, er
 func (s *AgentSession) CreateReplacedSessionContext() (ExtensionCommandContext, error) {
 	return ExtensionCommandContext{}, notImplemented("AgentSession.CreateReplacedSessionContext")
 }
-func (s *AgentSession) CycleModel(context.Context, ...ModelCycleDirection) (*ModelCycleResult, error) {
-	return nil, notImplemented("AgentSession.CycleModel")
-}
-func (s *AgentSession) CycleThinkingLevel() (agent.ThinkingLevel, error) {
-	return "", notImplemented("AgentSession.CycleThinkingLevel")
-}
 func (s *AgentSession) ExecuteBash(context.Context, string, ...ExecuteBashOptions) (BashResult, error) {
 	return BashResult{}, notImplemented("AgentSession.ExecuteBash")
 }
@@ -899,9 +917,6 @@ func (s *AgentSession) ExportToHTML(context.Context, ...string) (string, error) 
 }
 func (s *AgentSession) ExportToJSONL(...string) (string, error) {
 	return "", notImplemented("AgentSession.ExportToJSONL")
-}
-func (*AgentSession) GetAvailableThinkingLevels() ([]agent.ThinkingLevel, error) {
-	return nil, notImplemented("AgentSession.GetAvailableThinkingLevels")
 }
 func (*AgentSession) GetContextUsage() (*ContextUsage, error) {
 	return nil, notImplemented("AgentSession.GetContextUsage")
@@ -961,18 +976,11 @@ func (s *AgentSession) RecordBashResult(string, BashResult, ...RecordBashResultO
 	return notImplemented("AgentSession.RecordBashResult")
 }
 func (s *AgentSession) Reload(context.Context) error { return notImplemented("AgentSession.Reload") }
-func (s *AgentSession) SetActiveToolsByName([]string) error {
-	return notImplemented("AgentSession.SetActiveToolsByName")
-}
 func (s *AgentSession) SetAutoCompactionEnabled(bool) error {
 	return notImplemented("AgentSession.SetAutoCompactionEnabled")
 }
 func (s *AgentSession) SetAutoRetryEnabled(enabled bool) error {
 	return s.settingsManager.SetRetryEnabled(enabled)
-}
-func (s *AgentSession) SetModel(ai.Model) error { return notImplemented("AgentSession.SetModel") }
-func (s *AgentSession) SetScopedModels([]ScopedModel) error {
-	return notImplemented("AgentSession.SetScopedModels")
 }
 func (s *AgentSession) SetSessionName(name string) error {
 	if s.sessionManager == nil {
@@ -980,12 +988,6 @@ func (s *AgentSession) SetSessionName(name string) error {
 	}
 	_, err := s.sessionManager.AppendSessionInfo(name)
 	return err
-}
-func (s *AgentSession) SetThinkingLevel(agent.ThinkingLevel) error {
-	return notImplemented("AgentSession.SetThinkingLevel")
-}
-func (*AgentSession) SupportsThinking() (bool, error) {
-	return false, notImplemented("AgentSession.SupportsThinking")
 }
 
 var skillBlockPattern = regexp.MustCompile(`(?s)^<skill name="([^"]+)" location="([^"]+)">\n(.*?)\n</skill>(?:\n\n(.+))?$`)

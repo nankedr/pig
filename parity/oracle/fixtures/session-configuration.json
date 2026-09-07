@@ -1,0 +1,328 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/session-configuration",
+    "catalog_id": "contract:codingagent/session-configuration",
+    "surface": "go-sdk",
+    "input": {
+      "models": [
+        {
+          "id": "deepseek-v4-flash",
+          "provider": "deepseek",
+          "reasoning": true
+        },
+        {
+          "id": "deepseek-v4-pro",
+          "provider": "deepseek",
+          "reasoning": false
+        },
+        {
+          "id": "deepseek-v4-flash",
+          "provider": "deepseek",
+          "reasoning": true,
+          "thinkingLevelMap": {
+            "xhigh": "xhigh",
+            "max": "max"
+          }
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "states": [
+        {
+          "label": "high",
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "levels": [
+            "off",
+            "minimal",
+            "low",
+            "medium",
+            "high"
+          ],
+          "supports": true,
+          "tools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ]
+        },
+        {
+          "label": "nonreasoning",
+          "model": "deepseek-v4-pro",
+          "thinking": "off",
+          "levels": [
+            "off"
+          ],
+          "supports": false,
+          "tools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ]
+        },
+        {
+          "label": "scoped-max",
+          "model": "deepseek-v4-flash",
+          "thinking": "max",
+          "levels": [
+            "off",
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ],
+          "supports": true,
+          "tools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ]
+        },
+        {
+          "label": "cycle-off",
+          "model": "deepseek-v4-flash",
+          "thinking": "off",
+          "levels": [
+            "off",
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ],
+          "supports": true,
+          "tools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ]
+        },
+        {
+          "label": "cycle-xhigh",
+          "model": "deepseek-v4-flash",
+          "thinking": "xhigh",
+          "levels": [
+            "off",
+            "minimal",
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ],
+          "supports": true,
+          "tools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ]
+        },
+        {
+          "label": "backward",
+          "model": "deepseek-v4-pro",
+          "thinking": "off",
+          "levels": [
+            "off"
+          ],
+          "supports": false,
+          "tools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ]
+        },
+        {
+          "label": "restore-preference",
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "levels": [
+            "off",
+            "minimal",
+            "low",
+            "medium",
+            "high"
+          ],
+          "supports": true,
+          "tools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ]
+        },
+        {
+          "label": "tools",
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "levels": [
+            "off",
+            "minimal",
+            "low",
+            "medium",
+            "high"
+          ],
+          "supports": true,
+          "tools": [
+            "write",
+            "read"
+          ]
+        },
+        {
+          "label": "empty-tools",
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "levels": [
+            "off",
+            "minimal",
+            "low",
+            "medium",
+            "high"
+          ],
+          "supports": true,
+          "tools": []
+        }
+      ],
+      "requests": [
+        {
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "tools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ],
+          "promptTools": [
+            "read",
+            "bash",
+            "edit",
+            "write"
+          ]
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "tools": [
+            "write",
+            "read"
+          ],
+          "promptTools": [
+            "read",
+            "write"
+          ]
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "thinking": "high",
+          "tools": [],
+          "promptTools": []
+        }
+      ],
+      "events": [
+        "high",
+        "off",
+        "max",
+        "off",
+        "high",
+        "xhigh",
+        "off",
+        "high"
+      ],
+      "entries": [
+        {
+          "type": "model_change",
+          "model": "deepseek-v4-flash"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "off"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "high"
+        },
+        {
+          "type": "model_change",
+          "model": "deepseek-v4-pro"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "off"
+        },
+        {
+          "type": "model_change",
+          "model": "deepseek-v4-flash"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "max"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "off"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "high"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "xhigh"
+        },
+        {
+          "type": "model_change",
+          "model": "deepseek-v4-pro"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "off"
+        },
+        {
+          "type": "model_change",
+          "model": "deepseek-v4-flash"
+        },
+        {
+          "type": "thinking_level_change",
+          "thinking": "high"
+        }
+      ],
+      "single": null,
+      "defaultThinking": "high",
+      "defaultModel": "deepseek-v4-flash"
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:282cf72ef8f9e10bcde5fc93a79ccbd8945f8f710b8a8fb146b12054cf60a263",
+  "observation_hash": "sha256:801b5c12bb26cda6b3f6b9a0e7bdcadfd6997ba9835865e0df6a5e60b1e5ff9e",
+  "execution_method": "node --experimental-strip-types parity/oracle/session-configuration.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts"
+  }
+}

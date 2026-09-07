@@ -139,13 +139,6 @@ func TestAgentSessionExactOperationStubsAreInert(t *testing.T) {
 			}
 			return err
 		}},
-		{name: "cycle model", operation: "AgentSession.CycleModel", call: func() error {
-			result, err := session.CycleModel(context.Background(), codingagent.ModelCycleBackward)
-			if result != nil {
-				t.Errorf("CycleModel result = %#v, want nil", result)
-			}
-			return err
-		}},
 		{name: "execute bash", operation: "AgentSession.ExecuteBash", call: func() error {
 			result, err := session.ExecuteBash(context.Background(), "must not run", codingagent.ExecuteBashOptions{
 				OnChunk:    func(string) { chunkCalls++ },
