@@ -1,0 +1,1481 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts#compact"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/manual-compaction",
+    "catalog_id": "contract:codingagent/compaction",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "name": "history",
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "split",
+          "keep": 1,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "prefix-only",
+          "keep": 1,
+          "prefixOnly": true,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "small",
+          "keep": 10000,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "files",
+          "files": true,
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "update",
+          "update": true,
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "retry",
+          "errors": [
+            "terminated",
+            "503"
+          ],
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "permanent",
+          "errors": [
+            "insufficient_quota"
+          ],
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "exhausted",
+          "errors": [
+            "503",
+            "503",
+            "503"
+          ],
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "disabled",
+          "errors": [
+            "terminated"
+          ],
+          "disabled": true,
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "cancel-retry",
+          "errors": [
+            "terminated"
+          ],
+          "cancel": true,
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low"
+        },
+        {
+          "name": "uncapped",
+          "maxTokens": 0,
+          "keep": 10,
+          "reserve": 100,
+          "thinking": "low"
+        },
+        {
+          "name": "reasoning-off",
+          "thinking": "off",
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60
+        },
+        {
+          "name": "tool-result-summarized",
+          "keep": 10,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low",
+          "toolResult": true
+        },
+        {
+          "name": "tool-result-kept",
+          "keep": 1260,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low",
+          "toolResult": true
+        },
+        {
+          "name": "split-second-error",
+          "keep": 1,
+          "reserve": 100,
+          "maxTokens": 60,
+          "thinking": "low",
+          "errors": [
+            "",
+            "insufficient_quota"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "runs": [
+        {
+          "name": "history",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint",
+            "firstKeptIndex": 2,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 16,
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "split",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            },
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: recent request long enough to keep\n</conversation>\n\nThis is the PREFIX of a turn that was too large to keep. The SUFFIX (recent work) is retained.\n\nSummarize the prefix to provide context for the retained suffix:\n\n## Original Request\n[What did the user ask for in this turn?]\n\n## Early Progress\n- [Key decisions and work done in the prefix]\n\n## Context for Suffix\n- [Information needed to understand the retained recent work]\n\nBe concise. Focus on what's needed to understand the kept suffix."
+                }
+              ],
+              "maxTokens": 50,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint\n\n---\n\n**Turn Context (split turn):**\n\ncheckpoint",
+            "firstKeptIndex": 3,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 19,
+            "usage": {
+              "input": 160,
+              "output": 40,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 200,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint\n\n---\n\n**Turn Context (split turn):**\n\ncheckpoint"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "prefix-only",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: recent request long enough to keep\n</conversation>\n\nThis is the PREFIX of a turn that was too large to keep. The SUFFIX (recent work) is retained.\n\nSummarize the prefix to provide context for the retained suffix:\n\n## Original Request\n[What did the user ask for in this turn?]\n\n## Early Progress\n- [Key decisions and work done in the prefix]\n\n## Context for Suffix\n- [Information needed to understand the retained recent work]\n\nBe concise. Focus on what's needed to understand the kept suffix."
+                }
+              ],
+              "maxTokens": 50,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "No prior history.\n\n---\n\n**Turn Context (split turn):**\n\ncheckpoint",
+            "firstKeptIndex": 1,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 21,
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "No prior history.\n\n---\n\n**Turn Context (split turn):**\n\ncheckpoint"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "small",
+          "requests": [],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": "Compaction failed: Nothing to compact (session too small)"
+            }
+          ],
+          "error": "Nothing to compact (session too small)",
+          "result": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "old request"
+            },
+            {
+              "role": "assistant",
+              "text": "old answer"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change"
+          ]
+        },
+        {
+          "name": "files",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"only-read.go\"); write(path=\"written.go\")\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint\n\n<read-files>\nonly-read.go\n</read-files>\n\n<modified-files>\nshared.go\nwritten.go\n</modified-files>",
+            "firstKeptIndex": 2,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 40,
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [
+                "only-read.go"
+              ],
+              "modifiedFiles": [
+                "shared.go",
+                "written.go"
+              ]
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint\n\n<read-files>\nonly-read.go\n</read-files>\n\n<modified-files>\nshared.go\nwritten.go\n</modified-files>"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "update",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[Assistant]: old answer\n</conversation>\n\n<previous-summary>\nprevious checkpoint\n</previous-summary>\n\nThe messages above are NEW conversation messages to incorporate into the existing summary provided in <previous-summary> tags.\n\nUpdate the existing structured summary with new information. RULES:\n- PRESERVE all existing information from the previous summary\n- ADD new progress, decisions, and context from the new messages\n- UPDATE the Progress section: move items from \"In Progress\" to \"Done\" when completed\n- UPDATE \"Next Steps\" based on what was accomplished\n- PRESERVE exact file paths, function names, and error messages\n- If something is no longer relevant, you may remove it\n\nUse this EXACT format:\n\n## Goal\n[Preserve existing goals, add new ones if the task expanded]\n\n## Constraints & Preferences\n- [Preserve existing, add new ones discovered]\n\n## Progress\n### Done\n- [x] [Include previously done items AND newly completed items]\n\n### In Progress\n- [ ] [Current work - update based on progress]\n\n### Blocked\n- [Current blockers - remove if resolved]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale] (preserve all previous, add new)\n\n## Next Steps\n1. [Update based on current state]\n\n## Critical Context\n- [Preserve important context, add new if needed]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint\n\n<read-files>\nprior-read.go\n</read-files>\n\n<modified-files>\nprior-edit.go\n</modified-files>",
+            "firstKeptIndex": 3,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 39,
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [
+                "prior-read.go"
+              ],
+              "modifiedFiles": [
+                "prior-edit.go"
+              ]
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint\n\n<read-files>\nprior-read.go\n</read-files>\n\n<modified-files>\nprior-edit.go\n</modified-files>"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "compaction",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "retry",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            },
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            },
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "summarization_retry_scheduled",
+              "compacting": true,
+              "attempt": 1,
+              "maxAttempts": 2,
+              "delayMs": 1,
+              "errorMessage": "terminated"
+            },
+            {
+              "type": "summarization_retry_attempt_start",
+              "compacting": true,
+              "source": "compaction",
+              "reason": "manual"
+            },
+            {
+              "type": "summarization_retry_scheduled",
+              "compacting": true,
+              "attempt": 2,
+              "maxAttempts": 2,
+              "delayMs": 2,
+              "errorMessage": "503"
+            },
+            {
+              "type": "summarization_retry_attempt_start",
+              "compacting": true,
+              "source": "compaction",
+              "reason": "manual"
+            },
+            {
+              "type": "summarization_retry_finished",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint",
+            "firstKeptIndex": 2,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 16,
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "permanent",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": "Compaction failed: Summarization failed: insufficient_quota"
+            }
+          ],
+          "error": "Summarization failed: insufficient_quota",
+          "result": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "old request"
+            },
+            {
+              "role": "assistant",
+              "text": "old answer"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change"
+          ]
+        },
+        {
+          "name": "exhausted",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            },
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            },
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "summarization_retry_scheduled",
+              "compacting": true,
+              "attempt": 1,
+              "maxAttempts": 2,
+              "delayMs": 1,
+              "errorMessage": "503"
+            },
+            {
+              "type": "summarization_retry_attempt_start",
+              "compacting": true,
+              "source": "compaction",
+              "reason": "manual"
+            },
+            {
+              "type": "summarization_retry_scheduled",
+              "compacting": true,
+              "attempt": 2,
+              "maxAttempts": 2,
+              "delayMs": 2,
+              "errorMessage": "503"
+            },
+            {
+              "type": "summarization_retry_attempt_start",
+              "compacting": true,
+              "source": "compaction",
+              "reason": "manual"
+            },
+            {
+              "type": "summarization_retry_finished",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": "Compaction failed: Summarization failed: 503"
+            }
+          ],
+          "error": "Summarization failed: 503",
+          "result": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "old request"
+            },
+            {
+              "role": "assistant",
+              "text": "old answer"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change"
+          ]
+        },
+        {
+          "name": "disabled",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": "Compaction failed: Summarization failed: terminated"
+            }
+          ],
+          "error": "Summarization failed: terminated",
+          "result": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "old request"
+            },
+            {
+              "role": "assistant",
+              "text": "old answer"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change"
+          ]
+        },
+        {
+          "name": "cancel-retry",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "summarization_retry_scheduled",
+              "compacting": true,
+              "attempt": 1,
+              "maxAttempts": 2,
+              "delayMs": 1,
+              "errorMessage": "terminated"
+            },
+            {
+              "type": "summarization_retry_finished",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": true,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "cancelled",
+          "result": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "old request"
+            },
+            {
+              "role": "assistant",
+              "text": "old answer"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change"
+          ]
+        },
+        {
+          "name": "uncapped",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 80,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint",
+            "firstKeptIndex": 2,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 16,
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "reasoning-off",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint",
+            "firstKeptIndex": 2,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 16,
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "tool-result-summarized",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            },
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: recent request long enough to keep\n\n[Assistant tool calls]: read(path=\"context.go\")\n\n[Tool result]: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n\n[... 3000 more characters truncated]\n</conversation>\n\nThis is the PREFIX of a turn that was too large to keep. The SUFFIX (recent work) is retained.\n\nSummarize the prefix to provide context for the retained suffix:\n\n## Original Request\n[What did the user ask for in this turn?]\n\n## Early Progress\n- [Key decisions and work done in the prefix]\n\n## Context for Suffix\n- [Information needed to understand the retained recent work]\n\nBe concise. Focus on what's needed to understand the kept suffix."
+                }
+              ],
+              "maxTokens": 50,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint\n\n---\n\n**Turn Context (split turn):**\n\ncheckpoint\n\n<read-files>\ncontext.go\n</read-files>",
+            "firstKeptIndex": 5,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 29,
+            "usage": {
+              "input": 160,
+              "output": 40,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 200,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [
+                "context.go"
+              ],
+              "modifiedFiles": []
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint\n\n---\n\n**Turn Context (split turn):**\n\ncheckpoint\n\n<read-files>\ncontext.go\n</read-files>"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "tool-result-kept",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            },
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: recent request long enough to keep\n</conversation>\n\nThis is the PREFIX of a turn that was too large to keep. The SUFFIX (recent work) is retained.\n\nSummarize the prefix to provide context for the retained suffix:\n\n## Original Request\n[What did the user ask for in this turn?]\n\n## Early Progress\n- [Key decisions and work done in the prefix]\n\n## Context for Suffix\n- [Information needed to understand the retained recent work]\n\nBe concise. Focus on what's needed to understand the kept suffix."
+                }
+              ],
+              "maxTokens": 50,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": ""
+            }
+          ],
+          "error": "",
+          "result": {
+            "summary": "checkpoint\n\n---\n\n**Turn Context (split turn):**\n\ncheckpoint",
+            "firstKeptIndex": 3,
+            "tokensBefore": 100,
+            "estimatedTokensAfter": 1276,
+            "usage": {
+              "input": 160,
+              "output": 40,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 200,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            }
+          },
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": "checkpoint\n\n---\n\n**Turn Context (split turn):**\n\ncheckpoint"
+            },
+            {
+              "role": "assistant",
+              "text": ""
+            },
+            {
+              "role": "toolResult",
+              "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change",
+            "compaction"
+          ]
+        },
+        {
+          "name": "split-second-error",
+          "requests": [
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: old request\n\n[Assistant]: old answer\n</conversation>\n\nThe messages above are a conversation to summarize. Create a structured context checkpoint summary that another LLM will use to continue the work.\n\nUse this EXACT format:\n\n## Goal\n[What is the user trying to accomplish? Can be multiple items if the session covers different tasks.]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned by user]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Current work]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [Ordered list of what should happen next]\n\n## Critical Context\n- [Any data, examples, or references needed to continue]\n- [Or \"(none)\" if not applicable]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: preserve constraints"
+                }
+              ],
+              "maxTokens": 60,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            },
+            {
+              "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+              "messages": [
+                {
+                  "role": "user",
+                  "text": "<conversation>\n[User]: recent request long enough to keep\n</conversation>\n\nThis is the PREFIX of a turn that was too large to keep. The SUFFIX (recent work) is retained.\n\nSummarize the prefix to provide context for the retained suffix:\n\n## Original Request\n[What did the user ask for in this turn?]\n\n## Early Progress\n- [Key decisions and work done in the prefix]\n\n## Context for Suffix\n- [Information needed to understand the retained recent work]\n\nBe concise. Focus on what's needed to understand the kept suffix."
+                }
+              ],
+              "maxTokens": 50,
+              "reasoning": "low",
+              "cacheRetention": "none",
+              "freshSession": true
+            }
+          ],
+          "events": [
+            {
+              "type": "compaction_start",
+              "compacting": true
+            },
+            {
+              "type": "compaction_end",
+              "compacting": false,
+              "aborted": false,
+              "willRetry": false,
+              "error": "Compaction failed: Turn prefix summarization failed: insufficient_quota"
+            }
+          ],
+          "error": "Turn prefix summarization failed: insufficient_quota",
+          "result": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "old request"
+            },
+            {
+              "role": "assistant",
+              "text": "old answer"
+            },
+            {
+              "role": "user",
+              "text": "recent request long enough to keep"
+            },
+            {
+              "role": "assistant",
+              "text": "recent answer"
+            }
+          ],
+          "entries": [
+            "message",
+            "message",
+            "message",
+            "message",
+            "thinking_level_change"
+          ]
+        }
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:97dbecfdd9409b5b71df91aefa4c073718857d4c75f6fa39cffc8421d0ea0075",
+  "observation_hash": "sha256:70bb20ba400bb32efdcee1e580d276ea4481d3bea6ebf5d5f4824e9e3af48266",
+  "execution_method": "node --experimental-strip-types parity/oracle/manual-compaction.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts#compact"
+  }
+}

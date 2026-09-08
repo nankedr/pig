@@ -132,13 +132,7 @@ func TestAgentSessionExactOperationStubsAreInert(t *testing.T) {
 				CommandContextActions: &codingagent.ExtensionCommandContextActions{},
 			})
 		}},
-		{name: "compact", operation: "AgentSession.Compact", call: func() error {
-			result, err := session.Compact(context.Background(), "preserve decisions")
-			if !reflect.DeepEqual(result, codingagent.CompactionResult{}) {
-				t.Errorf("Compact result = %#v, want zero CompactionResult", result)
-			}
-			return err
-		}},
+
 		{name: "execute bash", operation: "AgentSession.ExecuteBash", call: func() error {
 			result, err := session.ExecuteBash(context.Background(), "must not run", codingagent.ExecuteBashOptions{
 				OnChunk:    func(string) { chunkCalls++ },

@@ -175,7 +175,6 @@ func TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects(t *testing.T
 		name string
 		call func() (string, error)
 	}{
-		{"append compaction", func() (string, error) { return manager.AppendCompaction("summary", "entry", 1) }},
 		{"append custom", func() (string, error) { return manager.AppendCustomEntry("kind") }},
 		{"append custom message", func() (string, error) { return manager.AppendCustomMessageEntry("kind", ai.UserText("text"), true) }},
 	}

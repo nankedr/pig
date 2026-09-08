@@ -214,7 +214,7 @@ member:codingagent/src/core/session-manager.ts#SessionInfoEntry.parentId	scaffol
 member:codingagent/src/core/session-manager.ts#SessionInfoEntry.timestamp	scaffolded
 member:codingagent/src/core/session-manager.ts#SessionInfoEntry.type	scaffolded
 member:codingagent/src/core/session-manager.ts#SessionManager._persist	inventoried
-member:codingagent/src/core/session-manager.ts#SessionManager.appendCompaction	scaffolded
+member:codingagent/src/core/session-manager.ts#SessionManager.appendCompaction	partial
 member:codingagent/src/core/session-manager.ts#SessionManager.appendCustomEntry	scaffolded
 member:codingagent/src/core/session-manager.ts#SessionManager.appendCustomMessageEntry	scaffolded
 member:codingagent/src/core/session-manager.ts#SessionManager.appendLabelChange	scaffolded

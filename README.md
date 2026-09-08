@@ -70,3 +70,5 @@ M2 完整冻结使用 `make m2-freeze`：要求干净 Pig checkout，追加全�
 M3 完整冻结使用 `make m3-freeze`，包含 M1/M2 回归和 M3 的真实子进程恢复、四工具、信任与凭证验收。安装 CLI：`go install github.com/nankedr/pig/cmd/pig@v0.3.0`；SDK：`go get github.com/nankedr/pig@v0.3.0`。复现与制品说明见 [M3 集成与冻结](docs/learning/m3-freeze.md)。
 
 Issue #84：显式选择 find/ls/read 完成文件定位与回读，详见 [M4.2 学习材料](docs/learning/m4-find-ls.md) 和 [Go 示例](examples/find-ls-read/main.go)。find 需要预装 fd，不自动下载。
+
+M4.7 支持手动压缩后继续任务，见 [压缩与恢复](docs/learning/m4-manual-compaction.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m4-manual-compaction.md)。

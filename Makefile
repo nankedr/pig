@@ -24,6 +24,7 @@ m0-offline:
 	go run ./examples/bash-read
 	go run ./examples/session-stats
 	go run ./examples/session-configuration
+	go run ./examples/manual-compaction
 	go run ./examples/turn-retry
 	go run ./examples/coding-task
 	go run ./examples/global-settings
@@ -79,6 +80,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/session-persistence.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-stats.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-configuration.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/manual-compaction.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/turn-retry.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/coding-tools.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-interop.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

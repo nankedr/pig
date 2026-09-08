@@ -15,12 +15,12 @@ import (
 var DefaultCompactionSettings = agent.DefaultCompactionSettings
 
 type CompactionResult struct {
-	Details              ai.JSONValue
-	EstimatedTokensAfter *int64
-	FirstKeptEntryID     string
-	Summary              string
-	TokensBefore         int64
-	Usage                *ai.Usage
+	Details              ai.JSONValue `json:"details,omitempty"`
+	EstimatedTokensAfter *int64       `json:"estimatedTokensAfter,omitempty"`
+	FirstKeptEntryID     string       `json:"firstKeptEntryId"`
+	Summary              string       `json:"summary"`
+	TokensBefore         int64        `json:"tokensBefore"`
+	Usage                *ai.Usage    `json:"usage,omitempty"`
 }
 
 type CutPointResult struct {
@@ -441,19 +441,7 @@ func GenerateBranchSummary(context.Context, []SessionEntry, GenerateBranchSummar
 	return BranchSummaryResult{}, notImplemented("GenerateBranchSummary")
 }
 
-func GenerateSummary(context.Context, []agent.AgentMessage, ai.Model, int64, ...any) (string, error) {
-	return "", notImplemented("GenerateSummary")
-}
-
 type SummaryWithUsage struct {
 	Text  string
 	Usage ai.Usage
-}
-
-func GenerateSummaryWithUsage(context.Context, []agent.AgentMessage, ai.Model, int64, ...any) (SummaryWithUsage, error) {
-	return SummaryWithUsage{}, notImplemented("GenerateSummaryWithUsage")
-}
-
-func Compact(context.Context, any, ai.Model, ...any) (CompactionResult, error) {
-	return CompactionResult{}, notImplemented("Compact")
 }

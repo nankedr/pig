@@ -126,13 +126,7 @@ func TestAgentSessionUnavailableQueriesReturnStructuredErrors(t *testing.T) {
 		operation string
 		call      func() error
 	}{
-		{name: "is compacting", operation: "AgentSession.IsCompacting", call: func() error {
-			value, err := session.IsCompacting()
-			if value {
-				t.Error("IsCompacting returned true with an error")
-			}
-			return err
-		}},
+
 		{name: "is bash running", operation: "AgentSession.IsBashRunning", call: func() error {
 			value, err := session.IsBashRunning()
 			if value {

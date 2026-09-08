@@ -448,6 +448,8 @@ type AgentSession struct {
 	promptOptions                      BuildSystemPromptOptions
 	runtimeStream                      bool
 	configurationNotifying             bool
+	compactionCancel                   context.CancelFunc
+	compactionDone                     chan struct{}
 	autoCompactionEnabled              bool
 	retryAttempt                       int
 	retryCancel                        context.CancelFunc
@@ -516,8 +518,10 @@ func (s *AgentSession) IsStreaming() bool {
 	return s.active
 }
 func (s *AgentSession) IsIdle() bool { return !s.IsStreaming() }
-func (*AgentSession) IsCompacting() (bool, error) {
-	return false, notImplemented("AgentSession.IsCompacting")
+func (s *AgentSession) IsCompacting() (bool, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.compactionCancel != nil, nil
 }
 func (s *AgentSession) IsRetrying() (bool, error) {
 	s.mu.RLock()
@@ -582,6 +586,9 @@ func (s *AgentSession) GetAllTools() []agent.ErasedAgentTool {
 func (s *AgentSession) WaitForIdle(ctx context.Context) error {
 	s.mu.RLock()
 	idle := s.idle
+	if s.compactionDone != nil {
+		idle = s.compactionDone
+	}
 	s.mu.RUnlock()
 	if idle == nil {
 		return nil
@@ -604,9 +611,13 @@ func (s *AgentSession) WaitForIdle(ctx context.Context) error {
 func (s *AgentSession) Abort() error {
 	s.mu.RLock()
 	cancel := s.activeCancel
+	compactCancel := s.compactionCancel
 	s.mu.RUnlock()
 	if cancel != nil {
 		cancel(context.Canceled)
+	}
+	if compactCancel != nil {
+		compactCancel()
 	}
 	if s.agent != nil {
 		s.agent.Abort()
@@ -621,6 +632,7 @@ func (s *AgentSession) Dispose() error {
 	}
 	s.disposed = true
 	cancel := s.activeCancel
+	compactCancel := s.compactionCancel
 	unsubscribe := agent.Unsubscribe(nil)
 	if !s.active {
 		unsubscribe = s.unsubscribeAgent
@@ -631,6 +643,9 @@ func (s *AgentSession) Dispose() error {
 	s.mu.Unlock()
 	if cancel != nil {
 		cancel(context.Canceled)
+	}
+	if compactCancel != nil {
+		compactCancel()
 	}
 	if s.agent != nil {
 		s.agent.Abort()
@@ -693,10 +708,10 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		cancel(nil)
 		return fmt.Errorf("AgentSession is disposed")
 	}
-	if s.configurationNotifying {
+	if s.configurationNotifying || s.compactionCancel != nil {
 		s.mu.Unlock()
 		cancel(nil)
-		return fmt.Errorf("AgentSession is delivering configuration notifications")
+		return fmt.Errorf("AgentSession is busy delivering configuration notifications or compacting")
 	}
 	if s.active {
 		var delivery UserMessageDelivery
@@ -850,6 +865,13 @@ func (s *AgentSession) emit(event AgentSessionEvent) {
 			event.Steering = append([]string{}, event.Steering...)
 			event.FollowUp = append([]string{}, event.FollowUp...)
 			snapshot = event
+		case AgentSessionCompactionEndEvent:
+			event.ErrorMessage = cloneStringPointer(event.ErrorMessage)
+			if event.Result != nil {
+				value := cloneCompactionResult(*event.Result)
+				event.Result = &value
+			}
+			snapshot = event
 		case AgentSessionAutoRetryEndEvent:
 			event.FinalError = cloneStringPointer(event.FinalError)
 			snapshot = event
@@ -891,7 +913,15 @@ func (s *AgentSession) AbortBash() error { return notImplemented("AgentSession.A
 func (s *AgentSession) AbortBranchSummary() error {
 	return notImplemented("AgentSession.AbortBranchSummary")
 }
-func (s *AgentSession) AbortCompaction() error { return notImplemented("AgentSession.AbortCompaction") }
+func (s *AgentSession) AbortCompaction() error {
+	s.mu.RLock()
+	cancel := s.compactionCancel
+	s.mu.RUnlock()
+	if cancel != nil {
+		cancel()
+	}
+	return nil
+}
 func (s *AgentSession) AbortRetry() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -902,9 +932,6 @@ func (s *AgentSession) AbortRetry() error {
 }
 func (s *AgentSession) BindExtensions(ExtensionBindings) error {
 	return notImplemented("AgentSession.BindExtensions")
-}
-func (s *AgentSession) Compact(context.Context, ...string) (CompactionResult, error) {
-	return CompactionResult{}, notImplemented("AgentSession.Compact")
 }
 func (s *AgentSession) CreateReplacedSessionContext() (ExtensionCommandContext, error) {
 	return ExtensionCommandContext{}, notImplemented("AgentSession.CreateReplacedSessionContext")
