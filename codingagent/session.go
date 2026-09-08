@@ -966,9 +966,6 @@ func sessionUserText(message agent.AgentMessage) string {
 func (*AgentSession) HasExtensionHandlers(string) (bool, error) {
 	return false, notImplemented("AgentSession.HasExtensionHandlers")
 }
-func (s *AgentSession) NavigateTree(string) error {
-	return notImplemented("AgentSession.NavigateTree")
-}
 func (*AgentSession) PromptTemplates() ([]PromptTemplate, error) {
 	return nil, notImplemented("AgentSession.PromptTemplates")
 }

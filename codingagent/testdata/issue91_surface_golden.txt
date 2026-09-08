@@ -1,0 +1,13 @@
+method NavigateTree func(*codingagent.AgentSession, context.Context, string, ...codingagent.NavigateTreeOptions) (codingagent.NavigateTreeResult, error)
+type codingagent.NavigateTreeOptions struct
+fields:
+- Summarize bool tag=""
+- CustomInstructions string tag=""
+- ReplaceInstructions bool tag=""
+- Label string tag=""
+type codingagent.NavigateTreeResult struct
+fields:
+- EditorText *string tag=""
+- Cancelled bool tag=""
+- Aborted bool tag=""
+- SummaryEntry *codingagent.BranchSummaryEntry tag=""

@@ -1,5 +1,7 @@
 # Pig 文档导航
 
+M4.9 支持同一 Session 树的无摘要导航与继续分支，见 [学习材料](learning/m4-session-tree-navigation.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-session-tree-navigation.md)。
+
 M4.1 已支持显式 grep 搜索并继续编码任务，见 [grep 学习材料](learning/m4-grep-tool.md)和 [TypeScript → Go](mappings/typescript-to-go/m4-grep-tool.md)。
 
 M3/v0.3.0 的发布范围、安装和门禁见 [M3 集成与冻结](learning/m3-freeze.md)、[TypeScript → Go 导航](mappings/typescript-to-go/m3-freeze.md)及 [发布说明](releases/v0.3.0.md)。

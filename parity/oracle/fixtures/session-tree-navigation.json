@@ -1,0 +1,656 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts#navigateTree"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/session-tree-navigation",
+    "catalog_id": "contract:codingagent/session-tree-navigation",
+    "surface": "go-sdk",
+    "input": {
+      "sequence": [
+        "first",
+        "second",
+        "new branch",
+        "original continuation"
+      ],
+      "projection": "Entry IDs are mapped to semantic names; model and thinking remain live across navigation, while SessionContext follows the selected path.",
+      "history": [
+        {
+          "type": "message",
+          "id": "root",
+          "parentId": null,
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "text",
+                "text": "hello"
+              },
+              {
+                "type": "image",
+                "mimeType": "image/png",
+                "data": "aGk="
+              },
+              {
+                "type": "text",
+                "text": " world"
+              }
+            ],
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "answer",
+          "parentId": "root",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "answer"
+              }
+            ],
+            "api": "openai-completions",
+            "provider": "deepseek",
+            "model": "deepseek-v4-flash",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 2
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "custom_message",
+          "id": "custom",
+          "parentId": "answer",
+          "customType": "note",
+          "content": [
+            {
+              "type": "text",
+              "text": "custom"
+            },
+            {
+              "type": "text",
+              "text": " text"
+            }
+          ],
+          "display": true,
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "tool",
+          "parentId": "custom",
+          "message": {
+            "role": "toolResult",
+            "toolCallId": "call",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "file"
+              }
+            ],
+            "isError": false,
+            "timestamp": 3
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "compaction",
+          "id": "compact",
+          "parentId": "tool",
+          "summary": "compressed",
+          "firstKeptEntryId": "answer",
+          "tokensBefore": 100,
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "branch_summary",
+          "id": "summary",
+          "parentId": "compact",
+          "summary": "other branch",
+          "fromId": "root",
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "label",
+          "id": "label",
+          "parentId": "summary",
+          "targetId": "root",
+          "label": "start",
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "model_change",
+          "id": "model",
+          "parentId": "label",
+          "provider": "deepseek",
+          "modelId": "deepseek-v4-flash",
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "thinking_level_change",
+          "id": "thinking",
+          "parentId": "model",
+          "thinkingLevel": "off",
+          "timestamp": "2026-01-01T00:00:00Z"
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "states": [
+        {
+          "name": "same",
+          "editorText": null,
+          "cancelled": false,
+          "leaf": "a2",
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:first"
+            },
+            {
+              "role": "user",
+              "text": "second"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:second"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high",
+          "pathModel": "deepseek-v4-pro",
+          "pathThinking": "high",
+          "labels": [
+            null,
+            null
+          ],
+          "summaryCount": 0
+        },
+        {
+          "name": "user",
+          "editorText": "second",
+          "cancelled": false,
+          "leaf": "label",
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:first"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high",
+          "pathModel": "deepseek-v4-pro",
+          "pathThinking": "high",
+          "labels": [
+            "retry",
+            null
+          ],
+          "summaryCount": 0
+        },
+        {
+          "name": "ancestor",
+          "editorText": null,
+          "cancelled": false,
+          "leaf": "a1",
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:first"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high",
+          "pathModel": "deepseek-v4-flash",
+          "pathThinking": "off",
+          "labels": [
+            "retry",
+            null
+          ],
+          "summaryCount": 0
+        },
+        {
+          "name": "other",
+          "editorText": null,
+          "cancelled": false,
+          "leaf": "a2",
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:first"
+            },
+            {
+              "role": "user",
+              "text": "second"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:second"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high",
+          "pathModel": "deepseek-v4-pro",
+          "pathThinking": "high",
+          "labels": [
+            "retry",
+            null
+          ],
+          "summaryCount": 0
+        },
+        {
+          "name": "return",
+          "editorText": null,
+          "cancelled": false,
+          "leaf": "branch",
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:first"
+            },
+            {
+              "role": "user",
+              "text": "new branch"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:new branch"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high",
+          "pathModel": "deepseek-v4-pro",
+          "pathThinking": "off",
+          "labels": [
+            "retry",
+            null
+          ],
+          "summaryCount": 0
+        }
+      ],
+      "requests": [
+        {
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            }
+          ],
+          "model": "deepseek-v4-flash",
+          "thinking": "off"
+        },
+        {
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:first"
+            },
+            {
+              "role": "user",
+              "text": "second"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:first"
+            },
+            {
+              "role": "user",
+              "text": "new branch"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "messages": [
+            {
+              "role": "user",
+              "text": "first"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:first"
+            },
+            {
+              "role": "user",
+              "text": "second"
+            },
+            {
+              "role": "assistant",
+              "text": "reply:second"
+            },
+            {
+              "role": "user",
+              "text": "original continuation"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        }
+      ],
+      "sameCount": true,
+      "invalid": true,
+      "persisted": {
+        "original": true,
+        "branch": true,
+        "label": "retry",
+        "messages": [
+          {
+            "role": "user",
+            "text": "first"
+          },
+          {
+            "role": "assistant",
+            "text": "reply:first"
+          },
+          {
+            "role": "user",
+            "text": "second"
+          },
+          {
+            "role": "assistant",
+            "text": "reply:second"
+          },
+          {
+            "role": "user",
+            "text": "original continuation"
+          },
+          {
+            "role": "assistant",
+            "text": "reply:original continuation"
+          }
+        ],
+        "thinking": "high",
+        "model": "deepseek-v4-pro"
+      },
+      "historical": [
+        {
+          "target": "root",
+          "leaf": null,
+          "editorText": "hello world",
+          "messages": [],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "target": "custom",
+          "leaf": "answer",
+          "editorText": "custom text",
+          "messages": [
+            {
+              "role": "user",
+              "text": "hello world"
+            },
+            {
+              "role": "assistant",
+              "text": "answer"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "target": "tool",
+          "leaf": "tool",
+          "editorText": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "hello world"
+            },
+            {
+              "role": "assistant",
+              "text": "answer"
+            },
+            {
+              "role": "custom",
+              "text": "custom text"
+            },
+            {
+              "role": "toolResult",
+              "text": "file"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "target": "compact",
+          "leaf": "compact",
+          "editorText": null,
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "answer"
+            },
+            {
+              "role": "custom",
+              "text": "custom text"
+            },
+            {
+              "role": "toolResult",
+              "text": "file"
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "target": "summary",
+          "leaf": "summary",
+          "editorText": null,
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "answer"
+            },
+            {
+              "role": "custom",
+              "text": "custom text"
+            },
+            {
+              "role": "toolResult",
+              "text": "file"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "target": "label",
+          "leaf": "label",
+          "editorText": null,
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "answer"
+            },
+            {
+              "role": "custom",
+              "text": "custom text"
+            },
+            {
+              "role": "toolResult",
+              "text": "file"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "target": "model",
+          "leaf": "model",
+          "editorText": null,
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "answer"
+            },
+            {
+              "role": "custom",
+              "text": "custom text"
+            },
+            {
+              "role": "toolResult",
+              "text": "file"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        },
+        {
+          "target": "thinking",
+          "leaf": "thinking",
+          "editorText": null,
+          "messages": [
+            {
+              "role": "compactionSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "answer"
+            },
+            {
+              "role": "custom",
+              "text": "custom text"
+            },
+            {
+              "role": "toolResult",
+              "text": "file"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "model": "deepseek-v4-pro",
+          "thinking": "high"
+        }
+      ],
+      "restoredBranch": {
+        "model": "deepseek-v4-pro",
+        "thinking": "off",
+        "messages": [
+          {
+            "role": "user",
+            "text": "first"
+          },
+          {
+            "role": "assistant",
+            "text": "reply:first"
+          },
+          {
+            "role": "user",
+            "text": "new branch"
+          },
+          {
+            "role": "assistant",
+            "text": "reply:new branch"
+          }
+        ]
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:91ae4591e67a64fe374d7e71ef2ccb25248ca3b66b57379d1214dbbef03b9d07",
+  "observation_hash": "sha256:9c97d8cf848e1e6e010e773a3b3b170e319b9d586205708f45a46cc874b5940b",
+  "execution_method": "node --experimental-strip-types parity/oracle/session-tree-navigation.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts#navigateTree"
+  }
+}
