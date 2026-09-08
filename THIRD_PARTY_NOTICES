@@ -11,6 +11,7 @@ Pig uses two Pi artifacts as its parity baseline:
 - Catalog baseline SHA-256: 294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7
 - Catalog baseline contents: 39 providers, 1220 chat models
 - License: MIT
+- Manual compaction prompts in codingagent/compaction_prompts.go are copied from the locked Code baseline packages/coding-agent/src/core/compaction/compaction.ts and utils.ts.
 
 MIT License
 

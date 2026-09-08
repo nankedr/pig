@@ -1,0 +1,54 @@
+method Compact func(*codingagent.AgentSession, context.Context, ...string) (codingagent.CompactionResult, error)
+method AbortCompaction func(*codingagent.AgentSession) error
+method IsCompacting func(*codingagent.AgentSession) (bool, error)
+type codingagent.SummaryOptions struct
+fields:
+- APIKey *string tag=""
+- Headers map[string]string tag=""
+- Env map[string]string tag=""
+- CustomInstructions string tag=""
+- PreviousSummary string tag=""
+- ThinkingLevel ai.ModelThinkingLevel tag=""
+- StreamFn agent.StreamFunction tag=""
+- Retry *agent.RetryPolicy tag=""
+- Callbacks *agent.RetryCallbacks tag=""
+type codingagent.CompactionPreparation struct
+fields:
+- FirstKeptEntryID string tag=""
+- MessagesToSummarize []agent.AgentMessage tag=""
+- TurnPrefixMessages []agent.AgentMessage tag=""
+- IsSplitTurn bool tag=""
+- TokensBefore int64 tag=""
+- PreviousSummary string tag=""
+- FileOps codingagent.FileOperations tag=""
+- Settings agent.CompactionSettings tag=""
+type codingagent.CompactionResult struct
+fields:
+- Details interface {} tag="json:\"details,omitempty\""
+- EstimatedTokensAfter *int64 tag="json:\"estimatedTokensAfter,omitempty\""
+- FirstKeptEntryID string tag="json:\"firstKeptEntryId\""
+- Summary string tag="json:\"summary\""
+- TokensBefore int64 tag="json:\"tokensBefore\""
+- Usage *ai.Usage tag="json:\"usage,omitempty\""
+type codingagent.SummaryWithUsage struct
+fields:
+- Text string tag=""
+- Usage ai.Usage tag=""
+type codingagent.AgentSessionCompactionEndEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Reason codingagent.CompactionReason tag="json:\"reason\""
+- Result *codingagent.CompactionResult tag="json:\"result,omitempty\""
+- Aborted bool tag="json:\"aborted\""
+- WillRetry bool tag="json:\"willRetry\""
+- ErrorMessage *string tag="json:\"errorMessage,omitempty\""
+type codingagent.AppendCompactionOptions struct
+fields:
+- Details json.RawMessage tag=""
+- FromHook *bool tag=""
+- Usage *ai.Usage tag=""
+func PrepareCompaction func([]codingagent.SessionEntry, agent.CompactionSettings) *codingagent.CompactionPreparation
+func Compact func(context.Context, interface {}, ai.Model, ...interface {}) (codingagent.CompactionResult, error)
+func GenerateSummary func(context.Context, []agent.AgentMessage, ai.Model, int64, ...interface {}) (string, error)
+func GenerateSummaryWithUsage func(context.Context, []agent.AgentMessage, ai.Model, int64, ...interface {}) (codingagent.SummaryWithUsage, error)
+func AppendCompaction func(*codingagent.SessionManager, string, string, int64, ...codingagent.AppendCompactionOptions) (string, error)

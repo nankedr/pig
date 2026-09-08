@@ -497,9 +497,6 @@ func (m *SessionManager) AppendModelChange(provider, modelID string) (string, er
 	entry.Provider, entry.ModelID = provider, modelID
 	return entry.ID, m.appendEntryLocked(entry)
 }
-func (m *SessionManager) AppendCompaction(string, string, int64, ...AppendCompactionOptions) (string, error) {
-	return "", notImplemented("SessionManager.AppendCompaction")
-}
 func (m *SessionManager) AppendBranchSummary(BranchSummaryEntry) error {
 	return notImplemented("SessionManager.AppendBranchSummary")
 }
@@ -640,7 +637,7 @@ func marshalSessionEntry(entry SessionEntry) ([]byte, error) {
 		Timestamp string  `json:"timestamp"`
 	}{entry.Type, entry.ID, entry.ParentID, entry.Timestamp}
 	switch entry.Type {
-	case "label", "branch_summary":
+	case "label", "branch_summary", "compaction":
 		fields := map[string]any{"type": base.Type, "id": base.ID, "parentId": base.ParentID, "timestamp": base.Timestamp}
 		if entry.Type == "label" {
 			fields["targetId"] = entry.TargetID
@@ -648,7 +645,12 @@ func marshalSessionEntry(entry SessionEntry) ([]byte, error) {
 				fields["label"] = *entry.Label
 			}
 		} else {
-			fields["fromId"] = entry.FromID
+			if entry.Type == "compaction" {
+				fields["firstKeptEntryId"] = entry.FirstKeptEntryID
+				fields["tokensBefore"] = entry.TokensBefore
+			} else {
+				fields["fromId"] = entry.FromID
+			}
 			fields["summary"] = entry.Summary
 			if len(entry.Details) > 0 {
 				fields["details"] = entry.Details

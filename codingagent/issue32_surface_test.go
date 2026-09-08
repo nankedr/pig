@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1834, catalog.StatusInventoried: 744, catalog.StatusPartial: 13, catalog.StatusImplemented: 9}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1827, catalog.StatusInventoried: 744, catalog.StatusPartial: 20, catalog.StatusImplemented: 9}); !reflect.DeepEqual(gotByStatus, want) {
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
 	if *updateIssue32Catalog {
@@ -1445,6 +1445,9 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
+	if issue89PromoteRuntimeEntry(entry) {
+		return
+	}
 	if issue87PromoteRuntimeEntry(entry) {
 		return
 	}
@@ -1808,7 +1811,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				},
 				Unsupported: []string{
 					"ambient model, credential, settings, trust, resource, and package assembly remain explicit Capability Stubs",
-					"extension ToolDefinition execution, branches, compaction, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
+					"extension runtime, model-backed branch summaries, automatic compaction, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
 				},
 			},
 			Notes: "Issue #55 delivers the narrow M1 Go SDK AgentSession slice and issue #71 adds explicit M3 v3 persistence injection and reopen. Session event listeners are ordered barriers, agent_settled follows transcript updates, and in-memory creation plus execution perform no ambient disk writes.",
@@ -1839,13 +1842,15 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				Supported: []string{
 					"shared compaction settings, context-token calculation, threshold policy, last usable assistant usage, turn-start and cut-point selection are implemented",
 					"branch divergence collection, branch-entry preparation, context projection, token estimation, conversation serialization, and UTF-16 tool-result truncation are implemented",
+					"Issue #89: public AgentSession manual compaction, history/split/update summary requests, file operations, budgets and isolated request IDs; independent summary retry lifecycle, atomic v3 persistence, cancellation and Headless reopen continuation",
 				},
 				Unsupported: []string{
-					"GenerateSummary, GenerateSummaryWithUsage, and GenerateBranchSummary remain explicit Capability Stubs and do not invoke a model",
-					"end-to-end Compact, automatic triggering, persistence, cancellation, retry, event lifecycle, and settings mutation remain explicit Capability Stubs",
+					"GenerateBranchSummary, automatic compaction, extension hooks and RPC/TUI controls remain explicit Capability Stubs",
+					"Adapter coverage remains the existing ModelRuntime subset; compaction queues and automatic compaction settings mutation remain deferred",
 				},
 			},
-			Notes: "Behavior owner for the M4 production Coding Agent compaction pipeline. Deterministic policy, selection, projection, and serialization helpers are live while model-backed summarization and end-to-end compaction remain explicitly unsupported.",
+			Deviation: &catalog.Deviation{ADR: "docs/adr/0026-manual-compaction.md", Reason: "Typed options, serialized admission/commit and atomic v3 replacement; canceled or failed summaries never trim history."},
+			Notes:     "Issue #89 manual slice; behavior owner for the M4 production Coding Agent compaction pipeline. Deterministic policy, selection, projection, and serialization helpers are live while model-backed summarization and end-to-end compaction remain explicitly unsupported.",
 		},
 		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32TranscriptCatalogID,
@@ -1977,16 +1982,7 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 			},
 		}
 	case issue32CompactionCatalogID:
-		descriptors = []issue32ModuleEvidenceDescriptor{{
-			InputPath: "codingagent/compaction_review_test.go",
-			Evidence: catalog.Evidence{
-				Kind: "go-test", Ref: "codingagent/compaction_review_test.go#TestCompactionPolicyUsesTheSharedAgentPrimitive", Baseline: issue32BaselineCommit,
-				CaseID:          "issue32-codingagent-compaction-deterministic-core",
-				ExecutionMethod: "go test ./codingagent -run '^(TestCompactionPolicyUsesTheSharedAgentPrimitive|TestFindCutPoint|TestCollectEntriesForBranchSummary|TestPrepareBranchEntries|TestSerializeConversationTruncatesToolResultsByUTF16CodeUnits|TestBuildSessionContextUsesLatestV3CompactionAndFullPathSettings|TestAgentSessionExactOperationStubsAreInert|TestRPCClientCompactResult|TestSessionManagerMutationStubsReturnNoIDsAndHaveNoSideEffects)$' -count=1",
-				Expected:        "deterministic compaction policy, cut-point, branch collection, message preparation, context reconstruction, and UTF-16 serialization behavior work while model-backed, session, RPC, and persistence operations remain explicit inert Capability Stubs",
-				Actual:          "PASS; deterministic compaction helpers produced the expected projections and all covered end-to-end or persistence operations returned structured ErrNotImplemented without mutation", Platform: "any", CatalogID: catalogID,
-			},
-		}}
+		descriptors = issue89CompactionEvidence(t)
 	case issue32TranscriptCatalogID:
 		descriptors = []issue32ModuleEvidenceDescriptor{{
 			InputPath: "codingagent/transcript_projection_review_test.go",
