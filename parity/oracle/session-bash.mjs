@@ -53,7 +53,8 @@ try {
  }
  const summarize = messages => messages.map(m => m.role === "bashExecution" ? {role:m.role,command:m.command,output:m.output,exitCode:m.exitCode ?? null,cancelled:m.cancelled,truncated:m.truncated,exclude:!!m.excludeFromContext} : {role:m.role,text:text(m)});
  const history = summarize(session.messages);
- let deferred;
+ let deferred, settlement;
+ session.subscribe(e=>{if(e.type==="agent_settled"&&!settlement){session.recordBashResult("settled",{output:"visible",exitCode:0,cancelled:false,truncated:false});settlement={pending:session.hasPendingBashMessages,history:summarize(session.messages)};}});
  runtime.streamSimple = async(m,context,opts)=>{
   requests.push(context.messages.map(m=>({role:m.role,text:text(m)})));
   if(requests.length===1){session.recordBashResult("during",{output:"queued",exitCode:0,cancelled:false,truncated:false});deferred={pending:session.hasPendingBashMessages,history:summarize(session.messages)};}
@@ -74,7 +75,7 @@ try {
   truncations.push({name,outputLength:r.output.length,outputStart:r.output.slice(0,5),outputEnd:r.output.slice(-5),truncated:r.truncated,hasFile:!!r.fullOutputPath,fullLength:full?.length,fullStart:full?.slice(0,5),fullEnd:full?.slice(-5)});
   if(r.fullOutputPath)rmSync(r.fullOutputPath,{force:true});
  }
- const outcome = {results,events,history,requests,deferred,settled,reopened,truncations};
+ const outcome = {results,events,history,requests,deferred,settlement,settled,reopened,truncations};
  const c = { schema_version: "1.0.0", id: "go-sdk/codingagent/session-bash", catalog_id: "contract:codingagent/session-bash", surface: "go-sdk", input, observe: ["outcome", "side_effects"] };
  const fixture = { schema_version: "1.0.0", deterministic:true, baseline_id:lock.baseline_id, baseline_commit:lock.upstream.commit, upstream:{repository:lock.upstream.repository,commit:lock.upstream.commit,reference}, case:c, observation:{outcome,side_effects:[]},input_hash:hash({...c,input:canonical(input)}),observation_hash:hash({outcome:canonical(outcome),side_effects:[]}),execution_method:"node --experimental-strip-types parity/oracle/session-bash.mjs <locked-pi-checkout>",platform:"any",environment:{oracle_entry:reference}};
  const out=join(root,"parity/oracle/fixtures/session-bash.json");

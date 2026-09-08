@@ -467,6 +467,7 @@ type AgentSession struct {
 	lastMessageTimestamp               int64
 	bashCancels                        map[*context.CancelFunc]struct{}
 	pendingBashMessages                []agent.AgentMessage
+	deferBashMessages                  bool
 }
 
 func NewAgentSession(config AgentSessionConfig) *AgentSession {
@@ -726,6 +727,7 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 	}
 	message := s.userMessageLocked(text)
 	s.active = true
+	s.deferBashMessages = true
 	s.lastAssistant = nil
 	s.retryCancelled = false
 	s.idle = make(chan struct{})
@@ -733,7 +735,6 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 	s.mu.Unlock()
 	defer func() {
 		s.mu.Lock()
-		err = errors.Join(err, s.flushPendingBashMessagesLocked())
 		s.active = false
 		s.activeCancel = nil
 		s.retryAttempt = 0
@@ -751,6 +752,7 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 	}()
 	defer func() {
 		s.mu.Lock()
+		s.deferBashMessages = false
 		err = errors.Join(err, s.flushPendingBashMessagesLocked())
 		s.mu.Unlock()
 		s.flushQueueEvents()

@@ -346,6 +346,10 @@
           },
           {
             "role": "user",
+            "text": "Ran `settled`\n```\nvisible\n```"
+          },
+          {
+            "role": "user",
             "text": "next"
           }
         ]
@@ -401,6 +405,82 @@
           {
             "role": "user",
             "text": "first"
+          }
+        ]
+      },
+      "settlement": {
+        "pending": false,
+        "history": [
+          {
+            "role": "bashExecution",
+            "command": "custom",
+            "output": "hello\nworld",
+            "exitCode": 7,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "private",
+            "output": "secret",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": true
+          },
+          {
+            "role": "bashExecution",
+            "command": "empty",
+            "output": "",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "unicode",
+            "output": "世界",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "cancel",
+            "output": "partial",
+            "exitCode": null,
+            "cancelled": true,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "user",
+            "text": "first"
+          },
+          {
+            "role": "assistant",
+            "text": "reply"
+          },
+          {
+            "role": "bashExecution",
+            "command": "during",
+            "output": "queued",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "settled",
+            "output": "visible",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
           }
         ]
       },
@@ -464,6 +544,15 @@
             "role": "bashExecution",
             "command": "during",
             "output": "queued",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "settled",
+            "output": "visible",
             "exitCode": 0,
             "cancelled": false,
             "truncated": false,
@@ -535,6 +624,15 @@
           "exclude": false
         },
         {
+          "role": "bashExecution",
+          "command": "settled",
+          "output": "visible",
+          "exitCode": 0,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": false
+        },
+        {
           "role": "user",
           "text": "next"
         },
@@ -582,7 +680,7 @@
     "side_effects": []
   },
   "input_hash": "sha256:71791b6240747afbb4a4bd03d4bec0fe1531f911d7338351892fa3887e5df5db",
-  "observation_hash": "sha256:a8247e0f98c18f4ff3f106366efc6a2be39519389bd3840635b1081a4b933bc8",
+  "observation_hash": "sha256:224c85a1eec819e32099f725a8c19e1ebd6c4bcdd220d7b6f772cb4e6ab493a8",
   "execution_method": "node --experimental-strip-types parity/oracle/session-bash.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {

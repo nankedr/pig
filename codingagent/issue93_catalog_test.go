@@ -7,7 +7,7 @@ import (
 )
 
 const issue93BashCatalogID = "contract:codingagent/session-bash"
-const issue93BashTestHash = "sha256:d11c7f34c64dcb474ca0ccabdcafbe6bb786cfaac6f34ece5b448d3d131563a3"
+const issue93BashTestHash = "sha256:43a5870b4104f5d8f369d0d358d145d814ce6796bfcafd646cf459f8926b0bac"
 
 func issue93BashCatalogEntry() catalog.Entry {
 	return catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: issue93BashCatalogID, Upstream: catalog.Upstream{Module: "coding-agent", Repository: "https://github.com/badlogic/pi-mono", Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/agent-session.ts"}, Mapping: catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".AgentSession.ExecuteBash", Kind: "contract"}, Status: catalog.StatusPartial, Milestone: "M4", Classification: "public-api", Partial: &catalog.Partial{Supported: []string{"public SDK ExecuteBash/AbortBash/RecordBashResult, chunk events with optional ID, injected BashOperations and shell settings", "sanitized output, exit/cancellation, rolling tail, retained full output and read回读", "parallel executions, deferred generation-time recording, v3 reopen and subsequent model input with ExcludeFromContext"}, Unsupported: []string{"RPC/TUI command routing and extension runtime remain deferred", "local process execution remains limited to the existing darwin/linux Bash contract; injected Operations are portable"}}, Notes: "Issue #93. Fixed Pi source SDK Oracle and public SDK tests; no implicit timeout. Cancellation returns a BashResult; execution failures do not record. Dispose cancels active Bash and lets each call finish recording. Existing SessionManager delayed flush and filesystem failure semantics apply."}

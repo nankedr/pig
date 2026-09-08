@@ -113,7 +113,7 @@ func (s *AgentSession) recordBashResult(command string, result BashResult, exclu
 	if err != nil {
 		return err
 	}
-	if s.active {
+	if s.deferBashMessages {
 		s.pendingBashMessages = append(s.pendingBashMessages, message)
 		return nil
 	}

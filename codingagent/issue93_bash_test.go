@@ -89,7 +89,7 @@ func TestSessionBashParity(t *testing.T) {
 		core.SetResponses([]ai.FauxResponseStep{reply, reply})
 		events, results, requests := []map[string]any{}, []map[string]any{}, [][]map[string]any{}
 		var session *codingagent.AgentSession
-		var deferred map[string]any
+		var deferred, settlement map[string]any
 		created, err := codingagent.CreateAgentSession(ctx, codingagent.CreateAgentSessionOptions{CWD: dir, AgentDir: dir, SessionManager: manager, SettingsManager: settings, Model: &model, NoTools: codingagent.NoToolsAll, StreamFunction: func(ctx context.Context, m ai.Model, in ai.Context, o ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
 			messages := []agent.AgentMessage{}
 			for _, m := range in.Messages {
@@ -159,6 +159,19 @@ func TestSessionBashParity(t *testing.T) {
 			}
 			results = append(results, map[string]any{"chunks": chunks, "calls": calls, "failed": err != nil, "result": value, "running": running})
 		}
+		session.Subscribe(func(e codingagent.AgentSessionEvent) {
+			if e.AgentSessionEventType() == codingagent.AgentSessionEventTypeAgentSettled && settlement == nil {
+				code := 0
+				if e := session.RecordBashResult("settled", codingagent.BashResult{Output: "visible", ExitCode: &code}); e != nil {
+					t.Error(e)
+				}
+				pending, e := session.HasPendingBashMessages()
+				if e != nil {
+					t.Error(e)
+				}
+				settlement = map[string]any{"pending": pending, "history": bash93History(session.Messages())}
+			}
+		})
 		history := bash93History(session.Messages())
 		if err := session.Prompt(ctx, "first"); err != nil {
 			return parity.Observation{}, err
@@ -202,7 +215,7 @@ func TestSessionBashParity(t *testing.T) {
 			}
 			truncations = append(truncations, map[string]any{"name": tc.name, "outputLength": len(r.Output), "outputStart": r.Output[:min(5, len(r.Output))], "outputEnd": r.Output[max(0, len(r.Output)-5):], "truncated": r.Truncated, "hasFile": true, "fullLength": len(full), "fullStart": string(full[:min(5, len(full))]), "fullEnd": string(full[max(0, len(full)-5):])})
 		}
-		data, err := json.Marshal(map[string]any{"truncations": truncations, "results": results, "events": events, "history": history, "requests": requests, "deferred": deferred, "settled": settled, "reopened": bash93History(reopened.BuildSessionContext().Messages)})
+		data, err := json.Marshal(map[string]any{"truncations": truncations, "results": results, "events": events, "history": history, "requests": requests, "deferred": deferred, "settlement": settlement, "settled": settled, "reopened": bash93History(reopened.BuildSessionContext().Messages)})
 		return parity.Observation{Outcome: data, SideEffects: &[]parity.SideEffect{}}, err
 	}})
 	if err != nil || !result.Match {

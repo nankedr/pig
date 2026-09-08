@@ -8,7 +8,7 @@
 
 直接 Bash 按固定 Pi 逐 chunk 解码 UTF-8、移除 ANSI 与指定控制字符、移除 CR。返回输出保留末尾 2000 行或 50 KiB；超限完整输出保存为临时文件。与模型 Bash 工具的原始字节日志不同，直接 Bash 的完整文件是清理后、未截断的文本。仅原始字节超限但清理后未超限时，也可能有 FullOutputPath 且 Truncated=false。滚动缓冲按 Pi 的 chunk 和 UTF-16 长度规则保留，最终再截断；不要通过 Truncated 推断总输出长度。Dispose 不删除这些文件，调用者可用 read 的 offset/limit 回读，随后自行清理。
 
-`RecordBashResult` 用于记录外部执行结果。两条路径都写 `bashExecution` 消息，不伪造 ToolCall/ToolResult，也不发 message_end。闲时立即加入历史；生成和整轮重试期间先排队，完成或取消后在 agent_settled 前刷新，下一请求才会收到。`HasPendingBashMessages` 与用户 steer/followUp 队列分开；ClearQueue 不清除 Bash 结果。settled 回调期间新增的 Bash 也会在 Prompt 返回前刷新。
+`RecordBashResult` 用于记录外部执行结果。两条路径都写 `bashExecution` 消息，不伪造 ToolCall/ToolResult，也不发 message_end。闲时立即加入历史；生成和整轮重试期间先排队，完成或取消后在 agent_settled 前刷新，下一请求才会收到。`HasPendingBashMessages` 与用户 steer/followUp 队列分开；ClearQueue 不清除 Bash 结果。agent_settled 回调期间新增的 Bash 立即进入历史；独立的 Bash 排队标记允许此时可见，同时保留 Session 对 Prompt 的既有防重入约束。
 
 ExcludeFromContext=true 仍保留历史和持久化消息，但不进入模型输入。普通 Bash 转换为一条 user 消息，其中包含命令、输出和失败/取消/截断提示；后续显式调用 Prompt 才开始模型生成。v3 Session 仍沿用首次 assistant 后落盘的既有契约；尚未产生 assistant 的新会话只在内存保存。文件写入错误会返回给 ExecuteBash、RecordBashResult 或刷新队列的 Prompt，不隐瞒失败；底层存储部分写入与跨进程原子性仍遵循现有 SessionManager 限制。
 
