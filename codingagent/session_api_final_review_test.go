@@ -127,20 +127,6 @@ func TestAgentSessionUnavailableQueriesReturnStructuredErrors(t *testing.T) {
 		call      func() error
 	}{
 
-		{name: "is bash running", operation: "AgentSession.IsBashRunning", call: func() error {
-			value, err := session.IsBashRunning()
-			if value {
-				t.Error("IsBashRunning returned true with an error")
-			}
-			return err
-		}},
-		{name: "has pending bash messages", operation: "AgentSession.HasPendingBashMessages", call: func() error {
-			value, err := session.HasPendingBashMessages()
-			if value {
-				t.Error("HasPendingBashMessages returned true with an error")
-			}
-			return err
-		}},
 		{name: "thinking levels", operation: "AgentSession.GetAvailableThinkingLevels", call: func() error {
 			value, err := session.GetAvailableThinkingLevels()
 			if value != nil {

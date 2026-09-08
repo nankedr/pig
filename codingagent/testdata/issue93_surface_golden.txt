@@ -1,0 +1,26 @@
+method ExecuteBash func(*codingagent.AgentSession, context.Context, string, ...codingagent.ExecuteBashOptions) (codingagent.BashResult, error)
+method AbortBash func(*codingagent.AgentSession) error
+method RecordBashResult func(*codingagent.AgentSession, string, codingagent.BashResult, ...codingagent.RecordBashResultOptions) error
+method IsBashRunning func(*codingagent.AgentSession) (bool, error)
+method HasPendingBashMessages func(*codingagent.AgentSession) (bool, error)
+type codingagent.ExecuteBashOptions struct
+fields:
+- OnChunk func(string) tag=""
+- ExcludeFromContext bool tag=""
+- ID *string tag=""
+- Operations codingagent.BashOperations tag=""
+type codingagent.RecordBashResultOptions struct
+fields:
+- ExcludeFromContext bool tag=""
+type codingagent.BashResult struct
+fields:
+- Output string tag=""
+- ExitCode *int tag=""
+- Cancelled bool tag=""
+- Truncated bool tag=""
+- FullOutputPath *string tag=""
+type codingagent.AgentSessionBashExecutionUpdateEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- ID *string tag="json:\"id,omitempty\""
+- Delta string tag="json:\"delta\""

@@ -91,3 +91,4 @@ M4.5 支持会话模型、thinking 和工具集切换，见 [配置切换](learn
 M4.6 的统计口径、空值和并发读取见 [会话统计](learning/m4-session-stats.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-session-stats.md)。
 
 M4.7 支持手动压缩后继续任务，见 [压缩与恢复](learning/m4-manual-compaction.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-manual-compaction.md)。
+M4.11 支持从会话执行 Bash，见 [学习材料](learning/m4-session-bash.md)、[TypeScript → Go](mappings/typescript-to-go/m4-session-bash.md) 和 [Go 示例](../examples/session-bash/main.go)。

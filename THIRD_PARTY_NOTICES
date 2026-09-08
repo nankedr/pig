@@ -96,3 +96,11 @@ patch construction used by Pi. The retained license text is in
 `codingagent/edit_unicode_data.go` contains the generated normalization delta
 over x/text's Unicode 15 tables. The retained license is
 `THIRD_PARTY_LICENSES/Unicode-3.0.txt`.
+
+## ANSI sequence matching
+
+The ANSI matching expression in `codingagent/session_bash.go` is adapted from
+Pi's `packages/coding-agent/src/utils/ansi.ts` at the pinned Code Baseline,
+which incorporates ansi-regex and strip-ansi by Sindre Sorhus
+(<sindresorhus@gmail.com>). The MIT notice is retained in
+`THIRD_PARTY_LICENSES/ansi-MIT.txt`.
