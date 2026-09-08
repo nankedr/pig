@@ -3,6 +3,7 @@ package codingagent
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
@@ -464,6 +465,8 @@ type AgentSession struct {
 	queueEvents                        []AgentSessionQueueUpdateEvent
 	queueDispatchDone                  chan struct{}
 	lastMessageTimestamp               int64
+	bashCancels                        map[*context.CancelFunc]struct{}
+	pendingBashMessages                []agent.AgentMessage
 }
 
 func NewAgentSession(config AgentSessionConfig) *AgentSession {
@@ -523,12 +526,6 @@ func (s *AgentSession) IsRetrying() (bool, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.retryCancel != nil, nil
-}
-func (*AgentSession) IsBashRunning() (bool, error) {
-	return false, notImplemented("AgentSession.IsBashRunning")
-}
-func (*AgentSession) HasPendingBashMessages() (bool, error) {
-	return false, notImplemented("AgentSession.HasPendingBashMessages")
 }
 func (s *AgentSession) RetryAttempt() int { s.mu.RLock(); defer s.mu.RUnlock(); return s.retryAttempt }
 func (s *AgentSession) SessionFile() *string {
@@ -620,6 +617,9 @@ func (s *AgentSession) Dispose() error {
 		return nil
 	}
 	s.disposed = true
+	for cancel := range s.bashCancels {
+		(*cancel)()
+	}
 	cancel := s.activeCancel
 	unsubscribe := agent.Unsubscribe(nil)
 	if !s.active {
@@ -685,7 +685,7 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 	return s.prompt(ctx, text, options...)
 }
 
-func (s *AgentSession) prompt(ctx context.Context, text string, options ...PromptOptions) error {
+func (s *AgentSession) prompt(ctx context.Context, text string, options ...PromptOptions) (err error) {
 	runContext, cancel := context.WithCancelCause(ctx)
 	s.mu.Lock()
 	if s.disposed {
@@ -719,6 +719,11 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		cancel(nil)
 		return fmt.Errorf("AgentSession is delivering queue notifications; start a new run after callbacks return")
 	}
+	if err := s.flushPendingBashMessagesLocked(); err != nil {
+		s.mu.Unlock()
+		cancel(nil)
+		return err
+	}
 	message := s.userMessageLocked(text)
 	s.active = true
 	s.lastAssistant = nil
@@ -728,6 +733,7 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 	s.mu.Unlock()
 	defer func() {
 		s.mu.Lock()
+		err = errors.Join(err, s.flushPendingBashMessagesLocked())
 		s.active = false
 		s.activeCancel = nil
 		s.retryAttempt = 0
@@ -744,12 +750,15 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		cancel(nil)
 	}()
 	defer func() {
+		s.mu.Lock()
+		err = errors.Join(err, s.flushPendingBashMessagesLocked())
+		s.mu.Unlock()
 		s.flushQueueEvents()
 		s.emit(AgentSessionAgentSettledEvent{Type: AgentSessionEventTypeAgentSettled})
 	}()
 
 	runContext = context.WithValue(runContext, bashSessionKey{}, s)
-	err := s.agent.Prompt(runContext, message)
+	err = s.agent.Prompt(runContext, message)
 	for err == nil {
 		retry, retryErr := s.prepareRetry(runContext)
 		if retryErr != nil {
@@ -850,6 +859,9 @@ func (s *AgentSession) emit(event AgentSessionEvent) {
 			event.Steering = append([]string{}, event.Steering...)
 			event.FollowUp = append([]string{}, event.FollowUp...)
 			snapshot = event
+		case AgentSessionBashExecutionUpdateEvent:
+			event.ID = cloneStringPointer(event.ID)
+			snapshot = event
 		case AgentSessionAutoRetryEndEvent:
 			event.FinalError = cloneStringPointer(event.FinalError)
 			snapshot = event
@@ -887,7 +899,6 @@ func bridgeAgentSessionEvent(event agent.AgentEvent) (AgentSessionEvent, error) 
 func (s *AgentSession) SendCustomMessage(any, ...any) error {
 	return notImplemented("AgentSession.SendCustomMessage")
 }
-func (s *AgentSession) AbortBash() error { return notImplemented("AgentSession.AbortBash") }
 func (s *AgentSession) AbortBranchSummary() error {
 	return notImplemented("AgentSession.AbortBranchSummary")
 }
@@ -908,9 +919,6 @@ func (s *AgentSession) Compact(context.Context, ...string) (CompactionResult, er
 }
 func (s *AgentSession) CreateReplacedSessionContext() (ExtensionCommandContext, error) {
 	return ExtensionCommandContext{}, notImplemented("AgentSession.CreateReplacedSessionContext")
-}
-func (s *AgentSession) ExecuteBash(context.Context, string, ...ExecuteBashOptions) (BashResult, error) {
-	return BashResult{}, notImplemented("AgentSession.ExecuteBash")
 }
 func (s *AgentSession) ExportToHTML(context.Context, ...string) (string, error) {
 	return "", notImplemented("AgentSession.ExportToHTML")
@@ -971,9 +979,6 @@ func (s *AgentSession) NavigateTree(string) error {
 }
 func (*AgentSession) PromptTemplates() ([]PromptTemplate, error) {
 	return nil, notImplemented("AgentSession.PromptTemplates")
-}
-func (s *AgentSession) RecordBashResult(string, BashResult, ...RecordBashResultOptions) error {
-	return notImplemented("AgentSession.RecordBashResult")
 }
 func (s *AgentSession) Reload(context.Context) error { return notImplemented("AgentSession.Reload") }
 func (s *AgentSession) SetAutoCompactionEnabled(bool) error {

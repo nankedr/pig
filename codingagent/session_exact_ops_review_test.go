@@ -105,7 +105,6 @@ func TestAgentSessionExactOperationStubsAreInert(t *testing.T) {
 	beforeEntries := manager.GetEntries()
 	beforeTools := session.GetActiveToolNames()
 	beforeScoped := session.ScopedModels()
-	chunkCalls := 0
 	listenerCalls := 0
 	unsubscribe := legacy.Subscribe(func(context.Context, agent.AgentEvent) error {
 		listenerCalls++
@@ -139,28 +138,6 @@ func TestAgentSessionExactOperationStubsAreInert(t *testing.T) {
 			}
 			return err
 		}},
-		{name: "execute bash", operation: "AgentSession.ExecuteBash", call: func() error {
-			result, err := session.ExecuteBash(context.Background(), "must not run", codingagent.ExecuteBashOptions{
-				OnChunk:    func(string) { chunkCalls++ },
-				ID:         pointerTo("bash-1"),
-				Operations: panicSessionBashOperations{},
-			})
-			if result != (codingagent.BashResult{}) {
-				t.Errorf("ExecuteBash result = %#v, want zero BashResult", result)
-			}
-			return err
-		}},
-		{name: "record bash result", operation: "AgentSession.RecordBashResult", call: func() error {
-			exitCode := 9
-			fullOutputPath := "/must/not/be/retained"
-			return session.RecordBashResult("must not persist", codingagent.BashResult{
-				Output:         "output",
-				ExitCode:       &exitCode,
-				Cancelled:      true,
-				Truncated:      true,
-				FullOutputPath: &fullOutputPath,
-			}, codingagent.RecordBashResultOptions{ExcludeFromContext: true})
-		}},
 	}
 
 	for _, test := range tests {
@@ -190,9 +167,6 @@ func TestAgentSessionExactOperationStubsAreInert(t *testing.T) {
 		})
 	}
 
-	if chunkCalls != 0 {
-		t.Fatalf("ExecuteBash invoked OnChunk %d times, want zero", chunkCalls)
-	}
 	if listenerCalls != 0 {
 		t.Fatalf("AgentSession stubs published %d Agent events, want zero", listenerCalls)
 	}

@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9661
+- Total entries: 9662
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5168 |
-| scaffolded | 4001 |
-| partial | 263 |
-| implemented | 60 |
+| scaffolded | 3996 |
+| partial | 264 |
+| implemented | 65 |
 | verified | 167 |
 | deferred | 2 |
 
@@ -6287,7 +6287,6 @@
 | member:codingagent/src/core/agent-session-services.ts#CreateAgentSessionServicesOptions.resourceLoaderReloadOptions | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.CreateAgentSessionServicesOptions.ResourceLoaderReloadOptions | coding-agent |
 | member:codingagent/src/core/agent-session-services.ts#CreateAgentSessionServicesOptions.settingsManager | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.CreateAgentSessionServicesOptions.SettingsManager | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abort | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Abort | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.abortBash | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBash | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortBranchSummary | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBranchSummary | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortCompaction | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortCompaction | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.agent | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Agent | coding-agent |
@@ -6297,7 +6296,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.compact | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Compact | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.createReplacedSessionContext | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CreateReplacedSessionContext | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.dispose | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Dispose | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.executeBash | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.exportToHtml | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExportToHTML | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.exportToJsonl | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExportToJSONL | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.extensionRunner | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExtensionRunner | coding-agent |
@@ -6311,8 +6309,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.getToolDefinition | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetToolDefinition | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getUserMessagesForForking | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetUserMessagesForForking | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.hasExtensionHandlers | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.HasExtensionHandlers | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.hasPendingBashMessages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.HasPendingBashMessages | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.isBashRunning | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsBashRunning | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isCompacting | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsCompacting | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isIdle | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsIdle | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isStreaming | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsStreaming | coding-agent |
@@ -6323,7 +6319,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.pendingMessageCount | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.PendingMessageCount | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.prompt | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.promptTemplates | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.PromptTemplates | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.recordBashResult | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.RecordBashResult | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.reload | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Reload | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.resourceLoader | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ResourceLoader | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.sendCustomMessage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SendCustomMessage | coding-agent |
@@ -8011,6 +8006,7 @@
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
+| contract:codingagent/session-bash | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash | coding-agent |
 | contract:codingagent/session-configuration | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
 | contract:codingagent/session-messages | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession | coding-agent |
 | contract:codingagent/turn-retry | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
@@ -8036,9 +8032,14 @@
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.abortBash | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBash | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortRetry | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortRetry | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.autoRetryEnabled | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AutoRetryEnabled | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.executeBash | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.hasPendingBashMessages | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.HasPendingBashMessages | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.isBashRunning | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsBashRunning | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isRetrying | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsRetrying | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.recordBashResult | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.RecordBashResult | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.retryAttempt | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.RetryAttempt | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setAutoRetryEnabled | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetAutoRetryEnabled | coding-agent |
 | symbol:codingagent/src/core/agent-session-runtime.ts#createAgentSessionRuntime | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntime | coding-agent |

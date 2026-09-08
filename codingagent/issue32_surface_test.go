@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1834, catalog.StatusInventoried: 744, catalog.StatusPartial: 13, catalog.StatusImplemented: 9}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1829, catalog.StatusInventoried: 744, catalog.StatusPartial: 13, catalog.StatusImplemented: 14}); !reflect.DeepEqual(gotByStatus, want) {
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
 	if *updateIssue32Catalog {
@@ -1445,6 +1445,9 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
+	if issue93PromoteRuntimeEntry(entry) {
+		return
+	}
 	if issue87PromoteRuntimeEntry(entry) {
 		return
 	}
@@ -1882,7 +1885,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue93BashCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1903,6 +1906,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = issue77RuntimeEvidence(t)
 	case issue84FindLsCatalogID:
 		descriptors = issue84FindLsEvidence(t)
+	case issue93BashCatalogID:
+		descriptors = issue93BashEvidence(t)
 	case issue87ConfigurationCatalogID:
 		descriptors = issue87ConfigurationEvidence(t)
 	case issue86RetryCatalogID:

@@ -1,0 +1,591 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/sdk.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/session-bash",
+    "catalog_id": "contract:codingagent/session-bash",
+    "surface": "go-sdk",
+    "input": {
+      "commands": [
+        {
+          "command": "custom",
+          "chunks": [
+            "\u001b[31mhello\u001b[0m\r\n\u0000",
+            "world￺"
+          ],
+          "code": 7,
+          "id": "bash-1"
+        },
+        {
+          "command": "private",
+          "chunks": [
+            "secret"
+          ],
+          "code": 0,
+          "exclude": true
+        },
+        {
+          "command": "empty",
+          "chunks": [],
+          "code": 0
+        },
+        {
+          "command": "unicode",
+          "chunks": [
+            [
+              239,
+              187,
+              191,
+              228
+            ],
+            [
+              184,
+              150,
+              231
+            ],
+            [
+              149,
+              140
+            ]
+          ],
+          "code": 0
+        },
+        {
+          "command": "cancel",
+          "chunks": [
+            "partial"
+          ],
+          "code": 0,
+          "cancel": true
+        },
+        {
+          "command": "failure",
+          "chunks": [
+            "before failure"
+          ],
+          "failure": true
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "results": [
+        {
+          "chunks": [
+            "hello\n",
+            "world"
+          ],
+          "calls": [
+            {
+              "command": "prefix\ncustom",
+              "cwd": true,
+              "timeout": null,
+              "running": true
+            }
+          ],
+          "failed": false,
+          "result": {
+            "output": "hello\nworld",
+            "exitCode": 7,
+            "cancelled": false,
+            "truncated": false,
+            "fullOutputPath": null
+          },
+          "running": false
+        },
+        {
+          "chunks": [
+            "secret"
+          ],
+          "calls": [
+            {
+              "command": "prefix\nprivate",
+              "cwd": true,
+              "timeout": null,
+              "running": true
+            }
+          ],
+          "failed": false,
+          "result": {
+            "output": "secret",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "fullOutputPath": null
+          },
+          "running": false
+        },
+        {
+          "chunks": [],
+          "calls": [
+            {
+              "command": "prefix\nempty",
+              "cwd": true,
+              "timeout": null,
+              "running": true
+            }
+          ],
+          "failed": false,
+          "result": {
+            "output": "",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "fullOutputPath": null
+          },
+          "running": false
+        },
+        {
+          "chunks": [
+            "",
+            "世",
+            "界"
+          ],
+          "calls": [
+            {
+              "command": "prefix\nunicode",
+              "cwd": true,
+              "timeout": null,
+              "running": true
+            }
+          ],
+          "failed": false,
+          "result": {
+            "output": "世界",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "fullOutputPath": null
+          },
+          "running": false
+        },
+        {
+          "chunks": [
+            "partial"
+          ],
+          "calls": [
+            {
+              "command": "prefix\ncancel",
+              "cwd": true,
+              "timeout": null,
+              "running": true
+            }
+          ],
+          "failed": false,
+          "result": {
+            "output": "partial",
+            "exitCode": null,
+            "cancelled": true,
+            "truncated": false,
+            "fullOutputPath": null
+          },
+          "running": false
+        },
+        {
+          "chunks": [
+            "before failure"
+          ],
+          "calls": [
+            {
+              "command": "prefix\nfailure",
+              "cwd": true,
+              "timeout": null,
+              "running": true
+            }
+          ],
+          "failed": true,
+          "result": null,
+          "running": false
+        }
+      ],
+      "events": [
+        {
+          "id": "bash-1",
+          "delta": "hello\n"
+        },
+        {
+          "id": "bash-1",
+          "delta": "world"
+        },
+        {
+          "id": null,
+          "delta": "secret"
+        },
+        {
+          "id": null,
+          "delta": ""
+        },
+        {
+          "id": null,
+          "delta": "世"
+        },
+        {
+          "id": null,
+          "delta": "界"
+        },
+        {
+          "id": null,
+          "delta": "partial"
+        },
+        {
+          "id": null,
+          "delta": "before failure"
+        }
+      ],
+      "history": [
+        {
+          "role": "bashExecution",
+          "command": "custom",
+          "output": "hello\nworld",
+          "exitCode": 7,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": false
+        },
+        {
+          "role": "bashExecution",
+          "command": "private",
+          "output": "secret",
+          "exitCode": 0,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": true
+        },
+        {
+          "role": "bashExecution",
+          "command": "empty",
+          "output": "",
+          "exitCode": 0,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": false
+        },
+        {
+          "role": "bashExecution",
+          "command": "unicode",
+          "output": "世界",
+          "exitCode": 0,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": false
+        },
+        {
+          "role": "bashExecution",
+          "command": "cancel",
+          "output": "partial",
+          "exitCode": null,
+          "cancelled": true,
+          "truncated": false,
+          "exclude": false
+        }
+      ],
+      "requests": [
+        [
+          {
+            "role": "user",
+            "text": "Ran `custom`\n```\nhello\nworld\n```\n\nCommand exited with code 7"
+          },
+          {
+            "role": "user",
+            "text": "Ran `empty`\n(no output)"
+          },
+          {
+            "role": "user",
+            "text": "Ran `unicode`\n```\n世界\n```"
+          },
+          {
+            "role": "user",
+            "text": "Ran `cancel`\n```\npartial\n```\n\n(command cancelled)"
+          },
+          {
+            "role": "user",
+            "text": "first"
+          }
+        ],
+        [
+          {
+            "role": "user",
+            "text": "Ran `custom`\n```\nhello\nworld\n```\n\nCommand exited with code 7"
+          },
+          {
+            "role": "user",
+            "text": "Ran `empty`\n(no output)"
+          },
+          {
+            "role": "user",
+            "text": "Ran `unicode`\n```\n世界\n```"
+          },
+          {
+            "role": "user",
+            "text": "Ran `cancel`\n```\npartial\n```\n\n(command cancelled)"
+          },
+          {
+            "role": "user",
+            "text": "first"
+          },
+          {
+            "role": "assistant",
+            "text": "reply"
+          },
+          {
+            "role": "user",
+            "text": "Ran `during`\n```\nqueued\n```"
+          },
+          {
+            "role": "user",
+            "text": "next"
+          }
+        ]
+      ],
+      "deferred": {
+        "pending": true,
+        "history": [
+          {
+            "role": "bashExecution",
+            "command": "custom",
+            "output": "hello\nworld",
+            "exitCode": 7,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "private",
+            "output": "secret",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": true
+          },
+          {
+            "role": "bashExecution",
+            "command": "empty",
+            "output": "",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "unicode",
+            "output": "世界",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "cancel",
+            "output": "partial",
+            "exitCode": null,
+            "cancelled": true,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "user",
+            "text": "first"
+          }
+        ]
+      },
+      "settled": {
+        "pending": false,
+        "history": [
+          {
+            "role": "bashExecution",
+            "command": "custom",
+            "output": "hello\nworld",
+            "exitCode": 7,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "private",
+            "output": "secret",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": true
+          },
+          {
+            "role": "bashExecution",
+            "command": "empty",
+            "output": "",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "unicode",
+            "output": "世界",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "bashExecution",
+            "command": "cancel",
+            "output": "partial",
+            "exitCode": null,
+            "cancelled": true,
+            "truncated": false,
+            "exclude": false
+          },
+          {
+            "role": "user",
+            "text": "first"
+          },
+          {
+            "role": "assistant",
+            "text": "reply"
+          },
+          {
+            "role": "bashExecution",
+            "command": "during",
+            "output": "queued",
+            "exitCode": 0,
+            "cancelled": false,
+            "truncated": false,
+            "exclude": false
+          }
+        ]
+      },
+      "reopened": [
+        {
+          "role": "bashExecution",
+          "command": "custom",
+          "output": "hello\nworld",
+          "exitCode": 7,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": false
+        },
+        {
+          "role": "bashExecution",
+          "command": "private",
+          "output": "secret",
+          "exitCode": 0,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": true
+        },
+        {
+          "role": "bashExecution",
+          "command": "empty",
+          "output": "",
+          "exitCode": 0,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": false
+        },
+        {
+          "role": "bashExecution",
+          "command": "unicode",
+          "output": "世界",
+          "exitCode": 0,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": false
+        },
+        {
+          "role": "bashExecution",
+          "command": "cancel",
+          "output": "partial",
+          "exitCode": null,
+          "cancelled": true,
+          "truncated": false,
+          "exclude": false
+        },
+        {
+          "role": "user",
+          "text": "first"
+        },
+        {
+          "role": "assistant",
+          "text": "reply"
+        },
+        {
+          "role": "bashExecution",
+          "command": "during",
+          "output": "queued",
+          "exitCode": 0,
+          "cancelled": false,
+          "truncated": false,
+          "exclude": false
+        },
+        {
+          "role": "user",
+          "text": "next"
+        },
+        {
+          "role": "assistant",
+          "text": "reply"
+        }
+      ],
+      "truncations": [
+        {
+          "name": "lines",
+          "outputLength": 9999,
+          "outputStart": "line\n",
+          "outputEnd": "\nline",
+          "truncated": true,
+          "hasFile": true,
+          "fullLength": 12505,
+          "fullStart": "line\n",
+          "fullEnd": "line\n"
+        },
+        {
+          "name": "bytes",
+          "outputLength": 51200,
+          "outputStart": "xxxxx",
+          "outputEnd": "xxxxx",
+          "truncated": true,
+          "hasFile": true,
+          "fullLength": 163845,
+          "fullStart": "xxxxx",
+          "fullEnd": "xxxxx"
+        },
+        {
+          "name": "sanitized",
+          "outputLength": 0,
+          "outputStart": "",
+          "outputEnd": "",
+          "truncated": false,
+          "hasFile": true,
+          "fullLength": 0,
+          "fullStart": "",
+          "fullEnd": ""
+        }
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:71791b6240747afbb4a4bd03d4bec0fe1531f911d7338351892fa3887e5df5db",
+  "observation_hash": "sha256:a8247e0f98c18f4ff3f106366efc6a2be39519389bd3840635b1081a4b933bc8",
+  "execution_method": "node --experimental-strip-types parity/oracle/session-bash.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "oracle_entry": "packages/coding-agent/src/core/sdk.ts"
+  }
+}
