@@ -12,4 +12,4 @@ compaction_end 发布前解除压缩占用，listener 可提交下一次 Prompt�
 
 沿用已有函数的 ...any 形状，但已实现的摘要 API 仅接受零个选项或一个 SummaryOptions 值；Compact 的 preparation 为 *CompactionPreparation。这样将 Pi 的位置参数映射为类型明确的 Go 配置。非法选项和非正输出预算明确失败。提示文本来自固定 Pi MIT 源码，归属见 THIRD_PARTY_NOTICES。
 
-自动阈值/溢出压缩、扩展 hook、自定义扩展摘要、branch summary、RPC/TUI 操作及尚未交付的 Adapter 仍未实现。本切片不宣称 M4 整体冻结。
+自动阈值/溢出压缩已由 ADR-0028 / Issue #90 接通；扩展 hook、自定义扩展摘要、branch summary、RPC/TUI 操作及尚未交付的 Adapter 仍未实现。本切片不宣称 M4 整体冻结。

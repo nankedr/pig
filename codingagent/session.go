@@ -451,11 +451,16 @@ type AgentSession struct {
 	configurationNotifying             bool
 	compactionCancel                   context.CancelFunc
 	compactionDone                     chan struct{}
-	autoCompactionEnabled              bool
+	autoCompacting                     bool
+	compactionSteering                 []agent.AgentMessage
+	compactionFollowUp                 []agent.AgentMessage
+	delayCompactionSteering            bool
+	overflowRecoveryAttempted          bool
 	retryAttempt                       int
 	retryCancel                        context.CancelFunc
 	lastAssistant                      *ai.AssistantMessage
 	retryCancelled                     bool
+	compactionOutcome                  bool
 	listeners                          map[uint64]AgentSessionEventListener
 	listenerOrder                      []uint64
 	nextListener                       uint64
@@ -554,7 +559,10 @@ func (s *AgentSession) SessionName() *string {
 	}
 	return s.sessionManager.GetSessionName()
 }
-func (s *AgentSession) AutoCompactionEnabled() bool { return s.autoCompactionEnabled }
+func (s *AgentSession) AutoCompactionEnabled() bool {
+	enabled, _ := s.settingsManager.GetCompactionEnabled()
+	return enabled
+}
 func (s *AgentSession) AutoRetryEnabled() bool {
 	enabled, _ := s.settingsManager.GetRetryEnabled()
 	return enabled
@@ -709,7 +717,7 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		cancel(nil)
 		return fmt.Errorf("AgentSession is disposed")
 	}
-	if s.configurationNotifying || s.compactionCancel != nil {
+	if s.configurationNotifying || s.compactionCancel != nil && !s.autoCompacting {
 		s.mu.Unlock()
 		cancel(nil)
 		return fmt.Errorf("AgentSession is busy delivering configuration notifications or compacting")
@@ -745,6 +753,7 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 	s.deferBashMessages = true
 	s.lastAssistant = nil
 	s.retryCancelled = false
+	s.compactionOutcome = false
 	s.idle = make(chan struct{})
 	s.activeCancel = cancel
 	s.mu.Unlock()
@@ -775,6 +784,16 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 	}()
 
 	runContext = context.WithValue(runContext, bashSessionKey{}, s)
+	messages := s.Messages()
+	for i := len(messages) - 1; i >= 0; i-- {
+		if last, ok := sessionAssistantMessage(messages[i]); ok {
+			s.checkAutoCompaction(runContext, last, false)
+			break
+		}
+	}
+	if runContext.Err() != nil {
+		return context.Cause(runContext)
+	}
 	err = s.agent.Prompt(runContext, message)
 	for err == nil {
 		retry, retryErr := s.prepareRetry(runContext)
@@ -783,9 +802,23 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 			break
 		}
 		if !retry {
-			break
+			s.mu.RLock()
+			message := s.lastAssistant
+			s.mu.RUnlock()
+			if message != nil {
+				retry = s.checkAutoCompaction(runContext, *message, true)
+			}
+			if !retry {
+				s.mu.RLock()
+				cancelled := s.retryCancelled
+				s.mu.RUnlock()
+				retry = !cancelled && runContext.Err() == nil && (s.agent.HasQueuedMessages() || s.hasCompactionQueue())
+				if !retry {
+					break
+				}
+			}
 		}
-		err = s.agent.Continue(runContext)
+		err = s.continueAfterCompaction(runContext)
 	}
 	if err != nil {
 		text := err.Error()
@@ -795,7 +828,22 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 }
 
 func (s *AgentSession) handleAgentEvent(_ context.Context, event agent.AgentEvent) error {
+	if _, ok := event.(agent.AgentStartEvent); ok {
+		if err := s.flushCompactionQueues(false); err != nil {
+			return err
+		}
+	}
+	if started, ok := event.(agent.MessageStartEvent); ok && started.Message.MessageRole() == ai.MessageRoleAssistant {
+		if err := s.flushCompactionQueues(true); err != nil {
+			return err
+		}
+	}
 	if started, ok := event.(agent.MessageStartEvent); ok {
+		if started.Message.MessageRole() == ai.MessageRoleUser {
+			s.mu.Lock()
+			s.overflowRecoveryAttempted = false
+			s.mu.Unlock()
+		}
 		s.consumeQueuedMessage(started.Message)
 	}
 	s.flushQueueEvents()
@@ -816,6 +864,11 @@ func (s *AgentSession) handleAgentEvent(_ context.Context, event agent.AgentEven
 			owned := ai.CloneAssistantMessage(message)
 			s.mu.Lock()
 			s.lastAssistant = &owned
+			s.compactionOutcome = false
+			s.retryCancelled = false
+			if message.StopReason != ai.StopReasonError && message.StopReason != ai.StopReasonLength {
+				s.overflowRecoveryAttempted = false
+			}
 			s.mu.Unlock()
 			if message.StopReason != ai.StopReasonError {
 				s.endRetry(true, nil)
@@ -998,8 +1051,8 @@ func (*AgentSession) PromptTemplates() ([]PromptTemplate, error) {
 	return nil, notImplemented("AgentSession.PromptTemplates")
 }
 func (s *AgentSession) Reload(context.Context) error { return notImplemented("AgentSession.Reload") }
-func (s *AgentSession) SetAutoCompactionEnabled(bool) error {
-	return notImplemented("AgentSession.SetAutoCompactionEnabled")
+func (s *AgentSession) SetAutoCompactionEnabled(enabled bool) error {
+	return s.settingsManager.SetCompactionEnabled(enabled)
 }
 func (s *AgentSession) SetAutoRetryEnabled(enabled bool) error {
 	return s.settingsManager.SetRetryEnabled(enabled)

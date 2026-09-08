@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1803, catalog.StatusInventoried: 744, catalog.StatusPartial: 21, catalog.StatusImplemented: 32}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1801, catalog.StatusInventoried: 744, catalog.StatusPartial: 21, catalog.StatusImplemented: 34}); !reflect.DeepEqual(gotByStatus, want) {
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
 	if *updateIssue32Catalog {
@@ -1445,7 +1445,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
-	if issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
+	if issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
 		return
 	}
 	if issue87PromoteRuntimeEntry(entry) {
@@ -1811,7 +1811,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				},
 				Unsupported: []string{
 					"ambient model, credential, settings, trust, resource, and package assembly remain explicit Capability Stubs",
-					"extension runtime, model-backed branch summaries, automatic compaction, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
+					"extension runtime, model-backed branch summaries, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
 				},
 			},
 			Notes: "Issue #55 delivers the narrow M1 Go SDK AgentSession slice and issue #71 adds explicit M3 v3 persistence injection and reopen. Session event listeners are ordered barriers, agent_settled follows transcript updates, and in-memory creation plus execution perform no ambient disk writes.",
@@ -1842,15 +1842,16 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				Supported: []string{
 					"shared compaction settings, context-token calculation, threshold policy, last usable assistant usage, turn-start and cut-point selection are implemented",
 					"branch divergence collection, branch-entry preparation, context projection, token estimation, conversation serialization, and UTF-16 tool-result truncation are implemented",
+					"Issue #90: automatic threshold/overflow and recoverable-length compaction before/after public prompts, single recovery budget, summary/provider retry coordination, stale usage filtering, buffered steering/follow-up modes, Headless terminal outcome and v3 cross-process reopen",
 					"Issue #89: public AgentSession manual compaction, history/split/update summary requests, file operations, budgets and isolated request IDs; independent summary retry lifecycle, atomic v3 persistence, cancellation and Headless reopen continuation",
 				},
 				Unsupported: []string{
-					"GenerateBranchSummary, automatic compaction, extension hooks and RPC/TUI controls remain explicit Capability Stubs",
-					"Adapter coverage remains the existing ModelRuntime subset; compaction queues and automatic compaction settings mutation remain deferred",
+					"GenerateBranchSummary, extension hooks and RPC/TUI controls remain explicit Capability Stubs",
+					"Adapter coverage remains the existing ModelRuntime subset; manual-compaction queues, extension custom queues and baseline retry-history tail limitations are not claimed as automatic recovery successes",
 				},
 			},
-			Deviation: &catalog.Deviation{ADR: "docs/adr/0026-manual-compaction.md", Reason: "Typed options, serialized admission/commit and atomic v3 replacement; canceled or failed summaries never trim history."},
-			Notes:     "Issue #89 manual slice; behavior owner for the M4 production Coding Agent compaction pipeline. Deterministic policy, selection, projection, and serialization helpers are live while model-backed summarization and end-to-end compaction remain explicitly unsupported.",
+			Deviation: &catalog.Deviation{ADR: "docs/adr/0028-auto-compaction.md", Reason: "Reuse manual atomic v3 commit; arm cancellation before callbacks, preserve terminal partial outcomes, and buffer automatic-compaction queues at Session boundary."},
+			Notes:     "Issues #89/#90 implement manual and automatic production v3 compaction. The fixed Pi retry-history tail error is recorded as a terminal limitation, not hidden by normalization. No M4-wide freeze claim.",
 		},
 		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32TranscriptCatalogID,
@@ -1988,7 +1989,7 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 			},
 		}
 	case issue32CompactionCatalogID:
-		descriptors = issue89CompactionEvidence(t)
+		descriptors = append(issue89CompactionEvidence(t), issue90CompactionEvidence(t)...)
 	case issue32TranscriptCatalogID:
 		descriptors = []issue32ModuleEvidenceDescriptor{{
 			InputPath: "codingagent/transcript_projection_review_test.go",

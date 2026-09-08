@@ -472,11 +472,11 @@ func headlessOutcome(messages []agent.AgentMessage) HeadlessOutcome {
 
 func (s *AgentSession) headlessOutcome() HeadlessOutcome {
 	s.mu.RLock()
-	message, canceled := s.lastAssistant, s.retryCancelled
+	message, canceled, compacted := s.lastAssistant, s.retryCancelled, s.compactionOutcome
 	s.mu.RUnlock()
-	if canceled && message != nil {
+	if (canceled || compacted) && message != nil {
 		outcome := headlessOutcome([]agent.AgentMessage{*message})
-		outcome.Canceled = true
+		outcome.Canceled = outcome.Canceled || canceled
 		return outcome
 	}
 	return headlessOutcome(s.Messages())
