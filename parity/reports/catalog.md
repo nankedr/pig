@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9661
+- Total entries: 9662
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5168 |
-| scaffolded | 4001 |
+| scaffolded | 3983 |
 | partial | 263 |
-| implemented | 60 |
+| implemented | 79 |
 | verified | 167 |
 | deferred | 2 |
 
@@ -6303,10 +6303,7 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.extensionRunner | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExtensionRunner | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.followUp | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.FollowUp | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.followUpMode | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.FollowUpMode | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.getContextUsage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetContextUsage | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getFollowUpMessages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetFollowUpMessages | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.getLastAssistantText | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetLastAssistantText | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.getSessionStats | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSessionStats | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getSteeringMessages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSteeringMessages | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getToolDefinition | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetToolDefinition | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getUserMessagesForForking | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetUserMessagesForForking | coding-agent |
@@ -6370,16 +6367,6 @@
 | member:codingagent/src/core/agent-session.ts#PromptOptions.preflightResult | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.PreflightResult | coding-agent |
 | member:codingagent/src/core/agent-session.ts#PromptOptions.source | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.Source | coding-agent |
 | member:codingagent/src/core/agent-session.ts#PromptOptions.streamingBehavior | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.StreamingBehavior | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.assistantMessages | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.AssistantMessages | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.contextUsage | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.ContextUsage | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.cost | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.Cost | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.sessionFile | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.SessionFile | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.sessionId | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.SessionID | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.tokens | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.Tokens | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.toolCalls | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.ToolCalls | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.toolResults | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.ToolResults | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.totalMessages | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.TotalMessages | coding-agent |
-| member:codingagent/src/core/agent-session.ts#SessionStats.userMessages | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.UserMessages | coding-agent |
 | member:codingagent/src/core/compaction/branch-summarization.ts#BranchPreparation.fileOps | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.BranchPreparation.FileOps | coding-agent |
 | member:codingagent/src/core/compaction/branch-summarization.ts#BranchPreparation.messages | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.BranchPreparation.Messages | coding-agent |
 | member:codingagent/src/core/compaction/branch-summarization.ts#BranchPreparation.totalTokens | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.BranchPreparation.TotalTokens | coding-agent |
@@ -6458,9 +6445,6 @@
 | member:codingagent/src/core/extensions/types.ts#CompactOptions.onError | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.CompactOptions.OnError | coding-agent |
 | member:codingagent/src/core/extensions/types.ts#ContextEvent.messages | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.ContextEvent.Messages | coding-agent |
 | member:codingagent/src/core/extensions/types.ts#ContextEvent.type | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.ContextEvent.Type | coding-agent |
-| member:codingagent/src/core/extensions/types.ts#ContextUsage.contextWindow | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.ContextUsage.ContextWindow | coding-agent |
-| member:codingagent/src/core/extensions/types.ts#ContextUsage.percent | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.ContextUsage.Percent | coding-agent |
-| member:codingagent/src/core/extensions/types.ts#ContextUsage.tokens | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.ContextUsage.Tokens | coding-agent |
 | member:codingagent/src/core/extensions/types.ts#CustomToolCallEvent.input | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.CustomToolCallEvent.Input | coding-agent |
 | member:codingagent/src/core/extensions/types.ts#CustomToolCallEvent.toolCallId | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.CustomToolCallEvent.ToolCallID | coding-agent |
 | member:codingagent/src/core/extensions/types.ts#CustomToolCallEvent.toolName | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.CustomToolCallEvent.ToolName | coding-agent |
@@ -7663,7 +7647,6 @@
 | symbol:codingagent/src/core/agent-session.ts#ModelCycleResult | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.ModelCycleResult | coding-agent |
 | symbol:codingagent/src/core/agent-session.ts#ParsedSkillBlock | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.ParsedSkillBlock | coding-agent |
 | symbol:codingagent/src/core/agent-session.ts#PromptOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.PromptOptions | coding-agent |
-| symbol:codingagent/src/core/agent-session.ts#SessionStats | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.SessionStats | coding-agent |
 | symbol:codingagent/src/core/agent-session.ts#parseSkillBlock | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.ParseSkillBlock | coding-agent |
 | symbol:codingagent/src/core/auth-storage.ts#readStoredCredential | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.ReadStoredCredential | coding-agent |
 | symbol:codingagent/src/core/compaction/branch-summarization.ts#BranchPreparation | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.BranchPreparation | coding-agent |
@@ -7709,7 +7692,6 @@
 | symbol:codingagent/src/core/extensions/types.ts#BeforeProviderRequestEventResult | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.BeforeProviderRequestEventResult | coding-agent |
 | symbol:codingagent/src/core/extensions/types.ts#CompactOptions | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.CompactOptions | coding-agent |
 | symbol:codingagent/src/core/extensions/types.ts#ContextEvent | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.ContextEvent | coding-agent |
-| symbol:codingagent/src/core/extensions/types.ts#ContextUsage | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.ContextUsage | coding-agent |
 | symbol:codingagent/src/core/extensions/types.ts#CustomToolCallEvent | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.CustomToolCallEvent | coding-agent |
 | symbol:codingagent/src/core/extensions/types.ts#EditToolCallEvent | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.EditToolCallEvent | coding-agent |
 | symbol:codingagent/src/core/extensions/types.ts#EntryRenderOptions | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.EntryRenderOptions | coding-agent |
@@ -8034,14 +8016,33 @@
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
+| contract:codingagent/session-stats | implemented | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSessionStats | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortRetry | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortRetry | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.autoRetryEnabled | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AutoRetryEnabled | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.getContextUsage | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetContextUsage | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.getLastAssistantText | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetLastAssistantText | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.getSessionStats | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSessionStats | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isRetrying | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsRetrying | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.retryAttempt | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.RetryAttempt | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setAutoRetryEnabled | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetAutoRetryEnabled | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.assistantMessages | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.AssistantMessages | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.contextUsage | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.ContextUsage | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.cost | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.Cost | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.sessionFile | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.SessionFile | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.sessionId | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.SessionID | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.tokens | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.Tokens | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.toolCalls | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.ToolCalls | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.toolResults | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.ToolResults | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.totalMessages | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.TotalMessages | coding-agent |
+| member:codingagent/src/core/agent-session.ts#SessionStats.userMessages | implemented | M4 | contract | github.com/nankedr/pig/codingagent.SessionStats.UserMessages | coding-agent |
+| member:codingagent/src/core/extensions/types.ts#ContextUsage.contextWindow | implemented | M7 | contract | github.com/nankedr/pig/codingagent.ContextUsage.ContextWindow | coding-agent |
+| member:codingagent/src/core/extensions/types.ts#ContextUsage.percent | implemented | M7 | contract | github.com/nankedr/pig/codingagent.ContextUsage.Percent | coding-agent |
+| member:codingagent/src/core/extensions/types.ts#ContextUsage.tokens | implemented | M7 | contract | github.com/nankedr/pig/codingagent.ContextUsage.Tokens | coding-agent |
 | symbol:codingagent/src/core/agent-session-runtime.ts#createAgentSessionRuntime | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntime | coding-agent |
+| symbol:codingagent/src/core/agent-session.ts#SessionStats | implemented | M4 | symbol | github.com/nankedr/pig/codingagent.SessionStats | coding-agent |
+| symbol:codingagent/src/core/extensions/types.ts#ContextUsage | implemented | M7 | symbol | github.com/nankedr/pig/codingagent.ContextUsage | coding-agent |
 | symbol:codingagent/src/core/tools/index.ts#createCodingTools | implemented | M4 | symbol | github.com/nankedr/pig/codingagent.CreateCodingTools | coding-agent |
 | symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.JSONAgentSessionEvent | coding-agent |
 | contract:cli/pig/auth-help | verified | M0 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |

@@ -918,15 +918,6 @@ func (s *AgentSession) ExportToHTML(context.Context, ...string) (string, error) 
 func (s *AgentSession) ExportToJSONL(...string) (string, error) {
 	return "", notImplemented("AgentSession.ExportToJSONL")
 }
-func (*AgentSession) GetContextUsage() (*ContextUsage, error) {
-	return nil, notImplemented("AgentSession.GetContextUsage")
-}
-func (*AgentSession) GetLastAssistantText() (*string, error) {
-	return nil, notImplemented("AgentSession.GetLastAssistantText")
-}
-func (*AgentSession) GetSessionStats() (SessionStats, error) {
-	return SessionStats{}, notImplemented("AgentSession.GetSessionStats")
-}
 func (*AgentSession) GetToolDefinition(string) (ToolDefinition, bool, error) {
 	return ToolDefinition{}, false, notImplemented("AgentSession.GetToolDefinition")
 }

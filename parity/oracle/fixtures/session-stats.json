@@ -1,0 +1,3898 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts#getSessionStats/getContextUsage/getLastAssistantText"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/session-stats",
+    "catalog_id": "contract:codingagent/session-stats",
+    "surface": "go-sdk",
+    "input": {
+      "sourceFixture": "parity/oracle/fixtures/session-interop.json",
+      "sourceHash": "sha256:e9aba7045692448433c213a1dfd708c19d6cf6c9fd827e01f11ed1ddc444bf3a",
+      "scenarios": [
+        {
+          "name": "empty",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "no-context-window",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "message",
+              "id": "added-1",
+              "parentId": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-2",
+              "parentId": "added-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": " ﻿answer"
+                  },
+                  {
+                    "type": "thinking",
+                    "thinking": "hidden"
+                  },
+                  {
+                    "type": "text",
+                    "text": " end ﻿"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 0
+        },
+        {
+          "name": "simple-native-total",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "message",
+              "id": "added-1",
+              "parentId": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-2",
+              "parentId": "added-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": " ﻿answer"
+                  },
+                  {
+                    "type": "thinking",
+                    "thinking": "hidden"
+                  },
+                  {
+                    "type": "text",
+                    "text": " end ﻿"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "existing-v3",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "model_change",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "provider": "fixture",
+              "modelId": "model-1"
+            },
+            {
+              "type": "thinking_level_change",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "thinkingLevel": "high"
+            },
+            {
+              "type": "compaction",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "superseded summary",
+              "firstKeptEntryId": "missing",
+              "tokensBefore": 7
+            },
+            {
+              "type": "message",
+              "id": "entry-3",
+              "parentId": "entry-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-4",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "hello"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "model-1",
+                "usage": {
+                  "input": 1,
+                  "output": 1,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 2,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-5",
+              "parentId": "entry-4",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "read",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "result"
+                  }
+                ],
+                "isError": false,
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-6",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "discarded sibling",
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "compaction",
+              "id": "entry-7",
+              "parentId": "entry-5",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "old summary",
+              "firstKeptEntryId": "entry-3",
+              "tokensBefore": 10,
+              "details": {
+                "source": "fixture"
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": [
+                  1,
+                  {
+                    "keep": true
+                  }
+                ]
+              },
+              "id": "entry-8",
+              "parentId": "entry-7",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "custom_message",
+              "customType": "note",
+              "content": "custom text",
+              "display": true,
+              "details": {
+                "keep": "details"
+              },
+              "id": "entry-9",
+              "parentId": "entry-8",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "label",
+              "id": "entry-10",
+              "parentId": "entry-9",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "old label"
+            },
+            {
+              "type": "label",
+              "id": "entry-11",
+              "parentId": "entry-10",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3"
+            },
+            {
+              "type": "label",
+              "id": "entry-12",
+              "parentId": "entry-11",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "keep"
+            },
+            {
+              "type": "session_info",
+              "id": "entry-13",
+              "parentId": "entry-12",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "name": "history"
+            },
+            {
+              "type": "branch_summary",
+              "id": "entry-14",
+              "parentId": "entry-13",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "fromId": "entry-13",
+              "summary": "branch summary",
+              "details": {
+                "details": {
+                  "keep": true
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-15",
+              "parentId": "entry-14",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "futureRole",
+                "content": [
+                  {
+                    "type": "futureBlock",
+                    "payload": {
+                      "keep": 1
+                    }
+                  }
+                ],
+                "timestamp": 4,
+                "unknown": [
+                  1,
+                  2
+                ]
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "paid-compaction-unknown",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "model_change",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "provider": "fixture",
+              "modelId": "model-1"
+            },
+            {
+              "type": "thinking_level_change",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "thinkingLevel": "high"
+            },
+            {
+              "type": "compaction",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "superseded summary",
+              "firstKeptEntryId": "missing",
+              "tokensBefore": 7,
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-3",
+              "parentId": "entry-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-4",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "read",
+                    "arguments": {
+                      "path": "a"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "old answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-5",
+              "parentId": "entry-4",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "read",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "result"
+                  }
+                ],
+                "isError": false,
+                "timestamp": 3,
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  },
+                  "reasoning": 0,
+                  "cacheWrite1h": 0
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-6",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "discarded sibling",
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "compaction",
+              "id": "entry-7",
+              "parentId": "entry-5",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "old summary",
+              "firstKeptEntryId": "entry-3",
+              "tokensBefore": 10,
+              "details": {
+                "source": "fixture"
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": [
+                  1,
+                  {
+                    "keep": true
+                  }
+                ]
+              },
+              "id": "entry-8",
+              "parentId": "entry-7",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "custom_message",
+              "customType": "note",
+              "content": "custom text",
+              "display": true,
+              "details": {
+                "keep": "details"
+              },
+              "id": "entry-9",
+              "parentId": "entry-8",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "label",
+              "id": "entry-10",
+              "parentId": "entry-9",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "old label"
+            },
+            {
+              "type": "label",
+              "id": "entry-11",
+              "parentId": "entry-10",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3"
+            },
+            {
+              "type": "label",
+              "id": "entry-12",
+              "parentId": "entry-11",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "keep"
+            },
+            {
+              "type": "session_info",
+              "id": "entry-13",
+              "parentId": "entry-12",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "name": "history"
+            },
+            {
+              "type": "branch_summary",
+              "id": "entry-14",
+              "parentId": "entry-13",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "fromId": "entry-13",
+              "summary": "branch summary",
+              "details": {
+                "details": {
+                  "keep": true
+                }
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-15",
+              "parentId": "entry-14",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "futureRole",
+                "content": [
+                  {
+                    "type": "futureBlock",
+                    "payload": {
+                      "keep": 1
+                    }
+                  }
+                ],
+                "timestamp": 4,
+                "unknown": [
+                  1,
+                  2
+                ]
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "post-compaction",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "model_change",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "provider": "fixture",
+              "modelId": "model-1"
+            },
+            {
+              "type": "thinking_level_change",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "thinkingLevel": "high"
+            },
+            {
+              "type": "compaction",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "superseded summary",
+              "firstKeptEntryId": "missing",
+              "tokensBefore": 7,
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-3",
+              "parentId": "entry-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-4",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "read",
+                    "arguments": {
+                      "path": "a"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "old answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-5",
+              "parentId": "entry-4",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "read",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "result"
+                  }
+                ],
+                "isError": false,
+                "timestamp": 3,
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  },
+                  "reasoning": 0,
+                  "cacheWrite1h": 0
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-6",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "discarded sibling",
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "compaction",
+              "id": "entry-7",
+              "parentId": "entry-5",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "old summary",
+              "firstKeptEntryId": "entry-3",
+              "tokensBefore": 10,
+              "details": {
+                "source": "fixture"
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": [
+                  1,
+                  {
+                    "keep": true
+                  }
+                ]
+              },
+              "id": "entry-8",
+              "parentId": "entry-7",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "custom_message",
+              "customType": "note",
+              "content": "custom text",
+              "display": true,
+              "details": {
+                "keep": "details"
+              },
+              "id": "entry-9",
+              "parentId": "entry-8",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "label",
+              "id": "entry-10",
+              "parentId": "entry-9",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "old label"
+            },
+            {
+              "type": "label",
+              "id": "entry-11",
+              "parentId": "entry-10",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3"
+            },
+            {
+              "type": "label",
+              "id": "entry-12",
+              "parentId": "entry-11",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "keep"
+            },
+            {
+              "type": "session_info",
+              "id": "entry-13",
+              "parentId": "entry-12",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "name": "history"
+            },
+            {
+              "type": "branch_summary",
+              "id": "entry-14",
+              "parentId": "entry-13",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "fromId": "entry-13",
+              "summary": "branch summary",
+              "details": {
+                "details": {
+                  "keep": true
+                }
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-15",
+              "parentId": "entry-14",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "futureRole",
+                "content": [
+                  {
+                    "type": "futureBlock",
+                    "payload": {
+                      "keep": 1
+                    }
+                  }
+                ],
+                "timestamp": 4,
+                "unknown": [
+                  1,
+                  2
+                ]
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-17",
+              "parentId": "entry-15",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "new answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "post-compaction-zero",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "model_change",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "provider": "fixture",
+              "modelId": "model-1"
+            },
+            {
+              "type": "thinking_level_change",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "thinkingLevel": "high"
+            },
+            {
+              "type": "compaction",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "superseded summary",
+              "firstKeptEntryId": "missing",
+              "tokensBefore": 7,
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-3",
+              "parentId": "entry-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-4",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "read",
+                    "arguments": {
+                      "path": "a"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "old answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-5",
+              "parentId": "entry-4",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "read",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "result"
+                  }
+                ],
+                "isError": false,
+                "timestamp": 3,
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  },
+                  "reasoning": 0,
+                  "cacheWrite1h": 0
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-6",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "discarded sibling",
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "compaction",
+              "id": "entry-7",
+              "parentId": "entry-5",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "old summary",
+              "firstKeptEntryId": "entry-3",
+              "tokensBefore": 10,
+              "details": {
+                "source": "fixture"
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": [
+                  1,
+                  {
+                    "keep": true
+                  }
+                ]
+              },
+              "id": "entry-8",
+              "parentId": "entry-7",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "custom_message",
+              "customType": "note",
+              "content": "custom text",
+              "display": true,
+              "details": {
+                "keep": "details"
+              },
+              "id": "entry-9",
+              "parentId": "entry-8",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "label",
+              "id": "entry-10",
+              "parentId": "entry-9",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "old label"
+            },
+            {
+              "type": "label",
+              "id": "entry-11",
+              "parentId": "entry-10",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3"
+            },
+            {
+              "type": "label",
+              "id": "entry-12",
+              "parentId": "entry-11",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "keep"
+            },
+            {
+              "type": "session_info",
+              "id": "entry-13",
+              "parentId": "entry-12",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "name": "history"
+            },
+            {
+              "type": "branch_summary",
+              "id": "entry-14",
+              "parentId": "entry-13",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "fromId": "entry-13",
+              "summary": "branch summary",
+              "details": {
+                "details": {
+                  "keep": true
+                }
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-15",
+              "parentId": "entry-14",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "futureRole",
+                "content": [
+                  {
+                    "type": "futureBlock",
+                    "payload": {
+                      "keep": 1
+                    }
+                  }
+                ],
+                "timestamp": 4,
+                "unknown": [
+                  1,
+                  2
+                ]
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-17",
+              "parentId": "entry-15",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "zero"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "post-compaction-error",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "model_change",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "provider": "fixture",
+              "modelId": "model-1"
+            },
+            {
+              "type": "thinking_level_change",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "thinkingLevel": "high"
+            },
+            {
+              "type": "compaction",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "superseded summary",
+              "firstKeptEntryId": "missing",
+              "tokensBefore": 7,
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-3",
+              "parentId": "entry-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-4",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "read",
+                    "arguments": {
+                      "path": "a"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "old answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-5",
+              "parentId": "entry-4",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "read",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "result"
+                  }
+                ],
+                "isError": false,
+                "timestamp": 3,
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  },
+                  "reasoning": 0,
+                  "cacheWrite1h": 0
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-6",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "discarded sibling",
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "compaction",
+              "id": "entry-7",
+              "parentId": "entry-5",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "old summary",
+              "firstKeptEntryId": "entry-3",
+              "tokensBefore": 10,
+              "details": {
+                "source": "fixture"
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": [
+                  1,
+                  {
+                    "keep": true
+                  }
+                ]
+              },
+              "id": "entry-8",
+              "parentId": "entry-7",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "custom_message",
+              "customType": "note",
+              "content": "custom text",
+              "display": true,
+              "details": {
+                "keep": "details"
+              },
+              "id": "entry-9",
+              "parentId": "entry-8",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "label",
+              "id": "entry-10",
+              "parentId": "entry-9",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "old label"
+            },
+            {
+              "type": "label",
+              "id": "entry-11",
+              "parentId": "entry-10",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3"
+            },
+            {
+              "type": "label",
+              "id": "entry-12",
+              "parentId": "entry-11",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "keep"
+            },
+            {
+              "type": "session_info",
+              "id": "entry-13",
+              "parentId": "entry-12",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "name": "history"
+            },
+            {
+              "type": "branch_summary",
+              "id": "entry-14",
+              "parentId": "entry-13",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "fromId": "entry-13",
+              "summary": "branch summary",
+              "details": {
+                "details": {
+                  "keep": true
+                }
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-15",
+              "parentId": "entry-14",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "futureRole",
+                "content": [
+                  {
+                    "type": "futureBlock",
+                    "payload": {
+                      "keep": 1
+                    }
+                  }
+                ],
+                "timestamp": 4,
+                "unknown": [
+                  1,
+                  2
+                ]
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-17",
+              "parentId": "entry-15",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "error"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "error",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "error-trailing",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "model_change",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "provider": "fixture",
+              "modelId": "model-1"
+            },
+            {
+              "type": "thinking_level_change",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "thinkingLevel": "high"
+            },
+            {
+              "type": "compaction",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "superseded summary",
+              "firstKeptEntryId": "missing",
+              "tokensBefore": 7,
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-3",
+              "parentId": "entry-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-4",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "read",
+                    "arguments": {
+                      "path": "a"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "old answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-5",
+              "parentId": "entry-4",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "read",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "result"
+                  }
+                ],
+                "isError": false,
+                "timestamp": 3,
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  },
+                  "reasoning": 0,
+                  "cacheWrite1h": 0
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-6",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "discarded sibling",
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "compaction",
+              "id": "entry-7",
+              "parentId": "entry-5",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "old summary",
+              "firstKeptEntryId": "entry-3",
+              "tokensBefore": 10,
+              "details": {
+                "source": "fixture"
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": [
+                  1,
+                  {
+                    "keep": true
+                  }
+                ]
+              },
+              "id": "entry-8",
+              "parentId": "entry-7",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "custom_message",
+              "customType": "note",
+              "content": "custom text",
+              "display": true,
+              "details": {
+                "keep": "details"
+              },
+              "id": "entry-9",
+              "parentId": "entry-8",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "label",
+              "id": "entry-10",
+              "parentId": "entry-9",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "old label"
+            },
+            {
+              "type": "label",
+              "id": "entry-11",
+              "parentId": "entry-10",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3"
+            },
+            {
+              "type": "label",
+              "id": "entry-12",
+              "parentId": "entry-11",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "keep"
+            },
+            {
+              "type": "session_info",
+              "id": "entry-13",
+              "parentId": "entry-12",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "name": "history"
+            },
+            {
+              "type": "branch_summary",
+              "id": "entry-14",
+              "parentId": "entry-13",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "fromId": "entry-13",
+              "summary": "branch summary",
+              "details": {
+                "details": {
+                  "keep": true
+                }
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-15",
+              "parentId": "entry-14",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "futureRole",
+                "content": [
+                  {
+                    "type": "futureBlock",
+                    "payload": {
+                      "keep": 1
+                    }
+                  }
+                ],
+                "timestamp": 4,
+                "unknown": [
+                  1,
+                  2
+                ]
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-17",
+              "parentId": "entry-15",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "new answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-18",
+              "parentId": "added-17",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "continue 😀",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-19",
+              "parentId": "added-18",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "partial"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "error",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "empty-abort-skipped",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "model_change",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "provider": "fixture",
+              "modelId": "model-1"
+            },
+            {
+              "type": "thinking_level_change",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "thinkingLevel": "high"
+            },
+            {
+              "type": "compaction",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "superseded summary",
+              "firstKeptEntryId": "missing",
+              "tokensBefore": 7,
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-3",
+              "parentId": "entry-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-4",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "read",
+                    "arguments": {
+                      "path": "a"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "old answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-5",
+              "parentId": "entry-4",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "read",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "result"
+                  }
+                ],
+                "isError": false,
+                "timestamp": 3,
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  },
+                  "reasoning": 0,
+                  "cacheWrite1h": 0
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-6",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "discarded sibling",
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "compaction",
+              "id": "entry-7",
+              "parentId": "entry-5",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "old summary",
+              "firstKeptEntryId": "entry-3",
+              "tokensBefore": 10,
+              "details": {
+                "source": "fixture"
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": [
+                  1,
+                  {
+                    "keep": true
+                  }
+                ]
+              },
+              "id": "entry-8",
+              "parentId": "entry-7",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "custom_message",
+              "customType": "note",
+              "content": "custom text",
+              "display": true,
+              "details": {
+                "keep": "details"
+              },
+              "id": "entry-9",
+              "parentId": "entry-8",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "label",
+              "id": "entry-10",
+              "parentId": "entry-9",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "old label"
+            },
+            {
+              "type": "label",
+              "id": "entry-11",
+              "parentId": "entry-10",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3"
+            },
+            {
+              "type": "label",
+              "id": "entry-12",
+              "parentId": "entry-11",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "keep"
+            },
+            {
+              "type": "session_info",
+              "id": "entry-13",
+              "parentId": "entry-12",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "name": "history"
+            },
+            {
+              "type": "branch_summary",
+              "id": "entry-14",
+              "parentId": "entry-13",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "fromId": "entry-13",
+              "summary": "branch summary",
+              "details": {
+                "details": {
+                  "keep": true
+                }
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-15",
+              "parentId": "entry-14",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "futureRole",
+                "content": [
+                  {
+                    "type": "futureBlock",
+                    "payload": {
+                      "keep": 1
+                    }
+                  }
+                ],
+                "timestamp": 4,
+                "unknown": [
+                  1,
+                  2
+                ]
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-17",
+              "parentId": "entry-15",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "new answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-18",
+              "parentId": "added-17",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "continue 😀",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-19",
+              "parentId": "added-18",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "partial"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "error",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-20",
+              "parentId": "added-19",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "aborted",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "branch-without-compaction",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "model_change",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "provider": "fixture",
+              "modelId": "model-1"
+            },
+            {
+              "type": "thinking_level_change",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "thinkingLevel": "high"
+            },
+            {
+              "type": "compaction",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "superseded summary",
+              "firstKeptEntryId": "missing",
+              "tokensBefore": 7,
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-3",
+              "parentId": "entry-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-4",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "call-1",
+                    "name": "read",
+                    "arguments": {
+                      "path": "a"
+                    }
+                  },
+                  {
+                    "type": "text",
+                    "text": "old answer"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-5",
+              "parentId": "entry-4",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "toolResult",
+                "toolCallId": "call-1",
+                "toolName": "read",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "result"
+                  }
+                ],
+                "isError": false,
+                "timestamp": 3,
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  },
+                  "reasoning": 0,
+                  "cacheWrite1h": 0
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-6",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "discarded sibling",
+                "timestamp": 3
+              }
+            },
+            {
+              "type": "compaction",
+              "id": "entry-7",
+              "parentId": "entry-5",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "summary": "old summary",
+              "firstKeptEntryId": "entry-3",
+              "tokensBefore": 10,
+              "details": {
+                "source": "fixture"
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": [
+                  1,
+                  {
+                    "keep": true
+                  }
+                ]
+              },
+              "id": "entry-8",
+              "parentId": "entry-7",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "custom_message",
+              "customType": "note",
+              "content": "custom text",
+              "display": true,
+              "details": {
+                "keep": "details"
+              },
+              "id": "entry-9",
+              "parentId": "entry-8",
+              "timestamp": "2025-01-01T00:00:00.000Z"
+            },
+            {
+              "type": "label",
+              "id": "entry-10",
+              "parentId": "entry-9",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "old label"
+            },
+            {
+              "type": "label",
+              "id": "entry-11",
+              "parentId": "entry-10",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3"
+            },
+            {
+              "type": "label",
+              "id": "entry-12",
+              "parentId": "entry-11",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "targetId": "entry-3",
+              "label": "keep"
+            },
+            {
+              "type": "session_info",
+              "id": "entry-13",
+              "parentId": "entry-12",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "name": "history"
+            },
+            {
+              "type": "branch_summary",
+              "id": "entry-14",
+              "parentId": "entry-13",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "fromId": "entry-13",
+              "summary": "branch summary",
+              "details": {
+                "details": {
+                  "keep": true
+                }
+              },
+              "usage": {
+                "input": 10,
+                "output": 20,
+                "cacheRead": 30,
+                "cacheWrite": 40,
+                "totalTokens": 999,
+                "cost": {
+                  "input": 0.1,
+                  "output": 0.2,
+                  "cacheRead": 0.3,
+                  "cacheWrite": 0.4,
+                  "total": 2
+                }
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-15",
+              "parentId": "entry-14",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "futureRole",
+                "content": [
+                  {
+                    "type": "futureBlock",
+                    "payload": {
+                      "keep": 1
+                    }
+                  }
+                ],
+                "timestamp": 4,
+                "unknown": [
+                  1,
+                  2
+                ]
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-17",
+              "parentId": "entry-3",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "sibling"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "tool-only-last",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "message",
+              "id": "added-1",
+              "parentId": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-2",
+              "parentId": "added-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": " ﻿answer"
+                  },
+                  {
+                    "type": "thinking",
+                    "thinking": "hidden"
+                  },
+                  {
+                    "type": "text",
+                    "text": " end ﻿"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-3",
+              "parentId": "added-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "toolCall",
+                    "id": "x",
+                    "name": "read",
+                    "arguments": {}
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "empty-error-not-skipped",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "message",
+              "id": "added-1",
+              "parentId": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-2",
+              "parentId": "added-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": " ﻿answer"
+                  },
+                  {
+                    "type": "thinking",
+                    "thinking": "hidden"
+                  },
+                  {
+                    "type": "text",
+                    "text": " end ﻿"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-3",
+              "parentId": "added-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "error",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "zero-fallback",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "message",
+              "id": "added-1",
+              "parentId": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-2",
+              "parentId": "added-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": " ﻿answer"
+                  },
+                  {
+                    "type": "thinking",
+                    "thinking": "hidden"
+                  },
+                  {
+                    "type": "text",
+                    "text": " end ﻿"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-3",
+              "parentId": "added-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "zero"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "all-estimated",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "message",
+              "id": "added-1",
+              "parentId": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "😀x"
+                  },
+                  {
+                    "type": "image",
+                    "data": "AA==",
+                    "mimeType": "image/png"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-2",
+              "parentId": "added-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "tail"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "whitespace-last",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "message",
+              "id": "added-1",
+              "parentId": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-2",
+              "parentId": "added-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": " ﻿answer"
+                  },
+                  {
+                    "type": "thinking",
+                    "thinking": "hidden"
+                  },
+                  {
+                    "type": "text",
+                    "text": " end ﻿"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-3",
+              "parentId": "added-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": " ﻿\n"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        },
+        {
+          "name": "non-js-whitespace",
+          "records": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "cwd": "/project"
+            },
+            {
+              "type": "message",
+              "id": "added-1",
+              "parentId": "pi-writer",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "user",
+                "content": "hi",
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-2",
+              "parentId": "added-1",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": " ﻿answer"
+                  },
+                  {
+                    "type": "thinking",
+                    "thinking": "hidden"
+                  },
+                  {
+                    "type": "text",
+                    "text": " end ﻿"
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "message",
+              "id": "added-3",
+              "parentId": "added-2",
+              "timestamp": "2025-01-01T00:00:00.000Z",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": ""
+                  }
+                ],
+                "api": "openai-completions",
+                "provider": "deepseek",
+                "model": "deepseek-v4-flash",
+                "usage": {
+                  "input": 10,
+                  "output": 20,
+                  "cacheRead": 30,
+                  "cacheWrite": 40,
+                  "totalTokens": 999,
+                  "cost": {
+                    "input": 0.1,
+                    "output": 0.2,
+                    "cacheRead": 0.3,
+                    "cacheWrite": 0.4,
+                    "total": 2
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "contextWindow": 32000
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "empty",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 0,
+          "assistantMessages": 0,
+          "toolCalls": 0,
+          "toolResults": 0,
+          "totalMessages": 0,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          },
+          "cost": 0,
+          "contextUsage": {
+            "tokens": 0,
+            "contextWindow": 32000,
+            "percent": 0
+          }
+        },
+        "context": {
+          "tokens": 0,
+          "contextWindow": 32000,
+          "percent": 0
+        },
+        "last": null,
+        "roles": []
+      },
+      {
+        "name": "no-context-window",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 1,
+          "assistantMessages": 1,
+          "toolCalls": 0,
+          "toolResults": 0,
+          "totalMessages": 2,
+          "tokens": {
+            "input": 10,
+            "output": 20,
+            "cacheRead": 30,
+            "cacheWrite": 40,
+            "total": 100
+          },
+          "cost": 2,
+          "contextUsage": null
+        },
+        "context": null,
+        "last": "answer end",
+        "roles": [
+          "user",
+          "assistant"
+        ]
+      },
+      {
+        "name": "simple-native-total",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 1,
+          "assistantMessages": 1,
+          "toolCalls": 0,
+          "toolResults": 0,
+          "totalMessages": 2,
+          "tokens": {
+            "input": 10,
+            "output": 20,
+            "cacheRead": 30,
+            "cacheWrite": 40,
+            "total": 100
+          },
+          "cost": 2,
+          "contextUsage": {
+            "tokens": 999,
+            "contextWindow": 32000,
+            "percent": 3.121875
+          }
+        },
+        "context": {
+          "tokens": 999,
+          "contextWindow": 32000,
+          "percent": 3.121875
+        },
+        "last": "answer end",
+        "roles": [
+          "user",
+          "assistant"
+        ]
+      },
+      {
+        "name": "existing-v3",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 2,
+          "assistantMessages": 1,
+          "toolCalls": 0,
+          "toolResults": 1,
+          "totalMessages": 5,
+          "tokens": {
+            "input": 1,
+            "output": 1,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 2
+          },
+          "cost": 0,
+          "contextUsage": {
+            "tokens": null,
+            "contextWindow": 32000,
+            "percent": null
+          }
+        },
+        "context": {
+          "tokens": null,
+          "contextWindow": 32000,
+          "percent": null
+        },
+        "last": "hello",
+        "roles": [
+          "compactionSummary",
+          "user",
+          "assistant",
+          "toolResult",
+          "custom",
+          "branchSummary",
+          "futureRole"
+        ]
+      },
+      {
+        "name": "paid-compaction-unknown",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 2,
+          "assistantMessages": 1,
+          "toolCalls": 1,
+          "toolResults": 1,
+          "totalMessages": 5,
+          "tokens": {
+            "input": 50,
+            "output": 100,
+            "cacheRead": 150,
+            "cacheWrite": 200,
+            "total": 500
+          },
+          "cost": 10,
+          "contextUsage": {
+            "tokens": null,
+            "contextWindow": 32000,
+            "percent": null
+          }
+        },
+        "context": {
+          "tokens": null,
+          "contextWindow": 32000,
+          "percent": null
+        },
+        "last": "old answer",
+        "roles": [
+          "compactionSummary",
+          "user",
+          "assistant",
+          "toolResult",
+          "custom",
+          "branchSummary",
+          "futureRole"
+        ]
+      },
+      {
+        "name": "post-compaction",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 2,
+          "assistantMessages": 2,
+          "toolCalls": 1,
+          "toolResults": 1,
+          "totalMessages": 6,
+          "tokens": {
+            "input": 60,
+            "output": 120,
+            "cacheRead": 180,
+            "cacheWrite": 240,
+            "total": 600
+          },
+          "cost": 12,
+          "contextUsage": {
+            "tokens": 999,
+            "contextWindow": 32000,
+            "percent": 3.121875
+          }
+        },
+        "context": {
+          "tokens": 999,
+          "contextWindow": 32000,
+          "percent": 3.121875
+        },
+        "last": "new answer",
+        "roles": [
+          "compactionSummary",
+          "user",
+          "assistant",
+          "toolResult",
+          "custom",
+          "branchSummary",
+          "futureRole",
+          "assistant"
+        ]
+      },
+      {
+        "name": "post-compaction-zero",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 2,
+          "assistantMessages": 2,
+          "toolCalls": 1,
+          "toolResults": 1,
+          "totalMessages": 6,
+          "tokens": {
+            "input": 50,
+            "output": 100,
+            "cacheRead": 150,
+            "cacheWrite": 200,
+            "total": 500
+          },
+          "cost": 12,
+          "contextUsage": {
+            "tokens": null,
+            "contextWindow": 32000,
+            "percent": null
+          }
+        },
+        "context": {
+          "tokens": null,
+          "contextWindow": 32000,
+          "percent": null
+        },
+        "last": "zero",
+        "roles": [
+          "compactionSummary",
+          "user",
+          "assistant",
+          "toolResult",
+          "custom",
+          "branchSummary",
+          "futureRole",
+          "assistant"
+        ]
+      },
+      {
+        "name": "post-compaction-error",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 2,
+          "assistantMessages": 2,
+          "toolCalls": 1,
+          "toolResults": 1,
+          "totalMessages": 6,
+          "tokens": {
+            "input": 60,
+            "output": 120,
+            "cacheRead": 180,
+            "cacheWrite": 240,
+            "total": 600
+          },
+          "cost": 12,
+          "contextUsage": {
+            "tokens": null,
+            "contextWindow": 32000,
+            "percent": null
+          }
+        },
+        "context": {
+          "tokens": null,
+          "contextWindow": 32000,
+          "percent": null
+        },
+        "last": "error",
+        "roles": [
+          "compactionSummary",
+          "user",
+          "assistant",
+          "toolResult",
+          "custom",
+          "branchSummary",
+          "futureRole",
+          "assistant"
+        ]
+      },
+      {
+        "name": "error-trailing",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 3,
+          "assistantMessages": 3,
+          "toolCalls": 1,
+          "toolResults": 1,
+          "totalMessages": 8,
+          "tokens": {
+            "input": 70,
+            "output": 140,
+            "cacheRead": 210,
+            "cacheWrite": 280,
+            "total": 700
+          },
+          "cost": 14,
+          "contextUsage": {
+            "tokens": 1004,
+            "contextWindow": 32000,
+            "percent": 3.1375
+          }
+        },
+        "context": {
+          "tokens": 1004,
+          "contextWindow": 32000,
+          "percent": 3.1375
+        },
+        "last": "partial",
+        "roles": [
+          "compactionSummary",
+          "user",
+          "assistant",
+          "toolResult",
+          "custom",
+          "branchSummary",
+          "futureRole",
+          "assistant",
+          "user",
+          "assistant"
+        ]
+      },
+      {
+        "name": "empty-abort-skipped",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 3,
+          "assistantMessages": 4,
+          "toolCalls": 1,
+          "toolResults": 1,
+          "totalMessages": 9,
+          "tokens": {
+            "input": 80,
+            "output": 160,
+            "cacheRead": 240,
+            "cacheWrite": 320,
+            "total": 800
+          },
+          "cost": 16,
+          "contextUsage": {
+            "tokens": 1004,
+            "contextWindow": 32000,
+            "percent": 3.1375
+          }
+        },
+        "context": {
+          "tokens": 1004,
+          "contextWindow": 32000,
+          "percent": 3.1375
+        },
+        "last": "partial",
+        "roles": [
+          "compactionSummary",
+          "user",
+          "assistant",
+          "toolResult",
+          "custom",
+          "branchSummary",
+          "futureRole",
+          "assistant",
+          "user",
+          "assistant",
+          "assistant"
+        ]
+      },
+      {
+        "name": "branch-without-compaction",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 2,
+          "assistantMessages": 2,
+          "toolCalls": 1,
+          "toolResults": 1,
+          "totalMessages": 6,
+          "tokens": {
+            "input": 60,
+            "output": 120,
+            "cacheRead": 180,
+            "cacheWrite": 240,
+            "total": 600
+          },
+          "cost": 12,
+          "contextUsage": {
+            "tokens": 999,
+            "contextWindow": 32000,
+            "percent": 3.121875
+          }
+        },
+        "context": {
+          "tokens": 999,
+          "contextWindow": 32000,
+          "percent": 3.121875
+        },
+        "last": "sibling",
+        "roles": [
+          "compactionSummary",
+          "user",
+          "assistant"
+        ]
+      },
+      {
+        "name": "tool-only-last",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 1,
+          "assistantMessages": 2,
+          "toolCalls": 1,
+          "toolResults": 0,
+          "totalMessages": 3,
+          "tokens": {
+            "input": 20,
+            "output": 40,
+            "cacheRead": 60,
+            "cacheWrite": 80,
+            "total": 200
+          },
+          "cost": 4,
+          "contextUsage": {
+            "tokens": 999,
+            "contextWindow": 32000,
+            "percent": 3.121875
+          }
+        },
+        "context": {
+          "tokens": 999,
+          "contextWindow": 32000,
+          "percent": 3.121875
+        },
+        "last": null,
+        "roles": [
+          "user",
+          "assistant",
+          "assistant"
+        ]
+      },
+      {
+        "name": "empty-error-not-skipped",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 1,
+          "assistantMessages": 2,
+          "toolCalls": 0,
+          "toolResults": 0,
+          "totalMessages": 3,
+          "tokens": {
+            "input": 20,
+            "output": 40,
+            "cacheRead": 60,
+            "cacheWrite": 80,
+            "total": 200
+          },
+          "cost": 4,
+          "contextUsage": {
+            "tokens": 999,
+            "contextWindow": 32000,
+            "percent": 3.121875
+          }
+        },
+        "context": {
+          "tokens": 999,
+          "contextWindow": 32000,
+          "percent": 3.121875
+        },
+        "last": null,
+        "roles": [
+          "user",
+          "assistant",
+          "assistant"
+        ]
+      },
+      {
+        "name": "zero-fallback",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 1,
+          "assistantMessages": 2,
+          "toolCalls": 0,
+          "toolResults": 0,
+          "totalMessages": 3,
+          "tokens": {
+            "input": 20,
+            "output": 40,
+            "cacheRead": 60,
+            "cacheWrite": 80,
+            "total": 200
+          },
+          "cost": 4,
+          "contextUsage": {
+            "tokens": 100,
+            "contextWindow": 32000,
+            "percent": 0.3125
+          }
+        },
+        "context": {
+          "tokens": 100,
+          "contextWindow": 32000,
+          "percent": 0.3125
+        },
+        "last": "zero",
+        "roles": [
+          "user",
+          "assistant",
+          "assistant"
+        ]
+      },
+      {
+        "name": "all-estimated",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 1,
+          "assistantMessages": 1,
+          "toolCalls": 0,
+          "toolResults": 0,
+          "totalMessages": 2,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          },
+          "cost": 2,
+          "contextUsage": {
+            "tokens": 1202,
+            "contextWindow": 32000,
+            "percent": 3.7562499999999996
+          }
+        },
+        "context": {
+          "tokens": 1202,
+          "contextWindow": 32000,
+          "percent": 3.7562499999999996
+        },
+        "last": "tail",
+        "roles": [
+          "user",
+          "assistant"
+        ]
+      },
+      {
+        "name": "whitespace-last",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 1,
+          "assistantMessages": 2,
+          "toolCalls": 0,
+          "toolResults": 0,
+          "totalMessages": 3,
+          "tokens": {
+            "input": 20,
+            "output": 40,
+            "cacheRead": 60,
+            "cacheWrite": 80,
+            "total": 200
+          },
+          "cost": 4,
+          "contextUsage": {
+            "tokens": 999,
+            "contextWindow": 32000,
+            "percent": 3.121875
+          }
+        },
+        "context": {
+          "tokens": 999,
+          "contextWindow": 32000,
+          "percent": 3.121875
+        },
+        "last": null,
+        "roles": [
+          "user",
+          "assistant",
+          "assistant"
+        ]
+      },
+      {
+        "name": "non-js-whitespace",
+        "stats": {
+          "sessionFile": true,
+          "sessionId": "pi-writer",
+          "userMessages": 1,
+          "assistantMessages": 2,
+          "toolCalls": 0,
+          "toolResults": 0,
+          "totalMessages": 3,
+          "tokens": {
+            "input": 20,
+            "output": 40,
+            "cacheRead": 60,
+            "cacheWrite": 80,
+            "total": 200
+          },
+          "cost": 4,
+          "contextUsage": {
+            "tokens": 999,
+            "contextWindow": 32000,
+            "percent": 3.121875
+          }
+        },
+        "context": {
+          "tokens": 999,
+          "contextWindow": 32000,
+          "percent": 3.121875
+        },
+        "last": "",
+        "roles": [
+          "user",
+          "assistant",
+          "assistant"
+        ]
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:b1ddc1e090ba3b3fa5b1f4bdd0efc62fb9d1443cfc403d840a6a13933e19ed23",
+  "observation_hash": "sha256:bfe965e323069e321d34790fb1c237256bf8ed4df4ebd625fed733521bbdaff5",
+  "execution_method": "node --experimental-strip-types parity/oracle/session-stats.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts#getSessionStats/getContextUsage/getLastAssistantText"
+  }
+}

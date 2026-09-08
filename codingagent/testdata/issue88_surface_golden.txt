@@ -1,0 +1,23 @@
+method GetSessionStats func(*codingagent.AgentSession) (codingagent.SessionStats, error)
+method GetContextUsage func(*codingagent.AgentSession) (*codingagent.ContextUsage, error)
+method GetLastAssistantText func(*codingagent.AgentSession) (*string, error)
+method Messages func(*codingagent.AgentSession) []agent.AgentMessage
+method SessionFile func(*codingagent.AgentSession) *string
+method SessionID func(*codingagent.AgentSession) string
+type codingagent.SessionStats struct
+fields:
+- AssistantMessages int tag=""
+- ToolCalls int tag=""
+- ToolResults int tag=""
+- TotalMessages int tag=""
+- UserMessages int tag=""
+- ContextUsage *codingagent.ContextUsage tag=""
+- Cost float64 tag=""
+- SessionFile *string tag=""
+- SessionID string tag=""
+- Tokens ai.Usage tag=""
+type codingagent.ContextUsage struct
+fields:
+- ContextWindow int64 tag=""
+- Percent *float64 tag=""
+- Tokens *int64 tag=""
