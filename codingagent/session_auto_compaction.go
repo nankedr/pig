@@ -10,7 +10,7 @@ import (
 
 func (s *AgentSession) checkAutoCompaction(ctx context.Context, message ai.AssistantMessage, skipAborted bool) bool {
 	settings, err := s.settingsManager.GetCompactionSettings()
-	if err != nil || !settings.Enabled || ctx.Err() != nil || skipAborted && message.StopReason == ai.StopReasonAborted {
+	if err != nil || s.sessionManager == nil || !settings.Enabled || ctx.Err() != nil || skipAborted && message.StopReason == ai.StopReasonAborted {
 		return false
 	}
 	model := s.Model()
@@ -50,15 +50,23 @@ func (s *AgentSession) checkAutoCompaction(ctx context.Context, message ai.Assis
 	tokens := CalculateContextTokens(message.Usage)
 	if message.StopReason == ai.StopReasonError || tokens == 0 {
 		messages := s.Messages()
-		estimate := agent.EstimateContextTokens(messages)
-		if estimate.LastUsageIndex < 0 {
+		tokens = 0
+		found := false
+		for i := len(messages) - 1; i >= 0; i-- {
+			source, ok := sessionAssistantMessage(messages[i])
+			if ok && source.StopReason != ai.StopReasonError && source.StopReason != ai.StopReasonAborted && CalculateContextTokens(source.Usage) > 0 {
+				if boundary != 0 && source.Timestamp <= boundary {
+					return false
+				}
+				tokens += CalculateContextTokens(source.Usage)
+				found = true
+				break
+			}
+			tokens += EstimateTokens(messages[i])
+		}
+		if !found {
 			return false
 		}
-		source, ok := sessionAssistantMessage(messages[estimate.LastUsageIndex])
-		if ok && boundary != 0 && source.Timestamp <= boundary {
-			return false
-		}
-		tokens = estimate.Tokens
 	}
 	if ShouldCompact(tokens, model.ContextWindow, settings) {
 		return s.runAutoCompaction(ctx, CompactionReasonThreshold, false, settings)
@@ -124,14 +132,19 @@ func (s *AgentSession) runAutoCompaction(ctx context.Context, reason CompactionR
 	return willRetry || s.agent.HasQueuedMessages() || s.hasCompactionQueue()
 }
 
-func (s *AgentSession) continueAfterCompaction(ctx context.Context) error {
+func (s *AgentSession) continueAfterCompaction(ctx context.Context) (err error) {
+	if ctx.Err() != nil {
+		return context.Cause(ctx)
+	}
 	s.mu.Lock()
 	messages := s.agent.State().Messages
 	var prompts []agent.AgentMessage
+	steering := true
 	if len(messages) > 0 && messages[len(messages)-1].MessageRole() == ai.MessageRoleAssistant && !s.agent.HasQueuedMessages() {
 		queue, mode := &s.compactionSteering, s.agent.SteeringMode()
 		if len(*queue) == 0 {
 			queue, mode = &s.compactionFollowUp, s.agent.FollowUpMode()
+			steering = false
 		}
 		count := len(*queue)
 		if mode == agent.QueueOneAtATime && count > 0 {
@@ -142,7 +155,29 @@ func (s *AgentSession) continueAfterCompaction(ctx context.Context) error {
 		s.delayCompactionSteering = len(prompts) > 0
 	}
 	s.mu.Unlock()
-	defer func() { s.mu.Lock(); s.delayCompactionSteering = false; s.mu.Unlock() }()
+	defer func() {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		s.delayCompactionSteering = false
+		if err == nil {
+			return
+		}
+		queue, pending := &s.compactionSteering, s.steeringMessages
+		if !steering {
+			queue, pending = &s.compactionFollowUp, s.followUpMessages
+		}
+		var remaining []agent.AgentMessage
+		for _, prompt := range prompts {
+			user := prompt.(ai.UserMessage)
+			for _, queued := range pending {
+				if queued.timestamp == user.Timestamp {
+					remaining = append(remaining, prompt)
+					break
+				}
+			}
+		}
+		*queue = append(remaining, *queue...)
+	}()
 	if len(prompts) > 0 {
 		return s.agent.Prompt(ctx, prompts...)
 	}

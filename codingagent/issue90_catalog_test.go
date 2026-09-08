@@ -28,4 +28,4 @@ func issue90PromoteRuntimeEntry(entry *catalog.Entry) bool {
 	return false
 }
 
-const issue90RuntimeHash = "sha256:b9975438d43926ff219529505a23b4fc2951f2ce2f22788e265a7c8ea3390cdb"
+const issue90RuntimeHash = "sha256:e3b971d885bc098f8c80fa6090f265e7524498dbed00ebad268a2cc925ee5ec7"

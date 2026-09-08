@@ -16,7 +16,7 @@ threshold 压缩只准备下一轮上下文；有排队消息时才续跑。over
 
 自动压缩复用手动压缩的 cut point、摘要预算和 v3 原子提交。旧消息完整留在文件中，模型上下文重建为摘要加保留尾部。失败 Assistant 只从运行上下文移除，Headless 仍能返回它的 partial 与取消状态。WaitForIdle 等待整个恢复过程。
 
-压缩时可以 Steer、FollowUp，或通过 Prompt 的 streamingBehavior 指定投递队列；Session 暂存后按 one-at-a-time/all 模式续跑。取消保留这些消息，可显式 Prompt 继续或 ClearQueue 清空。普通 idle 和 Provider retry 等待期仍沿用原有入队限制。
+压缩时可以 Steer、FollowUp，或通过 Prompt 的 streamingBehavior 指定投递队列；Session 暂存后按 one-at-a-time/all 模式续跑。运行后取消压缩会保留这些消息，可显式 Prompt 继续或 ClearQueue 清空；输入前检查中的 AbortCompaction 只取消摘要，已提交的 Prompt 仍执行。普通 idle 和 Provider retry 等待期仍沿用原有入队限制。
 
 基线有一个已验证限制：503 后紧接 overflow，重建可能保留前一个失败 Assistant，导致继续时报 cannot continue from message role: assistant。Pig 明确返回此终态并保留历史。空摘要后仍 overflow 也只尝试一次，不表示恢复成功。
 

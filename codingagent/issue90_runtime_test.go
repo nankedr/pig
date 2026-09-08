@@ -274,3 +274,96 @@ func TestAutoCompactionSettings(t *testing.T) {
 		t.Fatal("getter ignores effective settings")
 	}
 }
+
+func TestAutoCompactionPreflightAbortKeepsSubmittedPrompt(t *testing.T) {
+	generations := 0
+	s := auto90Session(t, func(_ context.Context, m ai.Model, input ai.Context, _ ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+		system, _ := input.SystemPrompt.Value()
+		if strings.HasPrefix(system, "You are a context summarization assistant.") {
+			t.Error("aborted preflight sent summary request")
+		}
+		generations++
+		tokens := int64(20)
+		if generations == 1 {
+			tokens = 950
+		}
+		return auto90Reply(m, "answer", auto90Response{Input: &tokens})
+	}, nil)
+	s.SetAutoCompactionEnabled(false)
+	if err := s.Prompt(context.Background(), "first"); err != nil {
+		t.Fatal(err)
+	}
+	s.SetAutoCompactionEnabled(true)
+	s.Subscribe(func(e codingagent.AgentSessionEvent) {
+		if e.AgentSessionEventType() == codingagent.AgentSessionEventTypeCompactionStart {
+			if err := s.FollowUp("queued"); err != nil {
+				t.Error(err)
+			}
+			s.AbortCompaction()
+		}
+	})
+	if err := s.Prompt(context.Background(), "submitted"); err != nil {
+		t.Fatal(err)
+	}
+	if generations != 3 {
+		t.Fatalf("explicit prompt or follow-up lost: %d", generations)
+	}
+	if pending, _ := s.PendingMessageCount(); pending != 0 {
+		t.Fatalf("pending=%d", pending)
+	}
+}
+
+func TestAutoCompactionWithoutSessionManager(t *testing.T) {
+	core, _ := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	model, _ := core.GetModel()
+	a, err := agent.NewAgent(agent.AgentOptions{InitialState: &agent.AgentInitialState{Model: model}, StreamFunction: func(_ context.Context, m ai.Model, _ ai.Context, _ ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+		return auto90Reply(m, "answer", auto90Response{Input: pointerTo(int64(950))})
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := codingagent.NewAgentSession(codingagent.AgentSessionConfig{Agent: a})
+	defer s.Dispose()
+	if err := s.Prompt(context.Background(), "without persistence"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAutoCompactionAbortAtCommitPreservesQueue(t *testing.T) {
+	generations := 0
+	s := auto90Session(t, func(_ context.Context, m ai.Model, input ai.Context, _ ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+		system, _ := input.SystemPrompt.Value()
+		if strings.HasPrefix(system, "You are a context summarization assistant.") {
+			return auto90Reply(m, "checkpoint", auto90Response{})
+		}
+		generations++
+		tokens := int64(20)
+		if generations == 1 {
+			tokens = 950
+		}
+		return auto90Reply(m, "answer", auto90Response{Input: &tokens})
+	}, nil)
+	s.Subscribe(func(e codingagent.AgentSessionEvent) {
+		switch e.AgentSessionEventType() {
+		case codingagent.AgentSessionEventTypeCompactionStart:
+			s.Steer("steering")
+			s.FollowUp("follow-up")
+		case codingagent.AgentSessionEventTypeCompactionEnd:
+			s.Abort()
+		}
+	})
+	outcome, err := auto90Run(context.Background(), s)
+	if err != nil || !outcome.Canceled {
+		t.Fatalf("abort outcome=%+v err=%v", outcome, err)
+	}
+	if generations != 1 {
+		t.Fatal("generated after abort")
+	}
+	s.SetAutoCompactionEnabled(false)
+	if err := s.Prompt(context.Background(), "explicit continuation"); err != nil {
+		t.Fatal(err)
+	}
+	if pending, _ := s.PendingMessageCount(); pending != 0 || generations != 3 {
+		t.Fatalf("lost queue: pending=%d generations=%d", pending, generations)
+	}
+}
