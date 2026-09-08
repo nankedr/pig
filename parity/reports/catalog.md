@@ -12,8 +12,8 @@
 | Status | Count |
 | --- | --- |
 | inventoried | 5168 |
-| scaffolded | 4001 |
-| partial | 263 |
+| scaffolded | 3994 |
+| partial | 270 |
 | implemented | 60 |
 | verified | 167 |
 | deferred | 2 |
@@ -6289,12 +6289,10 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.abort | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Abort | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortBash | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBash | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortBranchSummary | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBranchSummary | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.abortCompaction | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortCompaction | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.agent | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Agent | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.autoCompactionEnabled | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AutoCompactionEnabled | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.bindExtensions | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.BindExtensions | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.clearQueue | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ClearQueue | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.compact | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Compact | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.createReplacedSessionContext | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CreateReplacedSessionContext | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.dispose | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Dispose | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.executeBash | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash | coding-agent |
@@ -6313,7 +6311,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.hasExtensionHandlers | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.HasExtensionHandlers | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.hasPendingBashMessages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.HasPendingBashMessages | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isBashRunning | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsBashRunning | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.isCompacting | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsCompacting | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isIdle | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsIdle | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isStreaming | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsStreaming | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.messages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Messages | coding-agent |
@@ -7055,7 +7052,6 @@
 | member:codingagent/src/core/session-manager.ts#SessionInfoEntry.parentId | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.SessionInfoEntry.ParentID | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionInfoEntry.timestamp | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.SessionInfoEntry.Timestamp | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionInfoEntry.type | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.SessionInfoEntry.Type | coding-agent |
-| member:codingagent/src/core/session-manager.ts#SessionManager.appendCompaction | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendCompaction | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionManager.appendCustomEntry | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendCustomEntry | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionManager.appendCustomMessageEntry | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendCustomMessageEntry | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionManager.appendLabelChange | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendLabelChange | coding-agent |
@@ -7677,12 +7673,9 @@
 | symbol:codingagent/src/core/compaction/compaction.ts#CutPointResult | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CutPointResult | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#DEFAULT_COMPACTION_SETTINGS | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.DefaultCompactionSettings | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#calculateContextTokens | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CalculateContextTokens | coding-agent |
-| symbol:codingagent/src/core/compaction/compaction.ts#compact | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.Compact | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#estimateTokens | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.EstimateTokens | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#findCutPoint | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.FindCutPoint | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#findTurnStartIndex | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.FindTurnStartIndex | coding-agent |
-| symbol:codingagent/src/core/compaction/compaction.ts#generateSummary | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummary | coding-agent |
-| symbol:codingagent/src/core/compaction/compaction.ts#generateSummaryWithUsage | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummaryWithUsage | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#getLastAssistantUsage | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.GetLastAssistantUsage | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#shouldCompact | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.ShouldCompact | coding-agent |
 | symbol:codingagent/src/core/compaction/utils.ts#FileOperations | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.FileOperations | coding-agent |
@@ -8020,18 +8013,25 @@
 | contract:model-runtime/basic | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewModelRuntime | coding-agent |
 | contract:security/project-trust | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateHeadlessSession | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.abortCompaction | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortCompaction | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.compact | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Compact | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.cycleModel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleModel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.cycleThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getActiveToolNames | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetActiveToolNames | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getAllTools | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAllTools | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getAvailableThinkingLevels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAvailableThinkingLevels | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.isCompacting | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsCompacting | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.scopedModels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ScopedModels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setActiveToolsByName | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetActiveToolsByName | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setModel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setScopedModels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetScopedModels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.supportsThinking | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SupportsThinking | coding-agent |
+| member:codingagent/src/core/session-manager.ts#SessionManager.appendCompaction | partial | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendCompaction | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
+| symbol:codingagent/src/core/compaction/compaction.ts#compact | partial | M4 | symbol | github.com/nankedr/pig/codingagent.Compact | coding-agent |
+| symbol:codingagent/src/core/compaction/compaction.ts#generateSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummary | coding-agent |
+| symbol:codingagent/src/core/compaction/compaction.ts#generateSummaryWithUsage | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummaryWithUsage | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |

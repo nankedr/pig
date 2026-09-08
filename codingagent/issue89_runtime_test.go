@@ -308,3 +308,88 @@ func TestManualCompactionRetriesRuntimeTruncation(t *testing.T) {
 		t.Fatalf("result=%+v error=%v calls=%d retries=%d", result, err, calls, retries)
 	}
 }
+
+func TestManualCompactionCancellationWaitsForTurnCleanup(t *testing.T) {
+	started, cleaning, release := make(chan struct{}), make(chan struct{}), make(chan struct{})
+	s, _ := compact89Session(t, func(ctx context.Context, model ai.Model, input ai.Context, o ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+		stream := ai.NewAssistantMessageEventStream()
+		message, _ := ai.FauxAssistantMessage(ai.FauxAssistantText("partial"))
+		stream.Push(ai.AssistantMessageStartEvent{Type: ai.AssistantMessageEventTypeStart, Partial: message})
+		close(started)
+		go func() {
+			<-ctx.Done()
+			message.StopReason = ai.StopReasonAborted
+			stream.Push(ai.AssistantMessageErrorEvent{Type: ai.AssistantMessageEventTypeError, Reason: ai.StopReasonAborted, Error: message})
+		}()
+		return stream
+	}, false)
+	s.Subscribe(func(e codingagent.AgentSessionEvent) {
+		if e.AgentSessionEventType() == codingagent.AgentSessionEventTypeAgentSettled {
+			close(cleaning)
+			<-release
+		}
+	})
+	prompt := make(chan error, 1)
+	go func() { prompt <- s.Prompt(context.Background(), "active") }()
+	<-started
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	compact := make(chan error, 1)
+	go func() { _, err := s.Compact(ctx); compact <- err }()
+	<-cleaning
+	waiting := make(chan error, 1)
+	go func() { waiting <- s.WaitForIdle(context.Background()) }()
+	cancel()
+	select {
+	case err := <-compact:
+		t.Errorf("compaction returned before cleanup: %v", err)
+	case <-time.After(20 * time.Millisecond):
+	}
+	select {
+	case err := <-waiting:
+		t.Errorf("idle returned before cleanup: %v", err)
+	default:
+	}
+	close(release)
+	<-prompt
+	select {
+	case err := <-compact:
+		if !errors.Is(err, context.Canceled) {
+			t.Fatal(err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("compaction did not settle")
+	}
+	select {
+	case err := <-waiting:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("idle did not settle")
+	}
+}
+
+func TestManualCompactionPreservesCancellationCause(t *testing.T) {
+	for _, cause := range []error{context.DeadlineExceeded, errors.New("caller stopped summarization")} {
+		t.Run(cause.Error(), func(t *testing.T) {
+			ctx, cancel := context.WithCancelCause(context.Background())
+			defer cancel(nil)
+			s, manager := compact89Session(t, func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+				cancel(cause)
+				return compact89Response("checkpoint", ai.StopReasonStop)
+			}, false)
+			before := manager.GetEntries()
+			aborted := false
+			s.Subscribe(func(e codingagent.AgentSessionEvent) {
+				if end, ok := e.(codingagent.AgentSessionCompactionEndEvent); ok {
+					aborted = end.Aborted
+				}
+			})
+			_, err := s.Compact(ctx)
+			if !errors.Is(err, cause) || !aborted || !reflect.DeepEqual(before, manager.GetEntries()) {
+				t.Fatalf("cause=%v err=%v aborted=%t", cause, err, aborted)
+			}
+		})
+	}
+}

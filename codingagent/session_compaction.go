@@ -41,11 +41,7 @@ func (s *AgentSession) Compact(ctx context.Context, instructions ...string) (res
 	s.mu.RLock()
 	idle := s.idle
 	s.mu.RUnlock()
-	select {
-	case <-idle:
-	case <-run.Done():
-		err = context.Cause(run)
-	}
+	<-idle
 	s.mu.Lock()
 	s.compactionCancel = cancel
 	s.mu.Unlock()
@@ -59,7 +55,7 @@ func (s *AgentSession) Compact(ctx context.Context, instructions ...string) (res
 		event := AgentSessionCompactionEndEvent{Type: AgentSessionEventTypeCompactionEnd, Reason: CompactionReasonManual}
 		if err != nil {
 			result = CompactionResult{}
-			event.Aborted = errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded)
+			event.Aborted = run.Err() != nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded)
 			if !event.Aborted {
 				text := "Compaction failed: " + err.Error()
 				event.ErrorMessage = &text
@@ -136,7 +132,10 @@ func (s *AgentSession) Compact(ctx context.Context, instructions ...string) (res
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if run.Err() != nil || s.disposed {
+	if run.Err() != nil {
+		return CompactionResult{}, context.Cause(run)
+	}
+	if s.disposed {
 		return CompactionResult{}, context.Canceled
 	}
 	manager := s.sessionManager

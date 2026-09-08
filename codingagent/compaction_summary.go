@@ -165,7 +165,10 @@ func completeSummary(ctx context.Context, model ai.Model, prompt string, maxToke
 	if err != nil {
 		return SummaryWithUsage{}, err
 	}
-	if ctx.Err() != nil || result.StopReason == ai.StopReasonAborted {
+	if ctx.Err() != nil {
+		return SummaryWithUsage{}, context.Cause(ctx)
+	}
+	if result.StopReason == ai.StopReasonAborted {
 		return SummaryWithUsage{}, context.Canceled
 	}
 	if result.StopReason == ai.StopReasonError {

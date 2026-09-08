@@ -711,7 +711,7 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 	if s.configurationNotifying || s.compactionCancel != nil {
 		s.mu.Unlock()
 		cancel(nil)
-		return fmt.Errorf("AgentSession is delivering configuration notifications")
+		return fmt.Errorf("AgentSession is busy delivering configuration notifications or compacting")
 	}
 	if s.active {
 		var delivery UserMessageDelivery
