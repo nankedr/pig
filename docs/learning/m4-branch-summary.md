@@ -15,7 +15,7 @@ return session.Prompt(ctx, "结合探索结论继续")
 
 共同祖先到旧 leaf 之间的离开路径进入摘要；选择的目标若是用户/custom 消息，EditorText 返回其文本，新摘要挂在父节点。选择 assistant 则挂在该节点。根用户消息会产生根摘要。标签标记新摘要；旧分支的消息不会删除。`SummaryEntry.FromID` 是摘要挂载位置，这是固定 Pi 的字段语义。
 
-摘要请求从新消息向旧消息取预算，跳过工具结果，但保留 assistant 工具调用和已有摘要。文件记录去重后存进 Details，并附在摘要文本末尾。`branchSummary.reserveTokens` 留给提示和响应；输出请求固定 2048 token。自定义指令默认追加，ReplaceInstructions=true 且自定义指令非空时替换默认格式。当前模型继续用于摘要，但摘要不继承 thinking 等级。
+摘要请求从新消息向旧消息取预算，跳过工具结果，但保留 assistant 工具调用和已有摘要。文件记录去重后存进 Details，并附在摘要文本末尾。`branchSummary.reserveTokens` 留给提示和响应；显式 reserveTokens=0 使用完整 contextWindow，缺省时预留 16384；输出请求固定 2048 token。自定义指令默认追加，ReplaceInstructions=true 且自定义指令非空时替换默认格式。当前模型继续用于摘要，但摘要不继承 thinking 等级。
 
 摘要不立即执行后续生成；成功返回后调用 Prompt。模型通过标准 branchSummary 消息投影收到摘要，原分支仍可通过 NavigateTree 返回。同一 leaf 的重复导航不生成摘要；往返另一分支时仅处理新的离开路径及其中已有摘要。
 
@@ -27,6 +27,6 @@ go test -race ./codingagent -run '^TestBranchSummary' -count=1
 go run ./examples/branch-summary
 ```
 
-19 个 Oracle 场景从 Pi source/dist 和 Go 公开 SDK 比较请求、事件、摘要文件、重开与继续生成。真实 HTTP 测试补充动态认证和截断重试，公开 SDK 测试补充并发占用、取消、原子写入和数据所有权。Catalog 为 `contract:codingagent/branch-summary`，API snapshot 为 `codingagent/testdata/issue92_surface_golden.txt`。
+21 个 Oracle 场景从 Pi source/dist 和 Go 公开 SDK 比较请求、事件、摘要文件、重开与继续生成。真实 HTTP 测试补充动态认证和截断重试，公开 SDK 测试补充并发占用、取消、原子写入和数据所有权。Catalog 为 `contract:codingagent/branch-summary`，API snapshot 为 `codingagent/testdata/issue92_surface_golden.txt`。
 
 扩展 hook、扩展自定义摘要与取消、RPC/TUI 控制和自动压缩留给后继切片。详见 [设计决策](../adr/0028-branch-summary-navigation.md)与 [TypeScript → Go 导航](../mappings/typescript-to-go/m4-branch-summary.md)。

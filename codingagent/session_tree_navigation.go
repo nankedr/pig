@@ -46,6 +46,13 @@ func (s *AgentSession) NavigateTree(ctx context.Context, targetID string, option
 	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	defer func() {
+		if s.branchSummaryDone != nil {
+			s.branchSummaryCancel()
+			close(s.branchSummaryDone)
+			s.branchSummaryCancel, s.branchSummaryDone = nil, nil
+		}
+	}()
 	if err := ctx.Err(); err != nil {
 		return result, err
 	}

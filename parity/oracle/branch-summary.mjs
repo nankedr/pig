@@ -110,6 +110,8 @@ async function main() {
  {name:"ancestor",target:"shared",replace:true},
  {name:"same",target:"leaf",label:"ignored"},
  {name:"budget",target:"other",reserve:31990},
+ {name:"fractional-summary-budget",target:"other",reserve:31997,smallSummary:true},
+ {name:"zero-reserve",target:"other",reserve:0,window:17000,longHistory:true},
  {name:"summary-budget",target:"other",reserve:31955},
  {name:"oversized-reserve",target:"other",reserve:33000},
  {name:"no-content",target:"leaf",metadata:true},
@@ -123,7 +125,7 @@ async function main() {
  {name:"quota",target:"other",errors:["429 insufficient_quota"]},
  {name:"abort",target:"other",abort:true},
  {name:"abort-retry",target:"other",errors:["503 overloaded"],abortRetry:true}
- ].map(x=>({label:"",instructions:"",replace:false,reserve:1000,errors:[],abort:false,abortRetry:false,metadata:false,start:"",hook:false,compaction:false,custom:false,roundtrip:false,...x}))};
+ ].map(x=>({label:"",instructions:"",replace:false,reserve:1000,errors:[],abort:false,abortRetry:false,metadata:false,start:"",hook:false,compaction:false,custom:false,roundtrip:false,window:32000,longHistory:false,smallSummary:false,...x}))};
  let outcome;
  try{
  for(const sdk of ["src/core/sdk.ts","dist/core/sdk.js"]){
@@ -132,14 +134,16 @@ async function main() {
  runtime.registerProvider("deepseek",{api:"openai-completions",apiKey:"fixture",baseUrl:"https://invalid.test",models:[{id:"deepseek-v4-flash",name:"fixture",reasoning:true,input:["text"],cost:{input:0,output:0,cacheRead:0,cacheWrite:0},contextWindow:32000,maxTokens:4096}]});
  const runs=[];
  for(const scenario of input.scenarios){
- const seed=structuredClone(history);
+ let seed=structuredClone(history);
+ if(scenario.smallSummary){seed=seed.filter(e=>!["explore","tools","toolresult"].includes(e.id));seed.find(e=>e.id==="prior").parentId="shared";Object.assign(seed.find(e=>e.id==="leaf"),{parentId:"prior",message:assistant("abcdefgh")})}
+ if(scenario.longHistory)seed.find(e=>e.id==="explore").message=user("old exploration ".repeat(300));
  if(scenario.metadata)seed.push({type:"custom",id:"metadata",parentId:"leaf",timestamp:"2026-01-01T00:00:00Z",customType:"state",data:{}});
  if(scenario.hook)seed.find(e=>e.id==="prior").fromHook=true;
  if(scenario.compaction)Object.assign(seed.find(e=>e.id==="prior"),{type:"compaction",firstKeptEntryId:"tools",tokensBefore:100});
  if(scenario.custom)Object.assign(seed.find(e=>e.id==="target"),{type:"custom_message",customType:"note",content:[{type:"text",text:"custom target"}],display:true});
  const file=join(dir,"session.jsonl");writeFileSync(file,[{type:"session",version:3,id:"history",cwd:dir,timestamp:"2026-01-01T00:00:00Z"},...seed].map(e=>JSON.stringify(e)).join("\n")+"\n");
  const manager=SessionManager.open(file),settings=SettingsManager.inMemory({compaction:{enabled:false},branchSummary:{reserveTokens:scenario.reserve},retry:{enabled:true,maxRetries:2,baseDelayMs:1}});
- const {session}=await createAgentSession({cwd:dir,agentDir:dir,model:runtime.getModel("deepseek","deepseek-v4-flash"),modelRuntime:runtime,sessionManager:manager,settingsManager:settings,thinkingLevel:"high",tools:[]});
+ const {session}=await createAgentSession({cwd:dir,agentDir:dir,model:{...runtime.getModel("deepseek","deepseek-v4-flash"),contextWindow:scenario.window},modelRuntime:runtime,sessionManager:manager,settingsManager:settings,thinkingLevel:"high",tools:[]});
  const core=createFauxCore({}),requests=[],events=[],routing=[];
  session.agent.streamFunction=core.streamSimple;
  const text=m=>typeof m.content==="string"?m.content:(m.content??[]).filter(b=>b.type==="text").map(b=>b.text).join("");

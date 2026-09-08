@@ -216,3 +216,40 @@ func TestBranchSummaryRuntimeAuthAndReopen(t *testing.T) {
 		t.Fatalf("continuation missing committed summary: %s", data)
 	}
 }
+
+func TestBranchSummaryWaitForIdleIncludesPersistence(t *testing.T) {
+	entered, release := make(chan struct{}), make(chan struct{})
+	summary := strings.Repeat("context ", 512*1024)
+	s, m := compact89Session(t, func(context.Context, ai.Model, ai.Context, ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+		stream := ai.NewAssistantMessageEventStream()
+		close(entered)
+		go func() {
+			<-release
+			message, _ := ai.FauxAssistantMessage(ai.FauxAssistantText(summary))
+			stream.End(message)
+		}()
+		return stream
+	}, true)
+	done := make(chan error, 1)
+	go func() {
+		_, err := s.NavigateTree(context.Background(), m.GetEntries()[0].ID, codingagent.NavigateTreeOptions{Summarize: true})
+		done <- err
+	}()
+	<-entered
+	path := *s.SessionFile()
+	time.AfterFunc(20*time.Millisecond, func() { close(release) })
+	if err := s.WaitForIdle(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	persisted := strings.Contains(string(data), `"type":"branch_summary"`)
+	if err := <-done; err != nil {
+		t.Fatal(err)
+	}
+	if !persisted {
+		t.Fatal("WaitForIdle returned before branch_summary persistence")
+	}
+}

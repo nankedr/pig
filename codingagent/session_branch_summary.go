@@ -22,7 +22,6 @@ func (s *AgentSession) summarizeNavigationLocked(ctx context.Context, target str
 	}
 	count := len(m.entries)
 	run, cancel := context.WithCancel(ctx)
-	defer cancel()
 	done := make(chan struct{})
 	s.branchSummaryCancel, s.branchSummaryDone = cancel, done
 	m.mu.Unlock()
@@ -30,8 +29,6 @@ func (s *AgentSession) summarizeNavigationLocked(ctx context.Context, target str
 	defer func() {
 		s.mu.Lock()
 		m.mu.Lock()
-		s.branchSummaryCancel, s.branchSummaryDone = nil, nil
-		close(done)
 		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) || run.Err() != nil {
 			result = BranchSummaryResult{Aborted: true}
 			err = ctx.Err()
@@ -69,7 +66,6 @@ func (s *AgentSession) summarizeNavigationLocked(ctx context.Context, target str
 	if err != nil {
 		return result, err
 	}
-	o.ReserveTokens = settings.ReserveTokens
 	retry, err := s.settingsManager.GetRetrySettings()
 	if err != nil {
 		return result, err
@@ -89,7 +85,7 @@ func (s *AgentSession) summarizeNavigationLocked(ctx context.Context, target str
 			return nil
 		},
 	}
-	result, err = GenerateBranchSummary(run, collected.Entries, o)
+	result, err = generateBranchSummary(run, collected.Entries, o, settings.ReserveTokens)
 	if err == nil && run.Err() != nil {
 		err = context.Cause(run)
 	}

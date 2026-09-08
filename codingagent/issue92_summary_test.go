@@ -34,11 +34,12 @@ func TestBranchSummaryParity(t *testing.T) {
 		var input struct {
 			History   []json.RawMessage
 			Scenarios []struct {
-				Name, Target, Label, Instructions, Start      string
-				Metadata, Hook, Compaction, Custom, Roundtrip bool
-				Replace, Abort, AbortRetry                    bool
-				Errors                                        []string
-				Reserve                                       int64
+				Name, Target, Label, Instructions, Start                                 string
+				Metadata, Hook, Compaction, Custom, Roundtrip, LongHistory, SmallSummary bool
+				Window                                                                   int64
+				Replace, Abort, AbortRetry                                               bool
+				Errors                                                                   []string
+				Reserve                                                                  int64
 			}
 		}
 		if err := json.Unmarshal(c.Input, &input); err != nil {
@@ -48,7 +49,7 @@ func TestBranchSummaryParity(t *testing.T) {
 		for _, scenario := range input.Scenarios {
 			runtime, models, _ := config87Runtime(t)
 			models[0].MaxTokens = 4096
-			models[0].ContextWindow = 32000
+			models[0].ContextWindow = scenario.Window
 			models[0].Cost = ai.ModelCost{}
 			dir := t.TempDir()
 			file := filepath.Join(dir, "session.jsonl")
@@ -59,6 +60,21 @@ func TestBranchSummaryParity(t *testing.T) {
 				var entry map[string]any
 				if err := json.Unmarshal(e, &entry); err != nil {
 					t.Fatal(err)
+				}
+				if scenario.SmallSummary {
+					if entry["id"] == "explore" || entry["id"] == "tools" || entry["id"] == "toolresult" {
+						continue
+					}
+					if entry["id"] == "prior" {
+						entry["parentId"] = "shared"
+					}
+					if entry["id"] == "leaf" {
+						entry["parentId"] = "prior"
+						entry["message"].(map[string]any)["content"] = []any{map[string]any{"type": "text", "text": "abcdefgh"}}
+					}
+				}
+				if entry["id"] == "explore" && scenario.LongHistory {
+					entry["message"].(map[string]any)["content"] = []any{map[string]any{"type": "text", "text": strings.Repeat("old exploration ", 300)}}
 				}
 				if entry["id"] == "prior" {
 					if scenario.Hook {
@@ -94,7 +110,12 @@ func TestBranchSummaryParity(t *testing.T) {
 			if err != nil {
 				return parity.Observation{}, err
 			}
-			settings, _ := codingagent.NewInMemorySettingsManager(codingagent.Settings{BranchSummary: &codingagent.BranchSummarySettings{ReserveTokens: scenario.Reserve}, Retry: &codingagent.RetrySettings{Enabled: pointerTo(true), MaxRetries: pointerTo(2), BaseDelayMS: pointerTo(int64(1))}})
+			settingsJSON, _ := json.Marshal(map[string]any{"branchSummary": map[string]any{"reserveTokens": scenario.Reserve}, "retry": map[string]any{"enabled": true, "maxRetries": 2, "baseDelayMs": 1}})
+			var settingsValue codingagent.Settings
+			if err := json.Unmarshal(settingsJSON, &settingsValue); err != nil {
+				t.Fatal(err)
+			}
+			settings, _ := codingagent.NewInMemorySettingsManager(settingsValue)
 			core, _ := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
 			created, err := codingagent.CreateAgentSession(ctx, codingagent.CreateAgentSessionOptions{CWD: dir, Model: &models[0], ModelRuntime: runtime, SessionManager: manager, SettingsManager: settings, ThinkingLevel: "high", Tools: []string{}, StreamFunction: agent.StreamFunction(core.StreamSimple)})
 			if err != nil {

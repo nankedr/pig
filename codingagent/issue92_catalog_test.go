@@ -40,4 +40,4 @@ func issue92PromoteRuntimeEntry(entry *catalog.Entry) bool {
 	return false
 }
 
-const issue92SummaryTestHash = "sha256:151cbb04e5137eacdcbffbfc74301b6e468012bc7602f62591385846efdb4919"
+const issue92SummaryTestHash = "sha256:831e21ad96535fa0271375a0e01c8ac4cb86b1451a7e02a39a705cfa051c29c1"

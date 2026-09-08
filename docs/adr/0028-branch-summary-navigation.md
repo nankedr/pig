@@ -2,7 +2,7 @@
 
 Issue #92 延续 ADR-0027 的 Session 导航提交边界，实现固定 Pi 936aff0 的默认 branch summarizer。共同祖先选择以用户选择的目标节点为准，摘要范围为旧 leaf 到共同祖先之间的路径；用户/custom 目标实际挂载在其父节点。branch_summary 的 fromId 按 Pi 记录挂载位置（根位置为 root），不是离开路径的 leaf。标签标记摘要节点，标签记录自身成为 leaf。
 
-预算为当前模型 contextWindow（缺省 128000）减去 settings.branchSummary.reserveTokens（缺省 16384）；非正剩余预算按基线不限制。从新到旧收集消息，跳过工具结果，保留 compaction/branch_summary 的文本。已有非 hook 分支摘要贡献累计文件记录；工具调用只遍历到预算截止处，包括超出预算的当前条目。修改文件从读取列表去重。请求输出预算固定为 2048，不继承当前 thinking。CustomInstructions 默认追加；ReplaceInstructions 仅在自定义文本非空时替换默认提示。
+预算为当前模型 contextWindow（缺省 128000）减去 settings.branchSummary.reserveTokens（缺省 16384）；显式设置 0 保留整个窗口，非正剩余预算按基线不限制。独立 Go GenerateBranchSummaryOptions 的零值表示缺省 16384；Session 使用已解析设置保留显式零值。从新到旧收集消息，跳过工具结果，保留 compaction/branch_summary 的文本。摘要超出预算时，若已收集 token 严格小于预算的 90%，仍保留该摘要；90% 比较不向下取整。已有非 hook 分支摘要贡献累计文件记录；工具调用只遍历到预算截止处，包括超出预算的当前条目。修改文件从读取列表去重。请求输出预算固定为 2048，不继承当前 thinking。CustomInstructions 默认追加；ReplaceInstructions 仅在自定义文本非空时替换默认提示。
 
 摘要复用当前 Session stream 与已交付 ModelRuntime/认证契约。每次摘要使用独立 sessionId，禁用缓存；重试复用同一请求的 ID，重试预算来自 settings.retry。订阅流仅发布 summarization_retry_scheduled、source=branchSummary 的 summarization_retry_attempt_start 和 summarization_retry_finished，不伪造扩展 session_tree 或 compaction_start/end。
 

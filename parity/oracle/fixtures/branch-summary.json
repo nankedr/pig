@@ -284,6 +284,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "other",
           "target": "other"
         },
@@ -301,6 +304,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "root",
           "target": "root"
         },
@@ -318,6 +324,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "nested-user",
           "target": "target"
         },
@@ -335,6 +344,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "ancestor",
           "target": "shared"
         },
@@ -352,6 +364,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "same",
           "target": "leaf"
         },
@@ -369,7 +384,50 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "budget",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 31997,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": true,
+          "name": "fractional-summary-budget",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 0,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 17000,
+          "longHistory": true,
+          "smallSummary": false,
+          "name": "zero-reserve",
           "target": "other"
         },
         {
@@ -386,6 +444,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "summary-budget",
           "target": "other"
         },
@@ -403,6 +464,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "oversized-reserve",
           "target": "other"
         },
@@ -420,6 +484,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "no-content",
           "target": "leaf"
         },
@@ -437,6 +504,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "forward",
           "target": "other"
         },
@@ -454,6 +524,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "hook-details",
           "target": "other"
         },
@@ -471,6 +544,9 @@
           "compaction": true,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "compaction",
           "target": "other"
         },
@@ -488,6 +564,9 @@
           "compaction": false,
           "custom": true,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "custom",
           "target": "target"
         },
@@ -505,6 +584,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": true,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "roundtrip",
           "target": "other"
         },
@@ -524,6 +606,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "retry",
           "target": "other"
         },
@@ -545,6 +630,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "exhausted",
           "target": "other"
         },
@@ -564,6 +652,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "quota",
           "target": "other"
         },
@@ -581,6 +672,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "abort",
           "target": "other"
         },
@@ -600,6 +694,9 @@
           "compaction": false,
           "custom": false,
           "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
           "name": "abort-retry",
           "target": "other"
         }
@@ -1464,6 +1561,314 @@
           {
             "role": "user",
             "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "fractional-summary-budget",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: abcdefgh\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nshared.go\n</read-files>\n\n<modified-files>\nprior.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "shared.go"
+              ],
+              "modifiedFiles": [
+                "prior.go"
+              ]
+            },
+            "usage": {
+              "input": 299,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 303,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nshared.go\n</read-files>\n\n<modified-files>\nprior.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "abcdefgh"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "zero-reserve",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration \n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 1542,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 1546,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration "
           },
           {
             "role": "branchSummary",
@@ -3585,8 +3990,8 @@
     ],
     "side_effects": []
   },
-  "input_hash": "sha256:2ca780be4f67ece34481e1dbf25b68212495ffbb0556379b05b1ccd3482cf535",
-  "observation_hash": "sha256:9b11d2d1f1d72deff3f7a422cfb7ec85460556277ed9d0f99cd6408f517bd01e",
+  "input_hash": "sha256:1898df0db566c68b5f3865f6c41bd0715045fc6ddde549cda94b1ca7fe8c8bca",
+  "observation_hash": "sha256:ea25e771562474d342ebb54f88589da3c8b77ab7c9df44e1e0b4a32b9155b2df",
   "execution_method": "node --experimental-strip-types parity/oracle/branch-summary.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {

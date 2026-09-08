@@ -39,13 +39,18 @@ Use this EXACT format:
 Keep each section concise. Preserve exact file paths, function names, and error messages.`
 
 func GenerateBranchSummary(ctx context.Context, entries []SessionEntry, o GenerateBranchSummaryOptions) (BranchSummaryResult, error) {
-	if ctx == nil {
-		return BranchSummaryResult{}, fmt.Errorf("branch summary context must not be nil")
-	}
-	reserve, window := o.ReserveTokens, o.Model.ContextWindow
+	reserve := o.ReserveTokens
 	if reserve == 0 {
 		reserve = 16384
 	}
+	return generateBranchSummary(ctx, entries, o, reserve)
+}
+
+func generateBranchSummary(ctx context.Context, entries []SessionEntry, o GenerateBranchSummaryOptions, reserve int64) (BranchSummaryResult, error) {
+	if ctx == nil {
+		return BranchSummaryResult{}, fmt.Errorf("branch summary context must not be nil")
+	}
+	window := o.Model.ContextWindow
 	if window == 0 {
 		window = 128000
 	}
