@@ -130,18 +130,15 @@ func GenerateSummaryWithUsage(ctx context.Context, messages []agent.AgentMessage
 	}
 	return completeSummary(ctx, model, prompt+base, reserve*8/10, o)
 }
-func completeSummary(ctx context.Context, model ai.Model, prompt string, maxTokens int64, o SummaryOptions) (SummaryWithUsage, error) {
+func requestSummary(ctx context.Context, model ai.Model, prompt string, maxTokens int64, o SummaryOptions) (ai.AssistantMessage, error) {
 	if ctx == nil {
-		return SummaryWithUsage{}, fmt.Errorf("summary context must not be nil")
+		return ai.AssistantMessage{}, fmt.Errorf("summary context must not be nil")
 	}
 	if err := ctx.Err(); err != nil {
-		return SummaryWithUsage{}, context.Cause(ctx)
-	}
-	if model.MaxTokens > 0 {
-		maxTokens = min(maxTokens, model.MaxTokens)
+		return ai.AssistantMessage{}, context.Cause(ctx)
 	}
 	if maxTokens <= 0 {
-		return SummaryWithUsage{}, fmt.Errorf("summary token budget must be positive")
+		return ai.AssistantMessage{}, fmt.Errorf("summary token budget must be positive")
 	}
 	cache, id := ai.CacheRetentionNone, newSessionID()
 	headers := ai.ProviderHeaders{}
@@ -161,7 +158,13 @@ func completeSummary(ctx context.Context, model ai.Model, prompt string, maxToke
 			return ai.StreamSimple(ctx, m, c, o)
 		}
 	}
-	result, err := retrySummary(ctx, func() (ai.AssistantMessage, error) { return summaryResponse(ctx, stream(ctx, model, input, options)) }, o)
+	return retrySummary(ctx, func() (ai.AssistantMessage, error) { return summaryResponse(ctx, stream(ctx, model, input, options)) }, o)
+}
+func completeSummary(ctx context.Context, model ai.Model, prompt string, maxTokens int64, o SummaryOptions) (SummaryWithUsage, error) {
+	if model.MaxTokens > 0 {
+		maxTokens = min(maxTokens, model.MaxTokens)
+	}
+	result, err := requestSummary(ctx, model, prompt, maxTokens, o)
 	if err != nil {
 		return SummaryWithUsage{}, err
 	}

@@ -437,10 +437,6 @@ func truncateSummaryText(text string, limit int) string {
 	return string(utf16.Decode(codeUnits[:limit])) + fmt.Sprintf("\n\n[... %d more characters truncated]", len(codeUnits)-limit)
 }
 
-func GenerateBranchSummary(context.Context, []SessionEntry, GenerateBranchSummaryOptions) (BranchSummaryResult, error) {
-	return BranchSummaryResult{}, notImplemented("GenerateBranchSummary")
-}
-
 type SummaryWithUsage struct {
 	Text  string
 	Usage ai.Usage

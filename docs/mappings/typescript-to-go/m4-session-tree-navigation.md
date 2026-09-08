@@ -10,6 +10,6 @@
 | test/agent-session-tree-navigation.test.ts | parity/oracle/session-tree-navigation.mjs、codingagent/issue91_navigation_test.go | 固定 Pi source/dist 和 Go 公开 SDK 对比 |
 | test/suite/regressions/tree-during-streaming.test.ts | codingagent/issue91_runtime_test.go | 忙状态拒绝、重入监听器、继续生成及资源保留 |
 | session_before_tree / session_tree | 后继扩展切片 | 未执行扩展 hook，不增加伪造订阅事件 |
-| summarize / abortBranchSummary | 后继摘要导航切片 | 不同目标 Summarize=true 明确 Stub |
+| summarize / abortBranchSummary | [M4.10 分支摘要](m4-branch-summary.md) | 摘要导航、取消与重试已交付 |
 
 运行 `go run ./examples/session-tree-navigation`，配合[中文学习材料](../../learning/m4-session-tree-navigation.md)及 [ADR-0027](../../adr/0027-session-tree-navigation.md)。

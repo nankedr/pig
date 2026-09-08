@@ -29,4 +29,4 @@ go run ./examples/session-tree-navigation
 
 Parity Catalog 登记 `contract:codingagent/session-tree-navigation`，API snapshot 为 `codingagent/testdata/issue91_surface_golden.txt`。测试从公开 CreateAgentSession/NavigateTree/Prompt 进入，比较固定 Pi 源码及构建产物，覆盖根、祖先、其他分支、custom、工具结果、已有摘要/压缩/标签/配置节点以及继续生成和重开。失败及监听器生命周期由公开 SDK 测试补充。
 
-本切片实现无摘要路径。不同目标的 Summarize=true 返回 ErrNotImplemented；CustomInstructions 和 ReplaceInstructions 在无摘要时按基线忽略。扩展 session_before_tree/session_tree hook、扩展取消、摘要生成与取消重试、RPC 和 TUI 控制继续保留 Stub。独立 Session fork 沿用 M3。[设计决策](../adr/0027-session-tree-navigation.md)与 [TypeScript → Go 导航](../mappings/typescript-to-go/m4-session-tree-navigation.md)给出对应位置。
+本切片实现无摘要路径。M4.10 已实现 [摘要导航](m4-branch-summary.md)；CustomInstructions 和 ReplaceInstructions 在无摘要时按基线忽略。扩展 session_before_tree/session_tree hook、扩展取消、RPC 和 TUI 控制继续保留 Stub。独立 Session fork 沿用 M3。[设计决策](../adr/0027-session-tree-navigation.md)与 [TypeScript → Go 导航](../mappings/typescript-to-go/m4-session-tree-navigation.md)给出对应位置。

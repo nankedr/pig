@@ -17,7 +17,7 @@ func (s *AgentSession) configurationReady() error {
 	if s.disposed {
 		return fmt.Errorf("AgentSession is disposed")
 	}
-	if s.active || s.compactionCancel != nil || s.configurationNotifying || s.agent.State().IsStreaming {
+	if s.active || s.compactionCancel != nil || s.branchSummaryCancel != nil || s.configurationNotifying || s.agent.State().IsStreaming {
 		return fmt.Errorf("AgentSession is busy")
 	}
 	return nil

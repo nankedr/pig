@@ -176,7 +176,6 @@ func TestSessionTreeNavigationFailuresAreAtomic(t *testing.T) {
 		{name: "invalid", ctx: context.Background(), target: "missing"},
 		{name: "empty", ctx: context.Background()},
 		{name: "nil context", target: root},
-		{name: "summary", ctx: context.Background(), target: root, options: []codingagent.NavigateTreeOptions{{Summarize: true}}, want: codingagent.ErrNotImplemented},
 		{name: "multiple options", ctx: context.Background(), target: root, options: []codingagent.NavigateTreeOptions{{}, {}}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

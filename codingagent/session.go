@@ -450,6 +450,8 @@ type AgentSession struct {
 	configurationNotifying             bool
 	compactionCancel                   context.CancelFunc
 	compactionDone                     chan struct{}
+	branchSummaryCancel                context.CancelFunc
+	branchSummaryDone                  chan struct{}
 	autoCompactionEnabled              bool
 	retryAttempt                       int
 	retryCancel                        context.CancelFunc
@@ -521,7 +523,7 @@ func (s *AgentSession) IsIdle() bool { return !s.IsStreaming() }
 func (s *AgentSession) IsCompacting() (bool, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-	return s.compactionCancel != nil, nil
+	return s.compactionCancel != nil || s.branchSummaryCancel != nil, nil
 }
 func (s *AgentSession) IsRetrying() (bool, error) {
 	s.mu.RLock()
@@ -589,6 +591,9 @@ func (s *AgentSession) WaitForIdle(ctx context.Context) error {
 	if s.compactionDone != nil {
 		idle = s.compactionDone
 	}
+	if s.branchSummaryDone != nil {
+		idle = s.branchSummaryDone
+	}
 	s.mu.RUnlock()
 	if idle == nil {
 		return nil
@@ -612,12 +617,16 @@ func (s *AgentSession) Abort() error {
 	s.mu.RLock()
 	cancel := s.activeCancel
 	compactCancel := s.compactionCancel
+	branchCancel := s.branchSummaryCancel
 	s.mu.RUnlock()
 	if cancel != nil {
 		cancel(context.Canceled)
 	}
 	if compactCancel != nil {
 		compactCancel()
+	}
+	if branchCancel != nil {
+		branchCancel()
 	}
 	if s.agent != nil {
 		s.agent.Abort()
@@ -633,6 +642,7 @@ func (s *AgentSession) Dispose() error {
 	s.disposed = true
 	cancel := s.activeCancel
 	compactCancel := s.compactionCancel
+	branchCancel := s.branchSummaryCancel
 	unsubscribe := agent.Unsubscribe(nil)
 	if !s.active {
 		unsubscribe = s.unsubscribeAgent
@@ -646,6 +656,9 @@ func (s *AgentSession) Dispose() error {
 	}
 	if compactCancel != nil {
 		compactCancel()
+	}
+	if branchCancel != nil {
+		branchCancel()
 	}
 	if s.agent != nil {
 		s.agent.Abort()
@@ -708,7 +721,7 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		cancel(nil)
 		return fmt.Errorf("AgentSession is disposed")
 	}
-	if s.configurationNotifying || s.compactionCancel != nil {
+	if s.configurationNotifying || s.compactionCancel != nil || s.branchSummaryCancel != nil {
 		s.mu.Unlock()
 		cancel(nil)
 		return fmt.Errorf("AgentSession is busy delivering configuration notifications or compacting")
@@ -911,7 +924,13 @@ func (s *AgentSession) SendCustomMessage(any, ...any) error {
 }
 func (s *AgentSession) AbortBash() error { return notImplemented("AgentSession.AbortBash") }
 func (s *AgentSession) AbortBranchSummary() error {
-	return notImplemented("AgentSession.AbortBranchSummary")
+	s.mu.RLock()
+	cancel := s.branchSummaryCancel
+	s.mu.RUnlock()
+	if cancel != nil {
+		cancel()
+	}
+	return nil
 }
 func (s *AgentSession) AbortCompaction() error {
 	s.mu.RLock()

@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9663
+- Total entries: 9664
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5168 |
-| scaffolded | 3975 |
-| partial | 272 |
+| scaffolded | 3973 |
+| partial | 275 |
 | implemented | 79 |
 | verified | 167 |
 | deferred | 2 |
@@ -6288,7 +6288,6 @@
 | member:codingagent/src/core/agent-session-services.ts#CreateAgentSessionServicesOptions.settingsManager | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.CreateAgentSessionServicesOptions.SettingsManager | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abort | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Abort | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortBash | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBash | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.abortBranchSummary | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBranchSummary | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.agent | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Agent | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.autoCompactionEnabled | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AutoCompactionEnabled | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.bindExtensions | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.BindExtensions | coding-agent |
@@ -7649,7 +7648,6 @@
 | symbol:codingagent/src/core/compaction/branch-summarization.ts#CollectEntriesResult | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CollectEntriesResult | coding-agent |
 | symbol:codingagent/src/core/compaction/branch-summarization.ts#GenerateBranchSummaryOptions | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateBranchSummaryOptions | coding-agent |
 | symbol:codingagent/src/core/compaction/branch-summarization.ts#collectEntriesForBranchSummary | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CollectEntriesForBranchSummary | coding-agent |
-| symbol:codingagent/src/core/compaction/branch-summarization.ts#generateBranchSummary | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateBranchSummary | coding-agent |
 | symbol:codingagent/src/core/compaction/branch-summarization.ts#prepareBranchEntries | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.PrepareBranchEntries | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#CompactionResult | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CompactionResult | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#CutPointResult | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.CutPointResult | coding-agent |
@@ -7978,6 +7976,7 @@
 | contract:cli/pig/experimental | partial | M0 | contract | github.com/nankedr/pig/codingagent.runExperimentalCLI | coding-agent |
 | contract:codingagent/agent-session | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateAgentSession | coding-agent |
 | contract:codingagent/bash-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateBashTool | coding-agent |
+| contract:codingagent/branch-summary | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
 | contract:codingagent/compaction | partial | M4 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:codingagent/default-coding-tools | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateAgentSession | coding-agent |
 | contract:codingagent/edit-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateEditTool | coding-agent |
@@ -7995,6 +7994,7 @@
 | contract:model-runtime/basic | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewModelRuntime | coding-agent |
 | contract:security/project-trust | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateHeadlessSession | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.abortBranchSummary | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBranchSummary | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortCompaction | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortCompaction | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.compact | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Compact | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.cycleModel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleModel | coding-agent |
@@ -8012,6 +8012,7 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.supportsThinking | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SupportsThinking | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionManager.appendCompaction | partial | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendCompaction | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
+| symbol:codingagent/src/core/compaction/branch-summarization.ts#generateBranchSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateBranchSummary | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#compact | partial | M4 | symbol | github.com/nankedr/pig/codingagent.Compact | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#generateSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummary | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#generateSummaryWithUsage | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummaryWithUsage | coding-agent |

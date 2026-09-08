@@ -55,7 +55,8 @@ func (s *AgentSession) NavigateTree(ctx context.Context, targetID string, option
 	var target *SessionEntry
 	for i := range m.entries {
 		if m.entries[i].ID == targetID {
-			target = &m.entries[i]
+			entry := cloneSessionEntry(m.entries[i])
+			target = &entry
 			break
 		}
 	}
@@ -66,9 +67,18 @@ func (s *AgentSession) NavigateTree(ctx context.Context, targetID string, option
 	if len(options) > 0 {
 		option = options[0]
 	}
+	var summary BranchSummaryResult
 	if option.Summarize {
-		return result, notImplemented("AgentSession.NavigateTree.Summarize")
+		var err error
+		summary, err = s.summarizeNavigationLocked(ctx, targetID, option)
+		if summary.Aborted {
+			return NavigateTreeResult{Cancelled: true, Aborted: true}, err
+		}
+		if err != nil {
+			return result, err
+		}
 	}
+
 	leaf := &targetID
 	if target.Type == "message" && target.Message != nil && target.Message.MessageRole() == ai.MessageRoleUser {
 		leaf = cloneStringPointer(target.ParentID)
@@ -84,15 +94,39 @@ func (s *AgentSession) NavigateTree(ctx context.Context, targetID string, option
 		result.EditorText = &text
 	}
 	entries := m.entries
+	labelTarget := targetID
+	if summary.Summary != "" {
+		entry := m.newEntryLocked("branch_summary")
+		entry.ParentID = cloneStringPointer(leaf)
+		entry.FromID = "root"
+		if leaf != nil {
+			entry.FromID = *leaf
+		}
+		entry.Summary, entry.Usage = summary.Summary, summary.Usage
+		fromHook := false
+		entry.FromHook = &fromHook
+		if summary.ReadFiles == nil {
+			summary.ReadFiles = []string{}
+		}
+		if summary.ModifiedFiles == nil {
+			summary.ModifiedFiles = []string{}
+		}
+		entry.Details, _ = json.Marshal(map[string]any{"readFiles": summary.ReadFiles, "modifiedFiles": summary.ModifiedFiles})
+		entries = append(append([]SessionEntry{}, entries...), entry)
+		leaf = &entry.ID
+		labelTarget = entry.ID
+		owned := cloneSessionEntry(entry)
+		result.SummaryEntry = &BranchSummaryEntry{SessionEntryBase: owned.SessionEntryBase, FromID: owned.FromID, Summary: owned.Summary, Details: owned.Details, Usage: owned.Usage, FromHook: owned.FromHook}
+	}
 	if option.Label != "" {
 		entry := m.newEntryLocked("label")
-		entry.ParentID, entry.TargetID, entry.Label = leaf, targetID, &option.Label
+		entry.ParentID, entry.TargetID, entry.Label = leaf, labelTarget, &option.Label
 		entries = append(append([]SessionEntry{}, entries...), entry)
 		leaf = &entry.ID
 	}
 	messages := BuildSessionContext(entries, leaf).Messages
 	staged := ""
-	if option.Label != "" && m.sessionFile != "" {
+	if (option.Label != "" || summary.Summary != "") && m.sessionFile != "" {
 		persist := m.flushed
 		for _, entry := range entries {
 			if _, ok := sessionAssistantMessage(entry.Message); ok {
