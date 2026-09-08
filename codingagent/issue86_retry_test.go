@@ -77,7 +77,7 @@ func TestTurnRetryParity(t *testing.T) {
 				return parity.Observation{}, err
 			}
 			model, _ := core.GetModel()
-			settings, err := codingagent.NewInMemorySettingsManager(codingagent.Settings{Retry: &codingagent.RetrySettings{Enabled: &scenario.Enabled, MaxRetries: &scenario.MaxRetries, BaseDelayMS: &scenario.BaseDelayMs}})
+			settings, err := codingagent.NewInMemorySettingsManager(codingagent.Settings{Compaction: &codingagent.CompactionSettings{Enabled: false}, Retry: &codingagent.RetrySettings{Enabled: &scenario.Enabled, MaxRetries: &scenario.MaxRetries, BaseDelayMS: &scenario.BaseDelayMs}})
 			if err != nil {
 				return parity.Observation{}, err
 			}

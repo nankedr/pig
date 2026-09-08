@@ -72,11 +72,29 @@ func (s *AgentSession) Compact(ctx context.Context, instructions ...string) (res
 	if run.Err() != nil {
 		return result, context.Cause(run)
 	}
+	entries := s.sessionManager.GetBranch()
+	settings, e := s.settingsManager.GetCompactionSettings()
+	if e != nil {
+		return result, e
+	}
+	preparation := PrepareCompaction(entries, settings)
+	if preparation == nil {
+		if len(entries) > 0 && entries[len(entries)-1].Type == "compaction" {
+			return result, fmt.Errorf("Already compacted")
+		}
+		return result, fmt.Errorf("Nothing to compact (session too small)")
+	}
+	instruction := ""
+	if len(instructions) > 0 {
+		instruction = instructions[0]
+	}
+	return s.compactPrepared(run, entries, preparation, CompactionReasonManual, instruction)
+}
+
+func (s *AgentSession) compactPrepared(run context.Context, entries []SessionEntry, preparation *CompactionPreparation, reason CompactionReason, instructions string) (result CompactionResult, err error) {
 	model := s.Model()
 	options := SummaryOptions{ThinkingLevel: s.ThinkingLevel(), StreamFn: s.agent.StreamFunction()}
-	if len(instructions) > 0 {
-		options.CustomInstructions = instructions[0]
-	}
+	options.CustomInstructions = instructions
 	if s.modelRuntime != nil && !s.runtimeStream {
 		auth, e := s.modelRuntime.GetModelAuth(run, model)
 		if value, ok := auth.Value(); e == nil && ok {
@@ -95,18 +113,6 @@ func (s *AgentSession) Compact(ctx context.Context, instructions ...string) (res
 			}
 		}
 	}
-	entries := s.sessionManager.GetBranch()
-	settings, e := s.settingsManager.GetCompactionSettings()
-	if e != nil {
-		return result, e
-	}
-	preparation := PrepareCompaction(entries, settings)
-	if preparation == nil {
-		if len(entries) > 0 && entries[len(entries)-1].Type == "compaction" {
-			return result, fmt.Errorf("Already compacted")
-		}
-		return result, fmt.Errorf("Nothing to compact (session too small)")
-	}
 	retry, e := s.settingsManager.GetRetrySettings()
 	if e != nil {
 		return result, e
@@ -118,7 +124,7 @@ func (s *AgentSession) Compact(ctx context.Context, instructions ...string) (res
 			return nil
 		},
 		OnRetryAttemptStart: func() error {
-			s.emit(AgentSessionCompactionRetryAttemptStartEvent{Type: AgentSessionEventTypeSummarizationRetryAttemptStart, Source: SummarizationRetrySourceCompaction, Reason: CompactionReasonManual})
+			s.emit(AgentSessionCompactionRetryAttemptStartEvent{Type: AgentSessionEventTypeSummarizationRetryAttemptStart, Source: SummarizationRetrySourceCompaction, Reason: reason})
 			return nil
 		},
 		OnRetryFinished: func(bool, int, *string) error {

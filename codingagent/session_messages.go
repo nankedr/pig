@@ -73,7 +73,13 @@ func (s *AgentSession) queueMessageLocked(text string, delivery UserMessageDeliv
 	}
 	message := s.userMessageLocked(text)
 	var err error
-	if delivery == UserMessageDeliverySteer {
+	if s.autoCompacting {
+		if delivery == UserMessageDeliverySteer {
+			s.compactionSteering = append(s.compactionSteering, message)
+		} else {
+			s.compactionFollowUp = append(s.compactionFollowUp, message)
+		}
+	} else if delivery == UserMessageDeliverySteer {
 		err = s.agent.Steer(message)
 	} else {
 		err = s.agent.FollowUp(message)
@@ -148,6 +154,7 @@ func (s *AgentSession) ClearQueue() error {
 		return fmt.Errorf("AgentSession has no Agent")
 	}
 	s.agent.ClearAllQueues()
+	s.compactionSteering, s.compactionFollowUp = nil, nil
 	s.steeringMessages, s.followUpMessages = nil, nil
 	s.queueUpdateLocked()
 	s.mu.Unlock()

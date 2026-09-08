@@ -31,4 +31,4 @@ go run ./examples/manual-compaction
 
 Parity Catalog：contract:codingagent/compaction。固定 Pi 源码和发布构建的公开 SDK Oracle 验证请求、预算、裁剪、更新、文件信息及重试；Go 的真实 HTTP 测试另验证认证刷新、SSE 截断恢复和 Headless 重开。API 快照见 codingagent/testdata/issue89_surface_golden.txt。
 
-自动压缩、扩展摘要与 hook、branch summary、RPC/TUI 压缩入口、压缩期间自动排空队列仍未实现。详见 [ADR-0026](../adr/0026-manual-compaction.md)和 [TypeScript → Go](../mappings/typescript-to-go/m4-manual-compaction.md)。production v3 与 Harness v4 保持独立。
+自动压缩与对应队列续跑已由 [M4.8](m4-auto-compaction.md) 实现；扩展摘要与 hook、branch summary、RPC/TUI 压缩入口仍未实现。详见 [ADR-0026](../adr/0026-manual-compaction.md)和 [TypeScript → Go](../mappings/typescript-to-go/m4-manual-compaction.md)。production v3 与 Harness v4 保持独立。

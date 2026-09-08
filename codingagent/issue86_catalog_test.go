@@ -7,14 +7,14 @@ import (
 )
 
 const issue86RetryCatalogID = "contract:codingagent/turn-retry"
-const issue86RetryTestHash = "sha256:583f4359d3d202deb088d439541b5c583eb8b136ef2a79096a2047a83c88f6c0"
+const issue86RetryTestHash = "sha256:77e9ca4b0ceef6cd18d7522aff8865aac15bac184eb4c3a05db031b75f1c680d"
 
 func issue86RetryCatalogEntry() catalog.Entry {
 	return catalog.Entry{
 		SchemaVersion: catalog.SchemaVersion, ID: issue86RetryCatalogID,
 		Upstream: catalog.Upstream{Module: "coding-agent", Repository: "https://github.com/badlogic/pi-mono", Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/agent-session.ts"},
 		Mapping:  catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".AgentSession.Prompt", Kind: "contract"}, Status: catalog.StatusPartial, Milestone: "M4", Classification: "public-api",
-		Partial:   &catalog.Partial{Supported: []string{"public SDK/Headless turn retry: enabled setting, fixed-Pi error classification, independent exponential budget, attempt state and abortable waits", "Oracle-backed error Assistant removal from Agent context while preserving v3 history, retry/settled ordering and completed Tool side effects; complete recovery Tool loops", "Headless partial cancellation outcome and no late retries via AbortRetry/Abort/Context/Dispose; text/json CLI transport versus Session budgets and persisted failures"}, Unsupported: []string{"RPC retry controls, extension hooks, compaction and summarization retry remain deferred", "AI trailing-frame/malformed protocol errors retain existing validation errors without retry; execution remains limited to already implemented Provider adapters; noninteger settings and configured/computed delays outside int64 have no Go mapping"}},
+		Partial:   &catalog.Partial{Supported: []string{"public SDK/Headless turn retry: enabled setting, fixed-Pi error classification, independent exponential budget, attempt state and abortable waits", "Oracle-backed error Assistant removal from Agent context while preserving v3 history, retry/settled ordering and completed Tool side effects; complete recovery Tool loops", "Headless partial cancellation outcome and no late retries via AbortRetry/Abort/Context/Dispose; text/json CLI transport versus Session budgets and persisted failures"}, Unsupported: []string{"RPC retry controls and extension hooks remain deferred; automatic compaction and summarization retry coordination is covered by contract:codingagent/compaction", "AI trailing-frame/malformed protocol errors retain existing validation errors without retry; execution remains limited to already implemented Provider adapters; noninteger settings and configured/computed delays outside int64 have no Go mapping"}},
 		Deviation: &catalog.Deviation{ADR: "docs/adr/0024-session-turn-retry.md", Reason: "Arm cancellation before synchronous auto_retry_start listeners; preserve canceled partial HeadlessOutcome independently of the pruned Agent context, following ADR-0006."},
 		Notes:     "Issue #86; fixed Pi public createAgentSession Oracle, public SDK/Headless race tests and real text/json HTTP process tests. AbortRetry only cancels backoff; Prompt awaits the full recovered Tool loop. No M4-wide freeze claim.",
 	}

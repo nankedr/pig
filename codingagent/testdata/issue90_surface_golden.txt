@@ -1,0 +1,28 @@
+method AutoCompactionEnabled func(*codingagent.AgentSession) bool
+method SetAutoCompactionEnabled func(*codingagent.AgentSession, bool) error
+method AbortCompaction func(*codingagent.AgentSession) error
+method IsCompacting func(*codingagent.AgentSession) (bool, error)
+method Prompt func(*codingagent.AgentSession, context.Context, string, ...codingagent.PromptOptions) error
+method WaitForIdle func(*codingagent.AgentSession, context.Context) error
+type codingagent.AgentSessionCompactionStartEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Reason codingagent.CompactionReason tag="json:\"reason\""
+type codingagent.AgentSessionCompactionEndEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Reason codingagent.CompactionReason tag="json:\"reason\""
+- Result *codingagent.CompactionResult tag="json:\"result,omitempty\""
+- Aborted bool tag="json:\"aborted\""
+- WillRetry bool tag="json:\"willRetry\""
+- ErrorMessage *string tag="json:\"errorMessage,omitempty\""
+type codingagent.AgentSessionCompactionRetryAttemptStartEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Source codingagent.SummarizationRetrySource tag="json:\"source\""
+- Reason codingagent.CompactionReason tag="json:\"reason\""
+type codingagent.CompactionSettings struct
+fields:
+- Enabled bool tag=""
+- ReserveTokens int64 tag=""
+- KeepRecentTokens int64 tag=""
