@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9662
+- Total entries: 9663
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5168 |
-| scaffolded | 3976 |
-| partial | 270 |
+| scaffolded | 3975 |
+| partial | 272 |
 | implemented | 79 |
 | verified | 167 |
 | deferred | 2 |
@@ -6313,7 +6313,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.messages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Messages | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.model | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Model | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.modelRuntime | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ModelRuntime | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.navigateTree | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.pendingMessageCount | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.PendingMessageCount | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.prompt | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.promptTemplates | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.PromptTemplates | coding-agent |
@@ -7988,6 +7987,7 @@
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
 | contract:codingagent/session-configuration | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
 | contract:codingagent/session-messages | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession | coding-agent |
+| contract:codingagent/session-tree-navigation | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
 | contract:codingagent/turn-retry | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
 | contract:codingagent/write-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateWriteTool | coding-agent |
 | contract:config/auth-json | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewAuthStorage | coding-agent |
@@ -8003,6 +8003,7 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.getAllTools | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAllTools | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getAvailableThinkingLevels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAvailableThinkingLevels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isCompacting | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsCompacting | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.navigateTree | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.scopedModels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ScopedModels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setActiveToolsByName | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetActiveToolsByName | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setModel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |

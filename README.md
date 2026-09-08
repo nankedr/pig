@@ -1,5 +1,7 @@
 # Pig
 
+M4.9 支持同一 Session 树的无摘要导航与继续分支，见 [学习材料](docs/learning/m4-session-tree-navigation.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m4-session-tree-navigation.md)。
+
 M4.1 已支持显式 grep 搜索并继续编码任务，见 [grep 学习材料](docs/learning/m4-grep-tool.md)和 [TypeScript → Go](docs/mappings/typescript-to-go/m4-grep-tool.md)。
 
 Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.3.0 集成 M3 的本地持久化 Coding Agent：v3 Session 恢复与互操作、继续/fork、全局与可信项目 settings、canonical 凭证、基础 ModelRuntime，以及默认四工具的可恢复编码任务。

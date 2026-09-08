@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1809, catalog.StatusInventoried: 744, catalog.StatusPartial: 20, catalog.StatusImplemented: 27}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1808, catalog.StatusInventoried: 744, catalog.StatusPartial: 21, catalog.StatusImplemented: 27}); !reflect.DeepEqual(gotByStatus, want) {
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
 	if *updateIssue32Catalog {
@@ -1445,7 +1445,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
-	if issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) {
+	if issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) {
 		return
 	}
 	if issue87PromoteRuntimeEntry(entry) {
@@ -1874,10 +1874,10 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				},
 				Unsupported: []string{
 					"custom entries/messages and compaction append remain explicit Capability Stubs",
-					"AgentSession tree navigation and automatic branch summaries remain M4; extension callbacks and interactive selection retain their later milestone boundaries",
+					"Automatic branch summaries remain deferred; extension callbacks and interactive selection retain their later milestone boundaries",
 				},
 			},
-			Notes: "Behavior owner for production Coding Agent v3 JSONL parsing, append-only persistence, explicit reopen, and in-memory projection. Issue #71 verifies the highest public CLI and Go SDK boundaries against the fixed Pi baseline; Issue #73 adds discovery, continue, fork, tree and label persistence; AgentSession tree orchestration remains M4. Issue #72 adds historical file recovery and bidirectional production reader/writer interoperability; no fixed line/file/entry-count limits are imposed.",
+			Notes: "Behavior owner for production Coding Agent v3 JSONL parsing, append-only persistence, explicit reopen, and in-memory projection. Issue #71 verifies the highest public CLI and Go SDK boundaries against the fixed Pi baseline; Issue #73 adds discovery, continue, fork, tree and label persistence; Issue #91 adds no-summary AgentSession tree orchestration. Issue #72 adds historical file recovery and bidirectional production reader/writer interoperability; no fixed line/file/entry-count limits are imposed.",
 		},
 		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32MigrationCatalogID,
@@ -1887,7 +1887,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry())
+	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry())
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1908,6 +1908,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = issue77RuntimeEvidence(t)
 	case issue84FindLsCatalogID:
 		descriptors = issue84FindLsEvidence(t)
+	case issue91TreeCatalogID:
+		descriptors = issue91TreeEvidence(t)
 	case issue88StatsCatalogID:
 		descriptors = issue88StatsEvidence(t)
 	case issue87ConfigurationCatalogID:
