@@ -91,3 +91,5 @@ M4.5 支持会话模型、thinking 和工具集切换，见 [配置切换](learn
 M4.6 的统计口径、空值和并发读取见 [会话统计](learning/m4-session-stats.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-session-stats.md)。
 
 M4.7 支持手动压缩后继续任务，见 [压缩与恢复](learning/m4-manual-compaction.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-manual-compaction.md)。
+
+M4.12 支持基础 JSONL RPC 对话，见 [RPC 生命周期](learning/m4-jsonl-rpc.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-jsonl-rpc.md)。

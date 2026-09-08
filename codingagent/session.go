@@ -701,6 +701,10 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 }
 
 func (s *AgentSession) prompt(ctx context.Context, text string, options ...PromptOptions) error {
+	return s.promptWithPreflight(ctx, text, nil, options...)
+}
+
+func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, ready func(), options ...PromptOptions) error {
 	runContext, cancel := context.WithCancelCause(ctx)
 	s.mu.Lock()
 	if s.disposed {
@@ -722,6 +726,9 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		s.mu.Unlock()
 		cancel(nil)
 		s.dispatchQueueEvents()
+		if err == nil && ready != nil {
+			ready()
+		}
 		return err
 	}
 	if s.agent == nil {
@@ -763,6 +770,9 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 		s.emit(AgentSessionAgentSettledEvent{Type: AgentSessionEventTypeAgentSettled})
 	}()
 
+	if ready != nil {
+		ready()
+	}
 	runContext = context.WithValue(runContext, bashSessionKey{}, s)
 	err := s.agent.Prompt(runContext, message)
 	for err == nil {
