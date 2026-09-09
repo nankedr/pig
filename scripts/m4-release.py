@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -80,19 +81,27 @@ func main() {
             raise SystemExit("independent SDK install failed")
     with (dest / "installed-html-browser.log").open("w") as stream:
         subprocess.run(["node", "parity/export-html/check.mjs"], cwd=ROOT, env={**env, "PIG_BINARY": str(bundle / "pig")}, stdout=stream, stderr=subprocess.STDOUT, check=True)
+    for name in ["LICENSE", "THIRD_PARTY_NOTICES", "README.md"]:
+        shutil.copy2(ROOT / name, bundle / name)
+    shutil.copytree(ROOT / "THIRD_PARTY_LICENSES", bundle / "THIRD_PARTY_LICENSES")
+    html_license = bundle / "codingagent/exporthtml/LICENSES.txt"
+    html_license.parent.mkdir(parents=True)
+    shutil.copy2(ROOT / "codingagent/exporthtml/LICENSES.txt", html_license)
+    shutil.copy2(ROOT / "docs/releases/v0.4.0.md", bundle / "RELEASE_NOTES.md")
+    bundle_files = sorted(path for path in bundle.rglob("*") if path.is_file())
     archive = dest / (bundle.name + ".tar.gz")
     with tarfile.open(archive, "w:gz") as tar:
         tar.add(bundle, arcname=bundle.name)
     for path in [ROOT / "parity/catalog.jsonl", ROOT / "parity/catalog.manifest.json", ROOT / "internal/m4gate/testdata/catalog_scope.txt", *sorted((ROOT / "codingagent/testdata").glob("*surface*"))]:
         record["hashes"][str(path.relative_to(ROOT))] = digest(path)
-    for path in [*sorted(bundle.iterdir()), archive, dest / "installed-html-browser.log"]:
+    for path in [*bundle_files, archive, dest / "installed-html-browser.log"]:
         record["hashes"][str(path.relative_to(dest))] = digest(path)
     record["install"] = "PASS: local CLI, independent SDK module, installed-binary browser gate"
-    record["build_info"] = {path.name: output("go", "version", "-m", str(path)) for path in sorted(bundle.iterdir())}
+    record["build_info"] = {path.name: output("go", "version", "-m", str(path)) for path in [bundle / "pig", bundle / "pig-ai"]}
     if output("git", "rev-parse", "HEAD") != commit or output("git", "status", "--porcelain=v1", "--untracked-files=all"):
         raise SystemExit("checkout changed during packaging")
     verification.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
-    files = [*sorted(bundle.iterdir()), archive, log, verification, dest / "pig-ai-help.txt", dest / "installed-html-browser.log"]
+    files = [*bundle_files, archive, log, verification, dest / "pig-ai-help.txt", dest / "installed-html-browser.log"]
     (dest / "SHA256SUMS").write_text("".join(f"{digest(path)}  {path.relative_to(dest)}\n" for path in files))
     print(f"PASS: {archive}; verification: {verification}")
 

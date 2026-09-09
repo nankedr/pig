@@ -64,6 +64,6 @@ go get github.com/nankedr/pig@v0.4.0
 python3 scripts/m4-release.py /tmp/pig-v0.4.0-release
 ```
 
-脚本执行完整 freeze，然后安装无 CGO CLI、在独立 Go module 中验证 SDK、以安装的二进制重跑浏览器门禁，生成 tar.gz、`m4-freeze.log`、`installed-html-browser.log`、`verification.json` 与 `SHA256SUMS`。验证记录包含源码 commit、工具链、双来源基线及 Catalog/API/日志/二进制校验值；任意失败返回非零，不得据此创建发布 tag。对通过验证的同一 commit 创建 `v0.4.0` tag/Release，并上传这些制品；tag 发布后再次验证版本化 CLI/SDK 安装。
+脚本执行完整 freeze，然后安装无 CGO CLI、在独立 Go module 中验证 SDK、以安装的二进制重跑浏览器门禁，生成包含根许可证、第三方及 HTML 资产许可、README 和发布说明的 tar.gz，以及 `m4-freeze.log`、`installed-html-browser.log`、`verification.json` 与 `SHA256SUMS`。验证记录包含源码 commit、工具链、双来源基线及 Catalog/API/日志/二进制校验值；任意失败返回非零，不得据此创建发布 tag。对通过验证的同一 commit 创建 `v0.4.0` tag/Release，并上传这些制品；tag 发布后再次验证版本化 CLI/SDK 安装。
 
 Project Trust 不是 Tool 审批或 Sandbox，工具继承宿主权限。发布硬门仍为 darwin/arm64。#98 不修改或关闭父 Issue，里程碑前沿由父级维护流程单独推进。学习路径见 [源码导航](../mappings/typescript-to-go/m4-freeze.md)，产品范围见 [发布说明](../releases/v0.4.0.md)。
