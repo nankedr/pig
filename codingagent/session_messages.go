@@ -62,8 +62,8 @@ func (s *AgentSession) queueMessage(text string, delivery UserMessageDelivery) e
 }
 
 func (s *AgentSession) queueMessageLocked(text string, delivery UserMessageDelivery) error {
-	if s.disposed {
-		return fmt.Errorf("AgentSession is disposed")
+	if s.disposed || s.replacing {
+		return fmt.Errorf("AgentSession is busy or disposed")
 	}
 	if s.agent == nil {
 		return fmt.Errorf("AgentSession has no Agent")
@@ -145,9 +145,9 @@ func (s *AgentSession) PendingMessageCount() (int, error) {
 }
 func (s *AgentSession) ClearQueue() error {
 	s.mu.Lock()
-	if s.disposed {
+	if s.disposed || s.replacing {
 		s.mu.Unlock()
-		return fmt.Errorf("AgentSession is disposed")
+		return fmt.Errorf("AgentSession is busy or disposed")
 	}
 	if s.agent == nil {
 		s.mu.Unlock()
@@ -172,8 +172,8 @@ func (s *AgentSession) setQueueMode(mode agent.QueueMode, steering bool) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.disposed {
-		return fmt.Errorf("AgentSession is disposed")
+	if s.disposed || s.replacing {
+		return fmt.Errorf("AgentSession is busy or disposed")
 	}
 	if s.agent == nil {
 		return fmt.Errorf("AgentSession has no Agent")

@@ -90,7 +90,37 @@ func (r *AgentSessionRuntime) beginReplacement(ctx context.Context) (func(), err
 		r.replacing.Store(false)
 		return nil, fmt.Errorf("session replacement requires a Session and runtime factory")
 	}
-	return func() { r.replacing.Store(false) }, nil
+	old := r.session
+	old.mu.Lock()
+	if old.disposed {
+		old.mu.Unlock()
+		r.replacing.Store(false)
+		return nil, fmt.Errorf("AgentSession is disposed")
+	}
+	old.replacing = true
+	old.mu.Unlock()
+	done := func() { old.mu.Lock(); old.replacing = false; old.mu.Unlock(); r.replacing.Store(false) }
+	if err := old.Abort(); err != nil {
+		done()
+		return nil, err
+	}
+	if err := old.WaitForIdle(ctx); err != nil {
+		done()
+		return nil, err
+	}
+	_ = old.AbortBash()
+	old.mu.RLock()
+	bashIdle := old.bashIdle
+	old.mu.RUnlock()
+	if bashIdle != nil {
+		select {
+		case <-bashIdle:
+		case <-ctx.Done():
+			done()
+			return nil, ctx.Err()
+		}
+	}
+	return done, nil
 }
 func (r *AgentSessionRuntime) SwitchSession(ctx context.Context, path string, options ...SwitchSessionOptions) (SessionReplacementResult, error) {
 	done, err := r.beginReplacement(ctx)
@@ -150,6 +180,9 @@ func (r *AgentSessionRuntime) newSessionManager(parent *string) (*SessionManager
 	return NewInMemorySessionManager(r.CWD(), option), nil
 }
 func (r *AgentSessionRuntime) Fork(ctx context.Context, id string, options ...ForkSessionOptions) (SessionReplacementResult, error) {
+	return r.fork(ctx, id, false, options...)
+}
+func (r *AgentSessionRuntime) fork(ctx context.Context, id string, clone bool, options ...ForkSessionOptions) (SessionReplacementResult, error) {
 	done, err := r.beginReplacement(ctx)
 	if err != nil {
 		return SessionReplacementResult{}, err
@@ -170,6 +203,13 @@ func (r *AgentSessionRuntime) Fork(ctx context.Context, id string, options ...Fo
 		return SessionReplacementResult{}, fmt.Errorf("Invalid fork position: %s", position)
 	}
 	source := r.session.SessionManager()
+	if clone {
+		leaf := source.GetLeafID()
+		if leaf == nil {
+			return SessionReplacementResult{}, fmt.Errorf("Cannot clone session: no current entry selected")
+		}
+		id, position = *leaf, "at"
+	}
 	entry := source.GetEntry(id)
 	if entry == nil {
 		return SessionReplacementResult{}, fmt.Errorf("Invalid entry ID for forking")
@@ -221,9 +261,6 @@ func (r *AgentSessionRuntime) replaceSession(ctx context.Context, manager *Sessi
 	if file := old.SessionFile(); file != nil {
 		previous = *file
 	}
-	if err := r.teardownCurrent(ctx); err != nil {
-		return err
-	}
 	result, err := r.createRuntime(ctx, CreateAgentSessionRuntimeOptions{CWD: manager.GetCWD(), AgentDir: r.services.AgentDir, SessionManager: manager, SessionStartEvent: &SessionStartEvent{Type: "session_start", Reason: reason, PreviousSessionFile: previous}, ProjectTrustContext: trust})
 	if err != nil {
 		if result.Session != nil {
@@ -234,15 +271,18 @@ func (r *AgentSessionRuntime) replaceSession(ctx context.Context, manager *Sessi
 	if result.Session == nil {
 		return fmt.Errorf("runtime factory returned a nil Session")
 	}
+	if err = ctx.Err(); err == nil {
+		err = r.teardownCurrent(ctx)
+	}
+	if err != nil {
+		return errors.Join(err, result.Session.Dispose(), ai.CleanupSessionResources(result.Session.SessionID()))
+	}
 	r.session = result.Session
 	r.services = cloneServices(result.Services)
 	r.diagnostics = cloneRuntimeDiagnostics(result.Diagnostics)
 	r.modelFallbackMessage = cloneStringPointer(result.ModelFallbackMessage)
 	if r.rebindSession != nil {
 		err = r.rebindSession(result.Session)
-	}
-	if err == nil {
-		err = ctx.Err()
 	}
 	if err != nil {
 		r.invalidated = result.Session

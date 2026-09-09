@@ -466,7 +466,8 @@ type AgentSession struct {
 	listeners                          map[uint64]AgentSessionEventListener
 	listenerOrder                      []uint64
 	nextListener                       uint64
-	active, disposed                   bool
+	active, disposed, replacing        bool
+	bashIdle                           chan struct{}
 	idle                               chan struct{}
 	activeCancel                       context.CancelCauseFunc
 	unsubscribeAgent                   agent.Unsubscribe
@@ -738,7 +739,7 @@ func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, rea
 		cancel(nil)
 		return fmt.Errorf("AgentSession is disposed")
 	}
-	if s.configurationNotifying || s.branchSummaryCancel != nil || s.compactionCancel != nil && !s.autoCompacting {
+	if s.replacing || s.configurationNotifying || s.branchSummaryCancel != nil || s.compactionCancel != nil && !s.autoCompacting {
 		s.mu.Unlock()
 		cancel(nil)
 		return fmt.Errorf("AgentSession is busy delivering configuration notifications or compacting")
@@ -1089,12 +1090,27 @@ func (*AgentSession) PromptTemplates() ([]PromptTemplate, error) {
 }
 func (s *AgentSession) Reload(context.Context) error { return notImplemented("AgentSession.Reload") }
 func (s *AgentSession) SetAutoCompactionEnabled(enabled bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.disposed || s.replacing {
+		return fmt.Errorf("AgentSession is busy or disposed")
+	}
 	return s.settingsManager.SetCompactionEnabled(enabled)
 }
 func (s *AgentSession) SetAutoRetryEnabled(enabled bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.disposed || s.replacing {
+		return fmt.Errorf("AgentSession is busy or disposed")
+	}
 	return s.settingsManager.SetRetryEnabled(enabled)
 }
 func (s *AgentSession) SetSessionName(name string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.disposed || s.replacing {
+		return fmt.Errorf("AgentSession is busy or disposed")
+	}
 	if s.sessionManager == nil {
 		return fmt.Errorf("AgentSession has no SessionManager")
 	}

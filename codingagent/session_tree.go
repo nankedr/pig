@@ -39,7 +39,9 @@ func (m *SessionManager) GetChildren(id string) ([]SessionEntry, error) {
 }
 
 func (m *SessionManager) GetTree() ([]SessionTreeNode, error) {
-	entries := m.GetEntries()
+	return buildSessionTree(m.GetEntries()), nil
+}
+func buildSessionTree(entries []SessionEntry) []SessionTreeNode {
 	nodes := make(map[string]*SessionTreeNode, len(entries))
 	children := map[string][]string{}
 	roots := []string{}
@@ -88,7 +90,31 @@ func (m *SessionManager) GetTree() ([]SessionTreeNode, error) {
 	for _, id := range roots {
 		result = append(result, *nodes[id])
 	}
-	return result, nil
+	return result
+}
+
+func (m *SessionManager) getEntriesSince(since *string) ([]SessionEntry, *string, error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	entries := m.entries
+	if since != nil {
+		index := -1
+		for i, entry := range entries {
+			if entry.ID == *since {
+				index = i
+				break
+			}
+		}
+		if index < 0 {
+			return nil, nil, fmt.Errorf("Entry not found: %s", *since)
+		}
+		entries = entries[index+1:]
+	}
+	result := make([]SessionEntry, len(entries))
+	for i, entry := range entries {
+		result[i] = cloneSessionEntry(entry)
+	}
+	return result, cloneStringPointer(m.leafID), nil
 }
 
 func (m *SessionManager) Branch(id string) error {

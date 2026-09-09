@@ -33,16 +33,27 @@ func (s *AgentSession) executeBash(ctx context.Context, command string, option E
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	s.mu.Lock()
-	if s.disposed || s.agent == nil || s.sessionManager == nil {
+	if s.replacing || s.disposed || s.agent == nil || s.sessionManager == nil {
 		s.mu.Unlock()
 		return BashResult{}, fmt.Errorf("Bash requires a live AgentSession and SessionManager")
 	}
 	if s.bashCancels == nil {
 		s.bashCancels = make(map[*context.CancelFunc]struct{})
 	}
+	if len(s.bashCancels) == 0 {
+		s.bashIdle = make(chan struct{})
+	}
 	s.bashCancels[&cancel] = struct{}{}
 	s.mu.Unlock()
-	defer func() { s.mu.Lock(); delete(s.bashCancels, &cancel); s.mu.Unlock() }()
+	defer func() {
+		s.mu.Lock()
+		delete(s.bashCancels, &cancel)
+		if len(s.bashCancels) == 0 {
+			close(s.bashIdle)
+			s.bashIdle = nil
+		}
+		s.mu.Unlock()
+	}()
 	prefix, err := s.settingsManager.GetShellCommandPrefix()
 	if err != nil {
 		return BashResult{}, err

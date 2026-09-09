@@ -348,40 +348,9 @@ type RPCClientOptions struct {
 
 type RPCEventListener func(JSONAgentSessionEvent)
 
-func (*RPCClient) Clone(context.Context) (bool, error) {
-	return false, notImplemented("RPCClient.Clone")
-}
-func (*RPCClient) Compact(context.Context, ...string) (CompactionResult, error) {
-	return CompactionResult{}, notImplemented("RPCClient.Compact")
-}
 func (*RPCClient) ExportHTML(context.Context, ...string) (string, error) {
 	return "", notImplemented("RPCClient.ExportHTML")
 }
-func (*RPCClient) Fork(context.Context, string) (string, bool, error) {
-	return "", false, notImplemented("RPCClient.Fork")
-}
 func (*RPCClient) GetCommands(context.Context) ([]ResolvedCommand, error) {
 	return nil, notImplemented("RPCClient.GetCommands")
-}
-func (*RPCClient) GetEntries(context.Context, ...string) ([]SessionEntry, *string, error) {
-	return nil, nil, notImplemented("RPCClient.GetEntries")
-}
-func (*RPCClient) GetForkMessages(context.Context) ([]ForkMessage, error) {
-	return nil, notImplemented("RPCClient.GetForkMessages")
-}
-
-func (*RPCClient) GetTree(context.Context) ([]SessionTreeNode, *string, error) {
-	return nil, nil, notImplemented("RPCClient.GetTree")
-}
-func (*RPCClient) NewSession(context.Context, ...string) (bool, error) {
-	return false, notImplemented("RPCClient.NewSession")
-}
-func (*RPCClient) SetAutoCompaction(context.Context, bool) error {
-	return notImplemented("RPCClient.SetAutoCompaction")
-}
-func (*RPCClient) SetSessionName(context.Context, string) error {
-	return notImplemented("RPCClient.SetSessionName")
-}
-func (*RPCClient) SwitchSession(context.Context, string) (bool, error) {
-	return false, notImplemented("RPCClient.SwitchSession")
 }

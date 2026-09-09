@@ -1,0 +1,34 @@
+import { join } from "node:path";
+import { pathToFileURL } from "node:url";
+const [pi, mode, dir] = process.env.PIG_RPC_ORACLE_PI ? [process.env.PIG_RPC_ORACLE_PI,process.env.PIG_RPC_ORACLE_MODE,process.env.PIG_RPC_ORACLE_DIR] : process.argv.slice(2);
+const ext = mode === "src" ? "ts" : "js";
+const load = path => import(pathToFileURL(join(pi,"packages/coding-agent",mode,path+"."+ext)));
+globalThis.fetch = async () => { throw Error("unexpected network"); };
+const { ModelRuntime } = await load("core/model-runtime");
+const { AuthStorage } = await load("core/auth-storage");
+const { SessionManager } = await load("core/session-manager");
+const { SettingsManager } = await load("core/settings-manager");
+const { createAgentSession } = await load("core/sdk");
+const { AgentSessionRuntime } = await load("core/agent-session-runtime");
+const { runRpcMode } = await load("modes/rpc/rpc-mode");
+const models = await ModelRuntime.create({credentials:AuthStorage.inMemory(),modelsPath:null,allowModelNetwork:false});
+models.registerProvider("deepseek",{api:"openai-completions",apiKey:"fixture",baseUrl:"https://invalid.test",models:[{id:"deepseek-v4-flash",name:"fixture",reasoning:false,input:["text"],cost:{input:0,output:0,cacheRead:0,cacheWrite:0},contextWindow:32000,maxTokens:2048}]});
+const settings=SettingsManager.inMemory({compaction:{enabled:false,keepRecentTokens:1},retry:{enabled:false}});
+const { AssistantMessageEventStream } = await import(pathToFileURL(join(pi,"packages/ai/src/utils/event-stream.ts")));
+const streamFunction = (_model, _context, options) => {
+ const stream = new AssistantMessageEventStream();
+ const message = {role:"assistant",content:[{type:"text",text:"lifecycle answer"}],api:"openai-completions",provider:"deepseek",model:"deepseek-v4-flash",usage:{input:0,output:0,cacheRead:0,cacheWrite:0,totalTokens:0,cost:{input:0,output:0,cacheRead:0,cacheWrite:0,total:0}},stopReason:"stop",timestamp:1};
+ queueMicrotask(()=>{stream.push({type:"start",partial:message});stream.push({type:"text_start",contentIndex:0,partial:message});stream.push({type:"text_delta",contentIndex:0,delta:message.content[0].text,partial:message});});
+ const timer = setTimeout(()=>{stream.push({type:"text_end",contentIndex:0,content:message.content[0].text,partial:message});stream.push({type:"done",reason:"stop",message});},80);
+ options?.signal?.addEventListener("abort",()=>{clearTimeout(timer);stream.push({type:"error",reason:"aborted",error:{...message,stopReason:"aborted",errorMessage:"Request aborted"}});},{once:true});
+ return stream;
+};
+const services={cwd:dir,agentDir:dir,modelRuntime:models,settingsManager:settings};
+const factory=async ({sessionManager})=>{
+ const result=await createAgentSession({...services,model:models.getModel("deepseek","deepseek-v4-flash"),sessionManager,thinkingLevel:"off",tools:[]});
+ result.session.agent.streamFunction=streamFunction;
+ return {...result,services,diagnostics:[]};
+};
+const {session}=await factory({sessionManager:process.env.PIG_RPC_LIFECYCLE_PERSIST ? SessionManager.create(dir,dir) : SessionManager.inMemory(dir)});
+const runtime=new AgentSessionRuntime(session,services,factory);
+await runRpcMode(runtime);
