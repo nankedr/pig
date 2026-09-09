@@ -305,18 +305,18 @@ type RPCResponse struct {
 }
 
 type RPCSessionState struct {
-	AutoCompactionEnabled bool
-	FollowUpMode          agent.QueueMode
-	IsCompacting          bool
-	IsStreaming           bool
-	MessageCount          int
-	Model                 *ai.Model
-	PendingMessageCount   int
-	SessionFile           *string
-	SessionID             string
-	SessionName           *string
-	SteeringMode          agent.QueueMode
-	ThinkingLevel         agent.ThinkingLevel
+	AutoCompactionEnabled bool                `json:"autoCompactionEnabled"`
+	FollowUpMode          agent.QueueMode     `json:"followUpMode"`
+	IsCompacting          bool                `json:"isCompacting"`
+	IsStreaming           bool                `json:"isStreaming"`
+	MessageCount          int                 `json:"messageCount"`
+	Model                 *ai.Model           `json:"model,omitempty"`
+	PendingMessageCount   int                 `json:"pendingMessageCount"`
+	SessionFile           *string             `json:"sessionFile,omitempty"`
+	SessionID             string              `json:"sessionId"`
+	SessionName           *string             `json:"sessionName,omitempty"`
+	SteeringMode          agent.QueueMode     `json:"steeringMode"`
+	ThinkingLevel         agent.ThinkingLevel `json:"thinkingLevel"`
 }
 
 type ModelInfo struct {
@@ -348,21 +348,6 @@ type RPCClientOptions struct {
 
 type RPCEventListener func(JSONAgentSessionEvent)
 
-// RPCClient is the local JSONL subprocess client facade. It deliberately does
-// not embed client.Client because the latter speaks the framed remote protocol.
-type RPCClient struct {
-	options RPCClientOptions
-}
-
-func NewRPCClient(options ...RPCClientOptions) *RPCClient {
-	client := &RPCClient{}
-	if len(options) != 0 {
-		client.options = options[0]
-	}
-	return client
-}
-
-func (*RPCClient) Abort(context.Context) error { return notImplemented("RPCClient.Abort") }
 func (*RPCClient) AbortBash(context.Context) error {
 	return notImplemented("RPCClient.AbortBash")
 }
@@ -374,9 +359,6 @@ func (*RPCClient) Bash(context.Context, string) (BashResult, error) {
 }
 func (*RPCClient) Clone(context.Context) (bool, error) {
 	return false, notImplemented("RPCClient.Clone")
-}
-func (*RPCClient) CollectEvents(context.Context) ([]JSONAgentSessionEvent, error) {
-	return nil, notImplemented("RPCClient.CollectEvents")
 }
 func (*RPCClient) Compact(context.Context, ...string) (CompactionResult, error) {
 	return CompactionResult{}, notImplemented("RPCClient.Compact")
@@ -411,22 +393,8 @@ func (*RPCClient) GetEntries(context.Context, ...string) ([]SessionEntry, *strin
 func (*RPCClient) GetForkMessages(context.Context) ([]ForkMessage, error) {
 	return nil, notImplemented("RPCClient.GetForkMessages")
 }
-func (*RPCClient) GetLastAssistantText(context.Context) (*string, error) {
-	return nil, notImplemented("RPCClient.GetLastAssistantText")
-}
-func (*RPCClient) GetMessages(context.Context) ([]agent.AgentMessage, error) {
-	return nil, notImplemented("RPCClient.GetMessages")
-}
 func (*RPCClient) GetSessionStats(context.Context) (SessionStats, error) {
 	return SessionStats{}, notImplemented("RPCClient.GetSessionStats")
-}
-func (*RPCClient) GetState(context.Context) (RPCSessionState, error) {
-	return RPCSessionState{}, notImplemented("RPCClient.GetState")
-}
-
-// GetStderr is unavailable until RPCClient owns a subprocess and its stderr.
-func (*RPCClient) GetStderr() (string, error) {
-	return "", notImplemented("RPCClient.GetStderr")
 }
 
 func (*RPCClient) GetTree(context.Context) ([]SessionTreeNode, *string, error) {
@@ -434,15 +402,6 @@ func (*RPCClient) GetTree(context.Context) ([]SessionTreeNode, *string, error) {
 }
 func (*RPCClient) NewSession(context.Context, ...string) (bool, error) {
 	return false, notImplemented("RPCClient.NewSession")
-}
-func (*RPCClient) OnEvent(RPCEventListener) (func(), error) {
-	return nil, notImplemented("RPCClient.OnEvent")
-}
-func (*RPCClient) Prompt(context.Context, string, ...[]ai.ImageContent) error {
-	return notImplemented("RPCClient.Prompt")
-}
-func (*RPCClient) PromptAndWait(context.Context, string, ...[]ai.ImageContent) ([]JSONAgentSessionEvent, error) {
-	return nil, notImplemented("RPCClient.PromptAndWait")
 }
 func (*RPCClient) SetAutoCompaction(context.Context, bool) error {
 	return notImplemented("RPCClient.SetAutoCompaction")
@@ -465,20 +424,9 @@ func (*RPCClient) SetSteeringMode(context.Context, agent.QueueMode) error {
 func (*RPCClient) SetThinkingLevel(context.Context, agent.ThinkingLevel) error {
 	return notImplemented("RPCClient.SetThinkingLevel")
 }
-func (*RPCClient) Start(context.Context) error { return notImplemented("RPCClient.Start") }
 func (*RPCClient) Steer(context.Context, string, ...[]ai.ImageContent) error {
 	return notImplemented("RPCClient.Steer")
 }
-func (*RPCClient) Stop(context.Context) error { return notImplemented("RPCClient.Stop") }
 func (*RPCClient) SwitchSession(context.Context, string) (bool, error) {
 	return false, notImplemented("RPCClient.SwitchSession")
-}
-func (*RPCClient) WaitForIdle(context.Context) error {
-	return notImplemented("RPCClient.WaitForIdle")
-}
-
-// RunRPCMode exposes the JSONL process mode boundary without borrowing CBOR
-// framing, commands, or request correlation from package protocol.
-func RunRPCMode(context.Context, *AgentSessionRuntime) error {
-	return notImplemented("RunRPCMode")
 }

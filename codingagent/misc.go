@@ -363,7 +363,7 @@ func Main(ctx context.Context, arguments []string, _ ...MainOptions) error {
 			return errors.New("Error: Failed to write stdout.")
 		}
 	}
-	if isNotImplementedOperation(err, "mode.print.text") || isNotImplementedOperation(err, "mode.json") {
+	if isNotImplementedOperation(err, "mode.print.text") || isNotImplementedOperation(err, "mode.json") || isNotImplementedOperation(err, "mode.rpc") {
 		return runHeadlessMain(ctx, arguments)
 	}
 	return err
@@ -376,20 +376,23 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	}
 	messages := append([]string(nil), parsed.Messages...)
 	var initialMessage *string
-	stdin, stdinErr := readHeadlessStdin()
-	if stdinErr != nil {
-		return fmt.Errorf("read stdin: %w", stdinErr)
-	}
-	if stdin != "" || len(messages) != 0 {
-		initial := stdin
-		if len(messages) != 0 {
-			initial += messages[0]
-			messages = messages[1:]
+	if parsed.Mode != ModeRPC {
+		stdin, stdinErr := readHeadlessStdin()
+		if stdinErr != nil {
+			return fmt.Errorf("read stdin: %w", stdinErr)
 		}
-		initialMessage = &initial
-	}
-	if initialMessage == nil {
-		return &CLIArgumentError{Message: "Headless mode requires a prompt"}
+		if stdin != "" || len(messages) != 0 {
+			initial := stdin
+			if len(messages) != 0 {
+				initial += messages[0]
+				messages = messages[1:]
+			}
+			initialMessage = &initial
+		}
+		if initialMessage == nil {
+			return &CLIArgumentError{Message: "Headless mode requires a prompt"}
+		}
+
 	}
 
 	cwd, cwdErr := os.Getwd()
@@ -525,6 +528,9 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	}
 	for _, d := range runtime.Services().Diagnostics {
 		fmt.Fprintln(os.Stderr, "Warning: "+d.Message)
+	}
+	if parsed.Mode == ModeRPC {
+		return RunRPCMode(ctx, runtime)
 	}
 	_, err = RunPrintMode(ctx, runtime, PrintModeOptions{
 		InitialMessage: initialMessage,

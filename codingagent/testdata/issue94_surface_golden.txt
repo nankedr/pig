@@ -1,0 +1,43 @@
+method Start func(*codingagent.RPCClient, context.Context) error
+method Stop func(*codingagent.RPCClient, context.Context) error
+method Prompt func(*codingagent.RPCClient, context.Context, string, ...[]ai.ImageContent) error
+method PromptAndWait func(*codingagent.RPCClient, context.Context, string, ...[]ai.ImageContent) ([]codingagent.JSONAgentSessionEvent, error)
+method Abort func(*codingagent.RPCClient, context.Context) error
+method GetState func(*codingagent.RPCClient, context.Context) (codingagent.RPCSessionState, error)
+method GetMessages func(*codingagent.RPCClient, context.Context) ([]agent.AgentMessage, error)
+method GetLastAssistantText func(*codingagent.RPCClient, context.Context) (*string, error)
+method GetStderr func(*codingagent.RPCClient) (string, error)
+method OnEvent func(*codingagent.RPCClient, codingagent.RPCEventListener) (func(), error)
+method CollectEvents func(*codingagent.RPCClient, context.Context) ([]codingagent.JSONAgentSessionEvent, error)
+method WaitForIdle func(*codingagent.RPCClient, context.Context) error
+type codingagent.RPCClientOptions struct
+fields:
+- Args []string tag=""
+- CLIPath *string tag=""
+- CWD *string tag=""
+- Env map[string]string tag=""
+- Model *string tag=""
+- Provider *string tag=""
+type codingagent.RPCSessionState struct
+fields:
+- AutoCompactionEnabled bool tag="json:\"autoCompactionEnabled\""
+- FollowUpMode agent.QueueMode tag="json:\"followUpMode\""
+- IsCompacting bool tag="json:\"isCompacting\""
+- IsStreaming bool tag="json:\"isStreaming\""
+- MessageCount int tag="json:\"messageCount\""
+- Model *ai.Model tag="json:\"model,omitempty\""
+- PendingMessageCount int tag="json:\"pendingMessageCount\""
+- SessionFile *string tag="json:\"sessionFile,omitempty\""
+- SessionID string tag="json:\"sessionId\""
+- SessionName *string tag="json:\"sessionName,omitempty\""
+- SteeringMode agent.QueueMode tag="json:\"steeringMode\""
+- ThinkingLevel ai.ModelThinkingLevel tag="json:\"thinkingLevel\""
+type codingagent.RPCResponse struct
+fields:
+- Command string tag="json:\"command\""
+- ID *string tag="json:\"id,omitempty\""
+- Success bool tag="json:\"success\""
+- Type string tag="json:\"type\""
+- Data json.RawMessage tag="json:\"data,omitempty\""
+- Error *string tag="json:\"error,omitempty\""
+RunRPCMode func(context.Context, *codingagent.AgentSessionRuntime) error

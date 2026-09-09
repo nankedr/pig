@@ -646,7 +646,8 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1801, catalog.StatusInventoried: 744, catalog.StatusPartial: 21, catalog.StatusImplemented: 34}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1787, catalog.StatusInventoried: 744, catalog.StatusPartial: 23, catalog.StatusImplemented: 46}); !reflect.DeepEqual(gotByStatus, want) {
+
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
 	if *updateIssue32Catalog {
@@ -1445,7 +1446,8 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
-	if issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
+	if issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
+
 		return
 	}
 	if issue87PromoteRuntimeEntry(entry) {
@@ -1499,7 +1501,7 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 			Supported:   []string{"Headless text and one-way session-first JSON dispatch accept explicit Provider, exact model, API key or DEEPSEEK_API_KEY, prompt arguments or stdin, default Pig-owned v3 persistence, explicit-path reopen, and explicit memory"},
 			Unsupported: []string{"interactive, RPC, continue/recent lookup, fork, resource, extension, and broader Provider assembly remain exact Capability Stubs"},
 		}
-		entry.Notes = "Issues #56 and #57 promote the pinned main entrypoint for real Headless text and session-first JSONL. Issue #71 adds Pig-owned v3 persistence and explicit reopen without migrating Pi state; later resource, extension, interactive, RPC, continue, and fork capabilities remain deferred."
+		entry.Notes = "Issues #56 and #57 promote the pinned main entrypoint for real Headless text and session-first JSONL. Issue #71 adds Pig-owned v3 persistence and explicit reopen without migrating Pi state; Issue #94 adds the basic RPC runtime under contract:rpc/jsonl-transport; extension and interactive capabilities remain deferred."
 	case "symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent":
 		entry.Status = catalog.StatusImplemented
 		entry.Evidence = evidence(
@@ -1888,7 +1890,8 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry(), issue93BashCatalogEntry())
+	entries = append(entries, issue94RPCCatalogEntry(), issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry(), issue93BashCatalogEntry())
+
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
 	}
@@ -1909,6 +1912,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = issue77RuntimeEvidence(t)
 	case issue84FindLsCatalogID:
 		descriptors = issue84FindLsEvidence(t)
+	case issue94RPCCatalogID:
+		descriptors = issue94RPCEvidence(t)
 	case issue91TreeCatalogID:
 		descriptors = issue91TreeEvidence(t)
 	case issue88StatsCatalogID:

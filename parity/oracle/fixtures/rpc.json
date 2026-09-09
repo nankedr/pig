@@ -1,0 +1,325 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/rpc/rpc-mode.ts#runRpcMode"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "rpc/codingagent/basic",
+    "catalog_id": "contract:rpc/jsonl-transport",
+    "surface": "cli",
+    "input": {
+      "scenarios": [
+        {
+          "name": "empty-last-text",
+          "line": "{\"id\":\"empty\",\"type\":\"get_last_assistant_text\"}"
+        },
+        {
+          "name": "surrogate-id",
+          "line": "{\"id\":\"\\ud800\",\"type\":\"foobar\"}"
+        },
+        {
+          "name": "unknown-string",
+          "line": "{\"id\":\"unknown\",\"type\":\"foobar\"}"
+        },
+        {
+          "name": "unknown-object-id",
+          "line": "{\"id\":{\"key\":[1,true]},\"type\":\"foobar\"}"
+        },
+        {
+          "name": "unknown-number-id",
+          "line": "{\"id\":17,\"type\":\"foobar\"}"
+        },
+        {
+          "name": "null-id",
+          "line": "{\"id\":null,\"type\":\"foobar\"}"
+        },
+        {
+          "name": "empty-id",
+          "line": "{\"id\":\"\",\"type\":\"foobar\"}"
+        },
+        {
+          "name": "missing-type",
+          "line": "{\"id\":\"missing\"}"
+        },
+        {
+          "name": "number-type",
+          "line": "{\"id\":\"number-type\",\"type\":7}"
+        },
+        {
+          "name": "object-type",
+          "line": "{\"id\":\"object-type\",\"type\":{}}"
+        },
+        {
+          "name": "primitive",
+          "line": "42"
+        },
+        {
+          "name": "array",
+          "line": "[]"
+        },
+        {
+          "name": "malformed",
+          "line": "{\"id\":\"bad\","
+        },
+        {
+          "name": "blank",
+          "line": ""
+        },
+        {
+          "name": "missing-message",
+          "line": "{\"id\":\"missing-message\",\"type\":\"prompt\"}"
+        },
+        {
+          "name": "null-message",
+          "line": "{\"id\":\"null-message\",\"type\":\"prompt\",\"message\":null}"
+        },
+        {
+          "name": "number-message",
+          "line": "{\"id\":\"number-message\",\"type\":\"prompt\",\"message\":5}"
+        },
+        {
+          "name": "extra-fields",
+          "line": "{\"id\":\"extra\",\"type\":\"get_messages\",\"ignored\":true}"
+        },
+        {
+          "name": "unicode",
+          "line": "{\"id\":\"中文😀  \",\"type\":\"foobar\"}"
+        }
+      ],
+      "lifecyclePrompt": "hello"
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "dispatch": [
+        {
+          "name": "empty-last-text",
+          "response": {
+            "id": "empty",
+            "type": "response",
+            "command": "get_last_assistant_text",
+            "success": true,
+            "data": {}
+          }
+        },
+        {
+          "name": "surrogate-id",
+          "response": {
+            "id": "<lone-high-surrogate>",
+            "type": "response",
+            "command": "foobar",
+            "success": false,
+            "error": "Unknown command: foobar"
+          }
+        },
+        {
+          "name": "unknown-string",
+          "response": {
+            "id": "unknown",
+            "type": "response",
+            "command": "foobar",
+            "success": false,
+            "error": "Unknown command: foobar"
+          }
+        },
+        {
+          "name": "unknown-object-id",
+          "response": {
+            "id": {
+              "key": [
+                1,
+                true
+              ]
+            },
+            "type": "response",
+            "command": "foobar",
+            "success": false,
+            "error": "Unknown command: foobar"
+          }
+        },
+        {
+          "name": "unknown-number-id",
+          "response": {
+            "id": 17,
+            "type": "response",
+            "command": "foobar",
+            "success": false,
+            "error": "Unknown command: foobar"
+          }
+        },
+        {
+          "name": "null-id",
+          "response": {
+            "id": null,
+            "type": "response",
+            "command": "foobar",
+            "success": false,
+            "error": "Unknown command: foobar"
+          }
+        },
+        {
+          "name": "empty-id",
+          "response": {
+            "id": "",
+            "type": "response",
+            "command": "foobar",
+            "success": false,
+            "error": "Unknown command: foobar"
+          }
+        },
+        {
+          "name": "missing-type",
+          "response": {
+            "id": "missing",
+            "type": "response",
+            "success": false,
+            "error": "Unknown command: undefined"
+          }
+        },
+        {
+          "name": "number-type",
+          "response": {
+            "id": "number-type",
+            "type": "response",
+            "command": 7,
+            "success": false,
+            "error": "Unknown command: 7"
+          }
+        },
+        {
+          "name": "object-type",
+          "response": {
+            "id": "object-type",
+            "type": "response",
+            "command": {},
+            "success": false,
+            "error": "Unknown command: [object Object]"
+          }
+        },
+        {
+          "name": "primitive",
+          "response": {
+            "type": "response",
+            "success": false,
+            "error": "Unknown command: undefined"
+          }
+        },
+        {
+          "name": "array",
+          "response": {
+            "type": "response",
+            "success": false,
+            "error": "Unknown command: undefined"
+          }
+        },
+        {
+          "name": "malformed",
+          "response": {
+            "type": "response",
+            "command": "parse",
+            "success": false,
+            "error": "Failed to parse command: <syntax>"
+          }
+        },
+        {
+          "name": "blank",
+          "response": {
+            "type": "response",
+            "command": "parse",
+            "success": false,
+            "error": "Failed to parse command: <syntax>"
+          }
+        },
+        {
+          "name": "missing-message",
+          "response": {
+            "id": "missing-message",
+            "type": "response",
+            "command": "prompt",
+            "success": false,
+            "error": "Cannot read properties of undefined (reading 'startsWith')"
+          }
+        },
+        {
+          "name": "null-message",
+          "response": {
+            "id": "null-message",
+            "type": "response",
+            "command": "prompt",
+            "success": false,
+            "error": "Cannot read properties of null (reading 'startsWith')"
+          }
+        },
+        {
+          "name": "number-message",
+          "response": {
+            "id": "number-message",
+            "type": "response",
+            "command": "prompt",
+            "success": false,
+            "error": "text.startsWith is not a function"
+          }
+        },
+        {
+          "name": "extra-fields",
+          "response": {
+            "id": "extra",
+            "type": "response",
+            "command": "get_messages",
+            "success": true,
+            "data": {
+              "messages": []
+            }
+          }
+        },
+        {
+          "name": "unicode",
+          "response": {
+            "id": "中文😀  ",
+            "type": "response",
+            "command": "foobar",
+            "success": false,
+            "error": "Unknown command: foobar"
+          }
+        }
+      ],
+      "lifecycle": {
+        "roles": [
+          "user",
+          "assistant"
+        ],
+        "text": "你好😀 world",
+        "eventTypes": [
+          "agent_end",
+          "agent_settled",
+          "agent_start",
+          "message_end",
+          "message_start",
+          "message_update",
+          "turn_end",
+          "turn_start"
+        ],
+        "projected": true
+      }
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:3245f68e23e65d1546be0b216c0508240acad8ad98b13ff4b4a5519f6cebd73b",
+  "observation_hash": "sha256:7102fd36a2e2ad121374fb831089b993e4aefb67d7c5efe1de8a1d455e72fde2",
+  "execution_method": "node --experimental-strip-types parity/oracle/rpc.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/modes/rpc/rpc-mode.ts#runRpcMode"
+  }
+}
