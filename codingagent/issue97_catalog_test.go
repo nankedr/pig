@@ -39,7 +39,7 @@ func issue97PromoteRuntimeEntry(e *catalog.Entry) bool {
 	}
 	e.Status = catalog.StatusPartial
 	e.Partial = issue97HTMLCatalogEntry().Partial
-	e.Evidence = []catalog.Evidence{{Kind: "go-test", Ref: "codingagent/issue97_export_test.go", Baseline: issue32BaselineCommit, CaseID: e.ID, InputHash: "137d11adb21433168a8d7b8cfd804f91f4e93b08cb4e6b17ac68941817efed66", ExecutionMethod: "go test ./codingagent ./cmd/pig -run '^(TestIssue97Export|TestRPC97)' -count=1", Expected: "shared real file export", Actual: "PASS; CLI/SDK/RPC and browser validation", Platform: "any", CatalogID: e.ID}}
+	e.Evidence = []catalog.Evidence{{Kind: "go-test", Ref: "codingagent/issue97_export_test.go", Baseline: issue32BaselineCommit, CaseID: e.ID, InputHash: "5b4a59ab93e91208df2ef16827d1e66c12df49a6a37c936fd54b46f6c9268acf", ExecutionMethod: "go test ./codingagent ./cmd/pig -run '^(TestIssue97Export|TestRPC97)' -count=1", Expected: "shared real file export", Actual: "PASS; CLI/SDK/RPC and browser validation", Platform: "any", CatalogID: e.ID}}
 	e.Notes = "Issue #97; supported and deferred export branches in " + issue97HTMLCatalogID + "."
 	return true
 }

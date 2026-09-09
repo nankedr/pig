@@ -1278,7 +1278,7 @@
             if (msg.cancelled) {
               html += '<div style="color: var(--warning)">(cancelled)</div>';
             } else if (msg.exitCode !== 0 && msg.exitCode !== null) {
-              html += `<div style="color: var(--error)">(exit ${msg.exitCode})</div>`;
+              html += `<div style="color: var(--error)">(exit ${escapeHtml(msg.exitCode)})</div>`;
             }
             html += '</div>';
             return html;

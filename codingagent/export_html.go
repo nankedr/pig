@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -49,6 +50,9 @@ func ExportFromFile(ctx context.Context, input string, output ...string) (string
 		if data.Header == nil {
 			if err = json.Unmarshal(line, &data.Header); err != nil {
 				return "", fmt.Errorf("invalid session header: %w", err)
+			}
+			if data.Header == nil {
+				return "", fmt.Errorf("invalid session header: null")
 			}
 		} else {
 			data.Entries = append(data.Entries, bytes.Clone(line))
@@ -91,7 +95,11 @@ func writeSessionHTML(ctx context.Context, source string, data htmlSessionData, 
 		if e != nil {
 			return "", e
 		}
-		path = filepath.Join(home, strings.TrimPrefix(path, "~/"))
+		if path == "~" {
+			path = home
+		} else {
+			path = filepath.Join(home, strings.TrimPrefix(path, "~/"))
+		}
 	}
 	target, err := filepath.Abs(path)
 	if err != nil {
@@ -157,6 +165,25 @@ func validateHTMLSession(data htmlSessionData) error {
 			case "bashExecution":
 				if _, ok := m["command"].(string); !ok {
 					return fmt.Errorf("invalid bash command in %q", id)
+				}
+				for _, field := range []string{"output", "exitCode", "cancelled", "truncated"} {
+					value, exists := m[field]
+					if !exists || (field == "exitCode" && value == nil) {
+						continue
+					}
+					valid := false
+					switch field {
+					case "output":
+						_, valid = value.(string)
+					case "exitCode":
+						number, ok := value.(float64)
+						valid = ok && number == math.Trunc(number)
+					default:
+						_, valid = value.(bool)
+					}
+					if !valid {
+						return fmt.Errorf("invalid bash %s in %q", field, id)
+					}
 				}
 			default:
 				return notImplemented("export.message." + role)
@@ -231,7 +258,7 @@ func validateHTMLFieldTypes(value map[string]any) error {
 			continue
 		}
 		switch k {
-		case "toolName", "provider", "model", "modelId", "thinkingLevel", "label", "name", "diff":
+		case "errorMessage", "stopReason", "toolName", "provider", "model", "modelId", "thinkingLevel", "label", "name", "diff":
 			if _, ok := v.(string); !ok {
 				return fmt.Errorf("invalid export field %s", k)
 			}

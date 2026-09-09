@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9667
+- Total entries: 9668
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
-| scaffolded | 3927 |
-| partial | 281 |
+| scaffolded | 3925 |
+| partial | 284 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 2 |
@@ -6291,7 +6291,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.clearQueue | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ClearQueue | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.createReplacedSessionContext | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CreateReplacedSessionContext | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.dispose | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Dispose | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.exportToHtml | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExportToHTML | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.exportToJsonl | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExportToJSONL | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.extensionRunner | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExtensionRunner | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.followUp | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.FollowUp | coding-agent |
@@ -7508,7 +7507,6 @@
 | member:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo.id | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.ModelInfo.ID | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo.provider | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.ModelInfo.Provider | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo.reasoning | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.ModelInfo.Reasoning | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.exportHtml | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.ExportHTML | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getCommands | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetCommands | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClientOptions.args | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClientOptions.Args | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClientOptions.cliPath | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClientOptions.CLIPath | coding-agent |
@@ -7936,6 +7934,7 @@
 | contract:codingagent/find-ls | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateFindTool | coding-agent |
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
+| contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
 | contract:codingagent/session-bash | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash | coding-agent |
 | contract:codingagent/session-configuration | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
@@ -7956,6 +7955,7 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.compact | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Compact | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.cycleModel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleModel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.cycleThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.CycleThinkingLevel | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.exportToHtml | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExportToHTML | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getActiveToolNames | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetActiveToolNames | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getAllTools | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAllTools | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.getAvailableThinkingLevels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAvailableThinkingLevels | coding-agent |
@@ -7968,6 +7968,7 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.setThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.supportsThinking | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SupportsThinking | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionManager.appendCompaction | partial | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendCompaction | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.exportHtml | partial | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.ExportHTML | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
 | symbol:codingagent/src/core/compaction/branch-summarization.ts#generateBranchSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateBranchSummary | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#compact | partial | M4 | symbol | github.com/nankedr/pig/codingagent.Compact | coding-agent |

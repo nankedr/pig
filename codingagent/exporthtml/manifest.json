@@ -8,7 +8,8 @@
     "Hash CSP and delegated event handlers",
     "Escape read tool line numbers",
     "Visible M12 Markdown image placeholders; no automatic network resources",
-    "Full license and scope disclosure"
+    "Full license and scope disclosure",
+    "Escape Bash exit status and validate Bash fields"
   ],
   "assets": [
     {
@@ -21,7 +22,7 @@
       "path": "template.js",
       "upstream_path": "packages/coding-agent/src/core/export-html/template.js",
       "upstream_sha256": "1893cdb77587f592eef5717905391269886d6d7a4dc6a488417a73da374d9226",
-      "sha256": "8e23f5e115c978ce0f12ef8eea294da005b5c16afd2083af65cb510e379ddaf1"
+      "sha256": "b5811dd3f95e70da8beb0241cf7036bd95050bcc5a0417085a6e4d8070887bc4"
     },
     {
       "path": "template.css",

@@ -117,6 +117,7 @@ func TestIssue97ExportFailuresAndPaths(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Setenv("HOME", dir)
 	source := filepath.Join(dir, "source.jsonl")
 	output := filepath.Join(dir, "out.html")
 	if err = os.WriteFile(source, valid, 0600); err != nil {
@@ -126,7 +127,7 @@ func TestIssue97ExportFailuresAndPaths(t *testing.T) {
 	if err != nil || path != "pig-session-source.html" {
 		t.Fatal(path, err)
 	}
-	for _, target := range []string{source, dir, filepath.Join(dir, "missing", "out.html")} {
+	for _, target := range []string{source, dir, "~", filepath.Join(dir, "missing", "out.html")} {
 		if _, err = codingagent.ExportFromFile(context.Background(), source, target); err == nil {
 			t.Fatalf("accepted output %q", target)
 		}
@@ -147,7 +148,8 @@ func TestIssue97ExportFailuresAndPaths(t *testing.T) {
 		t.Fatal("accepted missing input")
 	}
 	cases := map[string]string{
-		"empty": "", "invalid": "{oops", "scalar": "1", "v2": strings.Replace(string(valid), `"version":3`, `"version":2`, 1),
+		"null-header": "null\n" + string(valid),
+		"empty":       "", "invalid": "{oops", "scalar": "1", "v2": strings.Replace(string(valid), `"version":3`, `"version":2`, 1),
 		"broken-line": string(valid) + "{oops\n", "cycle": strings.Replace(string(valid), `"parentId":null`, `"parentId":"entry-3"`, 1),
 		"image":           strings.Replace(string(valid), `"type":"text","text":"hello"`, `"type":"image","data":"x","mimeType":"image/png"`, 1),
 		"unknown":         strings.Replace(string(valid), `"role":"assistant"`, `"role":"futureRole"`, 1),
@@ -204,5 +206,46 @@ func TestIssue97ExportSDKMetadataAndInvalidUsage(t *testing.T) {
 	}
 	if _, err = codingagent.ExportFromFile(context.Background(), source, output); err == nil {
 		t.Fatal("accepted malformed usage")
+	}
+}
+
+func TestIssue97ExportRejectsMalformedBash(t *testing.T) {
+	input, err := os.ReadFile("../parity/export-html/session.jsonl")
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	source := filepath.Join(dir, "session.jsonl")
+	for _, field := range []string{"exitCode", "output", "cancelled", "truncated"} {
+		t.Run(field, func(t *testing.T) {
+			message := map[string]any{"role": "bashExecution", "command": "echo hi", "output": "hi", "exitCode": 0, "cancelled": false, "truncated": false}
+			message[field] = map[string]any{"bad": "<img src=x onerror=bad()>"}
+			raw, err := json.Marshal(map[string]any{"type": "message", "id": "bash-entry", "parentId": "entry-14", "timestamp": "2025-01-01T00:00:00.000Z", "message": message})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err = os.WriteFile(source, append(append([]byte{}, input...), raw...), 0600); err != nil {
+				t.Fatal(err)
+			}
+			if _, err = codingagent.ExportFromFile(context.Background(), source, filepath.Join(dir, "out.html")); err == nil {
+				t.Fatal("accepted malformed bash", field)
+			}
+		})
+	}
+}
+
+func TestIssue97ExportRejectsInvalidAssistantError(t *testing.T) {
+	input, err := os.ReadFile("../parity/export-html/session.jsonl")
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw := []byte(`{"type":"message","id":"error-entry","parentId":"entry-14","timestamp":"2025-01-01T00:00:00.000Z","message":{"role":"assistant","content":[],"errorMessage":{}}}`)
+	dir := t.TempDir()
+	source := filepath.Join(dir, "input.jsonl")
+	if err = os.WriteFile(source, append(input, raw...), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = codingagent.ExportFromFile(context.Background(), source, filepath.Join(dir, "out.html")); err == nil {
+		t.Fatal("accepted non-string assistant error")
 	}
 }

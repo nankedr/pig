@@ -36,6 +36,7 @@ try {
  }
  const last=entries.at(-1);const badID='id" onmouseover="window.__xss=1';
  entries.push({type:'message',id:badID,parentId:last.id,timestamp:last.timestamp,message:{role:'user',content:markdown,timestamp:1}});
+ entries.push({type:'message',id:'bash-text',parentId:badID,timestamp:last.timestamp,message:{role:'bashExecution',command:attack,output:attack,exitCode:1,cancelled:false,truncated:false}});
  writeFileSync(source,entries.map(JSON.stringify).join('\n')+'\n');run();
  const browser=await openBrowser();
  try {
