@@ -70,7 +70,7 @@ import ("fmt"; "os"; "github.com/nankedr/pig/codingagent")
 func main() {
  dir, err := os.MkdirTemp("", "pig-release-session-"); if err != nil { panic(err) }; defer os.RemoveAll(dir)
  manager, err := codingagent.NewSessionManager(dir, &dir); if err != nil { panic(err) }
- if manager.GetHeader().Version != 3 { panic("not a v3 Session") }
+ if manager.GetHeader().Version == nil || *manager.GetHeader().Version != 3 { panic("not a v3 Session") }
  fmt.Println(codingagent.Version)
 }
 ''')

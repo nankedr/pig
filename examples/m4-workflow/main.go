@@ -66,12 +66,12 @@ func run() error {
 	var session *codingagent.AgentSession
 	calls, retries := 0, 0
 	checkConfig, sawConfig, sawSummary := false, false, false
+	summaryText, expectedSummary := "", ""
 	stream := func(ctx context.Context, m ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
 		calls++
 		reply, _ := ai.FauxAssistantMessage(ai.FauxAssistantText("完成任务并保留验证结果。"))
-		system, _ := input.SystemPrompt.Value()
-		if strings.Contains(system, "context summarization assistant") {
-			reply, _ = ai.FauxAssistantMessage(ai.FauxAssistantText("## Goal\n保留 M4 工作流检查点。"))
+		if summaryText != "" {
+			reply, _ = ai.FauxAssistantMessage(ai.FauxAssistantText(summaryText))
 		} else if calls == 1 {
 			if e := session.Steer("先检查接口兼容性"); e != nil {
 				err = e
@@ -85,7 +85,7 @@ func run() error {
 				sawConfig = m.ID == "deepseek-v4-pro" && len(input.Tools) == 1 && input.Tools[0].Name == "read" && options.Reasoning != nil && string(*options.Reasoning) == "max"
 			}
 			data, _ := json.Marshal(input.Messages)
-			sawSummary = sawSummary || strings.Contains(string(data), "M4 工作流检查点")
+			sawSummary = strings.Contains(string(data), expectedSummary)
 		}
 		core.SetResponses([]ai.FauxResponseStep{reply})
 		return core.StreamSimple(ctx, m, input, options)
@@ -151,23 +151,30 @@ func run() error {
 		return err
 	}
 	branch := *manager.GetLeafID()
+	summaryText = "M4 离开分支的探索结论"
 	result, err := session.NavigateTree(ctx, original, codingagent.NavigateTreeOptions{Summarize: true, Label: "探索摘要"})
 	if err != nil {
 		return err
 	}
-	if result.Cancelled || result.SummaryEntry == nil {
+	if result.Cancelled || result.SummaryEntry == nil || !strings.Contains(result.SummaryEntry.Summary, summaryText) {
 		return fmt.Errorf("branch summary missing")
 	}
+	expectedSummary, summaryText, sawSummary = summaryText, "", false
 	if err = session.Prompt(ctx, "结合探索摘要继续原任务"); err != nil {
 		return err
 	}
+	if !sawSummary {
+		return fmt.Errorf("branch continuation did not receive its summary")
+	}
+	summaryText = "M4 压缩检查点：保留任务目标和验证结论。"
 	compacted, err := session.Compact(ctx, "保留 M4 工作流检查点")
 	if err != nil {
 		return err
 	}
-	if !strings.Contains(compacted.Summary, "M4 工作流检查点") {
+	if !strings.Contains(compacted.Summary, summaryText) {
 		return fmt.Errorf("compaction summary missing")
 	}
+	expectedSummary, summaryText, sawSummary = summaryText, "", false
 	if err = session.Prompt(ctx, "压缩后继续并检查摘要"); err != nil {
 		return err
 	}
