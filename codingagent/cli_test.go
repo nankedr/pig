@@ -435,26 +435,10 @@ func TestRunCLIVersionAndExportBypassRootConstraints(t *testing.T) {
 				return
 			}
 
-			var unavailable *codingagent.NotImplementedError
-			if !errors.As(err, &unavailable) || unavailable.Operation != test.wantOperation {
-				t.Fatalf("RunCLI error = %#v, want codingagent.%s", err, test.wantOperation)
+			if err == nil || !strings.Contains(err.Error(), "read export input") {
+				t.Fatalf("expected export input error before root constraints, got %v", err)
 			}
 		})
-	}
-}
-
-func TestRunCLIRoutesOneShotRootOperationsToDedicatedStubs(t *testing.T) {
-	for _, test := range []struct {
-		arguments []string
-		operation string
-	}{
-		{arguments: []string{"--export", "session.jsonl"}, operation: "session.export"},
-	} {
-		_, err := codingagent.RunCLI(context.Background(), codingagent.CLIInvocation{Arguments: test.arguments})
-		var unavailable *codingagent.NotImplementedError
-		if !errors.As(err, &unavailable) || unavailable.Operation != test.operation {
-			t.Fatalf("RunCLI(%q) error = %#v, want codingagent.%s", test.arguments, err, test.operation)
-		}
 	}
 }
 

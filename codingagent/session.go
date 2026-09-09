@@ -1040,9 +1040,6 @@ func (s *AgentSession) BindExtensions(ExtensionBindings) error {
 func (s *AgentSession) CreateReplacedSessionContext() (ExtensionCommandContext, error) {
 	return ExtensionCommandContext{}, notImplemented("AgentSession.CreateReplacedSessionContext")
 }
-func (s *AgentSession) ExportToHTML(context.Context, ...string) (string, error) {
-	return "", notImplemented("AgentSession.ExportToHTML")
-}
 func (s *AgentSession) ExportToJSONL(...string) (string, error) {
 	return "", notImplemented("AgentSession.ExportToJSONL")
 }

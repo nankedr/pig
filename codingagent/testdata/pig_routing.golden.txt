@@ -675,13 +675,13 @@ session export
   terminals: stdin=false stdout=false
   exit: 1
   stdout: ""
-  stderr: "codingagent.session.export: not implemented\n"
+  stderr: "Error: read export input: <missing session file>\n"
 session export bypasses root constraints
   args: ["--name" " " "--export" "session.jsonl"]
   terminals: stdin=false stdout=false
   exit: 1
   stdout: ""
-  stderr: "codingagent.session.export: not implemented\n"
+  stderr: "Error: read export input: <missing session file>\n"
 model list all
   args: ["--list-models"]
   terminals: stdin=false stdout=false

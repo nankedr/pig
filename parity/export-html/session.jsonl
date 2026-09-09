@@ -1,0 +1,16 @@
+{"type":"session","version":3,"id":"pi-writer","timestamp":"2025-01-01T00:00:00.000Z","cwd":"/project"}
+{"type":"model_change","id":"entry-0","parentId":null,"timestamp":"2025-01-01T00:00:00.000Z","provider":"fixture","modelId":"model-1"}
+{"type":"thinking_level_change","id":"entry-1","parentId":"entry-0","timestamp":"2025-01-01T00:00:00.000Z","thinkingLevel":"high"}
+{"type":"compaction","id":"entry-2","parentId":"entry-1","timestamp":"2025-01-01T00:00:00.000Z","summary":"superseded summary","firstKeptEntryId":"missing","tokensBefore":7}
+{"type":"message","id":"entry-3","parentId":"entry-2","timestamp":"2025-01-01T00:00:00.000Z","message":{"role":"user","content":"# Export heading\n\n**bold** and `inline`\n\n```go\nfmt.Println(\"<safe>\")\n```\n\n[link](https://example.com)\n\n| A | B |\n| - | - |\n| 1 | 2 |","timestamp":1}}
+{"type":"message","id":"entry-4","parentId":"entry-3","timestamp":"2025-01-01T00:00:00.000Z","message":{"role":"assistant","content":[{"type":"text","text":"hello"},{"type":"toolCall","id":"call-1","name":"read","arguments":{"path":"demo.go","offset":1,"limit":2}}],"api":"fixture","provider":"fixture","model":"model-1","usage":{"input":1,"output":1,"cacheRead":0,"cacheWrite":0,"totalTokens":2,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"stop","timestamp":2}}
+{"type":"message","id":"entry-5","parentId":"entry-4","timestamp":"2025-01-01T00:00:00.000Z","message":{"role":"toolResult","toolCallId":"call-1","toolName":"read","content":[{"type":"text","text":"  spaced line\n\tindented <text>"}],"isError":false,"timestamp":3}}
+{"type":"message","id":"entry-6","parentId":"entry-3","timestamp":"2025-01-01T00:00:00.000Z","message":{"role":"user","content":"discarded sibling","timestamp":3}}
+{"type":"compaction","id":"entry-7","parentId":"entry-5","timestamp":"2025-01-01T00:00:00.000Z","summary":"old summary","firstKeptEntryId":"entry-3","tokensBefore":10,"details":{"source":"fixture"}}
+{"type":"custom","customType":"state","data":{"nested":[1,{"keep":true}]},"id":"entry-8","parentId":"entry-7","timestamp":"2025-01-01T00:00:00.000Z"}
+{"type":"custom_message","customType":"note","content":"custom text","display":true,"details":{"keep":"details"},"id":"entry-9","parentId":"entry-8","timestamp":"2025-01-01T00:00:00.000Z"}
+{"type":"label","id":"entry-10","parentId":"entry-9","timestamp":"2025-01-01T00:00:00.000Z","targetId":"entry-3","label":"old label"}
+{"type":"label","id":"entry-11","parentId":"entry-10","timestamp":"2025-01-01T00:00:00.000Z","targetId":"entry-3"}
+{"type":"label","id":"entry-12","parentId":"entry-11","timestamp":"2025-01-01T00:00:00.000Z","targetId":"entry-3","label":"keep"}
+{"type":"session_info","id":"entry-13","parentId":"entry-12","timestamp":"2025-01-01T00:00:00.000Z","name":"history"}
+{"type":"branch_summary","id":"entry-14","parentId":"entry-13","timestamp":"2025-01-01T00:00:00.000Z","fromId":"entry-13","summary":"branch summary","details":{"details":{"keep":true}}}

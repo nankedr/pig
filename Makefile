@@ -22,6 +22,7 @@ m0-offline:
 	go run ./examples/write-read
 	go run ./examples/grep-edit
 	go run ./examples/bash-read
+	go run ./examples/html-export
 	go run ./examples/rpc-lifecycle
 	go run ./examples/rpc-control
 	go run ./examples/rpc-chat
@@ -162,3 +163,7 @@ m3-clean:
 
 m3-freeze: m3-clean m3-node-preflight m3-gate m3-oracle m0-source-drift m1-live-smoke
 	@$(MAKE) --no-print-directory m3-clean
+
+.PHONY: m4-html-browser
+m4-html-browser:
+	node parity/export-html/check.mjs

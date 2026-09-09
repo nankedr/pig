@@ -265,7 +265,11 @@ func TestIssue33CLIRoutingSnapshot(t *testing.T) {
 		exitCode, stderr := 0, result.Stderr
 		if err != nil {
 			exitCode = 1
-			stderr += err.Error() + "\n"
+			message := err.Error()
+			if strings.Contains(message, "read export input:") {
+				message = "Error: read export input: <missing session file>"
+			}
+			stderr += message + "\n"
 		}
 		fmt.Fprintf(&snapshot, "%s\n  args: %q\n  terminals: stdin=%t stdout=%t\n  exit: %d\n  stdout: %q\n  stderr: %q\n",
 			test.name, test.arguments, test.stdinTTY, test.stdoutTTY, exitCode, result.Stdout, stderr)

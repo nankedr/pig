@@ -348,9 +348,6 @@ type RPCClientOptions struct {
 
 type RPCEventListener func(JSONAgentSessionEvent)
 
-func (*RPCClient) ExportHTML(context.Context, ...string) (string, error) {
-	return "", notImplemented("RPCClient.ExportHTML")
-}
 func (*RPCClient) GetCommands(context.Context) ([]ResolvedCommand, error) {
 	return nil, notImplemented("RPCClient.GetCommands")
 }

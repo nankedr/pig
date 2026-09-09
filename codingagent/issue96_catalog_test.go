@@ -16,7 +16,7 @@ func issue96RPCCatalogEntry() catalog.Entry {
 		"Replacement admission cancels and drains active Prompt/summary/Bash before reading the source; target factory failure retains the live original Session; generation-scoped event forwarding drops late old-session events; race-built subprocess verifies concurrent queries, prompt rejection, abort and replacement",
 	}, Unsupported: []string{
 		"Fixed Pi has no navigate_tree or abort_compaction wire command and no RPCClient NavigateTree method. Branch-summary tree navigation is exposed only through extension command contexts; extension runtime/UI remains deferred, so RPC branch-summary generation is not claimed",
-		"Images, export_html, get_commands, extension callbacks/custom summaries and unsupported provider adapters remain deferred; SDK direct NavigateTree remains delivered by #91/#92",
+		"Images, get_commands, extension callbacks/custom summaries and unsupported provider adapters remain deferred; SDK direct NavigateTree remains delivered by #91/#92; Issue #97 delivers export_html",
 		"Generic runtime rebind callback failures retain the existing invalidated-target behavior; RPC's internal rebind only attaches a listener to a freshly constructed Session. Request Context cancellation is local; Abort controls remote work",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0032-rpc-session-lifecycle.md", Reason: "Stage target assembly before invalidating the old Session, reuse Session admission and v3 codecs, and preserve the fixed wire without inventing extension navigation commands."}, Notes: "Pi source Oracle only; no new dist build claim. No M4 freeze claim."}
 }
