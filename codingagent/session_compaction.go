@@ -19,7 +19,7 @@ func (s *AgentSession) Compact(ctx context.Context, instructions ...string) (res
 		return result, fmt.Errorf("expected at most one custom instruction")
 	}
 	s.mu.Lock()
-	if s.disposed || s.compactionCancel != nil || s.configurationNotifying || s.queueDispatchDone != nil {
+	if s.disposed || s.compactionCancel != nil || s.branchSummaryCancel != nil || s.configurationNotifying || s.queueDispatchDone != nil {
 		s.mu.Unlock()
 		return result, fmt.Errorf("AgentSession is busy or disposed")
 	}

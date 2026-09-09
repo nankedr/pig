@@ -1,0 +1,4001 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts#navigateTree"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "go-sdk/codingagent/branch-summary",
+    "catalog_id": "contract:codingagent/branch-summary",
+    "surface": "go-sdk",
+    "input": {
+      "history": [
+        {
+          "type": "message",
+          "id": "root",
+          "parentId": null,
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "text",
+                "text": "shared request"
+              }
+            ],
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "shared",
+          "parentId": "root",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "shared answer"
+              }
+            ],
+            "api": "openai-completions",
+            "provider": "deepseek",
+            "model": "deepseek-v4-flash",
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "target",
+          "parentId": "shared",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "text",
+                "text": "original path"
+              }
+            ],
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "other",
+          "parentId": "target",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "original answer"
+              }
+            ],
+            "api": "openai-completions",
+            "provider": "deepseek",
+            "model": "deepseek-v4-flash",
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "explore",
+          "parentId": "shared",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "text",
+                "text": "explore alternative"
+              }
+            ],
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "branch_summary",
+          "id": "prior",
+          "parentId": "explore",
+          "summary": "prior exploration",
+          "fromId": "shared",
+          "fromHook": false,
+          "details": {
+            "readFiles": [
+              "prior.txt",
+              "shared.go"
+            ],
+            "modifiedFiles": [
+              "prior.go"
+            ]
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "tools",
+          "parentId": "prior",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "exploration result"
+              },
+              {
+                "type": "toolCall",
+                "id": "call0",
+                "name": "read",
+                "arguments": {
+                  "path": "shared.go"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call1",
+                "name": "edit",
+                "arguments": {
+                  "path": "shared.go"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call2",
+                "name": "read",
+                "arguments": {
+                  "path": "read.go"
+                }
+              },
+              {
+                "type": "toolCall",
+                "id": "call3",
+                "name": "write",
+                "arguments": {
+                  "path": "write.go"
+                }
+              }
+            ],
+            "api": "openai-completions",
+            "provider": "deepseek",
+            "model": "deepseek-v4-flash",
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "toolresult",
+          "parentId": "tools",
+          "message": {
+            "role": "toolResult",
+            "toolCallId": "call0",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "tool output excluded"
+              }
+            ],
+            "isError": false,
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        },
+        {
+          "type": "message",
+          "id": "leaf",
+          "parentId": "toolresult",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "finished exploration"
+              }
+            ],
+            "api": "openai-completions",
+            "provider": "deepseek",
+            "model": "deepseek-v4-flash",
+            "usage": {
+              "input": 80,
+              "output": 20,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 100,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          "timestamp": "2026-01-01T00:00:00Z"
+        }
+      ],
+      "scenarios": [
+        {
+          "label": "explored",
+          "instructions": "focus files",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "other",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "only conclusions",
+          "replace": true,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "root",
+          "target": "root"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "nested-user",
+          "target": "target"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": true,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "ancestor",
+          "target": "shared"
+        },
+        {
+          "label": "ignored",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "same",
+          "target": "leaf"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 31990,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "budget",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 31997,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": true,
+          "name": "fractional-summary-budget",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 0,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 17000,
+          "longHistory": true,
+          "smallSummary": false,
+          "name": "zero-reserve",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 31955,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "summary-budget",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 33000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "oversized-reserve",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": true,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "no-content",
+          "target": "leaf"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "shared",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "forward",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": true,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "hook-details",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": true,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "compaction",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": true,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "custom",
+          "target": "target"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": true,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "roundtrip",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [
+            "503 overloaded"
+          ],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "retry",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [
+            "503 overloaded",
+            "503 overloaded",
+            "503 overloaded"
+          ],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "exhausted",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [
+            "429 insufficient_quota"
+          ],
+          "abort": false,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "quota",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [],
+          "abort": true,
+          "abortRetry": false,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "abort",
+          "target": "other"
+        },
+        {
+          "label": "",
+          "instructions": "",
+          "replace": false,
+          "reserve": 1000,
+          "errors": [
+            "503 overloaded"
+          ],
+          "abort": false,
+          "abortRetry": true,
+          "metadata": false,
+          "start": "",
+          "hook": false,
+          "compaction": false,
+          "custom": false,
+          "roundtrip": false,
+          "window": 32000,
+          "longHistory": false,
+          "smallSummary": false,
+          "name": "abort-retry",
+          "target": "other"
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "other",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages.\n\nAdditional focus: focus files"
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 354,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 358,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": "explored"
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 2,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "root",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[Assistant]: shared answer\n\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nonly conclusions"
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": "shared request",
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": null,
+            "from": "root",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 185,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 189,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "nested-user",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": "original path",
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "shared",
+            "from": "shared",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 347,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 351,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "ancestor",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "shared",
+            "from": "shared",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 347,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 351,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "same",
+        "roundtrip": null,
+        "requests": [],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "leaf",
+            "from": "leaf",
+            "text": "No content to summarize",
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            },
+            "usage": null,
+            "fromHook": false,
+            "label": "ignored"
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "explore alternative"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "exploration result"
+            },
+            {
+              "role": "toolResult",
+              "text": "tool output excluded"
+            },
+            {
+              "role": "assistant",
+              "text": "finished exploration"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 2,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>"
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nNo content to summarize</summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "budget",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 270,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 274,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "fractional-summary-budget",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: abcdefgh\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nshared.go\n</read-files>\n\n<modified-files>\nprior.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "shared.go"
+              ],
+              "modifiedFiles": [
+                "prior.go"
+              ]
+            },
+            "usage": {
+              "input": 299,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 303,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nshared.go\n</read-files>\n\n<modified-files>\nprior.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "abcdefgh"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "zero-reserve",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration \n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 1542,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 1546,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration old exploration "
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "summary-budget",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 347,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 351,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "oversized-reserve",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 347,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 351,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "no-content",
+        "roundtrip": null,
+        "requests": [],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "leaf",
+            "from": "leaf",
+            "text": "No content to summarize",
+            "details": {
+              "readFiles": [],
+              "modifiedFiles": []
+            },
+            "usage": null,
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "explore alternative"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "exploration result"
+            },
+            {
+              "role": "toolResult",
+              "text": "tool output excluded"
+            },
+            {
+              "role": "assistant",
+              "text": "finished exploration"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>"
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nNo content to summarize</summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "forward",
+        "roundtrip": null,
+        "requests": [],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            }
+          ],
+          "added": 0,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "hook-details",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nread.go\n</read-files>\n\n<modified-files>\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 347,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 351,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nread.go\n</read-files>\n\n<modified-files>\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "compaction",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The conversation history before this point was compacted into the following summary:\n\n<summary>\nprior exploration\n</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nread.go\n</read-files>\n\n<modified-files>\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 349,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 353,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nread.go\n</read-files>\n\n<modified-files>\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "compactionSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "custom",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": "custom target",
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "shared",
+            "from": "shared",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 347,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 351,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "roundtrip",
+        "roundtrip": {
+          "request": [
+            {
+              "role": "user",
+              "text": "<conversation>\n[User]: original path\n\n[Assistant]: original answer\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>\n\n[User]: continue target\n\n[Assistant]: continued\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+            }
+          ],
+          "summary": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nreturn summary\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+          "details": {
+            "readFiles": [
+              "prior.txt",
+              "read.go"
+            ],
+            "modifiedFiles": [
+              "prior.go",
+              "shared.go",
+              "write.go"
+            ]
+          },
+          "noDuplicate": true,
+          "original": true
+        },
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 347,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 351,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "retry",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          },
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [
+          {
+            "type": "summarization_retry_scheduled",
+            "attempt": 1,
+            "maxAttempts": 2,
+            "delayMs": 1,
+            "errorMessage": "503 overloaded"
+          },
+          {
+            "type": "summarization_retry_attempt_start",
+            "source": "branchSummary"
+          },
+          {
+            "type": "summarization_retry_finished"
+          }
+        ],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": {
+            "parent": "other",
+            "from": "other",
+            "text": "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files>",
+            "details": {
+              "readFiles": [
+                "prior.txt",
+                "read.go"
+              ],
+              "modifiedFiles": [
+                "prior.go",
+                "shared.go",
+                "write.go"
+              ]
+            },
+            "usage": {
+              "input": 347,
+              "output": 4,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 351,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "fromHook": false,
+            "label": null
+          },
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "original path"
+            },
+            {
+              "role": "assistant",
+              "text": "original answer"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            }
+          ],
+          "added": 1,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "original path"
+          },
+          {
+            "role": "assistant",
+            "text": "original answer"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nsummary result\n\n<read-files>\nprior.txt\nread.go\n</read-files>\n\n<modified-files>\nprior.go\nshared.go\nwrite.go\n</modified-files></summary>"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "exhausted",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          },
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          },
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [
+          {
+            "type": "summarization_retry_scheduled",
+            "attempt": 1,
+            "maxAttempts": 2,
+            "delayMs": 1,
+            "errorMessage": "503 overloaded"
+          },
+          {
+            "type": "summarization_retry_attempt_start",
+            "source": "branchSummary"
+          },
+          {
+            "type": "summarization_retry_scheduled",
+            "attempt": 2,
+            "maxAttempts": 2,
+            "delayMs": 2,
+            "errorMessage": "503 overloaded"
+          },
+          {
+            "type": "summarization_retry_attempt_start",
+            "source": "branchSummary"
+          },
+          {
+            "type": "summarization_retry_finished"
+          }
+        ],
+        "state": {
+          "error": "503 overloaded",
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "explore alternative"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "exploration result"
+            },
+            {
+              "role": "toolResult",
+              "text": "tool output excluded"
+            },
+            {
+              "role": "assistant",
+              "text": "finished exploration"
+            }
+          ],
+          "added": 0,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>"
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "quota",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": "429 insufficient_quota",
+          "editorText": null,
+          "cancelled": false,
+          "aborted": false,
+          "summary": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "explore alternative"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "exploration result"
+            },
+            {
+              "role": "toolResult",
+              "text": "tool output excluded"
+            },
+            {
+              "role": "assistant",
+              "text": "finished exploration"
+            }
+          ],
+          "added": 0,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>"
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "abort",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": true,
+          "aborted": true,
+          "summary": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "explore alternative"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "exploration result"
+            },
+            {
+              "role": "toolResult",
+              "text": "tool output excluded"
+            },
+            {
+              "role": "assistant",
+              "text": "finished exploration"
+            }
+          ],
+          "added": 0,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>"
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      },
+      {
+        "name": "abort-retry",
+        "roundtrip": null,
+        "requests": [
+          {
+            "system": "You are a context summarization assistant. Your task is to read a conversation between a user and an AI assistant, then produce a structured summary following the exact format specified.\n\nDo NOT continue the conversation. Do NOT respond to any questions in the conversation. ONLY output the structured summary.",
+            "messages": [
+              {
+                "role": "user",
+                "text": "<conversation>\n[User]: explore alternative\n\n[User]: The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>\n\n[Assistant]: exploration result\n\n[Assistant tool calls]: read(path=\"shared.go\"); edit(path=\"shared.go\"); read(path=\"read.go\"); write(path=\"write.go\")\n\n[Assistant]: finished exploration\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+              }
+            ],
+            "maxTokens": 2048,
+            "cache": "none",
+            "reasoning": null,
+            "apiKey": "fixture"
+          }
+        ],
+        "events": [
+          {
+            "type": "summarization_retry_scheduled",
+            "attempt": 1,
+            "maxAttempts": 2,
+            "delayMs": 1,
+            "errorMessage": "503 overloaded"
+          },
+          {
+            "type": "summarization_retry_finished"
+          }
+        ],
+        "state": {
+          "error": null,
+          "editorText": null,
+          "cancelled": true,
+          "aborted": true,
+          "summary": null,
+          "messages": [
+            {
+              "role": "user",
+              "text": "shared request"
+            },
+            {
+              "role": "assistant",
+              "text": "shared answer"
+            },
+            {
+              "role": "user",
+              "text": "explore alternative"
+            },
+            {
+              "role": "branchSummary",
+              "text": ""
+            },
+            {
+              "role": "assistant",
+              "text": "exploration result"
+            },
+            {
+              "role": "toolResult",
+              "text": "tool output excluded"
+            },
+            {
+              "role": "assistant",
+              "text": "finished exploration"
+            }
+          ],
+          "added": 0,
+          "original": true
+        },
+        "persisted": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "continuation": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "user",
+            "text": "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nprior exploration</summary>"
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          },
+          {
+            "role": "user",
+            "text": "continue target"
+          }
+        ],
+        "returned": [
+          {
+            "role": "user",
+            "text": "shared request"
+          },
+          {
+            "role": "assistant",
+            "text": "shared answer"
+          },
+          {
+            "role": "user",
+            "text": "explore alternative"
+          },
+          {
+            "role": "branchSummary",
+            "text": ""
+          },
+          {
+            "role": "assistant",
+            "text": "exploration result"
+          },
+          {
+            "role": "toolResult",
+            "text": "tool output excluded"
+          },
+          {
+            "role": "assistant",
+            "text": "finished exploration"
+          }
+        ],
+        "routing": true
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:1898df0db566c68b5f3865f6c41bd0715045fc6ddde549cda94b1ca7fe8c8bca",
+  "observation_hash": "sha256:ea25e771562474d342ebb54f88589da3c8b77ab7c9df44e1e0b4a32b9155b2df",
+  "execution_method": "node --experimental-strip-types parity/oracle/branch-summary.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/sdk.ts#createAgentSession + agent-session.ts#navigateTree"
+  }
+}

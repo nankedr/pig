@@ -12,4 +12,4 @@ Issue #90 在 production v3 AgentSession 的 Prompt 前后检查自动压缩，�
 
 取消或持久化失败不发布新 compaction 条目。overflow 的原始 partial 从模型上下文移除后，HeadlessOutcome 独立保留它；取消摘要还标记 Canceled，避免退回此前成功回答。提交边界后取消不撤回结果，Abort/Context/Dispose 仍能阻止下一轮生成。恢复调用因取消或错误未开始投递时，已从缓冲队列取出但仍未消费的消息归还队首；ClearQueue 已删除的消息不恢复。无 preparation 时不发送虚假开始/成功事件。公开低层构造器未配置 SessionManager 时跳过自动压缩，保持已有无持久化 AgentSession 的执行能力。
 
-证据为固定 Pi 源码/发布 SDK 的 auto-compaction Oracle、公开 SDK Parity Case，以及 Headless 的取消、失败、设置和真实子进程重开测试。RPC/TUI 控件、扩展 hook/自定义摘要、branch summary 和尚未交付的 API Adapter 仍未实现，不宣称 M4 整体冻结。
+证据为固定 Pi 源码/发布 SDK 的 auto-compaction Oracle、公开 SDK Parity Case，以及 Headless 的取消、失败、设置和真实子进程重开测试。RPC/TUI 控件、扩展 hook/自定义摘要、尚未交付的 API Adapter 仍未实现；branch summary 已由 ADR-0030 / Issue #92 接通，不宣称 M4 整体冻结。

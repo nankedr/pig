@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1787, catalog.StatusInventoried: 744, catalog.StatusPartial: 23, catalog.StatusImplemented: 46}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1785, catalog.StatusInventoried: 744, catalog.StatusPartial: 25, catalog.StatusImplemented: 46}); !reflect.DeepEqual(gotByStatus, want) {
 
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
@@ -1446,7 +1446,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
-	if issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
+	if issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
 
 		return
 	}
@@ -1813,7 +1813,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				},
 				Unsupported: []string{
 					"ambient model, credential, settings, trust, resource, and package assembly remain explicit Capability Stubs",
-					"extension runtime, model-backed branch summaries, RPC, and other later-milestone AgentSession operations remain explicit Capability Stubs",
+					"extension runtime, and other later-milestone AgentSession operations remain explicit Capability Stubs",
 				},
 			},
 			Notes: "Issue #55 delivers the narrow M1 Go SDK AgentSession slice and issue #71 adds explicit M3 v3 persistence injection and reopen. Session event listeners are ordered barriers, agent_settled follows transcript updates, and in-memory creation plus execution perform no ambient disk writes.",
@@ -1844,11 +1844,12 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 				Supported: []string{
 					"shared compaction settings, context-token calculation, threshold policy, last usable assistant usage, turn-start and cut-point selection are implemented",
 					"branch divergence collection, branch-entry preparation, context projection, token estimation, conversation serialization, and UTF-16 tool-result truncation are implemented",
+					"Issue #92: branch-summary generation and navigation are covered by contract:codingagent/branch-summary",
 					"Issue #90: automatic threshold/overflow and recoverable-length compaction before/after public prompts, single recovery budget, summary/provider retry coordination, stale usage filtering, buffered steering/follow-up modes, Headless terminal outcome and v3 cross-process reopen",
 					"Issue #89: public AgentSession manual compaction, history/split/update summary requests, file operations, budgets and isolated request IDs; independent summary retry lifecycle, atomic v3 persistence, cancellation and Headless reopen continuation",
 				},
 				Unsupported: []string{
-					"GenerateBranchSummary, extension hooks and RPC/TUI controls remain explicit Capability Stubs",
+					"extension hooks and RPC/TUI controls remain explicit Capability Stubs",
 					"Adapter coverage remains the existing ModelRuntime subset; manual-compaction queues, extension custom queues and baseline retry-history tail limitations are not claimed as automatic recovery successes",
 				},
 			},
@@ -1890,7 +1891,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue94RPCCatalogEntry(), issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry(), issue93BashCatalogEntry())
+	entries = append(entries, issue94RPCCatalogEntry(), issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry(), issue93BashCatalogEntry(), issue92SummaryCatalogEntry())
 
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
@@ -1912,6 +1913,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = issue77RuntimeEvidence(t)
 	case issue84FindLsCatalogID:
 		descriptors = issue84FindLsEvidence(t)
+	case issue92SummaryCatalogID:
+		descriptors = issue92SummaryEvidence(t)
 	case issue94RPCCatalogID:
 		descriptors = issue94RPCEvidence(t)
 	case issue91TreeCatalogID:

@@ -275,7 +275,7 @@ func PrepareBranchEntries(entries []SessionEntry, tokenBudget ...int64) BranchPr
 		extractFileOperations(message, &result.FileOps)
 		tokens := EstimateTokens(message)
 		if budget > 0 && result.TotalTokens+tokens > budget {
-			if (entries[index].Type == "compaction" || entries[index].Type == "branch_summary") && result.TotalTokens < budget*9/10 {
+			if (entries[index].Type == "compaction" || entries[index].Type == "branch_summary") && float64(result.TotalTokens) < float64(budget)*0.9 {
 				result.Messages = append([]agent.AgentMessage{message}, result.Messages...)
 				result.TotalTokens += tokens
 			}
@@ -435,10 +435,6 @@ func truncateSummaryText(text string, limit int) string {
 		return text
 	}
 	return string(utf16.Decode(codeUnits[:limit])) + fmt.Sprintf("\n\n[... %d more characters truncated]", len(codeUnits)-limit)
-}
-
-func GenerateBranchSummary(context.Context, []SessionEntry, GenerateBranchSummaryOptions) (BranchSummaryResult, error) {
-	return BranchSummaryResult{}, notImplemented("GenerateBranchSummary")
 }
 
 type SummaryWithUsage struct {

@@ -1,0 +1,49 @@
+method NavigateTree func(*codingagent.AgentSession, context.Context, string, ...codingagent.NavigateTreeOptions) (codingagent.NavigateTreeResult, error)
+method AbortBranchSummary func(*codingagent.AgentSession) error
+method IsCompacting func(*codingagent.AgentSession) (bool, error)
+method WaitForIdle func(*codingagent.AgentSession, context.Context) error
+type codingagent.NavigateTreeOptions struct
+fields:
+- Summarize bool tag=""
+- CustomInstructions string tag=""
+- ReplaceInstructions bool tag=""
+- Label string tag=""
+type codingagent.NavigateTreeResult struct
+fields:
+- EditorText *string tag=""
+- Cancelled bool tag=""
+- Aborted bool tag=""
+- SummaryEntry *codingagent.BranchSummaryEntry tag=""
+type codingagent.GenerateBranchSummaryOptions struct
+fields:
+- APIKey *string tag=""
+- Callbacks *agent.RetryCallbacks tag=""
+- CustomInstructions string tag=""
+- Env map[string]string tag=""
+- Headers map[string]string tag=""
+- Model ai.Model tag=""
+- ReplaceInstructions bool tag=""
+- ReserveTokens int64 tag=""
+- Retry *agent.RetryPolicy tag=""
+- StreamFn agent.StreamFunction tag=""
+type codingagent.BranchSummaryResult struct
+fields:
+- Aborted bool tag=""
+- Error string tag=""
+- ModifiedFiles []string tag=""
+- ReadFiles []string tag=""
+- Summary string tag=""
+- Usage *ai.Usage tag=""
+type codingagent.BranchSummaryEntry struct
+fields:
+- SessionEntryBase codingagent.SessionEntryBase tag=""
+- FromID string tag=""
+- Summary string tag=""
+- Details json.RawMessage tag=""
+- Usage *ai.Usage tag=""
+- FromHook *bool tag=""
+type codingagent.AgentSessionBranchSummaryRetryAttemptStartEvent struct
+fields:
+- Type codingagent.AgentSessionEventType tag="json:\"type\""
+- Source codingagent.SummarizationRetrySource tag="json:\"source\""
+function GenerateBranchSummary func(context.Context, []codingagent.SessionEntry, codingagent.GenerateBranchSummaryOptions) (codingagent.BranchSummaryResult, error)
