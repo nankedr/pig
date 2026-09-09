@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9666
+- Total entries: 9667
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
-| scaffolded | 3937 |
-| partial | 280 |
-| implemented | 113 |
+| scaffolded | 3927 |
+| partial | 281 |
+| implemented | 123 |
 | verified | 167 |
 | deferred | 2 |
 
@@ -7508,18 +7508,8 @@
 | member:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo.id | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.ModelInfo.ID | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo.provider | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.ModelInfo.Provider | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo.reasoning | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.ModelInfo.Reasoning | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.clone | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Clone | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.compact | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Compact | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.exportHtml | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.ExportHTML | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.fork | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Fork | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getCommands | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetCommands | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getEntries | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetEntries | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getForkMessages | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetForkMessages | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getTree | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetTree | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.newSession | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.NewSession | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setAutoCompaction | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetAutoCompaction | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setSessionName | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetSessionName | coding-agent |
-| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.switchSession | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SwitchSession | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClientOptions.args | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClientOptions.Args | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClientOptions.cliPath | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClientOptions.CLIPath | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClientOptions.cwd | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.RPCClientOptions.CWD | coding-agent |
@@ -7958,6 +7948,7 @@
 | contract:model-runtime/basic | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewModelRuntime | coding-agent |
 | contract:rpc/jsonl-transport | partial | M4 | contract | github.com/nankedr/pig/codingagent.RunRPCMode | coding-agent |
 | contract:rpc/session-control | partial | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
+| contract:rpc/session-lifecycle | partial | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
 | contract:security/project-trust | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateHeadlessSession | coding-agent |
 | contract:session/v3-jsonl | partial | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortBranchSummary | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBranchSummary | coding-agent |
@@ -8021,28 +8012,38 @@
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.abortBash | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.AbortBash | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.abortRetry | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.AbortRetry | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.bash | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Bash | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.clone | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Clone | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.collectEvents | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.CollectEvents | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.compact | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Compact | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.cycleModel | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.CycleModel | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.cycleThinkingLevel | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.CycleThinkingLevel | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.followUp | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.FollowUp | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.fork | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Fork | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getAvailableModels | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetAvailableModels | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getAvailableThinkingLevels | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetAvailableThinkingLevels | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getEntries | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetEntries | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getForkMessages | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetForkMessages | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getLastAssistantText | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetLastAssistantText | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getMessages | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetMessages | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getSessionStats | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetSessionStats | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getState | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetState | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getStderr | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetStderr | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getTree | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.GetTree | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.newSession | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.NewSession | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.onEvent | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.OnEvent | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.prompt | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Prompt | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.promptAndWait | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.PromptAndWait | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setAutoCompaction | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetAutoCompaction | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setAutoRetry | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetAutoRetry | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setFollowUpMode | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetFollowUpMode | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setModel | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetModel | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setSessionName | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetSessionName | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setSteeringMode | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetSteeringMode | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.setThinkingLevel | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SetThinkingLevel | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.start | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Start | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.steer | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Steer | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.stop | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.Stop | coding-agent |
+| member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.switchSession | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.SwitchSession | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.waitForIdle | implemented | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.WaitForIdle | coding-agent |
 | symbol:codingagent/src/core/agent-session-runtime.ts#createAgentSessionRuntime | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionRuntime | coding-agent |
 | symbol:codingagent/src/core/agent-session.ts#SessionStats | implemented | M4 | symbol | github.com/nankedr/pig/codingagent.SessionStats | coding-agent |

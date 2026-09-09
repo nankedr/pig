@@ -7,7 +7,7 @@ import (
 )
 
 const issue95RPCCatalogID = "contract:rpc/session-control"
-const issue95RPCTestHash = "ce9e7277c9f194fccfbd72ae765657098f478c4379b47f2d0d7015ac484b8db6"
+const issue95RPCTestHash = "ddd3665d7e5c29111748b02d285333562964b56df8ca898f55a04c2e77953f61"
 
 func issue95RPCCatalogEntry() catalog.Entry {
 	return catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: issue95RPCCatalogID, Upstream: catalog.Upstream{Module: "coding-agent", Repository: "https://github.com/badlogic/pi-mono", Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/modes/rpc/rpc-mode.ts"}, Mapping: catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".RPCClient", Kind: "contract"}, Status: catalog.StatusPartial, Milestone: "M4", Classification: "public-api", Partial: &catalog.Partial{Supported: []string{
@@ -15,7 +15,7 @@ func issue95RPCCatalogEntry() catalog.Entry {
 		"Ordered synchronous commands with an asynchronous FIFO writer, concurrent request correlation, arbitrary JSON Bash event IDs, active queue continuation, busy configuration failures, process endpoint override across model changes, deferred Bash history and cancelled retry persistence",
 		"Wire stats tokens.total maps to SDK Tokens.TotalTokens; null cycle_model maps to zero ModelCycleResult; null cycle_thinking_level maps to empty ThinkingLevel without changing published signatures",
 	}, Unsupported: []string{
-		"Images, resource/extension/UI commands, session replacement/tree/export and compaction RPC commands remain explicit Capability Stubs; the fixed baseline has no Tool control RPC command",
+		"Images, resource/extension/UI commands, export RPC commands remain explicit Capability Stubs; #96 delivers session replacement, tree queries and compaction controls; the fixed baseline has no Tool control RPC command",
 		"RPCClient.Bash keeps its existing command-only signature; excludeFromContext is supported on raw wire only; extension user_bash interception remains deferred",
 		"Idle/late/cancelled queue admission and active configuration updates retain ADR-0018/0025 Go invariants; invalid typed modes/thinking are rejected; only existing DeepSeek runtime adapters are supported",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0031-rpc-session-control.md", Reason: "Reuse Session admission/configuration invariants and existing typed client signatures; preserve raw wire IDs separately from SDK event IDs."}, Notes: "Fixed Pi source runRpcMode and public RpcClient fixture plus real pig tests. Pi dist rebuild is not claimed: the locked checkout has an existing cloudflare-ai-gateway TypeScript error."}

@@ -1,0 +1,55 @@
+method NewSession func(*codingagent.RPCClient, context.Context, ...string) (bool, error)
+method SwitchSession func(*codingagent.RPCClient, context.Context, string) (bool, error)
+method Fork func(*codingagent.RPCClient, context.Context, string) (string, bool, error)
+method Clone func(*codingagent.RPCClient, context.Context) (bool, error)
+method GetForkMessages func(*codingagent.RPCClient, context.Context) ([]codingagent.ForkMessage, error)
+method GetEntries func(*codingagent.RPCClient, context.Context, ...string) ([]codingagent.SessionEntry, *string, error)
+method GetTree func(*codingagent.RPCClient, context.Context) ([]codingagent.SessionTreeNode, *string, error)
+method SetSessionName func(*codingagent.RPCClient, context.Context, string) error
+method Compact func(*codingagent.RPCClient, context.Context, ...string) (codingagent.CompactionResult, error)
+method SetAutoCompaction func(*codingagent.RPCClient, context.Context, bool) error
+type codingagent.CompactionResult struct
+fields:
+- Details interface {} tag="json:\"details,omitempty\""
+- EstimatedTokensAfter *int64 tag="json:\"estimatedTokensAfter,omitempty\""
+- FirstKeptEntryID string tag="json:\"firstKeptEntryId\""
+- Summary string tag="json:\"summary\""
+- TokensBefore int64 tag="json:\"tokensBefore\""
+- Usage *ai.Usage tag="json:\"usage,omitempty\""
+type codingagent.ForkMessage struct
+fields:
+- EntryID string tag=""
+- Text string tag=""
+type codingagent.SessionEntry struct
+fields:
+- SessionEntryBase codingagent.SessionEntryBase tag=""
+- Raw json.RawMessage tag="json:\"-\""
+- Message agent.AgentMessage tag=""
+- ThinkingLevel string tag=""
+- Provider string tag=""
+- ModelID string tag=""
+- Summary string tag=""
+- FirstKeptEntryID string tag=""
+- TokensBefore int64 tag=""
+- FromID string tag=""
+- CustomType string tag=""
+- Data json.RawMessage tag=""
+- Content interface {} tag=""
+- Details json.RawMessage tag=""
+- Display bool tag=""
+- TargetID string tag=""
+- Label *string tag=""
+- Name *string tag=""
+- Usage *ai.Usage tag=""
+- FromHook *bool tag=""
+type codingagent.SessionTreeNode struct
+fields:
+- Entry codingagent.SessionEntry tag=""
+- Children []codingagent.SessionTreeNode tag=""
+- Label *string tag=""
+- LabelTimestamp *string tag=""
+type codingagent.SessionReplacementResult struct
+fields:
+- Cancelled bool tag=""
+- SelectedText *string tag=""
+RunRPCMode func(context.Context, *codingagent.AgentSessionRuntime) error

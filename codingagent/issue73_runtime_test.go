@@ -79,7 +79,7 @@ func TestSessionRuntimeReplacementLifecycle(t *testing.T) {
 	if err != nil || result.Cancelled || result.SelectedText == nil || *result.SelectedText != "first" {
 		t.Fatalf("fork=%+v err=%v", result, err)
 	}
-	if !reflect.DeepEqual(phases, []string{"invalidate", "cleanup", "create", "rebind"}) {
+	if !reflect.DeepEqual(phases, []string{"create", "invalidate", "cleanup", "rebind"}) {
 		t.Fatal(phases)
 	}
 	if start.Reason != "fork" || start.PreviousSessionFile != source {

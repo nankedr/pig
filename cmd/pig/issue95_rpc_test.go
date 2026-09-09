@@ -485,7 +485,7 @@ func TestRPC95WireIDsAndBoundaries(t *testing.T) {
 	}
 	for _, command := range []map[string]any{
 		{"type": "set_active_tools", "tools": []string{"read"}},
-		{"type": "get_commands"}, {"type": "compact"}, {"type": "set_auto_compaction", "enabled": true},
+		{"type": "get_commands"}, {"type": "export_html"},
 		{"type": "steer", "message": "image", "images": []any{map[string]any{"type": "image", "data": "AA==", "mimeType": "image/png"}}},
 		{"type": "set_thinking_level", "level": "invalid"}, {"type": "set_follow_up_mode", "mode": "invalid"},
 	} {

@@ -37,6 +37,9 @@ func RunRPCMode(ctx context.Context, runtime *AgentSessionRuntime) (result error
 	ctx, cancel := context.WithCancelCause(ctx)
 	defer cancel(nil)
 	session := runtime.Session()
+	var binding sync.Mutex
+	var listenerID uint64
+	var unsubscribe func()
 	writer := &jsonLineWriter{output: stdout}
 	outgoing := ai.NewEventStream(func(any) bool { return false }, func(any) struct{} { return struct{}{} })
 	written := make(chan struct{})
@@ -55,20 +58,38 @@ func RunRPCMode(ctx context.Context, runtime *AgentSessionRuntime) (result error
 		}
 	}()
 	output := func(value any) { outgoing.Push(value) }
-	unsubscribe, listenerID, err := session.subscribe(func(event AgentSessionEvent) {
-		value, err := projectJSONAgentSessionEvent(event)
+	bind := func(next *AgentSession) error {
+		binding.Lock()
+		defer binding.Unlock()
+		stop, id, err := next.subscribe(func(event AgentSessionEvent) {
+			binding.Lock()
+			defer binding.Unlock()
+			if session != next {
+				return
+			}
+			value, err := projectJSONAgentSessionEvent(event)
+			if err != nil {
+				cancel(err)
+				return
+			}
+			output(value)
+		})
 		if err != nil {
-			cancel(err)
-			return
+			return err
 		}
-		output(value)
-	})
-	if err != nil {
+		if unsubscribe != nil {
+			unsubscribe()
+		}
+		session, listenerID, unsubscribe = next, id, stop
+		return nil
+	}
+	if err := bind(session); err != nil {
 		outgoing.End(struct{}{})
 		<-written
 		return err
 	}
-	defer unsubscribe()
+	runtime.SetRebindSession(bind)
+	defer func() { unsubscribe(); runtime.SetRebindSession(nil) }()
 	lines := make(chan string)
 	readDone := make(chan struct{})
 	var readErr error
@@ -88,7 +109,10 @@ func RunRPCMode(ctx context.Context, runtime *AgentSessionRuntime) (result error
 	defer func() {
 		cancel(nil)
 		_ = input.Close()
-		_ = session.Abort()
+		binding.Lock()
+		current := session
+		binding.Unlock()
+		_ = current.Abort()
 		_ = stdout.SetWriteDeadline(time.Now().Add(time.Second))
 		commands.Wait()
 		outgoing.End(struct{}{})
@@ -124,12 +148,25 @@ func RunRPCMode(ctx context.Context, runtime *AgentSessionRuntime) (result error
 					fields["id"] = id
 				}
 			}
+			binding.Lock()
+			current, id := session, listenerID
+			binding.Unlock()
+			commandOutput := func(value any) {
+				if event, ok := value.(map[string]any); ok && event["type"] != "response" {
+					binding.Lock()
+					defer binding.Unlock()
+					if session != current {
+						return
+					}
+				}
+				output(value)
+			}
 			switch fields["type"] {
-			case "steer", "follow_up", "set_steering_mode", "set_follow_up_mode", "set_thinking_level", "cycle_thinking_level", "set_auto_retry", "abort_retry", "abort_bash", "get_state", "get_messages", "get_last_assistant_text", "get_session_stats", "get_available_models", "get_available_thinking_levels":
-				rpcCommand(ctx, session, fields, output, listenerID)
+			case "steer", "follow_up", "set_steering_mode", "set_follow_up_mode", "set_thinking_level", "cycle_thinking_level", "set_auto_retry", "abort_retry", "abort_bash", "get_state", "get_messages", "get_last_assistant_text", "get_session_stats", "get_available_models", "get_available_thinking_levels", "set_auto_compaction", "set_session_name", "get_entries", "get_tree", "get_fork_messages":
+				rpcCommand(ctx, current, fields, commandOutput, id, runtime)
 			default:
 				commands.Add(1)
-				go func() { defer commands.Done(); rpcCommand(ctx, session, fields, output, listenerID) }()
+				go func() { defer commands.Done(); rpcCommand(ctx, current, fields, commandOutput, id, runtime) }()
 			}
 		}
 	}
@@ -155,7 +192,7 @@ func readRPCLines(input io.Reader, line func(string) bool) error {
 	}
 }
 
-func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, output func(any), listenerID uint64) {
+func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, output func(any), listenerID uint64, runtime *AgentSessionRuntime) {
 	response := map[string]any{"type": "response", "success": true}
 	if value, ok := fields["id"]; ok {
 		response["id"] = value
@@ -366,11 +403,93 @@ func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, out
 			data["contextUsage"] = map[string]any{"tokens": stats.ContextUsage.Tokens, "contextWindow": stats.ContextUsage.ContextWindow, "percent": stats.ContextUsage.Percent}
 		}
 		response["data"] = data
+	case "compact":
+		instructions, _ := fields["customInstructions"].(string)
+		response["data"], err = s.Compact(ctx, instructions)
+	case "set_auto_compaction":
+		err = s.SetAutoCompactionEnabled(rpcTruthy(fields["enabled"]))
+	case "new_session", "switch_session", "fork", "clone":
+		var result SessionReplacementResult
+		switch command {
+		case "new_session":
+			var options NewRuntimeSessionOptions
+			if parent, ok := fields["parentSession"].(string); ok && parent != "" {
+				options.ParentSession = &parent
+			}
+			result, err = runtime.NewSession(ctx, options)
+		case "switch_session":
+			path, _ := fields["sessionPath"].(string)
+			if path == "" {
+				err = errors.New("Session path must be a non-empty string")
+			} else {
+				result, err = runtime.SwitchSession(ctx, path)
+			}
+		case "fork":
+			id, _ := fields["entryId"].(string)
+			result, err = runtime.Fork(ctx, id)
+		case "clone":
+			result, err = runtime.fork(ctx, "", true)
+
+		}
+		data := map[string]any{"cancelled": result.Cancelled}
+		if command == "fork" && result.SelectedText != nil {
+			data["text"] = *result.SelectedText
+		}
+		response["data"] = data
+	case "get_fork_messages":
+		messages, listErr := s.GetUserMessagesForForking()
+		err = listErr
+		data := make([]map[string]string, len(messages))
+		for i, message := range messages {
+			data[i] = map[string]string{"entryId": message.EntryID, "text": message.Text}
+		}
+		response["data"] = map[string]any{"messages": data}
+	case "get_entries":
+		var since *string
+		if value, exists := fields["since"]; exists {
+			text, ok := value.(string)
+			if !ok {
+				fail(fmt.Errorf("Entry not found: %s", rpcJSString(value)))
+				return
+			}
+			since = &text
+		}
+		entries, leaf, listErr := s.SessionManager().getEntriesSince(since)
+		if listErr != nil {
+			fail(listErr)
+			return
+		}
+		data := make([]json.RawMessage, len(entries))
+		for i, entry := range entries {
+			data[i], err = marshalSessionEntry(entry)
+			if err != nil {
+				fail(err)
+				return
+			}
+		}
+		response["data"] = map[string]any{"entries": data, "leafId": leaf}
+	case "get_tree":
+		entries, leaf, listErr := s.SessionManager().getEntriesSince(nil)
+		err = listErr
+		var data []rpcTreeNode
+		if err == nil {
+			data, err = encodeRPCTree(buildSessionTree(entries))
+		}
+		response["data"] = map[string]any{"tree": data, "leafId": leaf}
+	case "set_session_name":
+		name, ok := fields["name"].(string)
+		if !ok {
+			err = errors.New("Session name must be a string")
+		} else if name = strings.TrimSpace(name); name == "" {
+			err = errors.New("Session name cannot be empty")
+		} else {
+			err = s.SetSessionName(name)
+		}
 	case "extension_ui_response":
 		fail(notImplemented("rpc.extension_ui_response"))
 		return
 	default:
-		if strings.Contains("|new_session|compact|set_auto_compaction|export_html|switch_session|fork|clone|get_fork_messages|get_entries|get_tree|set_session_name|get_commands|", "|"+command+"|") && command != "" {
+		if strings.Contains("|export_html|get_commands|", "|"+command+"|") && command != "" {
 			fail(notImplemented("rpc." + command))
 			return
 		}

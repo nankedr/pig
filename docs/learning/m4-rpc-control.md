@@ -18,6 +18,8 @@
 
 每个请求用独立 id 关联响应，事件可以插在任意两个响应之间。短同步控制和查询按输入行顺序执行；输出单独排队，不阻塞输入的 EOF 处理。Bash update 携带原始请求 id；原始 wire 允许任意 JSON 值，公开客户端用递增字符串。重试失败消息写入 Session，AbortRetry 取消等待并产生 auto_retry_end，最终 agent_settled 才表示整轮结束。普通 Abort 和 AbortBash 的作用不同；取消 Go 请求 Context 不自动取消远端操作。
 
-统计的 wire 字段是 `tokens.total`，Go 对应 `Tokens.TotalTokens`；cycle_model 返回 null 时，Go ModelCycleResult.Model.ID 为空，cycle_thinking_level 返回 null 时 Go level 为空。客户端 Bash 暂不提供 excludeFromContext 参数，原始 wire 可以使用该字段。图片、资源/扩展/UI、会话替换、树、导出与压缩 RPC 控制保留明确 Stub；固定 Pi 没有 Tool 配置 wire。
+统计的 wire 字段是 `tokens.total`，Go 对应 `Tokens.TotalTokens`；cycle_model 返回 null 时，Go ModelCycleResult.Model.ID 为空，cycle_thinking_level 返回 null 时 Go level 为空。客户端 Bash 暂不提供 excludeFromContext 参数，原始 wire 可以使用该字段。图片、资源/扩展/UI 与导出仍保留明确 Stub；会话替换、树查询与压缩 RPC 控制已由 M4.14 接通；固定 Pi 没有 Tool 配置 wire。
 
 验证：`go test -race ./cmd/pig -run '^TestRPC95' -count=1`。目录条目为 `contract:rpc/session-control`；固定源码 Oracle 可通过 `node --experimental-strip-types parity/oracle/rpc-control.mjs <locked-pi-checkout> --check` 重跑。此次源代码 Oracle 验证通过，dist 重建受固定基线既有类型错误影响。详细边界见 [ADR-0031](../adr/0031-rpc-session-control.md)。
+
+M4.14 已接通会话替换、树查询与压缩控制，见 [RPC 生命周期](m4-rpc-lifecycle.md)。
