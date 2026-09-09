@@ -180,7 +180,7 @@ m4-gate: m4-tools-preflight m3-gate m4-repeat
 	go run ./examples/find-ls-read
 
 m4-repeat:
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test(SessionMessages|TurnRetry|SessionConfiguration|SessionStats|ManualCompaction|AutoCompaction|SessionTreeNavigation|BranchSummary|SessionBash|GrepToolSessionProcessCleanup|FindLsSessionAbortReapsFD|FindLsFDCancellationKillsTree|Issue96Replacement)' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test((SessionMessages|TurnRetry|SessionConfiguration|SessionStats|ManualCompaction|AutoCompaction|SessionTreeNavigation|BranchSummary|SessionBash).*(Concurrent|Cancel|Abort|Busy|Ownership|WaitForIdle|WaitAndQueued|LastTurnAdmission|IdleQueueCallbacks|PreservesQueuedMessages|Settlement|RunningReads|EventsAndAvailableCycle)|GrepToolSessionProcessCleanup|FindLsSessionAbortReapsFD|FindLsFDCancellationKillsTree|Issue96Replacement)' -count=20 -shuffle=on
 	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./cmd/pig ./internal/m4gate -run 'Test(RPC9[45678]|M4Workflow|PigM4)' -count=5 -shuffle=on
 
 m4-oracle: m3-oracle

@@ -21,7 +21,7 @@ make m4-freeze \
   PIG_PI_SOURCE_CHECKOUT=/path/to/pristine/pi
 ```
 
-`m4-gate` 继承 M1–M3 的全量 Go 测试、race、vet、darwin/arm64 无 CGO 构建、示例及并发回归，再执行 20 次 M4 Session 生命周期、取消、进程回收和随机顺序回归，以及 5 次真实 RPC/七工具子进程测试。门禁要求预装 `rg` 和 `fd`，缺失会立即失败；普通 `go test` 可跳过依赖真实二进制的七工具集成。准备工具后离线 gate 不访问 Pi 或真实 Provider，回环 HTTP 和宿主进程权限仍需可用。
+`m4-gate` 继承 M1–M3 的全量 Go 测试、race、vet、darwin/arm64 无 CGO 构建、示例及并发回归，再执行 20 次 M4 并发、取消、提交归属和资源回收的随机顺序回归（完整 Parity 用例由全量测试重放，固定 Oracle 在 freeze 中复核），以及 5 次真实 RPC/七工具子进程测试。门禁要求预装 `rg` 和 `fd`，缺失会立即失败；普通 `go test` 可跳过依赖真实二进制的七工具集成。准备工具后离线 gate 不访问 Pi 或真实 Provider，回环 HTTP 和宿主进程权限仍需可用。
 
 `m4-freeze` 要求源码前后干净，加入固定 Pi Oracle、source/API/catalog drift、正式 v3 双向互操作、Go API snapshot、精确 Catalog 范围审计、HTML 实际浏览器渲染/XSS、受保护 DeepSeek 发布冒烟。缺少真实凭证必须失败。两个 Pi checkout 均固定 `936aff00918de1187f085f123c2812d8f2d67745`；prepared checkout 带锁定依赖和 dist，pristine checkout 无 tracked/untracked/ignored 变更。Node 需支持 strip-types 且 Unicode 为 16.0（例如 24.4.1）。准备方式见 [M0](m0-compatibility-skeleton.md#冻结门禁)。独立 Catalog Baseline 仍是 `53fa77ccd8a279eb87e92294ef3687b03ff80112`，不宣称 fixed-run 模型目录对等。
 
