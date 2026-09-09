@@ -275,8 +275,9 @@ func TestBashToolDrainsActiveOutputAfterShellExit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	messages := runBashSession(t, context.Background(), cwd, []agent.ErasedAgentTool{tool}, []ai.ToolCall{{Type: "toolCall", ID: "drain", Name: "bash", Arguments: map[string]any{"command": "(i=1; while [ $i -le 10 ]; do printf 'tick-%s\\n' $i; i=$((i+1)); sleep 0.03; done) & exit 0"}}})
-	if messages[0].IsError || !strings.Contains(readToolResultText(t, messages[0]), "tick-10") {
+	// Keep the pipe active; scheduled sleeps can exceed the 100ms idle cutoff.
+	messages := runBashSession(t, context.Background(), cwd, []agent.ErasedAgentTool{tool}, []ai.ToolCall{{Type: "toolCall", ID: "drain", Name: "bash", Arguments: map[string]any{"command": "(i=1; while [ $i -le 30000 ]; do printf .; i=$((i+1)); done; printf 'drained\\n') & exit 0"}}})
+	if messages[0].IsError || !strings.HasSuffix(readToolResultText(t, messages[0]), "drained\n") {
 		t.Fatalf("drain=%v", messages)
 	}
 }

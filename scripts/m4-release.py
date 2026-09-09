@@ -44,7 +44,7 @@ def main():
     record = {
         "version": "0.4.0", "commit": commit,
         "verified_at": datetime.now(timezone.utc).isoformat(),
-        "platform": "darwin/arm64", "go": output("go", "version"),
+        "platform": "darwin/arm64", "go": output("go", "version"), "go_flags": os.environ.get("GOFLAGS", ""),
         "node": output("node", "--version"), "unicode": output("node", "-p", "process.versions.unicode"),
         "code_baseline": "936aff00918de1187f085f123c2812d8f2d67745",
         "catalog_baseline": "53fa77ccd8a279eb87e92294ef3687b03ff80112",
