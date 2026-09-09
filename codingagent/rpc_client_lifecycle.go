@@ -3,6 +3,7 @@ package codingagent
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 )
 
 func rpcData[T any](ctx context.Context, c *RPCClient, method string, command map[string]any) (data T, err error) {
@@ -133,4 +134,16 @@ func decodeRPCTree(tree []rpcTreeNode) ([]SessionTreeNode, error) {
 		result[i] = SessionTreeNode{entry, children, node.Label, node.LabelTimestamp}
 	}
 	return result, nil
+}
+
+func (c *RPCClient) ExportHTML(ctx context.Context, output ...string) (string, error) {
+	command := map[string]any{"type": "export_html"}
+	if len(output) > 0 {
+		command["outputPath"] = output[0]
+	}
+	data, err := rpcData[struct{ Path string }](ctx, c, "ExportHTML", command)
+	if err == nil && data.Path == "" {
+		err = fmt.Errorf("export_html response is missing path")
+	}
+	return data.Path, err
 }

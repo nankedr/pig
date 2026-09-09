@@ -99,3 +99,5 @@ M4.7 支持手动压缩后继续任务，见 [压缩与恢复](learning/m4-manua
 M4.11 支持从会话执行 Bash，见 [学习材料](learning/m4-session-bash.md)、[TypeScript → Go](mappings/typescript-to-go/m4-session-bash.md) 和 [Go 示例](../examples/session-bash/main.go)。
 
 M4.12 支持基础 JSONL RPC 对话，见 [RPC 生命周期](learning/m4-jsonl-rpc.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-jsonl-rpc.md)。
+
+M4.15 支持安全 HTML 导出，见 [学习材料](learning/m4-html-export.md)、[TypeScript → Go](mappings/typescript-to-go/m4-html-export.md) 和 [Go 示例](../examples/html-export/main.go)。

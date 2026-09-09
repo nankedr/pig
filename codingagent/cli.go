@@ -353,7 +353,12 @@ func RunCLI(ctx context.Context, invocation CLIInvocation) (CLIResult, error) {
 		return result, nil
 	}
 	if parsed.Export != nil {
-		return result, notImplemented("session.export")
+		path, err := ExportFromFile(ctx, *parsed.Export, parsed.Messages...)
+		if err != nil {
+			return result, &CLIArgumentError{Message: err.Error()}
+		}
+		result.Stdout = "Exported to: " + path + "\n"
+		return result, nil
 	}
 	if err := validateRootConstraints(parsed); err != nil {
 		return result, err

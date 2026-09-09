@@ -1,0 +1,46 @@
+{
+  "repository": "https://github.com/badlogic/pi-mono",
+  "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "licenses": "LICENSES.txt",
+  "changes": [
+    "Pig branding and sidebar storage key",
+    "Embedded fixed dark theme colors",
+    "Hash CSP and delegated event handlers",
+    "Escape read tool line numbers",
+    "Visible M12 Markdown image placeholders; no automatic network resources",
+    "Full license and scope disclosure",
+    "Escape Bash exit status and validate Bash fields"
+  ],
+  "assets": [
+    {
+      "path": "template.html",
+      "upstream_path": "packages/coding-agent/src/core/export-html/template.html",
+      "upstream_sha256": "916782b1184a9597527605ad751e2b3af30fcea23ba2194002969cd217a06881",
+      "sha256": "555ab48a669e4f96e99b7638edc8639f64eb0f5133d5f9a2ca30b5e9b1ea8788"
+    },
+    {
+      "path": "template.js",
+      "upstream_path": "packages/coding-agent/src/core/export-html/template.js",
+      "upstream_sha256": "1893cdb77587f592eef5717905391269886d6d7a4dc6a488417a73da374d9226",
+      "sha256": "b5811dd3f95e70da8beb0241cf7036bd95050bcc5a0417085a6e4d8070887bc4"
+    },
+    {
+      "path": "template.css",
+      "upstream_path": "packages/coding-agent/src/core/export-html/template.css",
+      "upstream_sha256": "28c16e3827c23a62eef8283cac316b478f946e023093adad25ff9c9b891d41af",
+      "sha256": "7d91dc7634eaee73cdbf5b4e44f43db488c04e4d5f0e9c6058c969361069aeb1"
+    },
+    {
+      "path": "vendor/marked.min.js",
+      "upstream_path": "packages/coding-agent/src/core/export-html/vendor/marked.min.js",
+      "upstream_sha256": "d5487edc7258b404bfa74c393d74a6393155f02517bd5e7e77cd64f8187f39a0",
+      "sha256": "d5487edc7258b404bfa74c393d74a6393155f02517bd5e7e77cd64f8187f39a0"
+    },
+    {
+      "path": "vendor/highlight.min.js",
+      "upstream_path": "packages/coding-agent/src/core/export-html/vendor/highlight.min.js",
+      "upstream_sha256": "837a6fa5b0c736b52bbde2b2b6190f305da3fc9ed41681db5321507057b5c846",
+      "sha256": "837a6fa5b0c736b52bbde2b2b6190f305da3fc9ed41681db5321507057b5c846"
+    }
+  ]
+}

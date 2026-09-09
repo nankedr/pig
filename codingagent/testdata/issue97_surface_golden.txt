@@ -1,0 +1,3 @@
+ExportFromFile func(context.Context, string, ...string) (string, error)
+AgentSession.ExportToHTML func(*codingagent.AgentSession, context.Context, ...string) (string, error)
+RPCClient.ExportHTML func(*codingagent.RPCClient, context.Context, ...string) (string, error)

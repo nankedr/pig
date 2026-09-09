@@ -485,11 +485,22 @@ func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, out
 		} else {
 			err = s.SetSessionName(name)
 		}
+	case "export_html":
+		path, ok := fields["outputPath"].(string)
+		if value := fields["outputPath"]; value != nil && !ok {
+			fail(fmt.Errorf("outputPath must be a string"))
+			return
+		}
+		var exported string
+		exported, err = s.ExportToHTML(ctx, path)
+		if err == nil {
+			response["data"] = map[string]any{"path": exported}
+		}
 	case "extension_ui_response":
 		fail(notImplemented("rpc.extension_ui_response"))
 		return
 	default:
-		if strings.Contains("|export_html|get_commands|", "|"+command+"|") && command != "" {
+		if strings.Contains("|get_commands|", "|"+command+"|") && command != "" {
 			fail(notImplemented("rpc." + command))
 			return
 		}
