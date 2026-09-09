@@ -348,41 +348,17 @@ type RPCClientOptions struct {
 
 type RPCEventListener func(JSONAgentSessionEvent)
 
-func (*RPCClient) AbortBash(context.Context) error {
-	return notImplemented("RPCClient.AbortBash")
-}
-func (*RPCClient) AbortRetry(context.Context) error {
-	return notImplemented("RPCClient.AbortRetry")
-}
-func (*RPCClient) Bash(context.Context, string) (BashResult, error) {
-	return BashResult{}, notImplemented("RPCClient.Bash")
-}
 func (*RPCClient) Clone(context.Context) (bool, error) {
 	return false, notImplemented("RPCClient.Clone")
 }
 func (*RPCClient) Compact(context.Context, ...string) (CompactionResult, error) {
 	return CompactionResult{}, notImplemented("RPCClient.Compact")
 }
-func (*RPCClient) CycleModel(context.Context) (ModelCycleResult, error) {
-	return ModelCycleResult{}, notImplemented("RPCClient.CycleModel")
-}
-func (*RPCClient) CycleThinkingLevel(context.Context) (agent.ThinkingLevel, error) {
-	return "", notImplemented("RPCClient.CycleThinkingLevel")
-}
 func (*RPCClient) ExportHTML(context.Context, ...string) (string, error) {
 	return "", notImplemented("RPCClient.ExportHTML")
 }
-func (*RPCClient) FollowUp(context.Context, string, ...[]ai.ImageContent) error {
-	return notImplemented("RPCClient.FollowUp")
-}
 func (*RPCClient) Fork(context.Context, string) (string, bool, error) {
 	return "", false, notImplemented("RPCClient.Fork")
-}
-func (*RPCClient) GetAvailableModels(context.Context) ([]ModelInfo, error) {
-	return nil, notImplemented("RPCClient.GetAvailableModels")
-}
-func (*RPCClient) GetAvailableThinkingLevels(context.Context) ([]agent.ThinkingLevel, error) {
-	return nil, notImplemented("RPCClient.GetAvailableThinkingLevels")
 }
 func (*RPCClient) GetCommands(context.Context) ([]ResolvedCommand, error) {
 	return nil, notImplemented("RPCClient.GetCommands")
@@ -392,9 +368,6 @@ func (*RPCClient) GetEntries(context.Context, ...string) ([]SessionEntry, *strin
 }
 func (*RPCClient) GetForkMessages(context.Context) ([]ForkMessage, error) {
 	return nil, notImplemented("RPCClient.GetForkMessages")
-}
-func (*RPCClient) GetSessionStats(context.Context) (SessionStats, error) {
-	return SessionStats{}, notImplemented("RPCClient.GetSessionStats")
 }
 
 func (*RPCClient) GetTree(context.Context) ([]SessionTreeNode, *string, error) {
@@ -406,26 +379,8 @@ func (*RPCClient) NewSession(context.Context, ...string) (bool, error) {
 func (*RPCClient) SetAutoCompaction(context.Context, bool) error {
 	return notImplemented("RPCClient.SetAutoCompaction")
 }
-func (*RPCClient) SetAutoRetry(context.Context, bool) error {
-	return notImplemented("RPCClient.SetAutoRetry")
-}
-func (*RPCClient) SetFollowUpMode(context.Context, agent.QueueMode) error {
-	return notImplemented("RPCClient.SetFollowUpMode")
-}
-func (*RPCClient) SetModel(context.Context, string, string) (ModelInfo, error) {
-	return ModelInfo{}, notImplemented("RPCClient.SetModel")
-}
 func (*RPCClient) SetSessionName(context.Context, string) error {
 	return notImplemented("RPCClient.SetSessionName")
-}
-func (*RPCClient) SetSteeringMode(context.Context, agent.QueueMode) error {
-	return notImplemented("RPCClient.SetSteeringMode")
-}
-func (*RPCClient) SetThinkingLevel(context.Context, agent.ThinkingLevel) error {
-	return notImplemented("RPCClient.SetThinkingLevel")
-}
-func (*RPCClient) Steer(context.Context, string, ...[]ai.ImageContent) error {
-	return notImplemented("RPCClient.Steer")
 }
 func (*RPCClient) SwitchSession(context.Context, string) (bool, error) {
 	return false, notImplemented("RPCClient.SwitchSession")

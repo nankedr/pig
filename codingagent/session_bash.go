@@ -18,12 +18,16 @@ import (
 )
 
 func (s *AgentSession) ExecuteBash(ctx context.Context, command string, options ...ExecuteBashOptions) (BashResult, error) {
-	if ctx == nil {
-		return BashResult{}, fmt.Errorf("Bash context must not be nil")
-	}
 	var option ExecuteBashOptions
 	if len(options) > 0 {
 		option = options[0]
+	}
+	return s.executeBash(ctx, command, option, nil, nil)
+}
+
+func (s *AgentSession) executeBash(ctx context.Context, command string, option ExecuteBashOptions, update func(string), excludedListener *uint64) (BashResult, error) {
+	if ctx == nil {
+		return BashResult{}, fmt.Errorf("Bash context must not be nil")
 	}
 	option.ID = cloneStringPointer(option.ID)
 	ctx, cancel := context.WithCancel(ctx)
@@ -59,7 +63,10 @@ func (s *AgentSession) ExecuteBash(ctx context.Context, command string, options 
 		if option.OnChunk != nil {
 			option.OnChunk(delta)
 		}
-		s.emit(AgentSessionBashExecutionUpdateEvent{Type: AgentSessionEventTypeBashExecutionUpdate, ID: option.ID, Delta: delta})
+		s.emitExcept(AgentSessionBashExecutionUpdateEvent{Type: AgentSessionEventTypeBashExecutionUpdate, ID: option.ID, Delta: delta}, excludedListener)
+		if update != nil {
+			update(delta)
+		}
 	})
 	if err != nil {
 		return result, err

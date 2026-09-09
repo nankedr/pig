@@ -1,0 +1,46 @@
+method Steer func(*codingagent.RPCClient, context.Context, string, ...[]ai.ImageContent) error
+method FollowUp func(*codingagent.RPCClient, context.Context, string, ...[]ai.ImageContent) error
+method SetSteeringMode func(*codingagent.RPCClient, context.Context, agent.QueueMode) error
+method SetFollowUpMode func(*codingagent.RPCClient, context.Context, agent.QueueMode) error
+method SetModel func(*codingagent.RPCClient, context.Context, string, string) (codingagent.ModelInfo, error)
+method CycleModel func(*codingagent.RPCClient, context.Context) (codingagent.ModelCycleResult, error)
+method GetAvailableModels func(*codingagent.RPCClient, context.Context) ([]codingagent.ModelInfo, error)
+method SetThinkingLevel func(*codingagent.RPCClient, context.Context, ai.ModelThinkingLevel) error
+method CycleThinkingLevel func(*codingagent.RPCClient, context.Context) (ai.ModelThinkingLevel, error)
+method GetAvailableThinkingLevels func(*codingagent.RPCClient, context.Context) ([]ai.ModelThinkingLevel, error)
+method SetAutoRetry func(*codingagent.RPCClient, context.Context, bool) error
+method AbortRetry func(*codingagent.RPCClient, context.Context) error
+method Bash func(*codingagent.RPCClient, context.Context, string) (codingagent.BashResult, error)
+method AbortBash func(*codingagent.RPCClient, context.Context) error
+method GetSessionStats func(*codingagent.RPCClient, context.Context) (codingagent.SessionStats, error)
+type codingagent.ModelInfo struct
+fields:
+- ContextWindow int64 tag=""
+- ID string tag=""
+- Provider string tag=""
+- Reasoning bool tag=""
+type codingagent.ModelCycleResult struct
+fields:
+- IsScoped bool tag=""
+- Model ai.Model tag=""
+- ThinkingLevel ai.ModelThinkingLevel tag=""
+type codingagent.BashResult struct
+fields:
+- Output string tag=""
+- ExitCode *int tag=""
+- Cancelled bool tag=""
+- Truncated bool tag=""
+- FullOutputPath *string tag=""
+type codingagent.SessionStats struct
+fields:
+- AssistantMessages int tag=""
+- ToolCalls int tag=""
+- ToolResults int tag=""
+- TotalMessages int tag=""
+- UserMessages int tag=""
+- ContextUsage *codingagent.ContextUsage tag=""
+- Cost float64 tag=""
+- SessionFile *string tag=""
+- SessionID string tag=""
+- Tokens ai.Usage tag=""
+RunRPCMode func(context.Context, *codingagent.AgentSessionRuntime) error

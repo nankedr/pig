@@ -1,0 +1,269 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/rpc/rpc-mode.ts#runRpcMode"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "rpc/codingagent/control",
+    "catalog_id": "contract:rpc/session-control",
+    "surface": "cli",
+    "input": {
+      "commands": [
+        {
+          "type": "set_steering_mode",
+          "mode": "all"
+        },
+        {
+          "type": "set_follow_up_mode",
+          "mode": "one-at-a-time"
+        },
+        {
+          "type": "get_state"
+        },
+        {
+          "type": "set_model",
+          "provider": "missing",
+          "modelId": "missing"
+        },
+        {
+          "type": "set_model"
+        },
+        {
+          "type": "set_model",
+          "provider": [
+            "deepseek"
+          ],
+          "modelId": "deepseek-v4-flash"
+        },
+        {
+          "type": "set_auto_retry",
+          "enabled": false
+        },
+        {
+          "type": "abort_retry"
+        },
+        {
+          "type": "bash",
+          "command": "printf rpc-bash",
+          "excludeFromContext": true
+        },
+        {
+          "type": "abort_bash"
+        },
+        {
+          "type": "get_session_stats"
+        },
+        {
+          "type": "get_last_assistant_text"
+        },
+        {
+          "type": "set_active_tools",
+          "tools": []
+        }
+      ],
+      "lifecyclePrompts": [
+        "start",
+        "steering",
+        "follow-up",
+        "configured"
+      ],
+      "pipelinedQueries": 200
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "dispatch": [
+        {
+          "response": {
+            "id": "0",
+            "type": "response",
+            "command": "set_steering_mode",
+            "success": true
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "1",
+            "type": "response",
+            "command": "set_follow_up_mode",
+            "success": true
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "2",
+            "type": "response",
+            "command": "get_state",
+            "success": true,
+            "data": {
+              "steeringMode": "all",
+              "followUpMode": "one-at-a-time",
+              "pendingMessageCount": 0,
+              "messageCount": 0,
+              "isStreaming": false
+            }
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "3",
+            "type": "response",
+            "command": "set_model",
+            "success": false,
+            "error": "Model not found: missing/missing"
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "4",
+            "type": "response",
+            "command": "set_model",
+            "success": false,
+            "error": "Model not found: undefined/undefined"
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "5",
+            "type": "response",
+            "command": "set_model",
+            "success": false,
+            "error": "Model not found: deepseek/deepseek-v4-flash"
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "6",
+            "type": "response",
+            "command": "set_auto_retry",
+            "success": true
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "7",
+            "type": "response",
+            "command": "abort_retry",
+            "success": true
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "8",
+            "type": "response",
+            "command": "bash",
+            "success": true,
+            "data": {
+              "output": "rpc-bash",
+              "exitCode": 0,
+              "cancelled": false,
+              "truncated": false
+            }
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "9",
+            "type": "response",
+            "command": "abort_bash",
+            "success": true
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "10",
+            "type": "response",
+            "command": "get_session_stats",
+            "success": true,
+            "data": {
+              "userMessages": 0,
+              "assistantMessages": 0,
+              "toolCalls": 0,
+              "toolResults": 0,
+              "totalMessages": 1,
+              "tokens": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              },
+              "cost": 0
+            }
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "11",
+            "type": "response",
+            "command": "get_last_assistant_text",
+            "success": true,
+            "data": {}
+          },
+          "events": []
+        },
+        {
+          "response": {
+            "id": "12",
+            "type": "response",
+            "command": "set_active_tools",
+            "success": false,
+            "error": "Unknown command: set_active_tools"
+          },
+          "events": []
+        }
+      ],
+      "lifecycle": {
+        "pending": 2,
+        "users": [
+          "start",
+          "steering",
+          "follow-up",
+          "configured"
+        ],
+        "text": "rpc answer",
+        "userMessages": 4,
+        "assistantMessages": 4,
+        "totalMessages": 8,
+        "tokens": {
+          "input": 40,
+          "output": 8,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "total": 48
+        }
+      },
+      "pipelinedQueries": 200
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:43de178ae5cf96abac9d854f18a2082f5367d3e711d49d8239351c7db0b54464",
+  "observation_hash": "sha256:b16909c0c1dbe19d02c47bda0f761131a55f6eaf101b4f337a50f977f2e824a2",
+  "execution_method": "node --experimental-strip-types parity/oracle/rpc-control.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/modes/rpc/rpc-mode.ts#runRpcMode"
+  }
+}

@@ -223,6 +223,9 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return nil, err
 	}
 	stream := func(runContext context.Context, requestModel ai.Model, input ai.Context, streamOptions ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+		if options.BaseURL != nil && requestModel.Provider == model.Provider {
+			requestModel.BaseURL = strings.TrimSpace(*options.BaseURL)
+		}
 		if options.APIKey != nil && *options.APIKey != "" {
 			key := *options.APIKey
 			streamOptions.APIKey = &key
