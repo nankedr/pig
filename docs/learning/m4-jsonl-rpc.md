@@ -18,3 +18,5 @@
 已交付的命令为 prompt、abort、get_state、get_messages、get_last_assistant_text。prompt 的 streamingBehavior 可将运行期间的新文本排入 steer/followUp；独立 steer/follow_up 命令、图片、模型/配置切换、Session 切换、统计、树、bash、compaction、HTML 和扩展 UI 命令仍明确失败。这是基础传输切片，不代表全部 RPC 命令已完成。
 
 验证见 `go test -race ./cmd/pig -run '^TestRPC94' -count=1`。固定 Pi source/dist Oracle 用例覆盖宽松分派和公开客户端事件投影；真实 Go 子进程覆盖 UTF-8 分片、EOF、并发、abort、输出失败与本地 waiter 清理。权威能力状态在 Parity Catalog 的 `contract:rpc/jsonl-transport`；Go 映射见 ADR-0028。
+
+M4.13 已增加运行中投递、配置、重试、Bash 和统计控制，见 [RPC 会话控制](m4-rpc-control.md)。

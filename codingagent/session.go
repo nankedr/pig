@@ -678,13 +678,17 @@ func (s *AgentSession) Dispose() error {
 	return nil
 }
 func (s *AgentSession) Subscribe(listener AgentSessionEventListener) (AgentSessionUnsubscribe, error) {
+	unsubscribe, _, err := s.subscribe(listener)
+	return unsubscribe, err
+}
+func (s *AgentSession) subscribe(listener AgentSessionEventListener) (AgentSessionUnsubscribe, uint64, error) {
 	if listener == nil {
-		return func() {}, nil
+		return func() {}, 0, nil
 	}
 	s.mu.Lock()
 	if s.disposed {
 		s.mu.Unlock()
-		return nil, fmt.Errorf("AgentSession is disposed")
+		return nil, 0, fmt.Errorf("AgentSession is disposed")
 	}
 	id := s.nextListener
 	s.nextListener++
@@ -698,7 +702,7 @@ func (s *AgentSession) Subscribe(listener AgentSessionEventListener) (AgentSessi
 			delete(s.listeners, id)
 			s.mu.Unlock()
 		})
-	}, nil
+	}, id, nil
 }
 func (s *AgentSession) Prompt(ctx context.Context, text string, options ...PromptOptions) error {
 	if ctx == nil {
@@ -936,10 +940,14 @@ func (s *AgentSession) emitAgentEvent(event agent.AgentEvent) error {
 	return nil
 }
 
-func (s *AgentSession) emit(event AgentSessionEvent) {
+func (s *AgentSession) emit(event AgentSessionEvent) { s.emitExcept(event, nil) }
+func (s *AgentSession) emitExcept(event AgentSessionEvent, excluded *uint64) {
 	s.mu.RLock()
 	listeners := make([]AgentSessionEventListener, 0, len(s.listeners))
 	for _, id := range s.listenerOrder {
+		if excluded != nil && id == *excluded {
+			continue
+		}
 		if listener, ok := s.listeners[id]; ok {
 			listeners = append(listeners, listener)
 		}
