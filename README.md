@@ -4,7 +4,7 @@ M4.9 支持同一 Session 树的无摘要导航与继续分支，见 [学习材�
 
 M4.1 已支持显式 grep 搜索并继续编码任务，见 [grep 学习材料](docs/learning/m4-grep-tool.md)和 [TypeScript → Go](docs/mappings/typescript-to-go/m4-grep-tool.md)。
 
-Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.3.0 集成 M3 的本地持久化 Coding Agent：v3 Session 恢复与互操作、继续/fork、全局与可信项目 settings、canonical 凭证、基础 ModelRuntime，以及默认四工具的可恢复编码任务。
+Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.4.0 集成 M4 Headless 编排：七工具、消息投递与重试、动态配置、压缩与分支摘要、统计、并发 JSONL RPC 和安全 HTML export，并保留 M1–M3 的持久化、互操作与恢复能力。
 
 M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回读](docs/learning/m3-write-tool.md)。
 M3.9 支持显式 edit 精确/模糊多区域替换、准确 diff 和回读，见 [edit 与回读](docs/learning/m3-edit-tool.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m3-edit-tool.md)。
@@ -12,6 +12,9 @@ M3.10 支持显式 bash 执行宿主命令、进程树取消与完整输出保�
 M3.11 默认启用 read/bash/edit/write，支持跨进程恢复和 fork 编码任务，见 [可恢复编码任务](docs/learning/m3-coding-task.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m3-coding-task.md)。
 M4.4 支持 Provider 错误后的整轮重试，见 [重试与取消](docs/learning/m4-turn-retry.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m4-turn-retry.md)。
 
+- [M4 集成与冻结](docs/learning/m4-freeze.md)
+- [M4 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m4-freeze.md)
+- [v0.4.0 发布说明](docs/releases/v0.4.0.md)
 - [M3 集成与冻结](docs/learning/m3-freeze.md)
 - [M3 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m3-freeze.md)
 - [v0.3.0 发布说明](docs/releases/v0.3.0.md)
@@ -60,12 +63,12 @@ go run ./examples/global-settings
 ```
 
 ```sh
-make m3-gate
+make m4-gate
 ```
 
-`m3-gate` 只重放仓库内已提交的 fixture，全程离线且不需要 Pi checkout。需要重新对照上游源码时，按 [M0 兼容骨架](docs/learning/m0-compatibility-skeleton.md#冻结门禁) 准备两个独立 checkout 后运行 `m0-freeze`。
+`m4-gate` 需要预装 rg/fd，只重放仓库内已提交的 fixture，全程离线且不需要 Pi checkout。需要重新对照上游源码时，按 [M0 兼容骨架](docs/learning/m0-compatibility-skeleton.md#冻结门禁) 准备两个独立 checkout 后运行 `m0-freeze`。
 
-M1 冻结门禁在 `m0-freeze` 之上追加受保护的真实 DeepSeek live smoke。普通 PR 缺 `DEEPSEEK_API_KEY` 时 `make m1-live-smoke` 明确 skip；`make m1-freeze`（含 `PIG_REQUIRE_LIVE=1`）缺密钥时必须失败。
+M1 冻结门禁在 `m0-freeze` 之上追加受保护的真实 DeepSeek live smoke。普通 Go 测试缺 `DEEPSEEK_API_KEY` 时跳过在线冒烟；`make m1-live-smoke` 和各阶段 freeze 均强制要求密钥。
 
 M2 完整冻结使用 `make m2-freeze`：要求干净 Pig checkout，追加全部 M2 Oracle、source drift 与真实 DeepSeek 冒烟。准备方式与 Catalog 剩余边界见 [M2 集成与冻结](docs/learning/m2-freeze.md)。
 
@@ -74,3 +77,5 @@ M3 完整冻结使用 `make m3-freeze`，包含 M1/M2 回归和 M3 的真实子�
 Issue #84：显式选择 find/ls/read 完成文件定位与回读，详见 [M4.2 学习材料](docs/learning/m4-find-ls.md) 和 [Go 示例](examples/find-ls-read/main.go)。find 需要预装 fd，不自动下载。
 
 M4.7 支持手动压缩后继续任务，见 [压缩与恢复](docs/learning/m4-manual-compaction.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m4-manual-compaction.md)。
+
+M4 安装：`go install github.com/nankedr/pig/cmd/pig@v0.4.0`；SDK：`go get github.com/nankedr/pig@v0.4.0`。组合示例 `go run ./examples/m4-workflow`；完整冻结和验证制品见 [M4 冻结](docs/learning/m4-freeze.md)。

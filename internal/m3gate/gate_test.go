@@ -1,7 +1,6 @@
 package m3gate_test
 
 import (
-	"context"
 	"github.com/nankedr/pig/internal/catalog"
 	"os"
 	"os/exec"
@@ -10,21 +9,7 @@ import (
 	"sort"
 	"strings"
 	"testing"
-
-	"github.com/nankedr/pig/codingagent"
 )
-
-func TestM3ReleaseVersion(t *testing.T) {
-	if codingagent.Version != "0.3.0" {
-		t.Fatalf("SDK version = %s, want 0.3.0", codingagent.Version)
-	}
-	for _, flag := range []string{"--version", "-v"} {
-		result, err := codingagent.RunCLI(context.Background(), codingagent.CLIInvocation{Arguments: []string{flag}})
-		if err != nil || result.Stdout != "0.3.0\n" || result.Stderr != "" {
-			t.Fatalf("%s: result=%+v, err=%v", flag, result, err)
-		}
-	}
-}
 
 func TestM3CatalogEvidence(t *testing.T) {
 	_, file, _, _ := runtime.Caller(0)

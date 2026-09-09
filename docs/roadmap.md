@@ -124,3 +124,7 @@ Issue #65 让 compat 与全部 deprecated aliases 复用同一注册表，验证
 ## M3 集成验收
 
 `make m3-gate` 继承 M1/M2 离线回归并重复验证 M3 的跨进程持久化、锁、四工具恢复/fork 与取消。`make m3-freeze` 在干净 checkout 上追加固定 Oracle、source/API drift、v3 双向互操作和受保护 DeepSeek 冒烟。Catalog 静态映射与已交付行为分别验收，后续里程碑缺口继续保持可见。发布范围及制品见 [M3 集成与冻结](learning/m3-freeze.md)和 [v0.3.0](releases/v0.3.0.md)。父 Issue 和里程碑前沿由阶段维护流程另行推进。
+
+## M4 集成验收
+
+`make m4-gate` 集成七工具真实进程恢复、SDK 编排与并发 RPC；`make m4-freeze` 追加固定 Oracle/source drift、浏览器 XSS 与受保护 DeepSeek 冒烟。逐项范围与安装制品见 [M4 冻结](learning/m4-freeze.md)和 [v0.4.0](releases/v0.4.0.md)。RPC 扩展上下文的分支摘要导航仍归 M7/#9；本票不推进父 Issue 或 Milestone Frontier。

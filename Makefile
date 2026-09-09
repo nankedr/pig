@@ -167,3 +167,28 @@ m3-freeze: m3-clean m3-node-preflight m3-gate m3-oracle m0-source-drift m1-live-
 .PHONY: m4-html-browser
 m4-html-browser:
 	node parity/export-html/check.mjs
+
+.PHONY: m4-tools-preflight m4-gate m4-repeat m4-oracle m4-clean m4-freeze
+.NOTPARALLEL: m4-gate m4-freeze m4-oracle
+
+m4-tools-preflight:
+	@command -v rg >/dev/null || (echo "M4 integration requires preinstalled ripgrep (rg)" >&2; exit 2)
+	@command -v fd >/dev/null || (echo "M4 integration requires preinstalled fd" >&2; exit 2)
+
+m4-gate: m4-tools-preflight m3-gate m4-repeat
+	go run ./examples/m4-workflow
+	go run ./examples/find-ls-read
+
+m4-repeat:
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test(SessionMessages|TurnRetry|SessionConfiguration|SessionStats|ManualCompaction|AutoCompaction|SessionTreeNavigation|BranchSummary|SessionBash|GrepToolSessionProcessCleanup|FindLsSessionAbortReapsFD|FindLsFDCancellationKillsTree|Issue96Replacement)' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./cmd/pig ./internal/m4gate -run 'Test(RPC9[45678]|M4Workflow|PigM4)' -count=5 -shuffle=on
+
+m4-oracle: m3-oracle
+	node --experimental-strip-types parity/oracle/export-html.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+m4-clean:
+	@set -eu; state=$$(git status --porcelain=v1 --untracked-files=all); \
+		test -z "$$state" || (echo "M4 freeze requires a clean Pig checkout" >&2; exit 2)
+
+m4-freeze: m4-clean m3-node-preflight m4-gate m4-oracle m4-html-browser m0-source-drift m1-live-smoke
+	@$(MAKE) --no-print-directory m4-clean

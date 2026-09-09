@@ -1499,7 +1499,7 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 		)...)
 		entry.Partial = &catalog.Partial{
 			Supported:   []string{"Headless text and one-way session-first JSON dispatch accept explicit Provider, exact model, API key or DEEPSEEK_API_KEY, prompt arguments or stdin, default Pig-owned v3 persistence, explicit-path reopen, and explicit memory"},
-			Unsupported: []string{"interactive, RPC, continue/recent lookup, fork, resource, extension, and broader Provider assembly remain exact Capability Stubs"},
+			Unsupported: []string{"interactive, resource, extension and broader Provider assembly remain Capability Stubs; continue/fork are covered by M3 Session contracts and direct RPC by contract:rpc/jsonl-transport, session-control and session-lifecycle"},
 		}
 		entry.Notes = "Issues #56 and #57 promote the pinned main entrypoint for real Headless text and session-first JSONL. Issue #71 adds Pig-owned v3 persistence and explicit reopen without migrating Pi state; Issue #94 adds the basic RPC runtime under contract:rpc/jsonl-transport; extension and interactive capabilities remain deferred."
 	case "symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent":
@@ -1849,7 +1849,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 					"Issue #89: public AgentSession manual compaction, history/split/update summary requests, file operations, budgets and isolated request IDs; independent summary retry lifecycle, atomic v3 persistence, cancellation and Headless reopen continuation",
 				},
 				Unsupported: []string{
-					"extension hooks and RPC/TUI controls remain explicit Capability Stubs",
+					"extension hooks and TUI controls remain Capability Stubs; direct RPC compact/set_auto_compaction is covered by contract:rpc/session-lifecycle; extension-context tree summary navigation remains M7 (#9)",
 					"Adapter coverage remains the existing ModelRuntime subset; manual-compaction queues, extension custom queues and baseline retry-history tail limitations are not claimed as automatic recovery successes",
 				},
 			},
@@ -2298,7 +2298,7 @@ func issue32ModulePartial() *catalog.Partial {
 			"Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects",
 		},
 		Unsupported: []string{
-			"project writes, full resources, packages, remaining tools, catalog overlays and OAuth/ambient auth, interactive mode, and RPC remain explicit Capability Stubs until their roadmap milestones",
+			"full resources/packages (M5), catalog overlays and other Provider adapters (M10), OAuth/ambient auth (M11), images (M12), themes (M5), interactive mode (M6) and extension runtime (M7) remain deferred; seven built-in Tools and direct JSONL RPC are delivered under their behavior contracts; extension-context RPC summary navigation remains M7 (#9)",
 			"surface tests prove API coverage and target resolution, not runtime parity",
 		},
 	}

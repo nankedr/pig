@@ -20,7 +20,7 @@ import (
 const ConfigDirName = ".pig"
 
 // Version is shared by the SDK and the pig CLI.
-const Version = "0.3.0"
+const Version = "0.4.0"
 
 // Mode selects one of the local Coding Agent process interfaces. Remote
 // sessions use client/protocol instead and are deliberately not a Mode.

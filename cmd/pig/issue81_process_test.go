@@ -20,7 +20,18 @@ import (
 	"github.com/nankedr/pig/codingagent"
 )
 
-func TestPigDefaultCodingTaskResumeAndFork(t *testing.T) {
+func TestPigDefaultCodingTaskResumeAndFork(t *testing.T) { pigCodingTaskResumeAndFork(t, false) }
+
+func TestPigM4SevenToolsResumeAndFork(t *testing.T) {
+	for _, tool := range []string{"fd", "rg"} {
+		if _, err := exec.LookPath(tool); err != nil {
+			t.Skipf("%s must be preinstalled; make m4-gate requires it", tool)
+		}
+	}
+	pigCodingTaskResumeAndFork(t, true)
+}
+
+func pigCodingTaskResumeAndFork(t *testing.T, all bool) {
 	binary := buildPigBinary(t)
 	for _, mode := range []string{"text", "json"} {
 		t.Run(mode, func(t *testing.T) {
@@ -50,7 +61,11 @@ func TestPigDefaultCodingTaskResumeAndFork(t *testing.T) {
 				for _, tool := range request.Tools {
 					names = append(names, tool.Function.Name)
 				}
-				if strings.Join(names, ",") != "read,bash,edit,write" {
+				wantTools := "read,bash,edit,write"
+				if all {
+					wantTools += ",grep,find,ls"
+				}
+				if strings.Join(names, ",") != wantTools {
 					t.Errorf("default tools: %v", names)
 				}
 				phase, users, prior, step := "", 0, 0, 0
@@ -85,6 +100,12 @@ func TestPigDefaultCodingTaskResumeAndFork(t *testing.T) {
 								t.Errorf("bash session metadata: %q", text)
 							}
 						}
+						if all && (strings.HasSuffix(m.ToolCallID, "-ls") || strings.HasSuffix(m.ToolCallID, "-find")) && !strings.Contains(fmt.Sprint(m.Content), "task.txt") {
+							t.Errorf("search/list result: %v", m.Content)
+						}
+						if all && strings.HasSuffix(m.ToolCallID, "-grep") && !strings.Contains(fmt.Sprint(m.Content), "1: v2") {
+							t.Errorf("grep result: %v", m.Content)
+						}
 						if strings.HasSuffix(m.ToolCallID, "-read") && fmt.Sprint(m.Content) != "v1\n" && fmt.Sprint(m.Content) != "v2\n" {
 							t.Errorf("read result: %v", m.Content)
 						}
@@ -93,9 +114,15 @@ func TestPigDefaultCodingTaskResumeAndFork(t *testing.T) {
 				wantUsers, wantPrior := 1, 0
 				if phase == "resume" {
 					wantUsers, wantPrior = 2, 5
+					if all {
+						wantPrior += 3
+					}
 				}
 				if phase == "fork" {
 					wantUsers, wantPrior = 3, 7
+					if all {
+						wantPrior += 3
+					}
 				}
 				if users != wantUsers || prior != wantPrior {
 					t.Errorf("%s history users=%d tools=%d", phase, users, prior)
@@ -119,6 +146,16 @@ func TestPigDefaultCodingTaskResumeAndFork(t *testing.T) {
 						{"bash", map[string]any{"command": "printf 'expected failure'; exit 7"}},
 					}
 				}
+				if all && phase == "create" {
+					commands = append(commands, []struct {
+						name string
+						args any
+					}{
+						{"ls", map[string]any{}},
+						{"find", map[string]any{"pattern": "*.txt"}},
+						{"grep", map[string]any{"pattern": "v2", "path": "task.txt"}},
+					}...)
+				}
 				delta := map[string]any{"content": phase + " complete"}
 				reason := "stop"
 				if step < len(commands) {
@@ -140,6 +177,9 @@ func TestPigDefaultCodingTaskResumeAndFork(t *testing.T) {
 			var saved []byte
 			for _, phase := range []string{"create", "resume", "fork"} {
 				args := []string{"--provider", "deepseek", "--model", "deepseek-v4-flash", "--thinking", "off", "--session-dir", dir, "--mode", mode, "-p", phase}
+				if all {
+					args = append(args, "--tools", "read,bash,edit,write,grep,find,ls")
+				}
 				id := "original"
 				switch phase {
 				case "create":
@@ -196,6 +236,9 @@ func TestPigDefaultCodingTaskResumeAndFork(t *testing.T) {
 				}
 				if phase == "fork" {
 					want = 24
+				}
+				if all {
+					want += 6
 				}
 				if len(history) != want {
 					t.Fatalf("%s persisted messages=%d want=%d", phase, len(history), want)
