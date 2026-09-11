@@ -36,6 +36,7 @@ type CreateAgentSessionOptions struct {
 	AgentTools          []agent.ErasedAgentTool
 	CustomTools         []ToolDefinition
 	ResourceLoader      ResourceLoader
+	NoContextFiles      bool
 	SessionManager      *SessionManager
 	SettingsManager     *SettingsManager
 	SessionStartEvent   *SessionStartEvent
@@ -79,12 +80,15 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 	runtimePath := stream == nil
 	var fallback *string
 	if stream == nil {
-		services, err := CreateAgentSessionServices(ctx, CreateAgentSessionServicesOptions{CWD: config.CWD, AgentDir: config.AgentDir, ModelRuntime: config.ModelRuntime, SettingsManager: config.SettingsManager})
+		services, err := CreateAgentSessionServices(ctx, CreateAgentSessionServicesOptions{CWD: config.CWD, AgentDir: config.AgentDir, ModelRuntime: config.ModelRuntime, SettingsManager: config.SettingsManager, ResourceLoaderOptions: DefaultResourceLoaderOptions{NoContextFiles: config.NoContextFiles}})
 		if err != nil {
 			return CreateAgentSessionResult{}, err
 		}
 		config.ModelRuntime = services.ModelRuntime
 		config.SettingsManager = services.SettingsManager
+		if config.ResourceLoader == nil {
+			config.ResourceLoader = services.ResourceLoader
+		}
 		if config.Model == nil {
 			model, thinking, err := resolveHeadlessModel(ctx, config.ModelRuntime, config.SettingsManager, CreateHeadlessSessionOptions{Thinking: config.ThinkingLevel, SessionManager: config.SessionManager})
 			if err != nil {
@@ -116,6 +120,16 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 		if err != nil {
 			return CreateAgentSessionResult{}, err
 		}
+	}
+	if config.ResourceLoader == nil {
+		loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: config.CWD, AgentDir: config.AgentDir, NoContextFiles: config.NoContextFiles})
+		if err != nil {
+			return CreateAgentSessionResult{}, err
+		}
+		if err = loader.Reload(ctx); err != nil {
+			return CreateAgentSessionResult{}, err
+		}
+		config.ResourceLoader = loader
 	}
 	if config.AgentTools == nil {
 		config.AgentTools, err = sessionServiceTools(config.CWD, config.SettingsManager, config.Tools)
@@ -246,7 +260,7 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 	})
 	session.allTools = cloneSessionTools(selectAgentTools(config.AgentTools, allowedTools, config.ExcludeTools, ""))
 	session.runtimeStream = runtimePath
-	if err := configureSessionPrompt(ctx, session, CreateHeadlessSessionOptions{CWD: config.CWD, AgentDir: config.AgentDir, NoContextFiles: !runtimePath}); err != nil {
+	if err := configureSessionPrompt(ctx, session, CreateHeadlessSessionOptions{CWD: config.CWD, AgentDir: config.AgentDir, NoContextFiles: config.NoContextFiles}); err != nil {
 		session.Dispose()
 		return CreateAgentSessionResult{}, err
 	}

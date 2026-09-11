@@ -26,6 +26,7 @@ m0-offline:
 	go run ./examples/rpc-lifecycle
 	go run ./examples/rpc-control
 	go run ./examples/rpc-chat
+	go run ./examples/context-files
 	go run ./examples/session-stats
 	go run ./examples/branch-summary
 	go run ./examples/session-tree-navigation
@@ -89,6 +90,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/rpc-lifecycle.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/rpc-control.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/rpc.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/context-files.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-stats.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/branch-summary.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/session-tree-navigation.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

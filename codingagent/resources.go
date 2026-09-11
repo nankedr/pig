@@ -2,6 +2,8 @@ package codingagent
 
 import (
 	"context"
+	"fmt"
+	"sync"
 )
 
 type ResourceCollision struct {
@@ -57,9 +59,7 @@ type ResourceLoaderReloadOptions struct {
 	ResolveProjectTrust ExtensionHandler
 }
 
-// DefaultResourceLoaderOptions preserves the pinned construction inputs while
-// resource loading remains deferred. Callback fields are inert data at this
-// milestone and are never invoked by the constructor.
+// DefaultResourceLoaderOptions supports local Context Files; other resource inputs remain explicit stubs.
 type DefaultResourceLoaderOptions struct {
 	CWD      string
 	AgentDir string
@@ -105,48 +105,102 @@ type ResourceLoader interface {
 	Reload(context.Context, ...ResourceLoaderReloadOptions) error
 }
 
-type DefaultResourceLoader struct{}
-
-// NewDefaultResourceLoader fails before resolving paths, constructing default
-// collaborators, or invoking overrides. Resource loading is deliberately
-// deferred without selecting an extension ABI (ADR-0009).
-func NewDefaultResourceLoader(DefaultResourceLoaderOptions) (*DefaultResourceLoader, error) {
-	return nil, notImplemented("NewDefaultResourceLoader")
+type DefaultResourceLoader struct {
+	mu             sync.RWMutex
+	cwd, agentDir  string
+	noContextFiles bool
+	files          []AgentsFile
+	diagnostics    []ResourceDiagnostic
 }
 
-func (DefaultResourceLoader) GetExtensions() (LoadExtensionsResult, error) {
+func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultResourceLoader, error) {
+	if len(options.AdditionalExtensionPaths) > 0 || len(options.AdditionalSkillPaths) > 0 || len(options.AdditionalPromptTemplatePaths) > 0 || len(options.AdditionalThemePaths) > 0 || len(options.ExtensionFactories) > 0 || options.SystemPrompt != nil || len(options.AppendSystemPrompt) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
+		return nil, notImplemented("NewDefaultResourceLoader")
+	}
+	cwd, err := resolveSessionPath(options.CWD)
+	if err != nil {
+		return nil, err
+	}
+	dir := options.AgentDir
+	if dir == "" {
+		dir, err = GetAgentDir()
+	} else {
+		dir, err = resolveSessionPath(dir)
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, noContextFiles: options.NoContextFiles, files: []AgentsFile{}}, nil
+}
+
+func (*DefaultResourceLoader) GetExtensions() (LoadExtensionsResult, error) {
 	return LoadExtensionsResult{}, notImplemented("DefaultResourceLoader.GetExtensions")
 }
-func (DefaultResourceLoader) GetSkills() (SkillLoadResult, error) {
+func (*DefaultResourceLoader) GetSkills() (SkillLoadResult, error) {
 	return SkillLoadResult{}, notImplemented("DefaultResourceLoader.GetSkills")
 }
-func (DefaultResourceLoader) GetPrompts() (PromptTemplateLoadResult, error) {
+func (*DefaultResourceLoader) GetPrompts() (PromptTemplateLoadResult, error) {
 	return PromptTemplateLoadResult{}, notImplemented("DefaultResourceLoader.GetPrompts")
 }
-func (DefaultResourceLoader) GetThemes() (ThemeLoadResult, error) {
+func (*DefaultResourceLoader) GetThemes() (ThemeLoadResult, error) {
 	return ThemeLoadResult{}, notImplemented("DefaultResourceLoader.GetThemes")
 }
-func (DefaultResourceLoader) GetAgentsFiles() ([]AgentsFile, error) {
-	return nil, notImplemented("DefaultResourceLoader.GetAgentsFiles")
+func (l *DefaultResourceLoader) GetAgentsFiles() ([]AgentsFile, error) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	if l.cwd == "" {
+		return nil, notImplemented("DefaultResourceLoader.GetAgentsFiles")
+	}
+	return append([]AgentsFile{}, l.files...), nil
 }
-func (DefaultResourceLoader) GetSystemPrompt() (*string, error) {
+
+func (l *DefaultResourceLoader) GetContextFileDiagnostics() []ResourceDiagnostic {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	return append([]ResourceDiagnostic{}, l.diagnostics...)
+}
+func (*DefaultResourceLoader) GetSystemPrompt() (*string, error) {
 	return nil, notImplemented("DefaultResourceLoader.GetSystemPrompt")
 }
-func (DefaultResourceLoader) GetSystemPromptSource() (*ResourcePathSource, error) {
+func (*DefaultResourceLoader) GetSystemPromptSource() (*ResourcePathSource, error) {
 	return nil, notImplemented("DefaultResourceLoader.GetSystemPromptSource")
 }
-func (DefaultResourceLoader) GetAppendSystemPrompt() ([]string, error) {
+func (*DefaultResourceLoader) GetAppendSystemPrompt() ([]string, error) {
 	return nil, notImplemented("DefaultResourceLoader.GetAppendSystemPrompt")
 }
-func (DefaultResourceLoader) GetAppendSystemPromptSources() ([]ResourcePathSource, error) {
+func (*DefaultResourceLoader) GetAppendSystemPromptSources() ([]ResourcePathSource, error) {
 	return nil, notImplemented("DefaultResourceLoader.GetAppendSystemPromptSources")
 }
-func (DefaultResourceLoader) ExtendResources(ResourceExtensionPaths) error {
+func (*DefaultResourceLoader) ExtendResources(ResourceExtensionPaths) error {
 	return notImplemented("DefaultResourceLoader.ExtendResources")
 }
-func (DefaultResourceLoader) LoadProjectTrustExtensions(context.Context) (LoadExtensionsResult, error) {
+func (*DefaultResourceLoader) LoadProjectTrustExtensions(context.Context) (LoadExtensionsResult, error) {
 	return LoadExtensionsResult{}, notImplemented("DefaultResourceLoader.LoadProjectTrustExtensions")
 }
-func (DefaultResourceLoader) Reload(context.Context, ...ResourceLoaderReloadOptions) error {
-	return notImplemented("DefaultResourceLoader.Reload")
+func (l *DefaultResourceLoader) Reload(ctx context.Context, options ...ResourceLoaderReloadOptions) error {
+	if l.cwd == "" || len(options) > 1 || len(options) == 1 && options[0].ResolveProjectTrust != nil {
+		return notImplemented("DefaultResourceLoader.Reload")
+	}
+	if ctx == nil {
+		return fmt.Errorf("resource loader context must not be nil")
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	files := []AgentsFile{}
+	diagnostics := []ResourceDiagnostic{}
+	if !l.noContextFiles {
+		var err error
+		files, err = loadProjectContextFiles(ctx, l.cwd, l.agentDir, &diagnostics)
+		if err != nil {
+			return err
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	l.files, l.diagnostics = files, diagnostics
+	return nil
 }

@@ -246,7 +246,7 @@ func TestCreateHeadlessSessionUsesExplicitAndAmbientCredentialsWithoutStateRunti
 		t.Fatal(err)
 	}
 	defer runtime.Session().Dispose()
-	if runtime.Session().SessionFile() != nil || runtime.Session().SettingsManager() == nil || runtime.Session().ResourceLoader() != nil {
+	if runtime.Session().SessionFile() != nil || runtime.Session().SettingsManager() == nil || runtime.Session().ResourceLoader() == nil {
 		t.Fatalf("Headless session state mismatch: file=%v settings=%v resources=%v", runtime.Session().SessionFile(), runtime.Session().SettingsManager(), runtime.Session().ResourceLoader())
 	}
 	if got := runtime.Session().GetActiveToolNames(); !reflect.DeepEqual(got, []string{"read"}) {

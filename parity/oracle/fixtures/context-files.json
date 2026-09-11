@@ -1,0 +1,314 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/resource-loader.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/codingagent/context-files",
+    "catalog_id": "contract:codingagent/context-files",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "name": "layering",
+          "files": {
+            "agent/AGENTS.override.md": "GLOBAL",
+            "agent/AGENTS.md": "IGNORED",
+            "AGENTS.md": "ABOVE_REPO",
+            "repo/.git/HEAD": "ref: refs/heads/main",
+            "repo/AGENTS.md": "REPO",
+            "repo/child/CLAUDE.md": "LEAF"
+          }
+        },
+        {
+          "name": "empty-wins",
+          "files": {
+            "repo/child/AGENTS.override.md": "",
+            "repo/child/AGENTS.md": "IGNORED"
+          }
+        },
+        {
+          "name": "missing",
+          "files": {}
+        },
+        {
+          "name": "uppercase",
+          "files": {
+            "repo/child/CLAUDE.MD": "UPPER"
+          }
+        },
+        {
+          "name": "file-link",
+          "files": {
+            "target.md": "LINKED"
+          },
+          "links": {
+            "repo/child/AGENTS.md": "../../target.md"
+          }
+        },
+        {
+          "name": "broken-link",
+          "files": {
+            "repo/child/CLAUDE.md": "FALLBACK"
+          },
+          "links": {
+            "repo/child/AGENTS.md": "missing"
+          }
+        },
+        {
+          "name": "directory-candidate",
+          "files": {
+            "repo/child/AGENTS.md/ignored": "DIRECTORY",
+            "repo/child/CLAUDE.md": "FALLBACK"
+          }
+        },
+        {
+          "name": "unreadable",
+          "files": {
+            "repo/child/AGENTS.override.md": "UNREADABLE",
+            "repo/child/AGENTS.md": "FALLBACK"
+          },
+          "unreadable": "repo/child/AGENTS.override.md"
+        },
+        {
+          "name": "disabled",
+          "files": {
+            "agent/AGENTS.md": "GLOBAL",
+            "repo/child/AGENTS.md": "LEAF"
+          },
+          "disabled": true
+        },
+        {
+          "name": "global-dedup",
+          "files": {
+            "repo/AGENTS.md": "ONCE"
+          },
+          "agentDir": "repo"
+        },
+        {
+          "name": "cwd-link",
+          "files": {
+            "repo/AGENTS.md": "LEXICAL_PARENT",
+            "target/AGENTS.md": "TARGET"
+          },
+          "links": {
+            "repo/child": "../target"
+          }
+        },
+        {
+          "name": "file-url",
+          "files": {
+            "repo/child/AGENTS.md": "URL"
+          },
+          "fileURL": true
+        },
+        {
+          "name": "nested-worktree",
+          "files": {
+            "repo/AGENTS.md": "SHADOWED",
+            "repo/.git/worktrees/feature/HEAD": "ref: refs/heads/feature",
+            "repo/.git/worktrees/feature/commondir": "../..",
+            "repo/child/.git": "gitdir: ../.git/worktrees/feature",
+            "repo/child/AGENTS.md": "WORKTREE"
+          }
+        },
+        {
+          "name": "incomplete-worktree",
+          "files": {
+            "repo/AGENTS.md": "SHADOWED",
+            "repo/.git/worktrees/feature/commondir": "../..",
+            "repo/child/.git": "gitdir: ../.git/worktrees/feature",
+            "repo/child/AGENTS.md": "WORKTREE"
+          }
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "layering",
+        "files": [
+          {
+            "path": "agent/AGENTS.override.md",
+            "content": "GLOBAL"
+          },
+          {
+            "path": "AGENTS.md",
+            "content": "ABOVE_REPO"
+          },
+          {
+            "path": "repo/AGENTS.md",
+            "content": "REPO"
+          },
+          {
+            "path": "repo/child/CLAUDE.md",
+            "content": "LEAF"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "empty-wins",
+        "files": [
+          {
+            "path": "repo/child/AGENTS.override.md",
+            "content": ""
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "missing",
+        "files": [],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "uppercase",
+        "files": [
+          {
+            "path": "repo/child/claude.md",
+            "content": "UPPER"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "file-link",
+        "files": [
+          {
+            "path": "repo/child/AGENTS.md",
+            "content": "LINKED"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "broken-link",
+        "files": [
+          {
+            "path": "repo/child/CLAUDE.md",
+            "content": "FALLBACK"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "directory-candidate",
+        "files": [
+          {
+            "path": "repo/child/CLAUDE.md",
+            "content": "FALLBACK"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "unreadable",
+        "files": [
+          {
+            "path": "repo/child/AGENTS.md",
+            "content": "FALLBACK"
+          }
+        ],
+        "inPrompt": true,
+        "warning": true
+      },
+      {
+        "name": "disabled",
+        "files": [],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "global-dedup",
+        "files": [
+          {
+            "path": "repo/AGENTS.md",
+            "content": "ONCE"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "cwd-link",
+        "files": [
+          {
+            "path": "repo/AGENTS.md",
+            "content": "LEXICAL_PARENT"
+          },
+          {
+            "path": "repo/child/AGENTS.md",
+            "content": "TARGET"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "file-url",
+        "files": [
+          {
+            "path": "repo/child/AGENTS.md",
+            "content": "URL"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "nested-worktree",
+        "files": [
+          {
+            "path": "repo/child/AGENTS.md",
+            "content": "WORKTREE"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      },
+      {
+        "name": "incomplete-worktree",
+        "files": [
+          {
+            "path": "repo/AGENTS.md",
+            "content": "SHADOWED"
+          },
+          {
+            "path": "repo/child/AGENTS.md",
+            "content": "WORKTREE"
+          }
+        ],
+        "inPrompt": true,
+        "warning": false
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:3bcfa93ecdb38e770fed2b2620ad27a6fa14da5d0ed84050f5802bd88f28119a",
+  "observation_hash": "sha256:426730254d58672ce071a60e4def667b07b73fa1945cfa99f333181c2ef92374",
+  "execution_method": "node --experimental-strip-types parity/oracle/context-files.mjs <locked-pi-checkout>",
+  "platform": "posix non-root",
+  "environment": {
+    "node": "v24.12.0",
+    "oracle_entry": "packages/coding-agent/src/core/resource-loader.ts"
+  }
+}

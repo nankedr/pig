@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func contextFileFromDir(dir string) *AgentsFile {
+func contextFileFromDir(dir string, diagnostics *[]ResourceDiagnostic) *AgentsFile {
 	for _, name := range []string{"AGENTS.override.md", "AGENTS.md", "AGENTS.MD", "CLAUDE.md", "CLAUDE.MD"} {
 		path := filepath.Join(dir, name)
 		info, err := os.Stat(path)
@@ -17,6 +17,9 @@ func contextFileFromDir(dir string) *AgentsFile {
 		}
 		content, err := os.ReadFile(path)
 		if err != nil {
+			if diagnostics != nil {
+				*diagnostics = append(*diagnostics, ResourceDiagnostic{Type: "warning", Path: path, Message: fmt.Sprintf("Could not read %s: %v", path, err)})
+			}
 			continue
 		}
 		return &AgentsFile{Path: path, Content: string(content)}
@@ -42,6 +45,9 @@ func shadowedContextFile(cwd string) string {
 			if !filepath.IsAbs(target) {
 				target = filepath.Join(dir, target)
 			}
+			if _, err := os.Stat(filepath.Join(target, "HEAD")); err != nil {
+				return ""
+			}
 			common, err := os.ReadFile(filepath.Join(target, "commondir"))
 			if err != nil {
 				return ""
@@ -63,7 +69,7 @@ func shadowedContextFile(cwd string) string {
 			if err != nil || mainGit != commonDir || !strings.HasPrefix(worktree, main+string(filepath.Separator)) {
 				return ""
 			}
-			if file := contextFileFromDir(dir); file != nil {
+			if file := contextFileFromDir(dir, nil); file != nil {
 				return filepath.Join(main, filepath.Base(file.Path))
 			}
 			return ""
@@ -75,6 +81,10 @@ func shadowedContextFile(cwd string) string {
 }
 
 func LoadProjectContextFiles(ctx context.Context, cwd, agentDir string) ([]AgentsFile, error) {
+	return loadProjectContextFiles(ctx, cwd, agentDir, nil)
+}
+
+func loadProjectContextFiles(ctx context.Context, cwd, agentDir string, diagnostics *[]ResourceDiagnostic) ([]AgentsFile, error) {
 	if ctx == nil {
 		return nil, fmt.Errorf("context files context must not be nil")
 	}
@@ -91,7 +101,7 @@ func LoadProjectContextFiles(ctx context.Context, cwd, agentDir string) ([]Agent
 	}
 	files := []AgentsFile{}
 	seen := map[string]bool{}
-	if file := contextFileFromDir(agentDir); file != nil {
+	if file := contextFileFromDir(agentDir, diagnostics); file != nil {
 		files = append(files, *file)
 		seen[file.Path] = true
 	}
@@ -101,7 +111,7 @@ func LoadProjectContextFiles(ctx context.Context, cwd, agentDir string) ([]Agent
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
-		if file := contextFileFromDir(dir); file != nil && !seen[file.Path] {
+		if file := contextFileFromDir(dir, diagnostics); file != nil && !seen[file.Path] {
 			canonical, err := canonicalTrustPath(file.Path)
 			if err != nil {
 				return nil, err

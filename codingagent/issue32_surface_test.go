@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1758, catalog.StatusInventoried: 744, catalog.StatusPartial: 27, catalog.StatusImplemented: 71}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1753, catalog.StatusInventoried: 744, catalog.StatusPartial: 32, catalog.StatusImplemented: 71}); !reflect.DeepEqual(gotByStatus, want) {
 
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
@@ -1438,6 +1438,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 			if err != nil {
 				return nil, err
 			}
+			issue100PromoteRuntimeEntry(&entry)
 			entries = append(entries, entry)
 		}
 	}
@@ -1446,7 +1447,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
-	if issue97PromoteRuntimeEntry(entry) || issue96PromoteRuntimeEntry(entry) || issue95PromoteRuntimeEntry(entry) || issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
+	if issue100PromoteRuntimeEntry(entry) || issue97PromoteRuntimeEntry(entry) || issue96PromoteRuntimeEntry(entry) || issue95PromoteRuntimeEntry(entry) || issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
 
 		return
 	}
@@ -1582,7 +1583,9 @@ func issue32BehaviorOwnerForReference(reference string) string {
 		return issue76CredentialCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/bash.ts#"), reference == issue32ReferencePrefix+"utils/shell.ts#getShellConfig":
 		return issue80BashCatalogID
-	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/trust-manager.ts#"), reference == issue32ReferencePrefix+"core/resource-loader.ts#loadProjectContextFiles":
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/resource-loader.ts#"):
+		return issue100ContextCatalogID
+	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/trust-manager.ts#"):
 		return issue75TrustCatalogID
 	case strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/edit.ts#"), strings.HasPrefix(reference, issue32ReferencePrefix+"core/tools/edit-diff.ts#"):
 		return issue79EditCatalogID
@@ -1891,7 +1894,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue97HTMLCatalogEntry(), issue96RPCCatalogEntry(), issue95RPCCatalogEntry(), issue94RPCCatalogEntry(), issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry(), issue93BashCatalogEntry(), issue92SummaryCatalogEntry())
+	entries = append(entries, issue100ContextCatalogEntry(), issue97HTMLCatalogEntry(), issue96RPCCatalogEntry(), issue95RPCCatalogEntry(), issue94RPCCatalogEntry(), issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry(), issue93BashCatalogEntry(), issue92SummaryCatalogEntry())
 
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
@@ -1915,6 +1918,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = issue84FindLsEvidence(t)
 	case issue92SummaryCatalogID:
 		descriptors = issue92SummaryEvidence(t)
+	case issue100ContextCatalogID:
+		descriptors = issue100ContextEvidence(t)
 	case issue97HTMLCatalogID:
 		descriptors = issue97HTMLEvidence(t)
 	case issue96RPCCatalogID:
@@ -2298,7 +2303,7 @@ func issue32ModulePartial() *catalog.Partial {
 			"Capability Stubs perform no ambient state, credential, resource, package, network, event, timer, or goroutine side effects",
 		},
 		Unsupported: []string{
-			"full resources/packages (M5), catalog overlays and other Provider adapters (M10), OAuth/ambient auth (M11), images (M12), themes (M5), interactive mode (M6) and extension runtime (M7) remain deferred; seven built-in Tools and direct JSONL RPC are delivered under their behavior contracts; extension-context RPC summary navigation remains M7 (#9)",
+			"remaining local resources (M5) and package ecosystem (#99 deferred), catalog overlays and other Provider adapters (M10), OAuth/ambient auth (M11), images (M12), themes (M5), interactive mode (M6) and extension runtime (M7) remain deferred; seven built-in Tools and direct JSONL RPC are delivered under their behavior contracts; extension-context RPC summary navigation remains M7 (#9)",
 			"surface tests prove API coverage and target resolution, not runtime parity",
 		},
 	}

@@ -1,0 +1,68 @@
+type codingagent.DefaultResourceLoaderOptions
+- CWD string ""
+- AgentDir string ""
+- SettingsManager *codingagent.SettingsManager ""
+- EventBus codingagent.EventBus ""
+- AdditionalExtensionPaths []string ""
+- AdditionalSkillPaths []string ""
+- AdditionalPromptTemplatePaths []string ""
+- AdditionalThemePaths []string ""
+- ExtensionFactories []codingagent.InlineExtension ""
+- NoExtensions bool ""
+- NoSkills bool ""
+- NoPromptTemplates bool ""
+- NoThemes bool ""
+- NoContextFiles bool ""
+- SystemPrompt *string ""
+- AppendSystemPrompt []string ""
+- ExtensionsOverride codingagent.ExtensionHandler ""
+- SkillsOverride codingagent.ExtensionHandler ""
+- PromptsOverride codingagent.ExtensionHandler ""
+- ThemesOverride codingagent.ExtensionHandler ""
+- AgentsFilesOverride codingagent.ExtensionHandler ""
+- SystemPromptOverride codingagent.ExtensionHandler ""
+- AppendSystemPromptOverride codingagent.ExtensionHandler ""
+type codingagent.ResourceLoaderReloadOptions
+- ResolveProjectTrust codingagent.ExtensionHandler ""
+type codingagent.AgentsFile
+- Path string ""
+- Content string ""
+type codingagent.ResourceDiagnostic
+- Type string ""
+- Message string ""
+- Path string ""
+- Collision *codingagent.ResourceCollision ""
+type codingagent.CreateAgentSessionOptions
+- CWD string ""
+- AgentDir string ""
+- ModelRuntime *codingagent.ModelRuntime ""
+- Model *ai.Model ""
+- Provider codingagent.AgentSessionProvider ""
+- StreamFunction agent.StreamFunction ""
+- ThinkingLevel ai.ModelThinkingLevel ""
+- ScopedModels []codingagent.ScopedModel ""
+- NoTools codingagent.NoToolsMode ""
+- Tools []string ""
+- ExcludeTools []string ""
+- AgentTools []agent.ErasedAgentTool ""
+- CustomTools []codingagent.ToolDefinition ""
+- ResourceLoader codingagent.ResourceLoader ""
+- NoContextFiles bool ""
+- SessionManager *codingagent.SessionManager ""
+- SettingsManager *codingagent.SettingsManager ""
+- SessionStartEvent *codingagent.SessionStartEvent ""
+method ExtendResources func(*codingagent.DefaultResourceLoader, codingagent.ResourceExtensionPaths) error
+method GetAgentsFiles func(*codingagent.DefaultResourceLoader) ([]codingagent.AgentsFile, error)
+method GetAppendSystemPrompt func(*codingagent.DefaultResourceLoader) ([]string, error)
+method GetAppendSystemPromptSources func(*codingagent.DefaultResourceLoader) ([]codingagent.ResourcePathSource, error)
+method GetContextFileDiagnostics func(*codingagent.DefaultResourceLoader) []codingagent.ResourceDiagnostic
+method GetExtensions func(*codingagent.DefaultResourceLoader) (codingagent.LoadExtensionsResult, error)
+method GetPrompts func(*codingagent.DefaultResourceLoader) (codingagent.PromptTemplateLoadResult, error)
+method GetSkills func(*codingagent.DefaultResourceLoader) (codingagent.SkillLoadResult, error)
+method GetSystemPrompt func(*codingagent.DefaultResourceLoader) (*string, error)
+method GetSystemPromptSource func(*codingagent.DefaultResourceLoader) (*codingagent.ResourcePathSource, error)
+method GetThemes func(*codingagent.DefaultResourceLoader) (codingagent.ThemeLoadResult, error)
+method LoadProjectTrustExtensions func(*codingagent.DefaultResourceLoader, context.Context) (codingagent.LoadExtensionsResult, error)
+method Reload func(*codingagent.DefaultResourceLoader, context.Context, ...codingagent.ResourceLoaderReloadOptions) error
+func(codingagent.DefaultResourceLoaderOptions) (*codingagent.DefaultResourceLoader, error)
+func(context.Context, string, string) ([]codingagent.AgentsFile, error)

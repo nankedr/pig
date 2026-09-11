@@ -29,6 +29,7 @@ func TestProjectContextLayeringAndWorktreeDedup(t *testing.T) {
 	write(filepath.Join(worktree, "AGENTS.md"), "worktree")
 	write(filepath.Join(cwd, "CLAUDE.md"), "leaf")
 	gitDir := filepath.Join(repo, ".git", "worktrees", "feature")
+	write(filepath.Join(gitDir, "HEAD"), "ref: refs/heads/feature\n")
 	write(filepath.Join(gitDir, "commondir"), "../..\n")
 	write(filepath.Join(worktree, ".git"), "gitdir: "+gitDir+"\n")
 	files, err := codingagent.LoadProjectContextFiles(context.Background(), cwd, agentDir)

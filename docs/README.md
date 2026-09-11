@@ -103,3 +103,5 @@ M4.11 支持从会话执行 Bash，见 [学习材料](learning/m4-session-bash.m
 M4.12 支持基础 JSONL RPC 对话，见 [RPC 生命周期](learning/m4-jsonl-rpc.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-jsonl-rpc.md)。
 
 M4.15 支持安全 HTML 导出，见 [学习材料](learning/m4-html-export.md)、[TypeScript → Go](mappings/typescript-to-go/m4-html-export.md) 和 [Go 示例](../examples/html-export/main.go)。
+
+M5.1 支持 Context File 加载与生成，见[学习材料](learning/m5-context-files.md)、[TypeScript → Go](mappings/typescript-to-go/m5-context-files.md)及[离线示例](../examples/context-files/main.go)。

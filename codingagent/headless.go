@@ -264,6 +264,8 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	}
 	created, err := CreateAgentSession(ctx, CreateAgentSessionOptions{
 		CWD:             options.CWD,
+		AgentDir:        options.AgentDir,
+		NoContextFiles:  options.NoContextFiles,
 		ModelRuntime:    models,
 		ScopedModels:    scoped,
 		Model:           &model,
@@ -299,8 +301,13 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		runtime.session.sessionStartEvent = next.SessionStartEvent
 		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session(), ModelFallbackMessage: runtime.ModelFallbackMessage()}, Services: runtime.Services()}, nil
 	}
+	if loader, ok := created.Session.ResourceLoader().(*DefaultResourceLoader); ok {
+		for _, d := range loader.GetContextFileDiagnostics() {
+			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
+		}
+	}
 	fallback := restoredModelFallback(options.SessionManager, model, options.Model != "")
-	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD, AgentDir: options.AgentDir, ModelRuntime: models, SettingsManager: settings, Diagnostics: diagnostics}, factory, diagnostics, fallback), nil
+	return NewAgentSessionRuntime(created.Session, AgentSessionServices{CWD: options.CWD, AgentDir: options.AgentDir, ModelRuntime: models, SettingsManager: settings, ResourceLoader: created.Session.ResourceLoader(), Diagnostics: diagnostics}, factory, diagnostics, fallback), nil
 }
 
 func configureSessionPrompt(ctx context.Context, session *AgentSession, options CreateHeadlessSessionOptions) error {
@@ -325,16 +332,8 @@ func configureSessionPrompt(ctx context.Context, session *AgentSession, options 
 		promptOptions.CustomPrompt = *options.SystemPrompt
 	}
 	if !options.NoContextFiles {
-		dir := options.AgentDir
-		if dir == "" {
-			dir, err = GetAgentDir()
-			if err != nil {
-				return err
-			}
-		}
-		promptOptions.ContextFiles, err = LoadProjectContextFiles(ctx, options.CWD, dir)
+		promptOptions.ContextFiles, err = session.ResourceLoader().GetAgentsFiles()
 		if err != nil {
-			session.Dispose()
 			return err
 		}
 	}

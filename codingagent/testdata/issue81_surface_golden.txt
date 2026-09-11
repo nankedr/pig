@@ -32,6 +32,7 @@ fields:
 - AgentTools []agent.ErasedAgentTool tag=""
 - CustomTools []codingagent.ToolDefinition tag=""
 - ResourceLoader codingagent.ResourceLoader tag=""
+- NoContextFiles bool tag=""
 - SessionManager *codingagent.SessionManager tag=""
 - SettingsManager *codingagent.SettingsManager tag=""
 - SessionStartEvent *codingagent.SessionStartEvent tag=""

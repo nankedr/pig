@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -729,6 +730,16 @@ func defaultSessionDir(cwd, agentDir string) string {
 }
 
 func resolveSessionPath(path string) (string, error) {
+	if strings.HasPrefix(path, "file:") {
+		u, err := url.Parse(path)
+		if err != nil {
+			return "", err
+		}
+		if u.Host != "" && u.Host != "localhost" || !filepath.IsAbs(u.Path) {
+			return "", fmt.Errorf("invalid local file URL: %s", path)
+		}
+		path = u.Path
+	}
 	if path == "~" || strings.HasPrefix(path, "~/") || strings.HasPrefix(path, `~\`) {
 		home, err := os.UserHomeDir()
 		if err != nil {
