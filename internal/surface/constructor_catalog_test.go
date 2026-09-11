@@ -403,12 +403,16 @@ func assertCodingAgentConstructorMetadata(t *testing.T, entriesByID map[string][
 		if len(entry.Evidence) == 0 {
 			t.Errorf("scaffolded Coding Agent constructor %s has no target-resolution evidence", entry.ID)
 		}
+	case catalog.StatusPartial:
+		if entry.ID != "constructor:codingagent/src/core/resource-loader.ts#DefaultResourceLoader" || entry.Partial == nil || len(entry.Partial.Supported) == 0 || len(entry.Partial.Unsupported) == 0 || len(entry.Evidence) == 0 {
+			t.Errorf("partial Coding Agent constructor %s needs reviewed local Context File scope and evidence", entry.ID)
+		}
 	case catalog.StatusInventoried:
 		if len(entry.Evidence) != 0 {
 			t.Errorf("inventoried Coding Agent constructor %s claims behavioral evidence", entry.ID)
 		}
 	default:
-		t.Errorf("Coding Agent constructor %s status = %q, want scaffolded or inventoried", entry.ID, entry.Status)
+		t.Errorf("Coding Agent constructor %s status = %q, want scaffolded, inventoried or reviewed partial", entry.ID, entry.Status)
 	}
 }
 

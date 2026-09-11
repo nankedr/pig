@@ -39,6 +39,10 @@ type CreateAgentSessionFromServicesOptions struct {
 }
 
 func CreateAgentSessionServices(ctx context.Context, options CreateAgentSessionServicesOptions) (AgentSessionServices, error) {
+	return createAgentSessionServices(ctx, options, nil)
+}
+
+func createAgentSessionServices(ctx context.Context, options CreateAgentSessionServicesOptions, resourceLoader ResourceLoader) (AgentSessionServices, error) {
 	if len(options.ExtensionFlagValues) > 0 || !reflect.ValueOf(options.ResourceLoaderReloadOptions).IsZero() {
 		return AgentSessionServices{}, notImplemented("CreateAgentSessionServices.Resources")
 	}
@@ -74,14 +78,17 @@ func CreateAgentSessionServices(ctx context.Context, options CreateAgentSessionS
 	if err = checkHeadlessSettings(settings); err != nil {
 		return AgentSessionServices{}, err
 	}
-	loaderOptions := options.ResourceLoaderOptions
-	loaderOptions.CWD, loaderOptions.AgentDir = cwd, dir
-	loader, err := NewDefaultResourceLoader(loaderOptions)
-	if err != nil {
-		return AgentSessionServices{}, err
-	}
-	if err = loader.Reload(ctx); err != nil {
-		return AgentSessionServices{}, err
+	if resourceLoader == nil {
+		loaderOptions := options.ResourceLoaderOptions
+		loaderOptions.CWD, loaderOptions.AgentDir = cwd, dir
+		loader, err := NewDefaultResourceLoader(loaderOptions)
+		if err != nil {
+			return AgentSessionServices{}, err
+		}
+		if err = loader.Reload(ctx); err != nil {
+			return AgentSessionServices{}, err
+		}
+		resourceLoader = loader
 	}
 	runtime := options.ModelRuntime
 	if runtime == nil {
@@ -90,7 +97,7 @@ func CreateAgentSessionServices(ctx context.Context, options CreateAgentSessionS
 			return AgentSessionServices{}, err
 		}
 	}
-	result := AgentSessionServices{CWD: cwd, AgentDir: dir, ModelRuntime: runtime, SettingsManager: settings, ResourceLoader: loader}
+	result := AgentSessionServices{CWD: cwd, AgentDir: dir, ModelRuntime: runtime, SettingsManager: settings, ResourceLoader: resourceLoader}
 	diagnostics, err := settings.DrainErrors()
 	if err != nil {
 		return AgentSessionServices{}, err
@@ -98,8 +105,10 @@ func CreateAgentSessionServices(ctx context.Context, options CreateAgentSessionS
 	for _, d := range diagnostics {
 		result.Diagnostics = append(result.Diagnostics, AgentSessionRuntimeDiagnostic{Type: "warning", Message: d.Error()})
 	}
-	for _, d := range loader.GetContextFileDiagnostics() {
-		result.Diagnostics = append(result.Diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
+	if loader, ok := resourceLoader.(*DefaultResourceLoader); ok {
+		for _, d := range loader.GetContextFileDiagnostics() {
+			result.Diagnostics = append(result.Diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
+		}
 	}
 	return result, nil
 }

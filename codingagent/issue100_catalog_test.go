@@ -24,6 +24,7 @@ func issue100ContextEvidence(t *testing.T) []issue32ModuleEvidenceDescriptor {
 	for _, e := range []struct{ kind, path, run string }{
 		{"oracle", "parity/oracle/fixtures/context-files.json", "node --experimental-strip-types parity/oracle/context-files.mjs <locked-pi-checkout> --check"},
 		{"go-test", "codingagent/issue100_context_test.go", "go test -race ./codingagent -run '^TestContextFiles' -count=1"},
+		{"go-test", "codingagent/issue100_injected_test.go", "go test ./codingagent -run '^TestContextFilesRuntimeInjectionDoesNotDiscover$' -count=1"},
 		{"go-test", "cmd/pig/issue100_context_test.go", "go test ./cmd/pig -run '^TestPigContextFiles' -count=1"},
 		{"go-test", "cmd/pig/issue75_process_test.go", "go test ./cmd/pig -run '^TestPigUntrustedProjectHasNoSensitiveReadsOrEffects$' -count=1"},
 		{"go-test", "codingagent/issue100_surface_test.go", "go test ./codingagent -run '^TestIssue100ContextAPISnapshot$' -count=1"},

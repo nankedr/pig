@@ -275,14 +275,21 @@ func TestContextFilesSessionServices(t *testing.T) {
 	received := make(chan string, 1)
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var body struct {
-			Messages []struct{ Role, Content string }
+			Messages []struct {
+				Role    string
+				Content json.RawMessage
+			}
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			t.Error(err)
 		}
 		for _, m := range body.Messages {
 			if m.Role == "system" {
-				received <- m.Content
+				var prompt string
+				if err := json.Unmarshal(m.Content, &prompt); err != nil {
+					t.Error(err)
+				}
+				received <- prompt
 			}
 		}
 		w.Header().Set("Content-Type", "text/event-stream")

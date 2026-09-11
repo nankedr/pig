@@ -80,7 +80,7 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 	runtimePath := stream == nil
 	var fallback *string
 	if stream == nil {
-		services, err := CreateAgentSessionServices(ctx, CreateAgentSessionServicesOptions{CWD: config.CWD, AgentDir: config.AgentDir, ModelRuntime: config.ModelRuntime, SettingsManager: config.SettingsManager, ResourceLoaderOptions: DefaultResourceLoaderOptions{NoContextFiles: config.NoContextFiles}})
+		services, err := createAgentSessionServices(ctx, CreateAgentSessionServicesOptions{CWD: config.CWD, AgentDir: config.AgentDir, ModelRuntime: config.ModelRuntime, SettingsManager: config.SettingsManager, ResourceLoaderOptions: DefaultResourceLoaderOptions{NoContextFiles: config.NoContextFiles}}, config.ResourceLoader)
 		if err != nil {
 			return CreateAgentSessionResult{}, err
 		}
