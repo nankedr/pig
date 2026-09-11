@@ -2,7 +2,7 @@
 
 Pig V1 使用双来源对等基线：Code Baseline 是 Pi `936aff00918de1187f085f123c2812d8f2d67745`，Catalog Baseline 是 Pi v0.84.1 官方 source tar（commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model）。两者相差 40 个 commit，因此这不是 fixed-run parity；详见 ADR-0014。主学习路线一次只推进一个里程碑前沿；并行支线必须重新集成到持续可运行的 `pig`。
 
-当前 Milestone Frontier：**M3**。M2/v0.2.0 在 M1 冻结契约上集成 Legacy AI、Agent 与 Telemetry 高级语义；范围、复现命令和剩余边界见 [M2 集成与冻结](learning/m2-freeze.md)。逐符号状态仍以 Parity Catalog 为准，明确说明范围的 `partial` 不代表全量 Pi 对等。
+当前 Milestone Frontier：**M5**。M4/v0.4.0 已完成 Headless 编排、JSONL RPC 和安全 HTML export；范围与证据见 [M4 集成与冻结](learning/m4-freeze.md)。M5 按 [ADR-0034](adr/0034-defer-package-ecosystem.md) 先交付本地资源，包生态延期但保留 V1 范围。逐符号状态仍以 Parity Catalog 为准，明确说明范围的 `partial` 不代表全量 Pi 对等。
 
 | 阶段 | 可验收产物 |
 | --- | --- |
@@ -11,7 +11,7 @@ Pig V1 使用双来源对等基线：Code Baseline 是 Pi `936aff00918de1187f085
 | M2 / v0.2.0 | 扩展 legacy AI/Agent 未触达分支：thinking/signature、deferred、跨 Provider 转换、usage/cost/overflow/cache、Agent steering/follow-up 队列、proxy、Telemetry、compat/deprecated API |
 | M3 / v0.3.0 | 本地持久化 Coding Agent：v3 JSONL、恢复/fork、全局 settings、最小 Project Trust 后的项目 settings、基础 model/auth runtime、完整 read/bash/edit/write |
 | M4 / v0.4.0 | Coding Agent Headless 编排：grep/find/ls、用户消息投递与 steer/follow-up 集成、整轮 Provider error retry、压缩、分支、树导航、stats、model/tool 切换、JSONL RPC 模式、HTML export |
-| M5 / v0.5.0 | 资源与包系统：AGENTS、system prompt、templates、skills、themes、完整 trust/resource 判定、npm/git package 与 lifecycle；扩展 entry 仅发现并明确未实现 |
+| M5 / v0.5.0 | 本地资源：Context File、system prompt、templates、skills、themes、项目信任、来源优先级、冲突诊断和重载；本地扩展 entry 仅发现并明确未实现；包生态按 ADR-0034 延期 |
 | M6 / v0.6.0 | 文本 TUI 与 Interactive 模式：布局、编辑器、按键、滚动、主题、对话框、session/model selectors |
 | M7 / v0.7.0 | 扩展系统：先专项设计并冻结运行时/ABI，再让 M5 已发现的扩展 entry 与完整 Extension Surface 可运行 |
 | M8 / v0.8.0 | 忠实复刻 AgentHarness v4：memory/JSONL、reducer、compaction substrate、工具及上游相同的未实现操作 |
@@ -21,6 +21,8 @@ Pig V1 使用双来源对等基线：Code Baseline 是 Pi `936aff00918de1187f085
 | M12 / v0.12.0 | 图片体系：image model/generation、消息图片、工具结果图片、处理与终端显示 |
 | M13 / v0.13.0 | 平台与发布闭环：六目标构建、原生行为、剪贴板、外部命令、资产、安装包、更新与第三方声明 |
 | M14 / v1.0.0 | 只关闭对等缺口：全量 Parity Catalog、测试、示例、文档、许可和发布门禁，不新增功能 |
+
+V1 未排期范围：[包生态兼容 #99](https://github.com/nankedr/pig/issues/99)，包含 package manifest、本地资源包、npm/git 管理、依赖及 lifecycle。它不阻塞调整后的 M5/M6，也不自动归入 M7/M14；出现明确包需求、团队版本管理需求或扩展分发需求时重新排期，完整 V1 验收仍要求关闭该缺口。
 
 M0 的普通集成入口是纯离线的 `make m0-gate`，只重放已提交 fixture，不读取 Pi checkout。完整冻结使用 `make m0-freeze PIG_PI_ORACLE_CHECKOUT=/path/to/prepared/pi PIG_PI_SOURCE_CHECKOUT=/path/to/pristine/pi`；前者预装依赖并构建 `dist`，后者必须没有 tracked、untracked 或 ignored 状态，不能互相复用。准备命令见 [M0 兼容骨架](learning/m0-compatibility-skeleton.md#冻结门禁)。
 

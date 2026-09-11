@@ -7,7 +7,7 @@
 
 ## Summary
 
-- Total entries: 9669
+- Total entries: 9670
 
 | Status | Count |
 | --- | --- |
@@ -16,7 +16,7 @@
 | partial | 290 |
 | implemented | 123 |
 | verified | 167 |
-| deferred | 2 |
+| deferred | 3 |
 
 ## Entries by module
 
@@ -8055,6 +8055,7 @@
 | contract:cli/pig/auth-help | verified | M0 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | contract:session/migration | verified | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | deferred-extension-runtime | deferred | M7 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| deferred-package-ecosystem | deferred | M5 | contract | github.com/nankedr/pig/codingagent.DefaultPackageManager | coding-agent |
 | deferred-pig-server | deferred | M0 | contract | github.com/nankedr/pig/codingagent | server |
 
 ### protocol

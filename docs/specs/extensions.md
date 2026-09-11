@@ -59,15 +59,21 @@ Parity Catalog 必须完整盘点 Pi 扩展可以观察、拦截或增加的能�
 
 Headless、RPC 和资源路径遇到扩展能力时保持相同边界。已有核心 Provider callback 和 Agent hook 必须为未来扩展保留语义，但当前不能据此宣称扩展可加载。
 
-### M5：包与资源，不执行扩展
+### M5：本地资源，不执行扩展
 
-完整实现 npm/git package manifest、安装、更新、依赖、lifecycle script、资源 symlink、Project Trust 和 global/project precedence。包内 skill、prompt、theme 等非扩展资源按 Pi 规则可用；扩展 entry 只发现和登记，仍返回 Stub。
+按 [ADR-0034](../adr/0034-defer-package-ecosystem.md)，M5 完成本地 Context File、system prompt、Skill、Prompt Template、Theme、资源 symlink、Project Trust、来源优先级、冲突诊断和重载。资源格式及已声明路径保持 Pi 语义兼容；本地目录和显式路径中的扩展 entry 只发现和登记，执行仍返回 Stub。
+
+Pi package manifest、本地资源包登记、npm/git 安装更新和移除、依赖及 lifecycle 从 M5 延期，由 [#99](https://github.com/nankedr/pig/issues/99) 保留 V1 未完成范围，当前未排期，不自动归入 M7/M14。既有包 API 保持明确未实现；资源扫描不能因此隐式安装依赖或把包标记为已生效。资源获取后可以通过具体资源路径使用；依赖生成步骤或辅助脚本的资源不保证仅靠 Go 二进制可用。
 
 Node、npm、pnpm、Bun 或用户配置 wrapper 只在用户明确触发需要它们的包工作流时成为外部依赖。普通 Pig 运行不依赖这些工具。受信任包及 lifecycle script 是 host code，不受 package-root 沙箱限制。
+
+上一段是后续包工作流的运行环境约束，不表示 M5 已支持该工作流。完整包兼容的 trust、Offline 和宿主执行契约继续保留，待排期时实施。
 
 ### M7：先决策，再实现
 
 M7 的第一个门禁是专项调查、grilling 和 ADR，不是编码。只有用户接受运行时方案后，才冻结并实现 ABI，使 M5 已发现的扩展 entry 与完整 Extension Surface 真正运行。
+
+运行时决策同时重新评估分发需求，但不会自动把 #99 纳入 M7；本地受控扩展可用于运行时验证。
 
 ## M7 方案评估维度
 

@@ -6,6 +6,8 @@ M4.1 已支持显式 grep 搜索并继续编码任务，见 [grep 学习材料](
 
 Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.4.0 集成 M4 Headless 编排：七工具、消息投递与重试、动态配置、压缩与分支摘要、统计、并发 JSONL RPC 和安全 HTML export，并保留 M1–M3 的持久化、互操作与恢复能力。
 
+当前推进 [M5 本地资源](https://github.com/nankedr/pig/issues/7)。Pi 包生态兼容按 [ADR-0034](docs/adr/0034-defer-package-ecosystem.md) 延期，由 [#99](https://github.com/nankedr/pig/issues/99) 保留 V1 未完成范围，尚未排期。
+
 M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回读](docs/learning/m3-write-tool.md)。
 M3.9 支持显式 edit 精确/模糊多区域替换、准确 diff 和回读，见 [edit 与回读](docs/learning/m3-edit-tool.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m3-edit-tool.md)。
 M3.10 支持显式 bash 执行宿主命令、进程树取消与完整输出保留，见 [bash 与回读](docs/learning/m3-bash-tool.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m3-bash-tool.md)。

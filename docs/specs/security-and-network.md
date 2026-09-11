@@ -47,6 +47,8 @@ Bash 使用宿主 shell 并继承完整进程环境，因而可以读取环境�
 
 ## 4. Package、resource 与 extension 边界
 
+按 [ADR-0034](../adr/0034-defer-package-ecosystem.md)，M5 仅实现本地资源，package manifest、安装更新、依赖及 lifecycle 由 [#99](https://github.com/nankedr/pig/issues/99) 延期跟踪。以下 package 契约保留为后续实现要求，不表示当前入口可执行。
+
 项目 scope 的 package/resource 配置、缺失依赖安装和 extension 执行都必须先通过 project trust；user/global/CLI 显式来源按用户代码处理。M7 前 extension 入口只做发现和 inventory，执行相关操作返回 `ErrNotImplemented`。
 
 npm/git 安装复刻普通依赖与 lifecycle script 语义，不默认加 `--ignore-scripts`。受信任 package 的 manifest resource 路径和 symlink 可以指向 package root 外部；Pig 不额外施加 package-root sandbox 或 realpath containment。仅受管安装目录的目标路径做必要的词法 containment，防止安装器自身覆盖无关位置；这不把 package 变成安全数据。

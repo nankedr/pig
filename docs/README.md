@@ -34,7 +34,8 @@ Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学
 - [CLI、存储与平台契约](specs/cli-storage-and-platform.md)：命令模式、RPC/Remote 区分、路径、Session、Shell 和平台边界。
 - [安全与网络契约](specs/security-and-network.md)：Project Trust、无 sandbox 的宿主模型、凭证、Offline 和外联边界。
 - [模型目录规范](specs/model-catalog.md)：双来源 Catalog Baseline、Snapshot 校验、运行时 overlay 和生成管线。
-- [扩展系统规范](specs/extensions.md)：Extension Surface、早期 Stub、M5 package 边界和 M7 ABI 决策门禁。
+- [扩展系统规范](specs/extensions.md)：Extension Surface、早期 Stub、M5 本地资源边界、包生态延期和 M7 ABI 决策门禁。
+- [M5 包生态延期决策](adr/0034-defer-package-ecosystem.md)：本地资源优先，包生态保留 V1 范围并另行排期。
 
 ## 决策记录
 
