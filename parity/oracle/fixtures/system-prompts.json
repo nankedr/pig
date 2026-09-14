@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/resource-loader.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/codingagent/system-prompts",
+    "catalog_id": "contract:codingagent/system-prompts",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "name": "default",
+          "files": {}
+        },
+        {
+          "name": "global",
+          "files": {
+            "agent/SYSTEM.md": "GLOBAL",
+            "agent/APPEND_SYSTEM.md": "GLOBAL_APPEND"
+          }
+        },
+        {
+          "name": "trusted-project",
+          "trusted": true,
+          "files": {
+            "agent/SYSTEM.md": "GLOBAL",
+            "agent/APPEND_SYSTEM.md": "GLOBAL_APPEND",
+            "repo/.pi/SYSTEM.md": "PROJECT",
+            "repo/.pi/APPEND_SYSTEM.md": "PROJECT_APPEND",
+            "repo/AGENTS.md": "CONTEXT"
+          }
+        },
+        {
+          "name": "untrusted-project",
+          "files": {
+            "agent/SYSTEM.md": "GLOBAL",
+            "agent/APPEND_SYSTEM.md": "GLOBAL_APPEND",
+            "repo/.pi/SYSTEM.md": "SECRET",
+            "repo/.pi/APPEND_SYSTEM.md": "SECRET_APPEND"
+          }
+        },
+        {
+          "name": "explicit-values",
+          "system": "EXPLICIT",
+          "append": [
+            "FIRST",
+            "",
+            "SECOND"
+          ],
+          "files": {
+            "agent/SYSTEM.md": "GLOBAL",
+            "agent/APPEND_SYSTEM.md": "GLOBAL_APPEND"
+          }
+        },
+        {
+          "name": "explicit-files",
+          "system": "$ROOT/repo/.pi/SYSTEM.md",
+          "append": [
+            "$ROOT/repo/.pi/APPEND_SYSTEM.md",
+            "TAIL"
+          ],
+          "files": {
+            "repo/.pi/SYSTEM.md": "EXPLICIT_FILE",
+            "repo/.pi/APPEND_SYSTEM.md": "EXPLICIT_APPEND"
+          }
+        },
+        {
+          "name": "explicit-empty",
+          "system": "",
+          "append": [],
+          "files": {
+            "agent/SYSTEM.md": "IGNORED",
+            "agent/APPEND_SYSTEM.md": "IGNORED_APPEND"
+          }
+        },
+        {
+          "name": "empty-files",
+          "trusted": true,
+          "files": {
+            "repo/.pi/SYSTEM.md": "",
+            "repo/.pi/APPEND_SYSTEM.md": "",
+            "agent/SYSTEM.md": "IGNORED",
+            "agent/APPEND_SYSTEM.md": "IGNORED_APPEND"
+          }
+        },
+        {
+          "name": "missing-path-is-value",
+          "system": "./missing-system.md",
+          "append": [
+            "./missing-append.md"
+          ],
+          "files": {}
+        },
+        {
+          "name": "directory-failure",
+          "system": "$ROOT/directory",
+          "append": [
+            "$ROOT/directory"
+          ],
+          "files": {
+            "directory/child": "x"
+          }
+        },
+        {
+          "name": "unreadable",
+          "system": "$ROOT/private.md",
+          "append": [
+            "$ROOT/private.md"
+          ],
+          "unreadable": "private.md",
+          "files": {
+            "private.md": "SECRET"
+          }
+        },
+        {
+          "name": "disabled-resources",
+          "disabled": true,
+          "files": {
+            "agent/SYSTEM.md": "GLOBAL",
+            "agent/APPEND_SYSTEM.md": "GLOBAL_APPEND",
+            "repo/AGENTS.md": "IGNORED_CONTEXT"
+          }
+        },
+        {
+          "name": "relative-path",
+          "system": "./relative.md",
+          "append": [
+            "./relative.md"
+          ],
+          "files": {
+            "repo/relative.md": "RELATIVE"
+          }
+        },
+        {
+          "name": "file-url-is-value",
+          "system": "file:///missing.md",
+          "append": [
+            "~/missing.md"
+          ],
+          "files": {}
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "default",
+        "system": null,
+        "append": [],
+        "source": null,
+        "appendSources": [],
+        "warning": false,
+        "custom": false,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "global",
+        "system": "GLOBAL",
+        "append": [
+          "GLOBAL_APPEND"
+        ],
+        "source": "$ROOT/agent/SYSTEM.md",
+        "appendSources": [
+          "$ROOT/agent/APPEND_SYSTEM.md"
+        ],
+        "warning": false,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "trusted-project",
+        "system": "PROJECT",
+        "append": [
+          "PROJECT_APPEND"
+        ],
+        "source": "$ROOT/repo/.pi/SYSTEM.md",
+        "appendSources": [
+          "$ROOT/repo/.pi/APPEND_SYSTEM.md"
+        ],
+        "warning": false,
+        "custom": true,
+        "context": true,
+        "appended": true
+      },
+      {
+        "name": "untrusted-project",
+        "system": "GLOBAL",
+        "append": [
+          "GLOBAL_APPEND"
+        ],
+        "source": "$ROOT/agent/SYSTEM.md",
+        "appendSources": [
+          "$ROOT/agent/APPEND_SYSTEM.md"
+        ],
+        "warning": false,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "explicit-values",
+        "system": "EXPLICIT",
+        "append": [
+          "FIRST",
+          "SECOND"
+        ],
+        "source": null,
+        "appendSources": [],
+        "warning": false,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "explicit-files",
+        "system": "EXPLICIT_FILE",
+        "append": [
+          "EXPLICIT_APPEND",
+          "TAIL"
+        ],
+        "source": "$ROOT/repo/.pi/SYSTEM.md",
+        "appendSources": [
+          "$ROOT/repo/.pi/APPEND_SYSTEM.md"
+        ],
+        "warning": false,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "explicit-empty",
+        "system": null,
+        "append": [],
+        "source": null,
+        "appendSources": [],
+        "warning": false,
+        "custom": false,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "empty-files",
+        "system": "",
+        "append": [
+          ""
+        ],
+        "source": "$ROOT/repo/.pi/SYSTEM.md",
+        "appendSources": [
+          "$ROOT/repo/.pi/APPEND_SYSTEM.md"
+        ],
+        "warning": false,
+        "custom": false,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "missing-path-is-value",
+        "system": "./missing-system.md",
+        "append": [
+          "./missing-append.md"
+        ],
+        "source": null,
+        "appendSources": [],
+        "warning": false,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "directory-failure",
+        "system": "$ROOT/directory",
+        "append": [
+          "$ROOT/directory"
+        ],
+        "source": "$ROOT/directory",
+        "appendSources": [
+          "$ROOT/directory"
+        ],
+        "warning": true,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "unreadable",
+        "system": "$ROOT/private.md",
+        "append": [
+          "$ROOT/private.md"
+        ],
+        "source": "$ROOT/private.md",
+        "appendSources": [
+          "$ROOT/private.md"
+        ],
+        "warning": true,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "disabled-resources",
+        "system": "GLOBAL",
+        "append": [
+          "GLOBAL_APPEND"
+        ],
+        "source": "$ROOT/agent/SYSTEM.md",
+        "appendSources": [
+          "$ROOT/agent/APPEND_SYSTEM.md"
+        ],
+        "warning": false,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "relative-path",
+        "system": "RELATIVE",
+        "append": [
+          "RELATIVE"
+        ],
+        "source": "$ROOT/repo/relative.md",
+        "appendSources": [
+          "$ROOT/repo/relative.md"
+        ],
+        "warning": false,
+        "custom": true,
+        "context": false,
+        "appended": true
+      },
+      {
+        "name": "file-url-is-value",
+        "system": "file:///missing.md",
+        "append": [
+          "~/missing.md"
+        ],
+        "source": null,
+        "appendSources": [],
+        "warning": false,
+        "custom": true,
+        "context": false,
+        "appended": true
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:367d26f7d990acede6782eb9ad3a5dc30fa75a84cd80b7ae670c3fa6812f0287",
+  "observation_hash": "sha256:7073e57324fd94b75373149e4d90eea70c4f02ead97e7e2f8ac8517193a63570",
+  "execution_method": "node --experimental-strip-types parity/oracle/system-prompts.mjs <locked-pi-checkout>",
+  "platform": "posix non-root",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/resource-loader.ts"
+  }
+}

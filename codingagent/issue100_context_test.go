@@ -191,6 +191,9 @@ type context100Loader struct {
 	err   error
 }
 
+func (l context100Loader) GetSystemPrompt() (*string, error)        { return nil, nil }
+func (l context100Loader) GetAppendSystemPrompt() ([]string, error) { return []string{}, nil }
+
 func (l context100Loader) GetAgentsFiles() ([]codingagent.AgentsFile, error) { return l.files, l.err }
 
 func TestContextFilesInjectedLoaderAndDisable(t *testing.T) {
@@ -258,7 +261,7 @@ func TestContextFilesReloadAndOwnership(t *testing.T) {
 		t.Fatalf("reload: %v", after)
 	}
 	for _, fn := range []func() error{
-		func() error { _, err := loader.GetSkills(); return err }, func() error { _, err := loader.GetPrompts(); return err }, func() error { _, err := loader.GetThemes(); return err }, func() error { _, err := loader.GetExtensions(); return err }, func() error { _, err := loader.GetSystemPrompt(); return err },
+		func() error { _, err := loader.GetSkills(); return err }, func() error { _, err := loader.GetPrompts(); return err }, func() error { _, err := loader.GetThemes(); return err }, func() error { _, err := loader.GetExtensions(); return err },
 	} {
 		if err := fn(); !errors.Is(err, codingagent.ErrNotImplemented) {
 			t.Fatalf("unsupported query: %v", err)
@@ -271,6 +274,8 @@ func TestContextFilesSessionServices(t *testing.T) {
 	dir := t.TempDir()
 	agentDir := t.TempDir()
 	context100Write(t, filepath.Join(dir, "AGENTS.md"), "SERVICES_CONTEXT")
+	context100Write(t, filepath.Join(agentDir, "SYSTEM.md"), "SERVICES_SYSTEM")
+	context100Write(t, filepath.Join(agentDir, "APPEND_SYSTEM.md"), "SERVICES_APPEND")
 	models, _, _ := config87Runtime(t)
 	received := make(chan string, 1)
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -316,7 +321,7 @@ func TestContextFilesSessionServices(t *testing.T) {
 	}
 	select {
 	case prompt := <-received:
-		if !strings.Contains(prompt, "SERVICES_CONTEXT") {
+		if !strings.Contains(prompt, "SERVICES_CONTEXT") || !strings.HasPrefix(prompt, "SERVICES_SYSTEM\n\nSERVICES_APPEND") {
 			t.Fatalf("missing services context: %s", prompt)
 		}
 	default:

@@ -25,6 +25,7 @@ type codingagent.CreateHeadlessSessionOptions
 - ExcludeTools []string ""
 - NoTools codingagent.NoToolsMode ""
 - SystemPrompt *string ""
+- AppendSystemPrompt []string ""
 - SessionManager *codingagent.SessionManager ""
 method Delete func(*codingagent.AuthStorage, context.Context, ai.ProviderID, ai.AuthOperationOptions) error
 method List func(*codingagent.AuthStorage, context.Context, ai.AuthOperationOptions) ([]ai.CredentialInfo, error)

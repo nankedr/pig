@@ -8,11 +8,11 @@
 
 `Session.ResourceLoader().GetAgentsFiles()` 提供独立的来源/内容快照。默认加载器的 `GetContextFileDiagnostics()` 返回读取诊断；Headless runtime 与 Session services 将诊断暴露为 warning，CLI 写到 stderr。空文件和缺失文件不报警。
 
-构造默认加载器不读取 Context File，调用 `Reload(ctx)` 才更新文件和诊断快照。SDK 自动构造并加载默认实例；显式 `ResourceLoader` 由调用者准备，SDK 只使用 `GetAgentsFiles()`，不会调用其 Reload 或不相关资源方法。`CreateAgentSessionOptions.NoContextFiles`、Headless 的同名选项和 CLI `--no-context-files` / `-nc` 禁止加载与注入；若调用者自己提前加载了注入实例，SDK 无法撤销那次读取。
+构造默认加载器不读取 Context File，调用 `Reload(ctx)` 才更新文件和诊断快照。SDK 自动构造并加载默认实例；显式 `ResourceLoader` 由调用者准备，SDK 使用 `GetAgentsFiles()` 及 M5.2 的 system/append prompt getter，不会调用其 Reload 或其他资源方法。`CreateAgentSessionOptions.NoContextFiles`、Headless 的同名选项和 CLI `--no-context-files` / `-nc` 禁止加载与注入；若调用者自己提前加载了注入实例，SDK 无法撤销那次读取。
 
 项目信任复用 M3：[ADR-0010](../adr/0010-trust-and-host-security.md) 规定先判断信任再读取敏感项目设置。拒绝信任仍加载 Context File；它们进入模型指令，不代表 Tool 审批或文件系统 Sandbox。
 
-本票只实现 Context File。Skill、Prompt Template、Theme、system/append prompt 资源加载及 ExtendResources 保持显式未实现；现有 CLI 显式 system prompt 仍可使用。Opaque override 和扩展运行时等待 M7 决策。按照 [#99](https://github.com/nankedr/pig/issues/99) 延期包生态，不构造默认包管理器、不扫描 manifest 后隐式安装，也不运行 lifecycle。`Reload` 更新加载器快照，已有 Session 的实时重载编排另行交付。
+本票实现 Context File；后续 [M5.2](m5-system-prompts.md) 已交付 system/append prompt 资源加载。Skill、Prompt Template、Theme 及 ExtendResources 保持显式未实现。Opaque override 和扩展运行时等待 M7 决策。按照 [#99](https://github.com/nankedr/pig/issues/99) 延期包生态，不构造默认包管理器、不扫描 manifest 后隐式安装，也不运行 lifecycle。`Reload` 更新加载器快照，已有 Session 的实时重载编排另行交付。
 
 运行离线示例：
 

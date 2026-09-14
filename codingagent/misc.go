@@ -503,22 +503,23 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		}
 	}
 	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
-		CWD:             cwd,
-		Models:          parsed.Models,
-		Offline:         ResolveOffline(parsed.Offline),
-		NoContextFiles:  parsed.NoContextFiles,
-		Provider:        ai.ProviderID(optionalHeadlessString(parsed.Provider)),
-		Model:           optionalHeadlessString(parsed.Model),
-		APIKey:          parsed.APIKey,
-		Environment:     environment,
-		BaseURL:         baseURL,
-		Thinking:        parsed.Thinking,
-		Tools:           parsed.Tools,
-		ExcludeTools:    parsed.ExcludeTools,
-		NoTools:         noTools,
-		SystemPrompt:    parsed.SystemPrompt,
-		SessionManager:  manager,
-		SettingsManager: settings,
+		CWD:                cwd,
+		Models:             parsed.Models,
+		Offline:            ResolveOffline(parsed.Offline),
+		NoContextFiles:     parsed.NoContextFiles,
+		Provider:           ai.ProviderID(optionalHeadlessString(parsed.Provider)),
+		Model:              optionalHeadlessString(parsed.Model),
+		APIKey:             parsed.APIKey,
+		Environment:        environment,
+		BaseURL:            baseURL,
+		Thinking:           parsed.Thinking,
+		Tools:              parsed.Tools,
+		ExcludeTools:       parsed.ExcludeTools,
+		NoTools:            noTools,
+		SystemPrompt:       parsed.SystemPrompt,
+		AppendSystemPrompt: parsed.AppendSystemPrompt,
+		SessionManager:     manager,
+		SettingsManager:    settings,
 	})
 	if err != nil {
 		return err
@@ -546,8 +547,6 @@ func unsupportedHeadlessOperation(parsed Args) string {
 		return "headless.file-arguments"
 	case parsed.Resume:
 		return "headless.session-persistence"
-	case len(parsed.AppendSystemPrompt) != 0:
-		return "headless.append-system-prompt"
 	case len(parsed.Extensions) != 0 || len(parsed.Skills) != 0 || len(parsed.PromptTemplates) != 0 || len(parsed.Themes) != 0:
 		return "headless.resources"
 	default:

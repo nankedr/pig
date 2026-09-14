@@ -3,6 +3,7 @@ package codingagent
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sync"
 )
 
@@ -59,7 +60,7 @@ type ResourceLoaderReloadOptions struct {
 	ResolveProjectTrust ExtensionHandler
 }
 
-// DefaultResourceLoaderOptions supports local Context Files; other resource inputs remain explicit stubs.
+// DefaultResourceLoaderOptions supports local Context Files and system prompts.
 type DefaultResourceLoaderOptions struct {
 	CWD      string
 	AgentDir string
@@ -106,15 +107,23 @@ type ResourceLoader interface {
 }
 
 type DefaultResourceLoader struct {
-	mu             sync.RWMutex
-	cwd, agentDir  string
-	noContextFiles bool
-	files          []AgentsFile
-	diagnostics    []ResourceDiagnostic
+	mu                sync.RWMutex
+	cwd, agentDir     string
+	noContextFiles    bool
+	files             []AgentsFile
+	diagnostics       []ResourceDiagnostic
+	settings          *SettingsManager
+	systemInput       *string
+	appendInputs      []string
+	systemPrompt      *string
+	systemSource      *ResourcePathSource
+	appendPrompts     []string
+	appendSources     []ResourcePathSource
+	promptDiagnostics []ResourceDiagnostic
 }
 
 func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultResourceLoader, error) {
-	if len(options.AdditionalExtensionPaths) > 0 || len(options.AdditionalSkillPaths) > 0 || len(options.AdditionalPromptTemplatePaths) > 0 || len(options.AdditionalThemePaths) > 0 || len(options.ExtensionFactories) > 0 || options.SystemPrompt != nil || len(options.AppendSystemPrompt) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
+	if len(options.AdditionalExtensionPaths) > 0 || len(options.AdditionalSkillPaths) > 0 || len(options.AdditionalPromptTemplatePaths) > 0 || len(options.AdditionalThemePaths) > 0 || len(options.ExtensionFactories) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
 		return nil, notImplemented("NewDefaultResourceLoader")
 	}
 	cwd, err := resolveSessionPath(options.CWD)
@@ -130,7 +139,7 @@ func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultRes
 	if err != nil {
 		return nil, err
 	}
-	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, noContextFiles: options.NoContextFiles, files: []AgentsFile{}}, nil
+	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, noContextFiles: options.NoContextFiles, files: []AgentsFile{}, settings: options.SettingsManager, systemInput: cloneStringPointer(options.SystemPrompt), appendInputs: slices.Clone(options.AppendSystemPrompt)}, nil
 }
 
 func (*DefaultResourceLoader) GetExtensions() (LoadExtensionsResult, error) {
@@ -159,17 +168,46 @@ func (l *DefaultResourceLoader) GetContextFileDiagnostics() []ResourceDiagnostic
 	defer l.mu.RUnlock()
 	return append([]ResourceDiagnostic{}, l.diagnostics...)
 }
-func (*DefaultResourceLoader) GetSystemPrompt() (*string, error) {
-	return nil, notImplemented("DefaultResourceLoader.GetSystemPrompt")
+func (l *DefaultResourceLoader) GetSystemPrompt() (*string, error) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	if l.cwd == "" {
+		return nil, notImplemented("DefaultResourceLoader.GetSystemPrompt")
+	}
+	return cloneStringPointer(l.systemPrompt), nil
 }
-func (*DefaultResourceLoader) GetSystemPromptSource() (*ResourcePathSource, error) {
-	return nil, notImplemented("DefaultResourceLoader.GetSystemPromptSource")
+func (l *DefaultResourceLoader) GetSystemPromptSource() (*ResourcePathSource, error) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	if l.cwd == "" {
+		return nil, notImplemented("DefaultResourceLoader.GetSystemPromptSource")
+	}
+	if l.systemSource == nil {
+		return nil, nil
+	}
+	source := *l.systemSource
+	return &source, nil
 }
-func (*DefaultResourceLoader) GetAppendSystemPrompt() ([]string, error) {
-	return nil, notImplemented("DefaultResourceLoader.GetAppendSystemPrompt")
+func (l *DefaultResourceLoader) GetAppendSystemPrompt() ([]string, error) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	if l.cwd == "" {
+		return nil, notImplemented("DefaultResourceLoader.GetAppendSystemPrompt")
+	}
+	return append([]string{}, l.appendPrompts...), nil
 }
-func (*DefaultResourceLoader) GetAppendSystemPromptSources() ([]ResourcePathSource, error) {
-	return nil, notImplemented("DefaultResourceLoader.GetAppendSystemPromptSources")
+func (l *DefaultResourceLoader) GetAppendSystemPromptSources() ([]ResourcePathSource, error) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	if l.cwd == "" {
+		return nil, notImplemented("DefaultResourceLoader.GetAppendSystemPromptSources")
+	}
+	return append([]ResourcePathSource{}, l.appendSources...), nil
+}
+func (l *DefaultResourceLoader) GetSystemPromptDiagnostics() []ResourceDiagnostic {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	return append([]ResourceDiagnostic{}, l.promptDiagnostics...)
 }
 func (*DefaultResourceLoader) ExtendResources(ResourceExtensionPaths) error {
 	return notImplemented("DefaultResourceLoader.ExtendResources")
@@ -189,6 +227,43 @@ func (l *DefaultResourceLoader) Reload(ctx context.Context, options ...ResourceL
 	}
 	l.mu.Lock()
 	defer l.mu.Unlock()
+	settings := l.settings
+	if settings == nil {
+		var err error
+		settings, err = NewSettingsManager(l.cwd, &l.agentDir)
+		if err != nil {
+			return err
+		}
+		if err = prepareHeadlessProjectSettings(ctx, l.cwd, l.agentDir, settings, nil); err != nil {
+			return err
+		}
+	}
+	trusted, err := settings.IsProjectTrusted()
+	if err != nil {
+		return err
+	}
+	promptDiagnostics := []ResourceDiagnostic{}
+	systemInput := l.systemInput
+	if systemInput == nil {
+		systemInput = l.discoverPrompt("SYSTEM.md", trusted)
+	}
+	system, source := resolveResourcePrompt(systemInput, "system prompt", &promptDiagnostics)
+	appendInputs := l.appendInputs
+	if appendInputs == nil {
+		if input := l.discoverPrompt("APPEND_SYSTEM.md", trusted); input != nil {
+			appendInputs = []string{*input}
+		}
+	}
+	appended, sources := []string{}, []ResourcePathSource{}
+	for _, input := range appendInputs {
+		prompt, source := resolveResourcePrompt(&input, "append system prompt", &promptDiagnostics)
+		if prompt != nil {
+			appended = append(appended, *prompt)
+		}
+		if source != nil {
+			sources = append(sources, *source)
+		}
+	}
 	files := []AgentsFile{}
 	diagnostics := []ResourceDiagnostic{}
 	if !l.noContextFiles {
@@ -202,5 +277,7 @@ func (l *DefaultResourceLoader) Reload(ctx context.Context, options ...ResourceL
 		return err
 	}
 	l.files, l.diagnostics = files, diagnostics
+	l.systemPrompt, l.systemSource = system, source
+	l.appendPrompts, l.appendSources, l.promptDiagnostics = appended, sources, promptDiagnostics
 	return nil
 }

@@ -80,7 +80,7 @@ func createAgentSessionServices(ctx context.Context, options CreateAgentSessionS
 	}
 	if resourceLoader == nil {
 		loaderOptions := options.ResourceLoaderOptions
-		loaderOptions.CWD, loaderOptions.AgentDir = cwd, dir
+		loaderOptions.CWD, loaderOptions.AgentDir, loaderOptions.SettingsManager = cwd, dir, settings
 		loader, err := NewDefaultResourceLoader(loaderOptions)
 		if err != nil {
 			return AgentSessionServices{}, err
@@ -106,7 +106,7 @@ func createAgentSessionServices(ctx context.Context, options CreateAgentSessionS
 		result.Diagnostics = append(result.Diagnostics, AgentSessionRuntimeDiagnostic{Type: "warning", Message: d.Error()})
 	}
 	if loader, ok := resourceLoader.(*DefaultResourceLoader); ok {
-		for _, d := range loader.GetContextFileDiagnostics() {
+		for _, d := range append(loader.GetContextFileDiagnostics(), loader.GetSystemPromptDiagnostics()...) {
 			result.Diagnostics = append(result.Diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
 		}
 	}

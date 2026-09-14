@@ -51,6 +51,7 @@ type CreateHeadlessSessionOptions struct {
 	ExcludeTools         []string
 	NoTools              NoToolsMode
 	SystemPrompt         *string
+	AppendSystemPrompt   []string
 	SessionManager       *SessionManager
 }
 
@@ -262,7 +263,15 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			return nil, err
 		}
 	}
+	loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: options.CWD, AgentDir: options.AgentDir, SettingsManager: settings, NoContextFiles: options.NoContextFiles, SystemPrompt: options.SystemPrompt, AppendSystemPrompt: options.AppendSystemPrompt})
+	if err != nil {
+		return nil, err
+	}
+	if err = loader.Reload(ctx); err != nil {
+		return nil, err
+	}
 	created, err := CreateAgentSession(ctx, CreateAgentSessionOptions{
+		ResourceLoader:  loader,
 		CWD:             options.CWD,
 		AgentDir:        options.AgentDir,
 		NoContextFiles:  options.NoContextFiles,
@@ -282,10 +291,6 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return nil, err
 	}
 	created.Session.runtimeStream = true
-	if err = configureSessionPrompt(ctx, created.Session, options); err != nil {
-		created.Session.Dispose()
-		return nil, err
-	}
 	factory := func(ctx context.Context, next CreateAgentSessionRuntimeOptions) (CreateAgentSessionRuntimeResult, error) {
 		config := options
 		config.CWD = next.CWD
@@ -302,7 +307,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session(), ModelFallbackMessage: runtime.ModelFallbackMessage()}, Services: runtime.Services()}, nil
 	}
 	if loader, ok := created.Session.ResourceLoader().(*DefaultResourceLoader); ok {
-		for _, d := range loader.GetContextFileDiagnostics() {
+		for _, d := range append(loader.GetContextFileDiagnostics(), loader.GetSystemPromptDiagnostics()...) {
 			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
 		}
 	}
@@ -328,9 +333,18 @@ func configureSessionPrompt(ctx context.Context, session *AgentSession, options 
 	}
 	promptOptions.PromptGuidelines = sessionToolGuidelines(activeTools)
 
-	if options.SystemPrompt != nil {
-		promptOptions.CustomPrompt = *options.SystemPrompt
+	system, err := session.ResourceLoader().GetSystemPrompt()
+	if err != nil {
+		return err
 	}
+	if system != nil {
+		promptOptions.CustomPrompt = *system
+	}
+	appended, err := session.ResourceLoader().GetAppendSystemPrompt()
+	if err != nil {
+		return err
+	}
+	promptOptions.AppendSystemPrompt = strings.Join(appended, "\n\n")
 	if !options.NoContextFiles {
 		promptOptions.ContextFiles, err = session.ResourceLoader().GetAgentsFiles()
 		if err != nil {

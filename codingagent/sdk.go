@@ -122,7 +122,7 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 		}
 	}
 	if config.ResourceLoader == nil {
-		loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: config.CWD, AgentDir: config.AgentDir, NoContextFiles: config.NoContextFiles})
+		loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: config.CWD, AgentDir: config.AgentDir, NoContextFiles: config.NoContextFiles, SettingsManager: config.SettingsManager})
 		if err != nil {
 			return CreateAgentSessionResult{}, err
 		}

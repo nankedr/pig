@@ -28,6 +28,7 @@ type codingagent.CreateHeadlessSessionOptions
 - ExcludeTools []string ""
 - NoTools codingagent.NoToolsMode ""
 - SystemPrompt *string ""
+- AppendSystemPrompt []string ""
 - SessionManager *codingagent.SessionManager ""
 method Get func(codingagent.ProjectTrustStore, context.Context, string) (*bool, error)
 method GetEntry func(codingagent.ProjectTrustStore, context.Context, string) (*codingagent.ProjectTrustStoreEntry, error)

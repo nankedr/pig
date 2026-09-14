@@ -72,6 +72,7 @@ type codingagent.CreateHeadlessSessionOptions
 - ExcludeTools []string ""
 - NoTools codingagent.NoToolsMode ""
 - SystemPrompt *string ""
+- AppendSystemPrompt []string ""
 - SessionManager *codingagent.SessionManager ""
 method ApplyOverrides func(codingagent.SettingsManager, codingagent.Settings) error
 method DrainErrors func(codingagent.SettingsManager) ([]error, error)

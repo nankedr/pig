@@ -46,6 +46,7 @@ type codingagent.CreateHeadlessSessionOptions
 - ExcludeTools []string ""
 - NoTools codingagent.NoToolsMode ""
 - SystemPrompt *string ""
+- AppendSystemPrompt []string ""
 - SessionManager *codingagent.SessionManager ""
 method CancelDeferred func(*codingagent.ModelRuntime, context.Context, ai.Model, ai.DeferredHandle, ...ai.ModelsDeferredCancelOptions) error
 method CheckAuth func(*codingagent.ModelRuntime, context.Context, string, ...ai.AuthOperationOptions) (ai.Optional[github.com/nankedr/pig/ai.AuthCheck], error)

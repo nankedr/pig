@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9670
+- Total entries: 9671
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
-| scaffolded | 3920 |
-| partial | 290 |
+| scaffolded | 3916 |
+| partial | 295 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -6909,13 +6909,9 @@
 | member:codingagent/src/core/prompt-templates.ts#PromptTemplate.name | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Name | coding-agent |
 | member:codingagent/src/core/prompt-templates.ts#PromptTemplate.sourceInfo | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.SourceInfo | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.extendResources | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.ExtendResources | coding-agent |
-| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getAppendSystemPrompt | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetAppendSystemPrompt | coding-agent |
-| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getAppendSystemPromptSources | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetAppendSystemPromptSources | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getExtensions | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetExtensions | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getPrompts | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetPrompts | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSkills | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSkills | coding-agent |
-| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSystemPrompt | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSystemPrompt | coding-agent |
-| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSystemPromptSource | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSystemPromptSource | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getThemes | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetThemes | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.loadProjectTrustExtensions | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.LoadProjectTrustExtensions | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#ResourceLoader.extendResources | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceLoader.ExtendResources | coding-agent |
@@ -7937,6 +7933,7 @@
 | contract:codingagent/session-configuration | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
 | contract:codingagent/session-messages | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession | coding-agent |
 | contract:codingagent/session-tree-navigation | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
+| contract:codingagent/system-prompts | partial | M5 | contract | github.com/nankedr/pig/codingagent.NewDefaultResourceLoader | coding-agent |
 | contract:codingagent/turn-retry | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
 | contract:codingagent/write-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateWriteTool | coding-agent |
 | contract:config/auth-json | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewAuthStorage | coding-agent |
@@ -7965,6 +7962,10 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.setThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.supportsThinking | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SupportsThinking | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getAgentsFiles | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetAgentsFiles | coding-agent |
+| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getAppendSystemPrompt | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetAppendSystemPrompt | coding-agent |
+| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getAppendSystemPromptSources | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetAppendSystemPromptSources | coding-agent |
+| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSystemPrompt | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSystemPrompt | coding-agent |
+| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSystemPromptSource | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSystemPromptSource | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.reload | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.Reload | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionManager.appendCompaction | partial | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendCompaction | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.exportHtml | partial | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.ExportHTML | coding-agent |

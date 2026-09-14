@@ -21,6 +21,7 @@ fields:
 - ExcludeTools []string tag=""
 - NoTools codingagent.NoToolsMode tag=""
 - SystemPrompt *string tag=""
+- AppendSystemPrompt []string tag=""
 - SessionManager *codingagent.SessionManager tag=""
 
 type codingagent.NewSessionOptions struct
