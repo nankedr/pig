@@ -106,7 +106,8 @@ func createAgentSessionServices(ctx context.Context, options CreateAgentSessionS
 		result.Diagnostics = append(result.Diagnostics, AgentSessionRuntimeDiagnostic{Type: "warning", Message: d.Error()})
 	}
 	if loader, ok := resourceLoader.(*DefaultResourceLoader); ok {
-		for _, d := range append(loader.GetContextFileDiagnostics(), loader.GetSystemPromptDiagnostics()...) {
+		prompts, _ := loader.GetPrompts()
+		for _, d := range append(append(loader.GetContextFileDiagnostics(), loader.GetSystemPromptDiagnostics()...), prompts.Diagnostics...) {
 			result.Diagnostics = append(result.Diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
 		}
 	}

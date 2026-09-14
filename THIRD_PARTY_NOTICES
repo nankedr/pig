@@ -114,3 +114,13 @@ Marked 18.0.5 (MIT), and Highlight.js 11.9.0 (BSD-3-Clause).
 Full notices are in codingagent/exporthtml/LICENSES.txt, embedded into every
 exported HTML and distributed with the Go module/binary. Source and local
 SHA-256 hashes and modifications are in codingagent/exporthtml/manifest.json.
+
+## go-yaml v3
+
+- Source: https://github.com/go-yaml/yaml
+- Module/version: gopkg.in/yaml.v3 v3.0.1
+- License: MIT (ported libyaml files) and Apache-2.0 (remaining files)
+
+Used for local Prompt Template frontmatter parsing. The retained notices are in
+`THIRD_PARTY_LICENSES/go-yaml-v3.txt`; the Apache-2.0 license is retained in
+`THIRD_PARTY_LICENSES/jsonschema-v6-Apache-2.0.txt`.

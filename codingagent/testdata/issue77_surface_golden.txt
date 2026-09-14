@@ -30,6 +30,8 @@ type codingagent.CreateHeadlessSessionOptions
 - Offline bool ""
 - ProjectTrustOverride *bool ""
 - NoContextFiles bool ""
+- NoPromptTemplates bool ""
+- PromptTemplates []string ""
 - CWD string ""
 - AgentDir string ""
 - AuthPath string ""

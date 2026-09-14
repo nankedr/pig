@@ -2,6 +2,7 @@ package codingagent
 
 import (
 	"context"
+	"gopkg.in/yaml.v3"
 	"regexp"
 	"strconv"
 	"strings"
@@ -105,6 +106,8 @@ type PromptTemplate struct {
 	SourceInfo   SourceInfo
 }
 
+func isPromptSpace(r rune) bool { return r == '\uFEFF' || r != '\u0085' && unicode.IsSpace(r) }
+
 func parseCommandArgs(value string) []string {
 	var arguments []string
 	var current strings.Builder
@@ -127,7 +130,7 @@ func parseCommandArgs(value string) []string {
 		switch {
 		case character == '\'' || character == '"':
 			quote = character
-		case unicode.IsSpace(character):
+		case isPromptSpace(character):
 			flush()
 		default:
 			current.WriteRune(character)
@@ -163,7 +166,7 @@ func substituteArgs(content string, args []string) string {
 			end := len(args)
 			if parts[4] != "" {
 				length, _ := strconv.Atoi(parts[4])
-				end = min(end, start+max(0, length))
+				end = start + min(end-start, max(0, length))
 			}
 			return strings.Join(args[start:end], " ")
 		}
@@ -187,11 +190,11 @@ func expandPromptTemplate(text string, templates []PromptTemplate) string {
 		return text
 	}
 	rest := text[1:]
-	nameEnd := strings.IndexFunc(rest, unicode.IsSpace)
+	nameEnd := strings.IndexFunc(rest, isPromptSpace)
 	name, argsText := rest, ""
 	if nameEnd >= 0 {
 		name = rest[:nameEnd]
-		argsText = strings.TrimSpace(rest[nameEnd:])
+		argsText = rest[nameEnd:]
 	}
 	if name == "" {
 		return text
@@ -326,10 +329,44 @@ type ParsedFrontmatter struct {
 	Frontmatter map[string]any
 }
 
-// ParseFrontmatter is an explicit capability stub until codingagent has a YAML
-// implementation compatible with the pinned upstream parser.
 func ParseFrontmatter(content string) (ParsedFrontmatter, error) {
-	return ParsedFrontmatter{}, notImplemented("ParseFrontmatter")
+	content = strings.ReplaceAll(strings.ReplaceAll(content, "\r\n", "\n"), "\r", "\n")
+	result := ParsedFrontmatter{Body: content, Frontmatter: map[string]any{}}
+	if !strings.HasPrefix(content, "---") {
+		return result, nil
+	}
+	end := strings.Index(content[3:], "\n---")
+	if end < 0 {
+		return result, nil
+	}
+	end += 3
+	result.Body = strings.TrimSpace(content[end+4:])
+	raw := ""
+	if end > 4 {
+		raw = content[4:end]
+	}
+	var document yaml.Node
+	if err := yaml.Unmarshal([]byte(raw), &document); err != nil {
+		return ParsedFrontmatter{}, err
+	}
+	var normalize func(*yaml.Node)
+	normalize = func(node *yaml.Node) {
+		if node.Tag == "!!timestamp" || node.Tag == "!!merge" {
+			node.Tag = "!!str"
+		}
+		for _, child := range node.Content {
+			normalize(child)
+		}
+	}
+	normalize(&document)
+	var value any
+	if err := document.Decode(&value); err != nil {
+		return ParsedFrontmatter{}, err
+	}
+	if metadata, ok := value.(map[string]any); ok {
+		result.Frontmatter = metadata
+	}
+	return result, nil
 }
 
 func StripFrontmatter(content string) (string, error) {

@@ -5,6 +5,8 @@ fields:
 - Offline bool tag=""
 - ProjectTrustOverride *bool tag=""
 - NoContextFiles bool tag=""
+- NoPromptTemplates bool tag=""
+- PromptTemplates []string tag=""
 - CWD string tag=""
 - AgentDir string tag=""
 - AuthPath string tag=""

@@ -108,3 +108,5 @@ M4.15 支持安全 HTML 导出，见 [学习材料](learning/m4-html-export.md)�
 M5.1 支持 Context File 加载与生成，见[学习材料](learning/m5-context-files.md)、[TypeScript → Go](mappings/typescript-to-go/m5-context-files.md)及[离线示例](../examples/context-files/main.go)。
 
 M5.2 支持本地 system/append prompt 与首次加载项目信任，见[学习材料](learning/m5-system-prompts.md)、[TypeScript → Go](mappings/typescript-to-go/m5-system-prompts.md)及[离线示例](../examples/system-prompts/main.go)。
+
+M5.3 支持本地 Prompt Template 发现、参数调用和 RPC 命令查询，见[学习材料](learning/m5-prompt-templates.md)、[TypeScript → Go](mappings/typescript-to-go/m5-prompt-templates.md)及[离线示例](../examples/prompt-templates/main.go)。

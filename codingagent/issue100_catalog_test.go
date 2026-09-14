@@ -9,12 +9,13 @@ const issue100ContextCatalogID = "contract:codingagent/context-files"
 
 func issue100ContextCatalogEntry() catalog.Entry {
 	return catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: issue100ContextCatalogID, Upstream: catalog.Upstream{Module: "coding-agent", Repository: "https://github.com/badlogic/pi-mono", Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/core/resource-loader.ts"}, Mapping: catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".NewDefaultResourceLoader", Kind: "contract"}, Status: catalog.StatusPartial, Milestone: "M5", Classification: "public-api", Partial: &catalog.Partial{Supported: []string{
+		"Issue #102 adds local Prompt Template discovery, invocation and RPC command queries; exact evidence: contract:codingagent/prompt-templates",
 		"Issue #101 adds local system/append prompt resources, independent explicit inputs, source/diagnostic snapshots and first-load trust; behavior evidence: contract:codingagent/system-prompts",
 		"Issue #100: default and injected ResourceLoader feed Context Files into real SDK/CLI model requests on startup and resume; Session services share the loaded resource instance; no default package manager dependency",
 		"Locked Pi fixture: global-first candidate priority, ancestors through filesystem root, empty and missing files, unreadable fallback diagnostics, lexical symlink paths, file URLs, global path dedup and valid/incomplete nested worktree metadata",
 		"NoContextFiles and CLI --no-context-files/-nc suppress reads and model context; Context Files remain available without project trust, preserving ADR-0010 pre-trust settings protection; public paths and defensive file/diagnostic snapshots; cancel-safe local Reload",
 	}, Unsupported: []string{
-		"Skill, Prompt Template, Theme resources and ExtendResources remain explicit stubs pending subsequent M5 slices; opaque overrides and extension execution/ABI remain M7",
+		"Skill, Theme resources and ExtendResources remain explicit stubs pending subsequent M5 slices; opaque overrides and extension execution/ABI remain M7",
 		"Package manifest/registration, npm/git, dependency installation and lifecycle remain stubs and are deferred under #99; this local chain does not install or execute packages; live session resource reload orchestration remains deferred",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0010-trust-and-host-security.md", Reason: "Resolve trust before reading trust-sensitive project settings. Local Context File loading never invokes a package manager or opaque extension callback."}}
 }

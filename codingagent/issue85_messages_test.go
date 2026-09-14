@@ -406,9 +406,6 @@ func TestSessionMessagesQueueListenersAndCapabilityBounds(t *testing.T) {
 		{func() error {
 			return session.SendUserMessage(ai.UserBlocks(ai.ImageContent{Type: ai.ContentTypeImage, Data: "aGk=", MIMEType: "image/png"}))
 		}, "AgentSession.SendUserMessage.Images"},
-		{func() error {
-			return session.Prompt(context.Background(), "template", codingagent.PromptOptions{ExpandPromptTemplates: pointerTo(true)})
-		}, "AgentSession.Prompt.ExpandPromptTemplates"},
 	} {
 		assertSessionOperationNotImplemented(t, item.call(), item.op)
 	}

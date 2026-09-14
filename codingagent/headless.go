@@ -35,6 +35,8 @@ type CreateHeadlessSessionOptions struct {
 	Offline              bool
 	ProjectTrustOverride ProjectTrustDecision
 	NoContextFiles       bool
+	NoPromptTemplates    bool
+	PromptTemplates      []string
 	CWD                  string
 	AgentDir             string
 	AuthPath             string
@@ -263,7 +265,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			return nil, err
 		}
 	}
-	loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: options.CWD, AgentDir: options.AgentDir, SettingsManager: settings, NoContextFiles: options.NoContextFiles, SystemPrompt: options.SystemPrompt, AppendSystemPrompt: options.AppendSystemPrompt})
+	loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: options.CWD, AgentDir: options.AgentDir, SettingsManager: settings, NoContextFiles: options.NoContextFiles, NoPromptTemplates: options.NoPromptTemplates, AdditionalPromptTemplatePaths: options.PromptTemplates, SystemPrompt: options.SystemPrompt, AppendSystemPrompt: options.AppendSystemPrompt})
 	if err != nil {
 		return nil, err
 	}
@@ -307,7 +309,8 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session(), ModelFallbackMessage: runtime.ModelFallbackMessage()}, Services: runtime.Services()}, nil
 	}
 	if loader, ok := created.Session.ResourceLoader().(*DefaultResourceLoader); ok {
-		for _, d := range append(loader.GetContextFileDiagnostics(), loader.GetSystemPromptDiagnostics()...) {
+		prompts, _ := loader.GetPrompts()
+		for _, d := range append(append(loader.GetContextFileDiagnostics(), loader.GetSystemPromptDiagnostics()...), prompts.Diagnostics...) {
 			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
 		}
 	}

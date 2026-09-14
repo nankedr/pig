@@ -43,29 +43,17 @@ func TestProjectTrustDecisionConstructors(t *testing.T) {
 	}
 }
 
-func TestParseFrontmatterIsExplicitCapabilityStub(t *testing.T) {
-	tests := map[string]string{
-		"flat YAML":      "---\nname: skill\n---\nBody",
-		"malformed YAML": "---\nfoo: [bar\n---\nBody",
-		"multiline YAML": "---\ndescription: |\n  Line one\n  Line two\n---\nBody",
-		"no frontmatter": "Body only",
+func TestFrontmatterPublicParsing(t *testing.T) {
+	parsed, err := codingagent.ParseFrontmatter("---\r\ndescription: |\r\n  First\r\n  Second\r\nargument-hint: '[file]'\r\n---\r\n Body ")
+	if err != nil || parsed.Body != "Body" || parsed.Frontmatter["description"] != "First\nSecond\n" || parsed.Frontmatter["argument-hint"] != "[file]" {
+		t.Fatalf("frontmatter: %#v %v", parsed, err)
 	}
-	for name, input := range tests {
-		t.Run(name, func(t *testing.T) {
-			parsed, err := codingagent.ParseFrontmatter(input)
-			assertReviewCapabilityError(t, err, "ParseFrontmatter")
-			if parsed.Body != "" || parsed.Frontmatter != nil {
-				t.Fatalf("ParseFrontmatter result = %#v, want zero value on unsupported capability", parsed)
-			}
-		})
+	body, err := codingagent.StripFrontmatter("---\nname: test\n---\nBody")
+	if err != nil || body != "Body" {
+		t.Fatalf("strip: %q %v", body, err)
 	}
-}
-
-func TestStripFrontmatterPropagatesCapabilityError(t *testing.T) {
-	body, err := codingagent.StripFrontmatter("---\nname: skill\n---\nBody")
-	assertReviewCapabilityError(t, err, "ParseFrontmatter")
-	if body != "" {
-		t.Fatalf("StripFrontmatter body = %q, want empty on unsupported capability", body)
+	if _, err = codingagent.ParseFrontmatter("---\nfoo: [bar\n---\nBody"); err == nil || errors.Is(err, codingagent.ErrNotImplemented) {
+		t.Fatalf("invalid YAML: %v", err)
 	}
 }
 

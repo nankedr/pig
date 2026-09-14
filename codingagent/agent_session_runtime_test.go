@@ -503,14 +503,12 @@ func TestAgentSessionDisposeCancelsWithoutDroppingActiveTranscript(t *testing.T)
 }
 
 func TestAgentSessionUnsupportedPromptOptionsAreExactInertStubs(t *testing.T) {
-	trueValue := true
 	callbackCalls := 0
 	tests := []struct {
 		name      string
 		option    codingagent.PromptOptions
 		operation string
 	}{
-		{name: "template expansion", option: codingagent.PromptOptions{ExpandPromptTemplates: &trueValue}, operation: "AgentSession.Prompt.ExpandPromptTemplates"},
 		{name: "images", option: codingagent.PromptOptions{Images: []ai.ImageContent{{Type: ai.ContentTypeImage, Data: "aGk=", MIMEType: "image/png"}}}, operation: "AgentSession.Prompt.Images"},
 		{name: "preflight callback", option: codingagent.PromptOptions{PreflightResult: func(bool) { callbackCalls++ }}, operation: "AgentSession.Prompt.PreflightResult"},
 		{name: "source", option: codingagent.PromptOptions{Source: "rpc"}, operation: "AgentSession.Prompt.Source"},

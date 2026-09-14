@@ -712,8 +712,6 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 	if len(options) > 0 {
 		option := options[0]
 		switch {
-		case option.ExpandPromptTemplates != nil && *option.ExpandPromptTemplates:
-			return notImplemented("AgentSession.Prompt.ExpandPromptTemplates")
 		case len(option.Images) != 0:
 			return notImplemented("AgentSession.Prompt.Images")
 		case option.PreflightResult != nil:
@@ -732,6 +730,12 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 }
 
 func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, ready func(), options ...PromptOptions) (err error) {
+	if len(options) == 0 || options[0].ExpandPromptTemplates == nil || *options[0].ExpandPromptTemplates {
+		text, err = s.expandTemplate(text)
+		if err != nil {
+			return err
+		}
+	}
 	runContext, cancel := context.WithCancelCause(ctx)
 	s.mu.Lock()
 	if s.disposed {
@@ -1082,8 +1086,22 @@ func sessionUserText(message agent.AgentMessage) string {
 func (*AgentSession) HasExtensionHandlers(string) (bool, error) {
 	return false, notImplemented("AgentSession.HasExtensionHandlers")
 }
-func (*AgentSession) PromptTemplates() ([]PromptTemplate, error) {
-	return nil, notImplemented("AgentSession.PromptTemplates")
+func (s *AgentSession) PromptTemplates() ([]PromptTemplate, error) {
+	if s.resourceLoader == nil {
+		return nil, notImplemented("AgentSession.PromptTemplates")
+	}
+	result, err := s.resourceLoader.GetPrompts()
+	return result.Prompts, err
+}
+func (s *AgentSession) expandTemplate(text string) (string, error) {
+	if !strings.HasPrefix(text, "/") || s.resourceLoader == nil {
+		return text, nil
+	}
+	templates, err := s.PromptTemplates()
+	if err != nil {
+		return "", err
+	}
+	return expandPromptTemplate(text, templates), nil
 }
 func (s *AgentSession) Reload(context.Context) error { return notImplemented("AgentSession.Reload") }
 func (s *AgentSession) SetAutoCompactionEnabled(enabled bool) error {

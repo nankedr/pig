@@ -496,14 +496,22 @@ func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, out
 		if err == nil {
 			response["data"] = map[string]any{"path": exported}
 		}
+	case "get_commands":
+		var templates []PromptTemplate
+		templates, err = s.PromptTemplates()
+		commands := []map[string]any{}
+		for _, p := range templates {
+			source := map[string]any{"path": p.SourceInfo.Path, "source": p.SourceInfo.Source, "scope": p.SourceInfo.Scope, "origin": p.SourceInfo.Origin}
+			if p.SourceInfo.BaseDir != "" {
+				source["baseDir"] = p.SourceInfo.BaseDir
+			}
+			commands = append(commands, map[string]any{"name": p.Name, "description": p.Description, "source": "prompt", "sourceInfo": source})
+		}
+		response["data"] = map[string]any{"commands": commands}
 	case "extension_ui_response":
 		fail(notImplemented("rpc.extension_ui_response"))
 		return
 	default:
-		if strings.Contains("|get_commands|", "|"+command+"|") && command != "" {
-			fail(notImplemented("rpc." + command))
-			return
-		}
 		value, ok := fields["type"]
 		name := "undefined"
 		if ok {

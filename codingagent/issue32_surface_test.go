@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1749, catalog.StatusInventoried: 744, catalog.StatusPartial: 36, catalog.StatusImplemented: 71}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1737, catalog.StatusInventoried: 744, catalog.StatusPartial: 48, catalog.StatusImplemented: 71}); !reflect.DeepEqual(gotByStatus, want) {
 
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
@@ -1452,7 +1452,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
-	if issue101PromoteRuntimeEntry(entry) || issue100PromoteRuntimeEntry(entry) || issue97PromoteRuntimeEntry(entry) || issue96PromoteRuntimeEntry(entry) || issue95PromoteRuntimeEntry(entry) || issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
+	if issue102PromoteRuntimeEntry(entry) || issue101PromoteRuntimeEntry(entry) || issue100PromoteRuntimeEntry(entry) || issue97PromoteRuntimeEntry(entry) || issue96PromoteRuntimeEntry(entry) || issue95PromoteRuntimeEntry(entry) || issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
 
 		return
 	}
@@ -1570,6 +1570,9 @@ func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
 }
 
 func issue32BehaviorOwnerForReference(reference string) string {
+	if strings.Contains(reference, "core/prompt-templates.ts#") || strings.Contains(reference, "utils/frontmatter.ts#") || strings.HasSuffix(reference, "#AgentSession.promptTemplates") || strings.HasSuffix(reference, "#PromptOptions.expandPromptTemplates") {
+		return issue102TemplateCatalogID
+	}
 	for _, name := range []string{"AgentSession.sendUserMessage", "AgentSession.steer", "AgentSession.followUp", "AgentSession.setSteeringMode", "AgentSession.setFollowUpMode", "AgentSession.steeringMode", "AgentSession.followUpMode", "AgentSession.getSteeringMessages", "AgentSession.getFollowUpMessages", "AgentSession.pendingMessageCount", "AgentSession.clearQueue", "PromptOptions.streamingBehavior", "PromptOptions.expandPromptTemplates"} {
 		if reference == issue32ReferencePrefix+"core/agent-session.ts#"+name {
 			return issue85MessagesCatalogID
@@ -1899,7 +1902,7 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 			Notes: "Issue #72 verifies explicit-file v1/v2 migration through open, runtime restoration, subsequent v3 persistence and reopen against the fixed Pi reader/writer. Missing version is v1; unknown fields and open messages survive migration. Credentials, trust and adjacent Pi state are not migrated.",
 		},
 	}
-	entries = append(entries, issue101PromptCatalogEntry(), issue100ContextCatalogEntry(), issue97HTMLCatalogEntry(), issue96RPCCatalogEntry(), issue95RPCCatalogEntry(), issue94RPCCatalogEntry(), issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry(), issue93BashCatalogEntry(), issue92SummaryCatalogEntry())
+	entries = append(entries, issue102TemplateCatalogEntry(), issue101PromptCatalogEntry(), issue100ContextCatalogEntry(), issue97HTMLCatalogEntry(), issue96RPCCatalogEntry(), issue95RPCCatalogEntry(), issue94RPCCatalogEntry(), issue74SettingsCatalogEntry(), issue75TrustCatalogEntry(), issue78WriteCatalogEntry(), issue76CredentialCatalogEntry(), issue80BashCatalogEntry(), issue77RuntimeCatalogEntry(), issue79EditCatalogEntry(), issue81ToolsCatalogEntry(), issue83GrepCatalogEntry(), issue84FindLsCatalogEntry(), issue85MessagesCatalogEntry(), issue86RetryCatalogEntry(), issue87ConfigurationCatalogEntry(), issue88StatsCatalogEntry(), issue91TreeCatalogEntry(), issue93BashCatalogEntry(), issue92SummaryCatalogEntry())
 
 	for index := range entries {
 		entries[index].Evidence = issue32EvidenceFromDescriptors(issue32BehaviorEvidenceDescriptors(t, entries[index].ID))
@@ -1923,6 +1926,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		descriptors = issue84FindLsEvidence(t)
 	case issue92SummaryCatalogID:
 		descriptors = issue92SummaryEvidence(t)
+	case issue102TemplateCatalogID:
+		descriptors = issue102TemplateEvidence(t)
 	case issue101PromptCatalogID:
 		descriptors = issue101PromptEvidence(t)
 	case issue100ContextCatalogID:

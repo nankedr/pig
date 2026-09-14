@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9671
+- Total entries: 9672
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
-| scaffolded | 3916 |
-| partial | 295 |
+| scaffolded | 3904 |
+| partial | 308 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -6306,7 +6306,6 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.modelRuntime | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ModelRuntime | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.pendingMessageCount | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.PendingMessageCount | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.prompt | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
-| member:codingagent/src/core/agent-session.ts#AgentSession.promptTemplates | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.PromptTemplates | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.reload | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.Reload | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.resourceLoader | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ResourceLoader | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.sendCustomMessage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SendCustomMessage | coding-agent |
@@ -6347,7 +6346,6 @@
 | member:codingagent/src/core/agent-session.ts#ParsedSkillBlock.location | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.ParsedSkillBlock.Location | coding-agent |
 | member:codingagent/src/core/agent-session.ts#ParsedSkillBlock.name | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.ParsedSkillBlock.Name | coding-agent |
 | member:codingagent/src/core/agent-session.ts#ParsedSkillBlock.userMessage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.ParsedSkillBlock.UserMessage | coding-agent |
-| member:codingagent/src/core/agent-session.ts#PromptOptions.expandPromptTemplates | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.ExpandPromptTemplates | coding-agent |
 | member:codingagent/src/core/agent-session.ts#PromptOptions.images | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.Images | coding-agent |
 | member:codingagent/src/core/agent-session.ts#PromptOptions.preflightResult | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.PreflightResult | coding-agent |
 | member:codingagent/src/core/agent-session.ts#PromptOptions.source | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.Source | coding-agent |
@@ -6902,15 +6900,8 @@
 | member:codingagent/src/core/package-manager.ts#ResolvedResource.enabled | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResolvedResource.Enabled | coding-agent |
 | member:codingagent/src/core/package-manager.ts#ResolvedResource.metadata | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResolvedResource.Metadata | coding-agent |
 | member:codingagent/src/core/package-manager.ts#ResolvedResource.path | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResolvedResource.Path | coding-agent |
-| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.argumentHint | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.ArgumentHint | coding-agent |
-| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.content | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Content | coding-agent |
-| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.description | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Description | coding-agent |
-| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.filePath | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.FilePath | coding-agent |
-| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.name | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Name | coding-agent |
-| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.sourceInfo | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.SourceInfo | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.extendResources | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.ExtendResources | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getExtensions | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetExtensions | coding-agent |
-| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getPrompts | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetPrompts | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSkills | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSkills | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getThemes | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetThemes | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.loadProjectTrustExtensions | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.LoadProjectTrustExtensions | coding-agent |
@@ -7735,7 +7726,6 @@
 | symbol:codingagent/src/core/package-manager.ts#ProgressEvent | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.ProgressEvent | coding-agent |
 | symbol:codingagent/src/core/package-manager.ts#ResolvedPaths | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.ResolvedPaths | coding-agent |
 | symbol:codingagent/src/core/package-manager.ts#ResolvedResource | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.ResolvedResource | coding-agent |
-| symbol:codingagent/src/core/prompt-templates.ts#PromptTemplate | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.PromptTemplate | coding-agent |
 | symbol:codingagent/src/core/resource-loader.ts#ResourceLoader | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.ResourceLoader | coding-agent |
 | symbol:codingagent/src/core/sdk.ts#CreateAgentSessionOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionOptions | coding-agent |
 | symbol:codingagent/src/core/sdk.ts#CreateAgentSessionResult | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.CreateAgentSessionResult | coding-agent |
@@ -7905,8 +7895,6 @@
 | symbol:codingagent/src/modes/rpc/rpc-types.ts#RpcResponse | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.RPCResponse | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-types.ts#RpcSessionState | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.RPCSessionState | coding-agent |
 | symbol:codingagent/src/utils/clipboard.ts#copyToClipboard | scaffolded | M13 | symbol | github.com/nankedr/pig/codingagent.CopyToClipboard | coding-agent |
-| symbol:codingagent/src/utils/frontmatter.ts#parseFrontmatter | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.ParseFrontmatter | coding-agent |
-| symbol:codingagent/src/utils/frontmatter.ts#stripFrontmatter | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.StripFrontmatter | coding-agent |
 | symbol:codingagent/src/utils/image-convert.ts#convertToPng | scaffolded | M12 | symbol | github.com/nankedr/pig/codingagent.ConvertToPNG | coding-agent |
 | symbol:codingagent/src/utils/image-resize-core.ts#ResizedImage | scaffolded | M12 | symbol | github.com/nankedr/pig/codingagent.ResizedImage | coding-agent |
 | symbol:codingagent/src/utils/image-resize.ts#formatDimensionNote | scaffolded | M12 | symbol | github.com/nankedr/pig/codingagent.FormatDimensionNote | coding-agent |
@@ -7928,6 +7916,7 @@
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
+| contract:codingagent/prompt-templates | partial | M5 | contract | github.com/nankedr/pig/codingagent.AgentSession.PromptTemplates | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
 | contract:codingagent/session-bash | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash | coding-agent |
 | contract:codingagent/session-configuration | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
@@ -7955,15 +7944,24 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.getAvailableThinkingLevels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetAvailableThinkingLevels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.isCompacting | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.IsCompacting | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.navigateTree | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
+| member:codingagent/src/core/agent-session.ts#AgentSession.promptTemplates | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.PromptTemplates | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.scopedModels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.ScopedModels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setActiveToolsByName | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetActiveToolsByName | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setModel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setScopedModels | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetScopedModels | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.setThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.supportsThinking | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SupportsThinking | coding-agent |
+| member:codingagent/src/core/agent-session.ts#PromptOptions.expandPromptTemplates | partial | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.ExpandPromptTemplates | coding-agent |
+| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.argumentHint | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.ArgumentHint | coding-agent |
+| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.content | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Content | coding-agent |
+| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.description | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Description | coding-agent |
+| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.filePath | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.FilePath | coding-agent |
+| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.name | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Name | coding-agent |
+| member:codingagent/src/core/prompt-templates.ts#PromptTemplate.sourceInfo | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.SourceInfo | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getAgentsFiles | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetAgentsFiles | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getAppendSystemPrompt | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetAppendSystemPrompt | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getAppendSystemPromptSources | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetAppendSystemPromptSources | coding-agent |
+| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getPrompts | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetPrompts | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSystemPrompt | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSystemPrompt | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSystemPromptSource | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSystemPromptSource | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.reload | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.Reload | coding-agent |
@@ -7974,12 +7972,15 @@
 | symbol:codingagent/src/core/compaction/compaction.ts#compact | partial | M4 | symbol | github.com/nankedr/pig/codingagent.Compact | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#generateSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummary | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#generateSummaryWithUsage | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummaryWithUsage | coding-agent |
+| symbol:codingagent/src/core/prompt-templates.ts#PromptTemplate | partial | M5 | symbol | github.com/nankedr/pig/codingagent.PromptTemplate | coding-agent |
 | symbol:codingagent/src/core/resource-loader.ts#DefaultResourceLoader | partial | M5 | symbol | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |
 | symbol:codingagent/src/core/resource-loader.ts#loadProjectContextFiles | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadProjectContextFiles | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#RpcClient | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-mode.ts#runRpcMode | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RunRPCMode | coding-agent |
+| symbol:codingagent/src/utils/frontmatter.ts#parseFrontmatter | partial | M5 | symbol | github.com/nankedr/pig/codingagent.ParseFrontmatter | coding-agent |
+| symbol:codingagent/src/utils/frontmatter.ts#stripFrontmatter | partial | M5 | symbol | github.com/nankedr/pig/codingagent.StripFrontmatter | coding-agent |
 | contract:codingagent/session-stats | implemented | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSessionStats | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |

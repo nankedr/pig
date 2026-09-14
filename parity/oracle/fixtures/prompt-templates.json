@@ -1,0 +1,764 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/resource-loader.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/codingagent/prompt-templates",
+    "catalog_id": "contract:codingagent/prompt-templates",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "name": "missing",
+          "files": {},
+          "calls": [
+            "/missing hi"
+          ]
+        },
+        {
+          "name": "metadata",
+          "files": {
+            "agent/prompts/review.md": "---\ndescription: Review code\nargument-hint: <file> [focus]\n---\nReview $1; ${2:-correctness}; ${@:2}; $ARGUMENTS",
+            "agent/prompts/bad.md": "---\ndescription: [broken\n---\nBAD",
+            "agent/prompts/fallback.md": "\n  First line\nsecond",
+            "agent/prompts/long.md": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "agent/prompts/crlf.md": "---\r\ndescription: >-\r\n  folded\r\n  description\r\n---\r\n BODY \r\n",
+            "agent/prompts/empty.md": "---\n---\n",
+            "agent/prompts/null.md": "---\nnull\n---\nNULL",
+            "agent/prompts/duplicate.md": "---\ndescription: one\ndescription: two\n---\nBAD",
+            "agent/prompts/.hidden.md": "HIDDEN",
+            "agent/prompts/nested/child.md": "NESTED"
+          },
+          "calls": [
+            "/review 'a b' security tests",
+            "/review",
+            "/review \"$1\" \"$@\"",
+            "/unknown x",
+            "plain",
+            "/review\nfoo"
+          ]
+        },
+        {
+          "name": "collisions",
+          "trusted": true,
+          "files": {
+            "agent/prompts/same.md": "GLOBAL",
+            "repo/.pi/prompts/same.md": "PROJECT",
+            "extra/same.md": "EXPLICIT",
+            "repo/.pi/prompts/project.md": "PROJECT_ONLY"
+          },
+          "paths": [
+            "../extra",
+            "../missing"
+          ],
+          "calls": [
+            "/same",
+            "/project"
+          ]
+        },
+        {
+          "name": "untrusted",
+          "files": {
+            "agent/prompts/same.md": "GLOBAL",
+            "repo/.pi/prompts/same.md": "SECRET"
+          },
+          "calls": [
+            "/same"
+          ]
+        },
+        {
+          "name": "disabled",
+          "disabled": true,
+          "trusted": true,
+          "files": {
+            "agent/prompts/same.md": "GLOBAL",
+            "repo/.pi/prompts/same.md": "PROJECT",
+            "extra/same.md": "EXPLICIT"
+          },
+          "paths": [
+            "../extra"
+          ],
+          "calls": [
+            "/same"
+          ]
+        },
+        {
+          "name": "disabled-empty",
+          "disabled": true,
+          "files": {
+            "agent/prompts/same.md": "GLOBAL"
+          },
+          "calls": [
+            "/same"
+          ]
+        },
+        {
+          "name": "explicit-project",
+          "files": {
+            "repo/.pi/prompts/same.md": "EXPLICIT"
+          },
+          "paths": [
+            ".pi/prompts/same.md"
+          ],
+          "calls": [
+            "/same"
+          ]
+        },
+        {
+          "name": "settings",
+          "trusted": true,
+          "global": [
+            "more",
+            "!skip.md"
+          ],
+          "project": [
+            "more"
+          ],
+          "files": {
+            "agent/more/same.md": "GLOBAL_SETTINGS",
+            "repo/.pi/more/same.md": "PROJECT_SETTINGS",
+            "agent/prompts/same.md": "GLOBAL",
+            "repo/.pi/prompts/same.md": "PROJECT",
+            "agent/prompts/skip.md": "SKIP"
+          },
+          "calls": [
+            "/same"
+          ]
+        },
+        {
+          "name": "ignore",
+          "files": {
+            "agent/prompts/.gitignore": "skip.md\n",
+            "agent/prompts/skip.md": "SKIP",
+            "agent/prompts/keep.md": "KEEP"
+          },
+          "calls": [
+            "/keep"
+          ]
+        },
+        {
+          "name": "arguments",
+          "files": {
+            "agent/prompts/args.md": "$1|$2|$0|$9|${1:-$@}|${9:-$1}|${@:-all}|${ARGUMENTS:-all}|${@:0:2}|${@:2:1}|${@:9}|${@:1:0}"
+          },
+          "calls": [
+            "/args a 'b c' d",
+            "/args",
+            "/args '' \"x y\"",
+            "/args 'unclosed",
+            "/args $1 $@",
+            "/args a",
+            "/args a"
+          ]
+        },
+        {
+          "name": "yaml-shapes",
+          "files": {
+            "agent/prompts/scalar.md": "---\nhello\n---\nSCALAR",
+            "agent/prompts/list.md": "---\n- hello\n---\nLIST",
+            "agent/prompts/date.md": "---\ndescription: 2026-09-14\n---\nDATE",
+            "agent/prompts/merge.md": "---\nbase: &base {description: inherited}\n<<: *base\n---\nMERGE",
+            "agent/prompts/alias.md": "---\nx: &text 'Aliased description'\ndescription: *text\n---\nALIAS"
+          },
+          "calls": [
+            "/date",
+            "/merge"
+          ]
+        },
+        {
+          "name": "settings-recursive",
+          "global": [
+            "more",
+            "!**/skip*.md",
+            "+more/skip-keep.md",
+            "-more/skip-no.md"
+          ],
+          "files": {
+            "agent/more/a.md": "A",
+            "agent/more/deep/b.md": "B",
+            "agent/more/deep/skip.md": "SKIP",
+            "agent/more/skip-keep.md": "KEEP",
+            "agent/more/skip-no.md": "NO",
+            "agent/more/.hidden.md": "HIDDEN",
+            "agent/more/.ignore": "ignored.md\n",
+            "agent/more/ignored.md": "IGNORED"
+          },
+          "calls": [
+            "/b",
+            "/skip-keep"
+          ]
+        },
+        {
+          "name": "explicit-url",
+          "paths": [
+            "file://$ROOT/extra/review.md"
+          ],
+          "files": {
+            "extra/review.md": "URL $1"
+          },
+          "calls": [
+            "/review file"
+          ]
+        },
+        {
+          "name": "duplicate-explicit-directory",
+          "paths": [
+            "../agent/prompts",
+            "../agent/prompts"
+          ],
+          "files": {
+            "agent/prompts/review.md": "SAME"
+          },
+          "calls": [
+            "/review"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "missing",
+        "prompts": [],
+        "diagnostics": [],
+        "expanded": [
+          "/missing hi"
+        ]
+      },
+      {
+        "name": "metadata",
+        "prompts": [
+          {
+            "name": "crlf",
+            "description": "folded description",
+            "content": "BODY",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/crlf.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/crlf.md"
+          },
+          {
+            "name": "empty",
+            "description": "",
+            "content": "",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/empty.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/empty.md"
+          },
+          {
+            "name": "fallback",
+            "description": "  First line",
+            "content": "\n  First line\nsecond",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/fallback.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/fallback.md"
+          },
+          {
+            "name": "long",
+            "description": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...",
+            "content": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/long.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/long.md"
+          },
+          {
+            "name": "null",
+            "description": "NULL",
+            "content": "NULL",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/null.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/null.md"
+          },
+          {
+            "name": "review",
+            "description": "Review code",
+            "argumentHint": "<file> [focus]",
+            "content": "Review $1; ${2:-correctness}; ${@:2}; $ARGUMENTS",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/review.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/review.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "Review a b; security; security tests; a b security tests",
+          "Review ; correctness; ; ",
+          "Review $1; $@; $@; $1 $@",
+          "/unknown x",
+          "plain",
+          "Review foo; correctness; ; foo"
+        ]
+      },
+      {
+        "name": "collisions",
+        "prompts": [
+          {
+            "name": "project",
+            "description": "PROJECT_ONLY",
+            "content": "PROJECT_ONLY",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.pi/prompts/project.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "filePath": "$ROOT/repo/.pi/prompts/project.md"
+          },
+          {
+            "name": "same",
+            "description": "PROJECT",
+            "content": "PROJECT",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.pi/prompts/same.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "filePath": "$ROOT/repo/.pi/prompts/same.md"
+          }
+        ],
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/agent/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/prompts/same.md",
+              "loserPath": "$ROOT/agent/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/extra/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/prompts/same.md",
+              "loserPath": "$ROOT/extra/same.md"
+            }
+          },
+          {
+            "type": "error",
+            "message": "Prompt template path does not exist",
+            "path": "$ROOT/missing"
+          }
+        ],
+        "expanded": [
+          "PROJECT",
+          "PROJECT_ONLY"
+        ]
+      },
+      {
+        "name": "untrusted",
+        "prompts": [
+          {
+            "name": "same",
+            "description": "GLOBAL",
+            "content": "GLOBAL",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/same.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/same.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "GLOBAL"
+        ]
+      },
+      {
+        "name": "disabled",
+        "prompts": [
+          {
+            "name": "same",
+            "description": "EXPLICIT",
+            "content": "EXPLICIT",
+            "sourceInfo": {
+              "path": "$ROOT/extra/same.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra"
+            },
+            "filePath": "$ROOT/extra/same.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "EXPLICIT"
+        ]
+      },
+      {
+        "name": "disabled-empty",
+        "prompts": [],
+        "diagnostics": [],
+        "expanded": [
+          "/same"
+        ]
+      },
+      {
+        "name": "explicit-project",
+        "prompts": [
+          {
+            "name": "same",
+            "description": "EXPLICIT",
+            "content": "EXPLICIT",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.pi/prompts/same.md",
+              "source": "local",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi/prompts"
+            },
+            "filePath": "$ROOT/repo/.pi/prompts/same.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "EXPLICIT"
+        ]
+      },
+      {
+        "name": "settings",
+        "prompts": [
+          {
+            "name": "same",
+            "description": "PROJECT_SETTINGS",
+            "content": "PROJECT_SETTINGS",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.pi/more/same.md",
+              "source": "local",
+              "scope": "project",
+              "origin": "top-level"
+            },
+            "filePath": "$ROOT/repo/.pi/more/same.md"
+          }
+        ],
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/repo/.pi/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/same.md",
+              "loserPath": "$ROOT/repo/.pi/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/agent/more/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/same.md",
+              "loserPath": "$ROOT/agent/more/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/agent/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/same.md",
+              "loserPath": "$ROOT/agent/prompts/same.md"
+            }
+          }
+        ],
+        "expanded": [
+          "PROJECT_SETTINGS"
+        ]
+      },
+      {
+        "name": "ignore",
+        "prompts": [
+          {
+            "name": "keep",
+            "description": "KEEP",
+            "content": "KEEP",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/keep.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/keep.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "KEEP"
+        ]
+      },
+      {
+        "name": "arguments",
+        "prompts": [
+          {
+            "name": "args",
+            "description": "$1|$2|$0|$9|${1:-$@}|${9:-$1}|${@:-all}|${ARGUMENTS:-all}|${...",
+            "content": "$1|$2|$0|$9|${1:-$@}|${9:-$1}|${@:-all}|${ARGUMENTS:-all}|${@:0:2}|${@:2:1}|${@:9}|${@:1:0}",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/args.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/args.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "a|b c|||a|$1|a b c d|a b c d|a b c|b c||",
+          "||||$@|$1|all|all||||",
+          "x y||||x y|$1|x y|x y|x y|||",
+          "unclosed||||unclosed|$1|unclosed|unclosed|unclosed|||",
+          "$1|$@|||$1|$1|$1 $@|$1 $@|$1 $@|$@||",
+          "a||||a|$1|a|a|a|||",
+          "/args a"
+        ]
+      },
+      {
+        "name": "yaml-shapes",
+        "prompts": [
+          {
+            "name": "alias",
+            "description": "Aliased description",
+            "content": "ALIAS",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/alias.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/alias.md"
+          },
+          {
+            "name": "date",
+            "description": "2026-09-14",
+            "content": "DATE",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/date.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/date.md"
+          },
+          {
+            "name": "list",
+            "description": "LIST",
+            "content": "LIST",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/list.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/list.md"
+          },
+          {
+            "name": "merge",
+            "description": "MERGE",
+            "content": "MERGE",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/merge.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/merge.md"
+          },
+          {
+            "name": "scalar",
+            "description": "SCALAR",
+            "content": "SCALAR",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/scalar.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/scalar.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "DATE",
+          "MERGE"
+        ]
+      },
+      {
+        "name": "settings-recursive",
+        "prompts": [
+          {
+            "name": "a",
+            "description": "A",
+            "content": "A",
+            "sourceInfo": {
+              "path": "$ROOT/agent/more/a.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "filePath": "$ROOT/agent/more/a.md"
+          },
+          {
+            "name": "b",
+            "description": "B",
+            "content": "B",
+            "sourceInfo": {
+              "path": "$ROOT/agent/more/deep/b.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "filePath": "$ROOT/agent/more/deep/b.md"
+          },
+          {
+            "name": "skip-keep",
+            "description": "KEEP",
+            "content": "KEEP",
+            "sourceInfo": {
+              "path": "$ROOT/agent/more/skip-keep.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "filePath": "$ROOT/agent/more/skip-keep.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "B",
+          "KEEP"
+        ]
+      },
+      {
+        "name": "explicit-url",
+        "prompts": [
+          {
+            "name": "review",
+            "description": "URL $1",
+            "content": "URL $1",
+            "sourceInfo": {
+              "path": "$ROOT/extra/review.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra"
+            },
+            "filePath": "$ROOT/extra/review.md"
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "URL file"
+        ]
+      },
+      {
+        "name": "duplicate-explicit-directory",
+        "prompts": [
+          {
+            "name": "review",
+            "description": "SAME",
+            "content": "SAME",
+            "sourceInfo": {
+              "path": "$ROOT/agent/prompts/review.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "filePath": "$ROOT/agent/prompts/review.md"
+          }
+        ],
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"/review\" collision",
+            "path": "$ROOT/agent/prompts/review.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "review",
+              "winnerPath": "$ROOT/agent/prompts/review.md",
+              "loserPath": "$ROOT/agent/prompts/review.md"
+            }
+          }
+        ],
+        "expanded": [
+          "SAME"
+        ]
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:ed873c4bd03c3fc7c8050477e3622d53c223ed193e171adfc032126368c957d3",
+  "observation_hash": "sha256:1a63a37e70ba77a266ac1a0a477fe3a46818082890b9cfb18c232148e7627731",
+  "execution_method": "node --experimental-strip-types parity/oracle/prompt-templates.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/resource-loader.ts"
+  }
+}

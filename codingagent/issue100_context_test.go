@@ -261,7 +261,7 @@ func TestContextFilesReloadAndOwnership(t *testing.T) {
 		t.Fatalf("reload: %v", after)
 	}
 	for _, fn := range []func() error{
-		func() error { _, err := loader.GetSkills(); return err }, func() error { _, err := loader.GetPrompts(); return err }, func() error { _, err := loader.GetThemes(); return err }, func() error { _, err := loader.GetExtensions(); return err },
+		func() error { _, err := loader.GetSkills(); return err }, func() error { _, err := loader.GetThemes(); return err }, func() error { _, err := loader.GetExtensions(); return err },
 	} {
 		if err := fn(); !errors.Is(err, codingagent.ErrNotImplemented) {
 			t.Fatalf("unsupported query: %v", err)

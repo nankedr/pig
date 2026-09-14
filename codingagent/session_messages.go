@@ -43,7 +43,8 @@ func (s *AgentSession) SendUserMessage(content ai.UserMessageContent, options ..
 		}
 		text = strings.Join(parts, "\n")
 	}
-	return s.prompt(context.Background(), text, PromptOptions{StreamingBehavior: string(delivery)})
+	disabled := false
+	return s.prompt(context.Background(), text, PromptOptions{StreamingBehavior: string(delivery), ExpandPromptTemplates: &disabled})
 }
 
 func (s *AgentSession) Steer(text string) error {
@@ -54,8 +55,12 @@ func (s *AgentSession) FollowUp(text string) error {
 }
 
 func (s *AgentSession) queueMessage(text string, delivery UserMessageDelivery) error {
+	text, err := s.expandTemplate(text)
+	if err != nil {
+		return err
+	}
 	s.mu.Lock()
-	err := s.queueMessageLocked(text, delivery)
+	err = s.queueMessageLocked(text, delivery)
 	s.mu.Unlock()
 	s.dispatchQueueEvents()
 	return err
