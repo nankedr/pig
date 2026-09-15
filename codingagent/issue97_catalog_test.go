@@ -15,7 +15,7 @@ func issue97HTMLCatalogEntry() catalog.Entry {
 		"Embedded offline assets and full third-party licenses; base64 session data, escaped attributes and hash-only script CSP; browser XSS tests at the real CLI boundary; deterministic input/path/write/cancellation errors without source mutation or implicit Pi state/services",
 	}, Unsupported: []string{
 		"Message/tool-result image blocks fail explicitly (M12); Markdown images display a visible deferred placeholder and make no network request. Extension HTML renderers remain deferred to M7; custom tools use Pi's plain-text/JSON fallback",
-		"Only the locked dark theme is embedded; configured/custom themes wait for M5. Legacy/future versions, unknown roles/blocks/entries and corrupt topology are rejected; explicit session migration remains available separately",
+		"Theme resources and configured/custom HTML colors are delivered under contract:codingagent/themes (#104). Legacy/future versions, unknown roles/blocks/entries and corrupt topology are rejected; explicit session migration remains available separately",
 		"No hosted sharing service or remote assets. ExportToJSONL SDK method remains a stub; the browser's existing JSONL download exports the embedded whole tree. M4 freeze evidence is audited separately by internal/m4gate",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0033-safe-html-export.md", Reason: "Embed locked licensed assets; reject invalid input without rewriting it; remove inline handlers, escape tool offsets and use a hash CSP with no automatic network access."}}
 }

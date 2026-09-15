@@ -28,6 +28,18 @@ type htmlSessionData struct {
 
 // ExportFromFile exports a v3 session without opening or modifying Pig or Pi state.
 func ExportFromFile(ctx context.Context, input string, output ...string) (string, error) {
+	theme, _, err := loadExportTheme(ctx, nil, nil, DefaultResourceLoaderOptions{}, nil)
+	if err != nil {
+		return "", err
+	}
+	options := HTMLExportOptions{Theme: theme}
+	if len(output) > 0 {
+		options.OutputPath = output[0]
+	}
+	return ExportFromFileWithOptions(ctx, input, options)
+}
+
+func ExportFromFileWithOptions(ctx context.Context, input string, options HTMLExportOptions) (string, error) {
 	if err := ctx.Err(); err != nil {
 		return "", err
 	}
@@ -66,10 +78,10 @@ func ExportFromFile(ctx context.Context, input string, output ...string) (string
 		}
 		data.LeafID = &e.ID
 	}
-	return writeSessionHTML(ctx, path, data, output)
+	return writeSessionHTML(ctx, path, data, []string{options.OutputPath}, options.Theme)
 }
 
-func writeSessionHTML(ctx context.Context, source string, data htmlSessionData, output []string) (string, error) {
+func writeSessionHTML(ctx context.Context, source string, data htmlSessionData, output []string, theme *Theme) (string, error) {
 	if err := validateHTMLSession(data); err != nil {
 		return "", err
 	}
@@ -85,7 +97,11 @@ func writeSessionHTML(ctx context.Context, source string, data htmlSessionData, 
 		scriptPolicy += " 'sha256-" + base64.StdEncoding.EncodeToString(h[:]) + "'"
 	}
 	csp := "default-src 'none'; script-src" + scriptPolicy + "; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'"
-	document := strings.NewReplacer("{{CSS}}", asset("template.css"), "{{JS}}", js, "{{SESSION_DATA}}", base64.StdEncoding.EncodeToString(encoded), "{{MARKED_JS}}", marked, "{{HIGHLIGHT_JS}}", highlight, "{{CSP}}", csp, "{{LICENSES}}", html.EscapeString(asset("LICENSES.txt"))).Replace(asset("template.html"))
+	themeCSS, err := themeExportCSS(theme)
+	if err != nil {
+		return "", err
+	}
+	document := strings.NewReplacer("{{CSS}}", themeCSS+asset("template.css"), "{{JS}}", js, "{{SESSION_DATA}}", base64.StdEncoding.EncodeToString(encoded), "{{MARKED_JS}}", marked, "{{HIGHLIGHT_JS}}", highlight, "{{CSP}}", csp, "{{LICENSES}}", html.EscapeString(asset("LICENSES.txt"))).Replace(asset("template.html"))
 	path := "pig-session-" + strings.TrimSuffix(filepath.Base(source), ".jsonl") + ".html"
 	if len(output) > 0 && output[0] != "" {
 		path = output[0]
@@ -335,5 +351,13 @@ func (s *AgentSession) ExportToHTML(ctx context.Context, output ...string) (stri
 	for _, tool := range state.Tools {
 		data.Tools = append(data.Tools, map[string]any{"name": tool.Tool.Name, "description": tool.Tool.Description, "parameters": tool.Tool.Parameters})
 	}
-	return writeSessionHTML(ctx, source, data, output)
+	var theme *Theme
+	if s.settingsManager != nil || s.resourceLoader != nil {
+		var err error
+		theme, _, err = loadExportTheme(ctx, s.settingsManager, s.resourceLoader, DefaultResourceLoaderOptions{CWD: m.GetCWD()}, nil)
+		if err != nil {
+			return "", err
+		}
+	}
+	return writeSessionHTML(ctx, source, data, output, theme)
 }

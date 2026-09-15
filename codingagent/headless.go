@@ -35,6 +35,8 @@ type CreateHeadlessSessionOptions struct {
 	Offline              bool
 	ProjectTrustOverride ProjectTrustDecision
 	NoContextFiles       bool
+	NoThemes             bool
+	Themes               []string
 	NoSkills             bool
 	Skills               []string
 	NoPromptTemplates    bool
@@ -267,7 +269,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			return nil, err
 		}
 	}
-	loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: options.CWD, AgentDir: options.AgentDir, SettingsManager: settings, NoContextFiles: options.NoContextFiles, NoSkills: options.NoSkills, AdditionalSkillPaths: options.Skills, NoPromptTemplates: options.NoPromptTemplates, AdditionalPromptTemplatePaths: options.PromptTemplates, SystemPrompt: options.SystemPrompt, AppendSystemPrompt: options.AppendSystemPrompt})
+	loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: options.CWD, AgentDir: options.AgentDir, SettingsManager: settings, NoContextFiles: options.NoContextFiles, NoSkills: options.NoSkills, NoThemes: options.NoThemes, AdditionalThemePaths: options.Themes, AdditionalSkillPaths: options.Skills, NoPromptTemplates: options.NoPromptTemplates, AdditionalPromptTemplatePaths: options.PromptTemplates, SystemPrompt: options.SystemPrompt, AppendSystemPrompt: options.AppendSystemPrompt})
 	if err != nil {
 		return nil, err
 	}
@@ -313,7 +315,8 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if loader, ok := created.Session.ResourceLoader().(*DefaultResourceLoader); ok {
 		prompts, _ := loader.GetPrompts()
 		skills, _ := loader.GetSkills()
-		prompts.Diagnostics = append(prompts.Diagnostics, skills.Diagnostics...)
+		themes, _ := loader.GetThemes()
+		prompts.Diagnostics = append(append(prompts.Diagnostics, skills.Diagnostics...), themes.Diagnostics...)
 		for _, d := range append(append(loader.GetContextFileDiagnostics(), loader.GetSystemPromptDiagnostics()...), prompts.Diagnostics...) {
 			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
 		}

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -17,6 +17,26 @@ try {
  const run=()=>execFileSync(binary,['--export',source,html],{cwd:dir,env:{...process.env,PIG_OFFLINE:'1',PIG_CODING_AGENT_DIR:join(dir,'state')}});
  run();
  assert.deepEqual(await observeExport(html),fixture.observation.outcome.rendered);
+ const themes=JSON.parse(readFileSync(join(root,'parity/oracle/fixtures/themes.json')));
+ const themePath=join(dir,'theme.json');mkdirSync(join(dir,'state'),{recursive:true});
+ const themedBrowser=await openBrowser();
+ try {
+  const page=await themedBrowser.newPage();const requests=[];page.on('request',r=>{if(/^https?:/.test(r.url()))requests.push(r.url())});
+  for(let i=0;i<themes.case.input.documents.length;i++){
+   const doc=themes.case.input.documents[i],expected=themes.observation.outcome.colors[i];
+   writeFileSync(themePath,JSON.stringify(doc));writeFileSync(join(dir,'state/settings.json'),JSON.stringify({theme:doc.name}));
+   execFileSync(binary,['--export',source,html,'--theme',themePath,'--no-themes'],{cwd:dir,env:{...process.env,PIG_OFFLINE:'1',PIG_CODING_AGENT_DIR:join(dir,'state')}});
+   await page.goto(pathToFileURL(html).href);await page.locator('#messages .user-message').first().waitFor();
+   const colors=await page.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,getComputedStyle(document.documentElement).getPropertyValue('--'+key).trim()])),Object.keys(expected.html));
+   assert.deepEqual(colors,expected.html);
+  }
+  const bad=structuredClone(themes.case.input.documents[2]);bad.name='custom</style><script>window.__themeXss=1</script>';bad.export.pageBg='#fff;</style><script>window.__themeXss=1</script>';
+  writeFileSync(themePath,JSON.stringify(bad));writeFileSync(join(dir,'state/settings.json'),'{}');
+  execFileSync(binary,['--export',source,html,'--theme',themePath],{cwd:dir,env:{...process.env,PIG_OFFLINE:'1',PIG_CODING_AGENT_DIR:join(dir,'state')},stdio:['ignore','pipe','pipe']});
+  await page.goto(pathToFileURL(html).href);assert.equal(await page.evaluate(()=>!!window.__themeXss),false);assert.deepEqual(requests,[]);
+  console.log('PASS: dark/light/custom theme CSS matches locked Pi HTML; theme injection rejected');
+ }finally{await themedBrowser.close();rmSync(join(dir,'state/settings.json'));}
+
  const entries=fixture.case.input.session.trim().split('\n').map(JSON.parse);
  const attack='<img src=x onerror="window.__xss=1"><svg onload="window.__xss=1"></svg></script><script>window.__xss=1</script>';
  const markdown=[attack,'[bad](javascript:window.__xss=1)','[bad](JaVaScRiPt:window.__xss=1)','[bad](java\u0001script:window.__xss=1)','[bad](data:text/html,test)','[bad](vbscript:msgbox)','[attr](https://example.com/\"onmouseover=\"window.__xss=1)','![image](https://example.com/track.png)','`'+attack+'`','```html\n'+attack+'\n```','[safe](https://example.com)'].join('\n\n');

@@ -1,0 +1,86 @@
+type codingagent.Theme
+- Name string ""
+- SourceInfo *codingagent.SourceInfo ""
+- SourcePath string ""
+type codingagent.ThemeLoadResult
+- Themes []*codingagent.Theme ""
+- Diagnostics []codingagent.ResourceDiagnostic ""
+type codingagent.HTMLExportOptions
+- OutputPath string ""
+- Theme *codingagent.Theme ""
+type codingagent.DefaultResourceLoaderOptions
+- CWD string ""
+- AgentDir string ""
+- SettingsManager *codingagent.SettingsManager ""
+- EventBus codingagent.EventBus ""
+- AdditionalExtensionPaths []string ""
+- AdditionalSkillPaths []string ""
+- AdditionalPromptTemplatePaths []string ""
+- AdditionalThemePaths []string ""
+- ExtensionFactories []codingagent.InlineExtension ""
+- NoExtensions bool ""
+- NoSkills bool ""
+- NoPromptTemplates bool ""
+- NoThemes bool ""
+- NoContextFiles bool ""
+- SystemPrompt *string ""
+- AppendSystemPrompt []string ""
+- ExtensionsOverride codingagent.ExtensionHandler ""
+- SkillsOverride codingagent.ExtensionHandler ""
+- PromptsOverride codingagent.ExtensionHandler ""
+- ThemesOverride codingagent.ExtensionHandler ""
+- AgentsFilesOverride codingagent.ExtensionHandler ""
+- SystemPromptOverride codingagent.ExtensionHandler ""
+- AppendSystemPromptOverride codingagent.ExtensionHandler ""
+type codingagent.CreateHeadlessSessionOptions
+- ModelRuntime *codingagent.ModelRuntime ""
+- Models []string ""
+- Offline bool ""
+- ProjectTrustOverride *bool ""
+- NoContextFiles bool ""
+- NoThemes bool ""
+- Themes []string ""
+- NoSkills bool ""
+- Skills []string ""
+- NoPromptTemplates bool ""
+- PromptTemplates []string ""
+- CWD string ""
+- AgentDir string ""
+- AuthPath string ""
+- Credentials ai.CredentialStore ""
+- SettingsManager *codingagent.SettingsManager ""
+- SessionDir *string ""
+- Provider ai.ProviderID ""
+- Model string ""
+- APIKey *string ""
+- Environment ai.ProviderEnv ""
+- BaseURL *string ""
+- Thinking ai.ModelThinkingLevel ""
+- Tools []string ""
+- ExcludeTools []string ""
+- NoTools codingagent.NoToolsMode ""
+- SystemPrompt *string ""
+- AppendSystemPrompt []string ""
+- SessionManager *codingagent.SessionManager ""
+method BG func(*codingagent.Theme, codingagent.ThemeBG, string) string
+method Bg func(*codingagent.Theme, codingagent.ThemeBG, string) string
+method Bold func(*codingagent.Theme, string) string
+method ExportColors func(*codingagent.Theme) map[string]string
+method FG func(*codingagent.Theme, codingagent.ThemeColor, string) string
+method Fg func(*codingagent.Theme, codingagent.ThemeColor, string) string
+method GetBGANSI func(*codingagent.Theme, codingagent.ThemeBG) string
+method GetBashModeBorderColor func(*codingagent.Theme) tui.TextStyleFunc
+method GetBgANSI func(*codingagent.Theme, codingagent.ThemeBG) string
+method GetColorMode func(*codingagent.Theme) codingagent.ColorMode
+method GetFGANSI func(*codingagent.Theme, codingagent.ThemeColor) string
+method GetFgANSI func(*codingagent.Theme, codingagent.ThemeColor) string
+method GetThinkingBorderColor func(*codingagent.Theme, ai.ModelThinkingLevel) (tui.TextStyleFunc, error)
+method Inverse func(*codingagent.Theme, string) string
+method Italic func(*codingagent.Theme, string) string
+method ResolvedColors func(*codingagent.Theme) map[string]string
+method Strikethrough func(*codingagent.Theme, string) string
+method Underline func(*codingagent.Theme, string) string
+func(string, ...codingagent.ColorMode) (*codingagent.Theme, error)
+func(string, ...codingagent.ColorMode) (*codingagent.Theme, error)
+func(string, codingagent.ThemeLoadResult) (*codingagent.Theme, error)
+func(context.Context, string, codingagent.HTMLExportOptions) (string, error)

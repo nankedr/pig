@@ -5,7 +5,7 @@ contract:codingagent/branch-summary	partial	github.com/nankedr/pig/codingagent.A
 contract:codingagent/compaction	partial	github.com/nankedr/pig/codingagent	6af44ccb3ea224d04d0b8c7e2496958a81ecccfe7866aafbe8bc8a23091d50c0
 contract:codingagent/find-ls	partial	github.com/nankedr/pig/codingagent.CreateFindTool	0dce3e5bd6d084446cf94d4ac5712da523d9411ed7e4c4ccd4ac61f7194d0a2d
 contract:codingagent/grep-tool	partial	github.com/nankedr/pig/codingagent.CreateGrepTool	48b629f34ba0bbf59e1c5576eb73678e52dda7b1978551a8ac8202273d394a24
-contract:codingagent/html-export	partial	github.com/nankedr/pig/codingagent.ExportFromFile	922aae09eae855f140b92a7acaab60e57fc004127be7d82ac6f441c668c9b79b
+contract:codingagent/html-export	partial	github.com/nankedr/pig/codingagent.ExportFromFile	028728d69d19010c9bceb510e68e0018b6e0a3e593ea82a4618f082c6db660df
 contract:codingagent/session-bash	partial	github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash	9334244743bee62cc983e9d1fa61b972fade08c023c238a6bb6a389cbff71a61
 contract:codingagent/session-configuration	partial	github.com/nankedr/pig/codingagent.AgentSession.SetModel	4acf7303c97c1603ee6ccdc4424831f19b335018806e859a513ec65c6d66db23
 contract:codingagent/session-messages	partial	github.com/nankedr/pig/codingagent.AgentSession	32bf239717e07c6af64210e091b26f1f1690efe3e0d9ced77b9448cb8f7cab07
@@ -117,7 +117,7 @@ member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.collectEvents	implement
 member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.compact	implemented	github.com/nankedr/pig/codingagent.RPCClient.Compact	74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b
 member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.cycleModel	implemented	github.com/nankedr/pig/codingagent.RPCClient.CycleModel	74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b
 member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.cycleThinkingLevel	implemented	github.com/nankedr/pig/codingagent.RPCClient.CycleThinkingLevel	74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b
-member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.exportHtml	partial	github.com/nankedr/pig/codingagent.RPCClient.ExportHTML	922aae09eae855f140b92a7acaab60e57fc004127be7d82ac6f441c668c9b79b
+member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.exportHtml	partial	github.com/nankedr/pig/codingagent.RPCClient.ExportHTML	028728d69d19010c9bceb510e68e0018b6e0a3e593ea82a4618f082c6db660df
 member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.followUp	implemented	github.com/nankedr/pig/codingagent.RPCClient.FollowUp	74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b
 member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.fork	implemented	github.com/nankedr/pig/codingagent.RPCClient.Fork	74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b
 member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.getAvailableModels	implemented	github.com/nankedr/pig/codingagent.RPCClient.GetAvailableModels	74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b

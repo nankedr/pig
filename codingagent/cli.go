@@ -353,7 +353,18 @@ func RunCLI(ctx context.Context, invocation CLIInvocation) (CLIResult, error) {
 		return result, nil
 	}
 	if parsed.Export != nil {
-		path, err := ExportFromFile(ctx, *parsed.Export, parsed.Messages...)
+		theme, diagnostics, err := loadExportTheme(ctx, nil, nil, DefaultResourceLoaderOptions{NoThemes: parsed.NoThemes, AdditionalThemePaths: parsed.Themes}, parsed.ProjectTrustOverride)
+		for _, d := range diagnostics {
+			result.Stderr += fmt.Sprintf("Warning: %s: %s\n", d.Path, d.Message)
+		}
+		if err != nil {
+			return result, &CLIArgumentError{Message: err.Error()}
+		}
+		options := HTMLExportOptions{Theme: theme}
+		if len(parsed.Messages) > 0 {
+			options.OutputPath = parsed.Messages[0]
+		}
+		path, err := ExportFromFileWithOptions(ctx, *parsed.Export, options)
 		if err != nil {
 			return result, &CLIArgumentError{Message: err.Error()}
 		}

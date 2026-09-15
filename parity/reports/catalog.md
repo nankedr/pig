@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9673
+- Total entries: 9674
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
-| scaffolded | 3883 |
-| partial | 330 |
+| scaffolded | 3866 |
+| partial | 348 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -6902,7 +6902,6 @@
 | member:codingagent/src/core/package-manager.ts#ResolvedResource.path | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResolvedResource.Path | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.extendResources | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.ExtendResources | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getExtensions | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetExtensions | coding-agent |
-| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getThemes | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetThemes | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.loadProjectTrustExtensions | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.LoadProjectTrustExtensions | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#ResourceLoader.extendResources | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceLoader.ExtendResources | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#ResourceLoader.getAgentsFiles | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceLoader.GetAgentsFiles | coding-agent |
@@ -7454,21 +7453,6 @@
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions.modelFallbackMessage | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveModeOptions.ModelFallbackMessage | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions.tuiMode | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveModeOptions.TUIMode | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions.verbose | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveModeOptions.Verbose | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.bg | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Bg | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.bold | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Bold | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.fg | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Fg | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getBashModeBorderColor | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetBashModeBorderColor | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getBgAnsi | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetBgANSI | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getColorMode | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetColorMode | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getFgAnsi | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetFgANSI | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getThinkingBorderColor | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetThinkingBorderColor | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.inverse | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Inverse | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.italic | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Italic | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.name | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Name | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.sourceInfo | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.SourceInfo | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.sourcePath | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.SourcePath | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.strikethrough | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Strikethrough | coding-agent |
-| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.underline | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Underline | coding-agent |
 | member:codingagent/src/modes/print-mode.ts#PrintModeOptions.initialImages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PrintModeOptions.InitialImages | coding-agent |
 | member:codingagent/src/modes/print-mode.ts#PrintModeOptions.initialMessage | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PrintModeOptions.InitialMessage | coding-agent |
 | member:codingagent/src/modes/print-mode.ts#PrintModeOptions.messages | scaffolded | M1 | contract | github.com/nankedr/pig/codingagent.PrintModeOptions.Messages | coding-agent |
@@ -7856,7 +7840,6 @@
 | symbol:codingagent/src/modes/interactive/components/visual-truncate.ts#truncateToVisualLines | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.TruncateToVisualLines | coding-agent |
 | symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveModeOptions | coding-agent |
-| symbol:codingagent/src/modes/interactive/theme/theme.ts#Theme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.Theme | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#ThemeColor | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ThemeColor | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#getLanguageFromPath | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetLanguageFromPath | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#getMarkdownTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetMarkdownTheme | coding-agent |
@@ -7903,6 +7886,7 @@
 | contract:codingagent/session-tree-navigation | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
 | contract:codingagent/skills | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSkills | coding-agent |
 | contract:codingagent/system-prompts | partial | M5 | contract | github.com/nankedr/pig/codingagent.NewDefaultResourceLoader | coding-agent |
+| contract:codingagent/themes | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetThemes | coding-agent |
 | contract:codingagent/turn-retry | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
 | contract:codingagent/write-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateWriteTool | coding-agent |
 | contract:config/auth-json | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewAuthStorage | coding-agent |
@@ -7945,6 +7929,7 @@
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSkills | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSkills | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSystemPrompt | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSystemPrompt | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getSystemPromptSource | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSystemPromptSource | coding-agent |
+| member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.getThemes | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetThemes | coding-agent |
 | member:codingagent/src/core/resource-loader.ts#DefaultResourceLoader.reload | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.Reload | coding-agent |
 | member:codingagent/src/core/session-manager.ts#SessionManager.appendCompaction | partial | M3 | contract | github.com/nankedr/pig/codingagent.SessionManager.AppendCompaction | coding-agent |
 | member:codingagent/src/core/skills.ts#LoadSkillsFromDirOptions.dir | partial | M5 | contract | github.com/nankedr/pig/codingagent.LoadSkillsFromDirOptions.Dir | coding-agent |
@@ -7960,6 +7945,21 @@
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.description | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.Description | coding-agent |
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.disable-model-invocation | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.DisableModelInvocation | coding-agent |
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.name | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.Name | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.bg | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Bg | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.bold | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Bold | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.fg | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Fg | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getBashModeBorderColor | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetBashModeBorderColor | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getBgAnsi | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetBgANSI | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getColorMode | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetColorMode | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getFgAnsi | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetFgANSI | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.getThinkingBorderColor | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.GetThinkingBorderColor | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.inverse | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Inverse | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.italic | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Italic | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.name | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Name | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.sourceInfo | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.SourceInfo | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.sourcePath | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.SourcePath | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.strikethrough | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Strikethrough | coding-agent |
+| member:codingagent/src/modes/interactive/theme/theme.ts#Theme.underline | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Underline | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.exportHtml | partial | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.ExportHTML | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
 | symbol:codingagent/src/core/compaction/branch-summarization.ts#generateBranchSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateBranchSummary | coding-agent |
@@ -7977,6 +7977,7 @@
 | symbol:codingagent/src/core/skills.ts#loadSkills | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadSkills | coding-agent |
 | symbol:codingagent/src/core/skills.ts#loadSkillsFromDir | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadSkillsFromDir | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
+| symbol:codingagent/src/modes/interactive/theme/theme.ts#Theme | partial | M6 | symbol | github.com/nankedr/pig/codingagent.Theme | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#RpcClient | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-mode.ts#runRpcMode | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RunRPCMode | coding-agent |

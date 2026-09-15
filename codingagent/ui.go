@@ -580,12 +580,14 @@ const (
 )
 
 type Theme struct {
-	Name       string
-	SourceInfo *SourceInfo
-	SourcePath string
-	mode       ColorMode
-	foreground map[ThemeColor]string
-	background map[ThemeBG]string
+	Name         string
+	SourceInfo   *SourceInfo
+	SourcePath   string
+	mode         ColorMode
+	foreground   map[ThemeColor]string
+	background   map[ThemeBG]string
+	colors       map[string]string
+	exportColors map[string]string
 }
 
 func (t *Theme) FG(color ThemeColor, text string) string {
@@ -627,8 +629,16 @@ func (t *Theme) GetColorMode() ColorMode {
 	}
 	return t.mode
 }
-func (*Theme) GetThinkingBorderColor(agent.ThinkingLevel) (tui.TextStyleFunc, error) {
-	return nil, notImplemented("Theme.GetThinkingBorderColor")
+func (t *Theme) GetThinkingBorderColor(level agent.ThinkingLevel) (tui.TextStyleFunc, error) {
+	if t == nil || t.foreground == nil {
+		return nil, notImplemented("Theme.GetThinkingBorderColor")
+	}
+	colors := map[agent.ThinkingLevel]ThemeColor{"off": "thinkingOff", "minimal": "thinkingMinimal", "low": "thinkingLow", "medium": "thinkingMedium", "high": "thinkingHigh", "xhigh": "thinkingXhigh", "max": "thinkingMax"}
+	color, ok := colors[level]
+	if !ok {
+		color = "thinkingOff"
+	}
+	return func(text string) string { return t.FG(color, text) }, nil
 }
 func (t *Theme) GetBashModeBorderColor() tui.TextStyleFunc {
 	return func(s string) string { return t.FG("bashMode", s) }

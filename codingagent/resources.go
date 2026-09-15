@@ -123,13 +123,16 @@ type DefaultResourceLoader struct {
 	skills            SkillLoadResult
 	skillPaths        []string
 	noSkills          bool
+	themes            ThemeLoadResult
+	themePaths        []string
+	noThemes          bool
 	templates         PromptTemplateLoadResult
 	templatePaths     []string
 	noPromptTemplates bool
 }
 
 func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultResourceLoader, error) {
-	if len(options.AdditionalExtensionPaths) > 0 || len(options.AdditionalThemePaths) > 0 || len(options.ExtensionFactories) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
+	if len(options.AdditionalExtensionPaths) > 0 || len(options.ExtensionFactories) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
 		return nil, notImplemented("NewDefaultResourceLoader")
 	}
 	cwd, err := resolveSessionPath(options.CWD)
@@ -145,7 +148,7 @@ func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultRes
 	if err != nil {
 		return nil, err
 	}
-	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, noContextFiles: options.NoContextFiles, noSkills: options.NoSkills, skillPaths: slices.Clone(options.AdditionalSkillPaths), noPromptTemplates: options.NoPromptTemplates, templatePaths: slices.Clone(options.AdditionalPromptTemplatePaths), files: []AgentsFile{}, settings: options.SettingsManager, systemInput: cloneStringPointer(options.SystemPrompt), appendInputs: slices.Clone(options.AppendSystemPrompt)}, nil
+	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, noContextFiles: options.NoContextFiles, noSkills: options.NoSkills, noThemes: options.NoThemes, themePaths: slices.Clone(options.AdditionalThemePaths), skillPaths: slices.Clone(options.AdditionalSkillPaths), noPromptTemplates: options.NoPromptTemplates, templatePaths: slices.Clone(options.AdditionalPromptTemplatePaths), files: []AgentsFile{}, settings: options.SettingsManager, systemInput: cloneStringPointer(options.SystemPrompt), appendInputs: slices.Clone(options.AppendSystemPrompt)}, nil
 }
 
 func (*DefaultResourceLoader) GetExtensions() (LoadExtensionsResult, error) {
@@ -183,8 +186,28 @@ func (l *DefaultResourceLoader) GetPrompts() (PromptTemplateLoadResult, error) {
 	}
 	return result, nil
 }
-func (*DefaultResourceLoader) GetThemes() (ThemeLoadResult, error) {
-	return ThemeLoadResult{}, notImplemented("DefaultResourceLoader.GetThemes")
+func (l *DefaultResourceLoader) GetThemes() (ThemeLoadResult, error) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	if l.cwd == "" {
+		return ThemeLoadResult{}, notImplemented("DefaultResourceLoader.GetThemes")
+	}
+	result := ThemeLoadResult{Themes: []*Theme{}, Diagnostics: append([]ResourceDiagnostic{}, l.themes.Diagnostics...)}
+	for _, theme := range l.themes.Themes {
+		copy := *theme
+		if copy.SourceInfo != nil {
+			source := *copy.SourceInfo
+			copy.SourceInfo = &source
+		}
+		result.Themes = append(result.Themes, &copy)
+	}
+	for i, d := range result.Diagnostics {
+		if d.Collision != nil {
+			c := *d.Collision
+			result.Diagnostics[i].Collision = &c
+		}
+	}
+	return result, nil
 }
 func (l *DefaultResourceLoader) GetAgentsFiles() ([]AgentsFile, error) {
 	l.mu.RLock()
@@ -316,6 +339,11 @@ func (l *DefaultResourceLoader) Reload(ctx context.Context, options ...ResourceL
 	if err != nil {
 		return err
 	}
+	themes, err := l.loadThemes(ctx, settings, trusted)
+	if err != nil {
+		return err
+	}
+	l.themes = themes
 	l.skills = skills
 	l.templates = templates
 	l.files, l.diagnostics = files, diagnostics

@@ -508,6 +508,8 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		Offline:            ResolveOffline(parsed.Offline),
 		NoContextFiles:     parsed.NoContextFiles,
 		NoSkills:           parsed.NoSkills,
+		NoThemes:           parsed.NoThemes,
+		Themes:             parsed.Themes,
 		Skills:             parsed.Skills,
 		NoPromptTemplates:  parsed.NoPromptTemplates,
 		PromptTemplates:    parsed.PromptTemplates,
@@ -551,7 +553,7 @@ func unsupportedHeadlessOperation(parsed Args) string {
 		return "headless.file-arguments"
 	case parsed.Resume:
 		return "headless.session-persistence"
-	case len(parsed.Extensions) != 0 || len(parsed.Themes) != 0:
+	case len(parsed.Extensions) != 0:
 		return "headless.resources"
 	default:
 		return ""

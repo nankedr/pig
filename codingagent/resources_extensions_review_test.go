@@ -144,9 +144,9 @@ func TestDefaultResourceLoaderUnavailableBoundary(t *testing.T) {
 	cwd := filepath.Join(root, "missing-project")
 	agentDir := filepath.Join(root, "missing-agent-dir")
 	created, err := codingagent.NewDefaultResourceLoader(codingagent.DefaultResourceLoaderOptions{
-		CWD:                  cwd,
-		AgentDir:             agentDir,
-		AdditionalThemePaths: []string{"unsupported"},
+		CWD:                      cwd,
+		AgentDir:                 agentDir,
+		AdditionalExtensionPaths: []string{"unsupported"},
 		EventBus: codingagent.EventBus{
 			Emit: nil,
 			On:   nil,
