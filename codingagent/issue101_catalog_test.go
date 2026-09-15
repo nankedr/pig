@@ -17,7 +17,7 @@ func issue101PromptCatalogEntry() catalog.Entry {
 		"Trust gates project settings and prompt reads from the first load; global defaults and saved decisions are resolved before project reads, explicit resources retain independent trust, Headless ask fails closed; local Reload publishes owned snapshots only after successful completion",
 	}, Unsupported: []string{
 		"SystemPromptOverride, AppendSystemPromptOverride, ResolveProjectTrust and LoadProjectTrustExtensions remain explicit M7 Capability Stubs; no extension execution or frozen extension ABI",
-		"Skill, Theme and live Session resource reload orchestration remain later M5 slices; package manifest/registration, npm/git installation, dependencies and lifecycle remain deferred under #99",
+		"Skill, Theme and local Session reload are delivered by #103, #104 and #106; extension reload remains deferred; package manifest/registration, npm/git installation, dependencies and lifecycle remain deferred under #99",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0010-trust-and-host-security.md", Reason: "Resolve trust before project settings reads. Non-regular prompt inputs produce a warning and retain the input value instead of opening a device or blocking on a FIFO."}}
 }
 

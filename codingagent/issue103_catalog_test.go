@@ -16,7 +16,7 @@ func issue103SkillCatalogEntry() catalog.Entry {
 		"Public SDK sessions and real CLI subprocesses match locked Pi fixtures for model-visible lists gated by read Tool and explicit skill blocks; unknown commands and expansion opt-out preserve original text",
 		"RPC get_commands includes skill/source information and explicit-only skills; first-load trust, owned reload snapshots, malformed metadata, symlink cycles and streaming queue delivery are covered",
 	}, Unsupported: []string{
-		"Package manifest/registration, npm/git, dependencies and lifecycle are deferred under #99; opaque SkillsOverride, ExtendResources, extension error callbacks and live Session reload orchestration remain later slices",
+		"Package manifest/registration, npm/git, dependencies and lifecycle are deferred under #99; opaque SkillsOverride, ExtendResources, extension error callbacks and extension reload orchestration remains deferred; local Session reload is delivered by #106",
 		"General-purpose YAML error-text parity and full minimatch extglob grammar are not verified; six-platform runtime parity remains M13; auxiliary scripts require the host tools named by each skill",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0010-trust-and-host-security.md", Reason: "Project settings and skills are read only after trust; explicit paths are independently authorized. Non-regular files are skipped, and recursive symlink cycles are not followed."}}
 }

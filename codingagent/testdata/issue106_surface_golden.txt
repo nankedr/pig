@@ -1,0 +1,13 @@
+method *codingagent.AgentSession.Reload func(*codingagent.AgentSession, context.Context) error
+method *codingagent.AgentSession.Prompt func(*codingagent.AgentSession, context.Context, string, ...codingagent.PromptOptions) error
+method *codingagent.AgentSession.PromptTemplates func(*codingagent.AgentSession) ([]codingagent.PromptTemplate, error)
+method *codingagent.AgentSession.ResourceLoader func(*codingagent.AgentSession) codingagent.ResourceLoader
+method *codingagent.AgentSession.SettingsManager func(*codingagent.AgentSession) *codingagent.SettingsManager
+method *codingagent.DefaultResourceLoader.Reload func(*codingagent.DefaultResourceLoader, context.Context, ...codingagent.ResourceLoaderReloadOptions) error
+method *codingagent.DefaultResourceLoader.GetSkills func(*codingagent.DefaultResourceLoader) (codingagent.SkillLoadResult, error)
+method *codingagent.DefaultResourceLoader.GetThemes func(*codingagent.DefaultResourceLoader) (codingagent.ThemeLoadResult, error)
+method *codingagent.DefaultResourceLoader.GetSystemPrompt func(*codingagent.DefaultResourceLoader) (*string, error)
+method *codingagent.SettingsManager.Reload func(*codingagent.SettingsManager, context.Context) error
+method *codingagent.SettingsManager.SetProjectTrusted func(*codingagent.SettingsManager, bool) error
+type codingagent.ResourceLoaderReloadOptions
+- ResolveProjectTrust codingagent.ExtensionHandler

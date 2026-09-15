@@ -447,6 +447,9 @@ type AgentSession struct {
 	activeToolNames                    []string
 	allTools                           []agent.ErasedAgentTool
 	promptOptions                      BuildSystemPromptOptions
+	noContextFiles                     bool
+	reloading                          bool
+	resourceVersion                    uint64
 	runtimeStream                      bool
 	configurationNotifying             bool
 	compactionCancel                   context.CancelFunc
@@ -730,6 +733,12 @@ func (s *AgentSession) prompt(ctx context.Context, text string, options ...Promp
 }
 
 func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, ready func(), options ...PromptOptions) (err error) {
+	s.mu.RLock()
+	version, reloading := s.resourceVersion, s.reloading
+	s.mu.RUnlock()
+	if reloading {
+		return fmt.Errorf("AgentSession is reloading")
+	}
 	if len(options) == 0 || options[0].ExpandPromptTemplates == nil || *options[0].ExpandPromptTemplates {
 		text, err = s.expandTemplate(text)
 		if err != nil {
@@ -743,7 +752,7 @@ func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, rea
 		cancel(nil)
 		return fmt.Errorf("AgentSession is disposed")
 	}
-	if s.replacing || s.configurationNotifying || s.branchSummaryCancel != nil || s.compactionCancel != nil && !s.autoCompacting {
+	if s.replacing || s.reloading || version != s.resourceVersion || s.configurationNotifying || s.branchSummaryCancel != nil || s.compactionCancel != nil && !s.autoCompacting {
 		s.mu.Unlock()
 		cancel(nil)
 		return fmt.Errorf("AgentSession is busy delivering configuration notifications or compacting")
@@ -1104,11 +1113,10 @@ func (s *AgentSession) expandTemplate(text string) (string, error) {
 	}
 	return expandPromptTemplate(text, templates), nil
 }
-func (s *AgentSession) Reload(context.Context) error { return notImplemented("AgentSession.Reload") }
 func (s *AgentSession) SetAutoCompactionEnabled(enabled bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.disposed || s.replacing {
+	if s.disposed || s.replacing || s.reloading {
 		return fmt.Errorf("AgentSession is busy or disposed")
 	}
 	return s.settingsManager.SetCompactionEnabled(enabled)
@@ -1116,7 +1124,7 @@ func (s *AgentSession) SetAutoCompactionEnabled(enabled bool) error {
 func (s *AgentSession) SetAutoRetryEnabled(enabled bool) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.disposed || s.replacing {
+	if s.disposed || s.replacing || s.reloading {
 		return fmt.Errorf("AgentSession is busy or disposed")
 	}
 	return s.settingsManager.SetRetryEnabled(enabled)
@@ -1124,7 +1132,7 @@ func (s *AgentSession) SetAutoRetryEnabled(enabled bool) error {
 func (s *AgentSession) SetSessionName(name string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.disposed || s.replacing {
+	if s.disposed || s.replacing || s.reloading {
 		return fmt.Errorf("AgentSession is busy or disposed")
 	}
 	if s.sessionManager == nil {

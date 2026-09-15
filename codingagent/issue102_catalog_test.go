@@ -16,7 +16,7 @@ func issue102TemplateCatalogEntry() catalog.Entry {
 		"Real CLI subprocess and public SDK model inputs/replies match locked Pi fixtures for positional and quoted args, defaults, slices, unknown commands, nonrecursive substitution and expansion opt-out; local Reload publishes owned snapshots",
 		"Public AgentSession.PromptTemplates and ResourceLoader.GetPrompts; existing JSONL RPC get_commands returns prompt/source information without extension registration; normal Prompt and streaming queues expand templates while SendUserMessage bypasses expansion",
 	}, Unsupported: []string{
-		"Package manifest/registration, npm/git, dependencies and lifecycle remain deferred under #99; extension commands, opaque PromptsOverride and ExtendResources retain M7 Capability Stubs; Theme is delivered in #104; live Session reload orchestration remains a later slice",
+		"Package manifest/registration, npm/git, dependencies and lifecycle remain deferred under #99; extension commands, opaque PromptsOverride and ExtendResources retain M7 Capability Stubs; Theme is delivered in #104; local Session reload is delivered by #106; extension reload remains deferred",
 		"General-purpose YAML schema parity outside the typed template metadata contract and full minimatch extglob grammar are not verified by this local-resource slice; six-platform runtime parity remains M13",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0010-trust-and-host-security.md", Reason: "Project settings and templates are read only after trust; explicit paths are independently authorized. Non-regular files are skipped, and recursive symlink cycles are not followed."}}
 }

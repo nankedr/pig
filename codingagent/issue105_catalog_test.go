@@ -18,7 +18,7 @@ func issue105ResourceCatalogEntry() catalog.Entry {
 		"Collision queries expose winner/loser paths and scope:source labels with owned snapshots; real CLI diagnostics display both sources and RPC command queries agree with SDK winners",
 	}, Unsupported: []string{
 		"Package source priority, manifests/registration, npm/git, dependencies and lifecycle remain deferred under #99 and ADR-0034; no implicit installation or extension execution/ABI freeze",
-		"Live Session reload orchestration, extension-provided resources and full minimatch extglob remain outside this slice; six-platform runtime parity remains unverified",
+		"Extension reload orchestration, extension-provided resources and full minimatch extglob remain outside this slice; six-platform runtime parity remains unverified",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0010-trust-and-host-security.md", Reason: "Project resources are gated before reads; global and explicit paths are independently authorized. Collision source labels supplement the pinned diagnostics without changing their winner/loser paths or order."}}
 }
 

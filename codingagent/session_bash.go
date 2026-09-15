@@ -33,7 +33,7 @@ func (s *AgentSession) executeBash(ctx context.Context, command string, option E
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	s.mu.Lock()
-	if s.replacing || s.disposed || s.agent == nil || s.sessionManager == nil {
+	if s.replacing || s.reloading || s.disposed || s.agent == nil || s.sessionManager == nil {
 		s.mu.Unlock()
 		return BashResult{}, fmt.Errorf("Bash requires a live AgentSession and SessionManager")
 	}

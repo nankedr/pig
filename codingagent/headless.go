@@ -378,9 +378,16 @@ func configureSessionPrompt(ctx context.Context, session *AgentSession, options 
 	}
 	promptOptions.Skills = skills.Skills
 	session.mu.Lock()
+	defer session.mu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if session.disposed || session.replacing {
+		return fmt.Errorf("AgentSession is busy or disposed")
+	}
+	session.noContextFiles = options.NoContextFiles
 	session.promptOptions = promptOptions
 	session.Agent().SetSystemPrompt(buildSystemPrompt(promptOptions))
-	session.mu.Unlock()
 	return nil
 }
 

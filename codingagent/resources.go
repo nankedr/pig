@@ -352,6 +352,9 @@ func (l *DefaultResourceLoader) Reload(ctx context.Context, options ...ResourceL
 	if err != nil {
 		return err
 	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	l.themes = themes
 	l.skills = skills
 	l.templates = templates

@@ -47,4 +47,4 @@ go run ./examples/local-resources
 
 19 个受控多目录用例覆盖混合优先级、类型各异的递归、home/祖先、默认禁用与显式组合、筛选、symlink、trust 和来源。公开 SDK 会话实际向 Faux Provider 发送展开后的模板，并核对技能清单及主题 ANSI；真实 CLI 子进程验收 RPC 命令查询及诊断输出。新增用例先复现了禁用别名复活、禁用默认加载后的来源丢失、Theme 设置目录未递归三个缺口，再验证修复。
 
-Catalog `contract:codingagent/local-resources` 精确记录支持范围与证据。包来源优先级、manifest/登记、npm/git、依赖和 lifecycle 仍由 [#99](https://github.com/nankedr/pig/issues/99) 延期跟踪；本实现不隐式安装包、执行扩展或冻结扩展 ABI。会话级热重载编排、完整六平台运行对等仍待后续阶段。
+Catalog `contract:codingagent/local-resources` 精确记录支持范围与证据。包来源优先级、manifest/登记、npm/git、依赖和 lifecycle 仍由 [#99](https://github.com/nankedr/pig/issues/99) 延期跟踪；本实现不隐式安装包、执行扩展或冻结扩展 ABI。会话级热重载编排已由 [M5.7](m5-session-reload.md) 交付；完整六平台运行对等仍待后续阶段。

@@ -55,11 +55,21 @@ func (s *AgentSession) FollowUp(text string) error {
 }
 
 func (s *AgentSession) queueMessage(text string, delivery UserMessageDelivery) error {
+	s.mu.RLock()
+	version, reloading := s.resourceVersion, s.reloading
+	s.mu.RUnlock()
+	if reloading {
+		return fmt.Errorf("AgentSession is reloading")
+	}
 	text, err := s.expandTemplate(text)
 	if err != nil {
 		return err
 	}
 	s.mu.Lock()
+	if version != s.resourceVersion {
+		s.mu.Unlock()
+		return fmt.Errorf("AgentSession resources changed; retry message")
+	}
 	err = s.queueMessageLocked(text, delivery)
 	s.mu.Unlock()
 	s.dispatchQueueEvents()
@@ -67,7 +77,7 @@ func (s *AgentSession) queueMessage(text string, delivery UserMessageDelivery) e
 }
 
 func (s *AgentSession) queueMessageLocked(text string, delivery UserMessageDelivery) error {
-	if s.disposed || s.replacing {
+	if s.disposed || s.replacing || s.reloading {
 		return fmt.Errorf("AgentSession is busy or disposed")
 	}
 	if s.agent == nil {
@@ -150,7 +160,7 @@ func (s *AgentSession) PendingMessageCount() (int, error) {
 }
 func (s *AgentSession) ClearQueue() error {
 	s.mu.Lock()
-	if s.disposed || s.replacing {
+	if s.disposed || s.replacing || s.reloading {
 		s.mu.Unlock()
 		return fmt.Errorf("AgentSession is busy or disposed")
 	}
@@ -177,7 +187,7 @@ func (s *AgentSession) setQueueMode(mode agent.QueueMode, steering bool) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.disposed || s.replacing {
+	if s.disposed || s.replacing || s.reloading {
 		return fmt.Errorf("AgentSession is busy or disposed")
 	}
 	if s.agent == nil {

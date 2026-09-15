@@ -16,7 +16,7 @@ func issue100ContextCatalogEntry() catalog.Entry {
 		"NoContextFiles and CLI --no-context-files/-nc suppress reads and model context; Context Files remain available without project trust, preserving ADR-0010 pre-trust settings protection; public paths and defensive file/diagnostic snapshots; cancel-safe local Reload",
 	}, Unsupported: []string{
 		"ExtendResources remains an explicit stub; local Skill and Theme resources are delivered in #103/#104; opaque overrides and extension execution/ABI remain M7",
-		"Package manifest/registration, npm/git, dependency installation and lifecycle remain stubs and are deferred under #99; this local chain does not install or execute packages; live session resource reload orchestration remains deferred",
+		"Package manifest/registration, npm/git, dependency installation and lifecycle remain stubs and are deferred under #99; this local chain does not install or execute packages; local Session resource reload is delivered by #106; extension reload remains deferred",
 	}}, Deviation: &catalog.Deviation{ADR: "docs/adr/0010-trust-and-host-security.md", Reason: "Resolve trust before reading trust-sensitive project settings. Local Context File loading never invokes a package manager or opaque extension callback."}}
 }
 

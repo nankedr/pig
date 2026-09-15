@@ -92,10 +92,10 @@ func (r *AgentSessionRuntime) beginReplacement(ctx context.Context) (func(), err
 	}
 	old := r.session
 	old.mu.Lock()
-	if old.disposed {
+	if old.disposed || old.reloading {
 		old.mu.Unlock()
 		r.replacing.Store(false)
-		return nil, fmt.Errorf("AgentSession is disposed")
+		return nil, fmt.Errorf("AgentSession is busy or disposed")
 	}
 	old.replacing = true
 	old.mu.Unlock()
