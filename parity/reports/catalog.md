@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9674
+- Total entries: 9675
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
-| scaffolded | 3866 |
-| partial | 348 |
+| scaffolded | 3854 |
+| partial | 361 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -6383,16 +6383,6 @@
 | member:codingagent/src/core/compaction/utils.ts#FileOperations.edited | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.FileOperations.Edited | coding-agent |
 | member:codingagent/src/core/compaction/utils.ts#FileOperations.read | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.FileOperations.Read | coding-agent |
 | member:codingagent/src/core/compaction/utils.ts#FileOperations.written | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.FileOperations.Written | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceCollision.loserPath | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.LoserPath | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceCollision.loserSource | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.LoserSource | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceCollision.name | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.Name | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceCollision.resourceType | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.ResourceType | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceCollision.winnerPath | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.WinnerPath | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceCollision.winnerSource | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.WinnerSource | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.collision | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Collision | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.message | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Message | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.path | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Path | coding-agent |
-| member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.type | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Type | coding-agent |
 | member:codingagent/src/core/event-bus.ts#EventBus.emit | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.EventBus.Emit | coding-agent |
 | member:codingagent/src/core/event-bus.ts#EventBus.on | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.EventBus.On | coding-agent |
 | member:codingagent/src/core/event-bus.ts#EventBusController.clear | scaffolded | M7 | contract | github.com/nankedr/pig/codingagent.EventBusController.Clear | coding-agent |
@@ -7567,8 +7557,6 @@
 | symbol:codingagent/src/core/compaction/compaction.ts#shouldCompact | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.ShouldCompact | coding-agent |
 | symbol:codingagent/src/core/compaction/utils.ts#FileOperations | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.FileOperations | coding-agent |
 | symbol:codingagent/src/core/compaction/utils.ts#serializeConversation | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.SerializeConversation | coding-agent |
-| symbol:codingagent/src/core/diagnostics.ts#ResourceCollision | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.ResourceCollision | coding-agent |
-| symbol:codingagent/src/core/diagnostics.ts#ResourceDiagnostic | scaffolded | M5 | symbol | github.com/nankedr/pig/codingagent.ResourceDiagnostic | coding-agent |
 | symbol:codingagent/src/core/event-bus.ts#EventBus | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.EventBus | coding-agent |
 | symbol:codingagent/src/core/event-bus.ts#EventBusController | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.EventBusController | coding-agent |
 | symbol:codingagent/src/core/event-bus.ts#createEventBus | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.CreateEventBus | coding-agent |
@@ -7878,6 +7866,7 @@
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
+| contract:codingagent/local-resources | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |
 | contract:codingagent/prompt-templates | partial | M5 | contract | github.com/nankedr/pig/codingagent.AgentSession.PromptTemplates | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
 | contract:codingagent/session-bash | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.ExecuteBash | coding-agent |
@@ -7916,6 +7905,16 @@
 | member:codingagent/src/core/agent-session.ts#AgentSession.setThinkingLevel | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetThinkingLevel | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.supportsThinking | partial | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.SupportsThinking | coding-agent |
 | member:codingagent/src/core/agent-session.ts#PromptOptions.expandPromptTemplates | partial | M1 | contract | github.com/nankedr/pig/codingagent.PromptOptions.ExpandPromptTemplates | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceCollision.loserPath | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.LoserPath | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceCollision.loserSource | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.LoserSource | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceCollision.name | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.Name | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceCollision.resourceType | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.ResourceType | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceCollision.winnerPath | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.WinnerPath | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceCollision.winnerSource | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceCollision.WinnerSource | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.collision | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Collision | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.message | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Message | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.path | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Path | coding-agent |
+| member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.type | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Type | coding-agent |
 | member:codingagent/src/core/prompt-templates.ts#PromptTemplate.argumentHint | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.ArgumentHint | coding-agent |
 | member:codingagent/src/core/prompt-templates.ts#PromptTemplate.content | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Content | coding-agent |
 | member:codingagent/src/core/prompt-templates.ts#PromptTemplate.description | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Description | coding-agent |
@@ -7966,6 +7965,8 @@
 | symbol:codingagent/src/core/compaction/compaction.ts#compact | partial | M4 | symbol | github.com/nankedr/pig/codingagent.Compact | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#generateSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummary | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#generateSummaryWithUsage | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummaryWithUsage | coding-agent |
+| symbol:codingagent/src/core/diagnostics.ts#ResourceCollision | partial | M5 | symbol | github.com/nankedr/pig/codingagent.ResourceCollision | coding-agent |
+| symbol:codingagent/src/core/diagnostics.ts#ResourceDiagnostic | partial | M5 | symbol | github.com/nankedr/pig/codingagent.ResourceDiagnostic | coding-agent |
 | symbol:codingagent/src/core/prompt-templates.ts#PromptTemplate | partial | M5 | symbol | github.com/nankedr/pig/codingagent.PromptTemplate | coding-agent |
 | symbol:codingagent/src/core/resource-loader.ts#DefaultResourceLoader | partial | M5 | symbol | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |
 | symbol:codingagent/src/core/resource-loader.ts#loadProjectContextFiles | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadProjectContextFiles | coding-agent |
