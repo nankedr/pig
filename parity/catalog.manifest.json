@@ -9,13 +9,13 @@
   "surface_manifest": "surface/manifest.json",
   "catalog_snapshot_manifest": "baseline/snapshot.manifest.json",
   "generated_report": "reports/catalog.md",
-  "entry_count": 9672,
+  "entry_count": 9673,
   "status_counts": {
     "deferred": 3,
     "implemented": 123,
     "inventoried": 5167,
-    "partial": 308,
-    "scaffolded": 3904,
+    "partial": 330,
+    "scaffolded": 3883,
     "verified": 167
   }
 }
