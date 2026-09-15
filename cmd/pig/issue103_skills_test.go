@@ -106,9 +106,6 @@ func TestPigSkills(t *testing.T) {
 			write(filepath.Join(agentDir, "settings.json"), string(global))
 			write(filepath.Join(cwd, ".pig/settings.json"), string(project))
 			calls := scenario.Calls
-			if scenario.Name == "arguments" {
-				calls = calls[:6]
-			}
 			args := []string{"-p", "--provider", "deepseek", "--model", "deepseek-v4-flash", "--no-tools", "--offline", "--no-session"}
 			args = append(args, calls...)
 			if scenario.Trusted {

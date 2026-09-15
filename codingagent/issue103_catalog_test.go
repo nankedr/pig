@@ -27,7 +27,7 @@ func issue103SkillEvidence(t *testing.T) []issue32ModuleEvidenceDescriptor {
 	for _, e := range []struct{ kind, path, run string }{
 		{"oracle", "parity/oracle/fixtures/skills.json", "node --experimental-strip-types parity/oracle/skills.mjs <locked-pi-checkout> --check"},
 		{"go-test", "codingagent/issue103_skills_test.go", "go test ./codingagent -run '^TestSkills(SDKParity|StreamingQueuesAndSendUserMessage|InvalidMetadataAndSymlinkCycle)$' -count=1"},
-		{"go-test", "codingagent/issue103_trust_test.go", "go test ./codingagent -run '^TestSkillsTrustReloadAndOwnership$' -count=1"},
+		{"go-test", "codingagent/issue103_trust_test.go", "go test ./codingagent -run '^TestSkills(TrustReloadAndOwnership|MissingHomeFailsBeforeRelativeDiscovery)$' -count=1"},
 		{"go-test", "cmd/pig/issue103_skills_test.go", "go test ./cmd/pig -run 'Test(PigSkills|RPC103SkillCommands)$' -count=1"},
 		{"go-test", "cmd/pig/issue75_process_test.go", "go test ./cmd/pig -run '^TestPigUntrustedProjectHasNoSensitiveReadsOrEffects$' -count=1"},
 		{"go-test", "codingagent/issue103_surface_test.go", "go test ./codingagent -run '^TestIssue103SkillAPISnapshot$' -count=1"},
@@ -54,4 +54,4 @@ func issue103PromoteRuntimeEntry(e *catalog.Entry) bool {
 	return true
 }
 
-const issue103SkillFixtureHash = "sha256:b44458a10443287620305084d8b89c2ffda00ef2a65783022b2c6e1b3fe76edb"
+const issue103SkillFixtureHash = "sha256:da8ac8d6ee075629fd5635fe3630868cefc73ace3667daa9f0ce0373ed3cd16d"

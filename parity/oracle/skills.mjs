@@ -47,6 +47,8 @@ async function main() {
   {name:"ancestor-boundary",cwd:"repo/sub/deep",trusted:true,files:{"repo/.git":"gitdir: elsewhere","repo/.agents/skills/root/SKILL.md":skill("root"),"repo/sub/.agents/skills/parent/SKILL.md":skill("parent"),"repo/sub/deep/.agents/skills/child/SKILL.md":skill("child"),".agents/skills/outside/SKILL.md":skill("outside")},calls:["/skill:root"]},
   {name:"ignored-root",files:{"agent/skills/SKILL.md":skill("ignored"),"agent/skills/.gitignore":"SKILL.md\n","agent/skills/root.md":skill("root")},calls:["/skill:root"]},
   {name:"ancestor-settings-priority",trusted:true,global:["more"],files:{"agent/more/SKILL.md":skill("same","","GLOBAL_SETTING"),"repo/.agents/skills/same/SKILL.md":skill("same","","ANCESTOR")},calls:["/skill:same"]},
+  {name:"disabled-symlink",global:["skills/a","-skills/a"],files:{"agent/skills/a/SKILL.md":skill("a")},links:{"agent/skills/b":"a"},calls:["/skill:a"]},
+  {name:"disabled-symlink-explicit",global:["skills/a","-skills/a"],files:{"agent/skills/a/SKILL.md":skill("a")},links:{"agent/skills/b":"a"},paths:["../agent/skills/b"],calls:["/skill:a"]},
   {name:"explicit-url",files:{"extra/review/SKILL.md":skill("review")},paths:["file://$ROOT/extra/review/SKILL.md"],calls:["/skill:review"]},
  ];
  const outcomes=[];

@@ -88,3 +88,22 @@ func TestSkillsTrustReloadAndOwnership(t *testing.T) {
 		})
 	}
 }
+
+func TestSkillsMissingHomeFailsBeforeRelativeDiscovery(t *testing.T) {
+	t.Setenv("HOME", "")
+	dir := t.TempDir()
+	settings, err := codingagent.NewSettingsManager(dir, &dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = settings.SetProjectTrusted(false); err != nil {
+		t.Fatal(err)
+	}
+	loader, err := codingagent.NewDefaultResourceLoader(codingagent.DefaultResourceLoaderOptions{CWD: dir, AgentDir: dir, SettingsManager: settings, NoContextFiles: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = loader.Reload(context.Background()); err == nil {
+		t.Fatal("missing home must not resolve user skills relative to the process directory")
+	}
+}

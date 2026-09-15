@@ -181,7 +181,7 @@ func (l *DefaultResourceLoader) loadSkills(ctx context.Context, settings *Settin
 	paths := []string{}
 	sources := map[string]SourceInfo{}
 	seen := map[string]bool{}
-	add := func(path string, source SourceInfo) {
+	add := func(path string, source SourceInfo, enabled bool) {
 		real, err := filepath.EvalSymlinks(path)
 		if err != nil {
 			real = path
@@ -190,6 +190,9 @@ func (l *DefaultResourceLoader) loadSkills(ctx context.Context, settings *Settin
 			return
 		}
 		seen[real] = true
+		if !enabled {
+			return
+		}
 		paths = append(paths, path)
 		source.Path = path
 		sources[path] = source
@@ -213,7 +216,10 @@ func (l *DefaultResourceLoader) loadSkills(ctx context.Context, settings *Settin
 		if trusted {
 			scopes = append(scopes, scope{filepath.Join(l.cwd, ".pig"), SourceScopeProject, project.Skills, "skills"})
 		}
-		home, _ := os.UserHomeDir()
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return SkillLoadResult{}, err
+		}
 		if trusted {
 			for dir := l.cwd; ; dir = filepath.Dir(dir) {
 				base := filepath.Join(dir, ".agents")
@@ -236,18 +242,22 @@ func (l *DefaultResourceLoader) loadSkills(ctx context.Context, settings *Settin
 						continue
 					}
 					for _, file := range templateFiles(templatePath(p, s.base), "skills") {
-						if skillEnabled(file, s.base, s.patterns, false) {
-							add(file, SourceInfo{Source: "local", Scope: s.scope, Origin: ResourceOriginTopLevel})
-						}
+						add(file, SourceInfo{Source: "local", Scope: s.scope, Origin: ResourceOriginTopLevel}, skillEnabled(file, s.base, s.patterns, false))
 					}
 				}
 			}
 			for _, file := range templateFiles(filepath.Join(s.base, "skills"), s.mode) {
-				if skillEnabled(file, s.base, s.patterns, true) {
-					add(file, SourceInfo{Source: "auto", Scope: s.scope, Origin: ResourceOriginTopLevel, BaseDir: s.base})
-				}
+				add(file, SourceInfo{Source: "auto", Scope: s.scope, Origin: ResourceOriginTopLevel, BaseDir: s.base}, skillEnabled(file, s.base, s.patterns, true))
 			}
 		}
+	}
+	seen = map[string]bool{}
+	for _, path := range paths {
+		real, err := filepath.EvalSymlinks(path)
+		if err != nil {
+			real = path
+		}
+		seen[real] = true
 	}
 	for _, p := range l.skillPaths {
 		path := templatePath(p, l.cwd)

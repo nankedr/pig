@@ -227,6 +227,41 @@
           ]
         },
         {
+          "name": "disabled-symlink",
+          "global": [
+            "skills/a",
+            "-skills/a"
+          ],
+          "files": {
+            "agent/skills/a/SKILL.md": "---\nname: a\ndescription: Use a for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "links": {
+            "agent/skills/b": "a"
+          },
+          "calls": [
+            "/skill:a"
+          ]
+        },
+        {
+          "name": "disabled-symlink-explicit",
+          "global": [
+            "skills/a",
+            "-skills/a"
+          ],
+          "files": {
+            "agent/skills/a/SKILL.md": "---\nname: a\ndescription: Use a for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "links": {
+            "agent/skills/b": "a"
+          },
+          "paths": [
+            "../agent/skills/b"
+          ],
+          "calls": [
+            "/skill:a"
+          ]
+        },
+        {
           "name": "explicit-url",
           "files": {
             "extra/review/SKILL.md": "---\nname: review\ndescription: Use review for this task\n---\nRun scripts/check.sh using the supplied task."
@@ -888,6 +923,45 @@
         ]
       },
       {
+        "name": "disabled-symlink",
+        "skills": [],
+        "diagnostics": [],
+        "expanded": [
+          "/skill:a"
+        ],
+        "systems": [
+          "SYSTEM\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "disabled-symlink-explicit",
+        "skills": [
+          {
+            "name": "a",
+            "description": "Use a for this task",
+            "filePath": "$ROOT/agent/skills/b/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/b",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/b/SKILL.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent/skills/b"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"a\" location=\"$ROOT/agent/skills/b/SKILL.md\">\nReferences are relative to $ROOT/agent/skills/b.\n\nRun scripts/check.sh using the supplied task.\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>a</name>\n    <description>Use a for this task</description>\n    <location>$ROOT/agent/skills/b/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
         "name": "explicit-url",
         "skills": [
           {
@@ -917,8 +991,8 @@
     ],
     "side_effects": []
   },
-  "input_hash": "sha256:b44458a10443287620305084d8b89c2ffda00ef2a65783022b2c6e1b3fe76edb",
-  "observation_hash": "sha256:abe5bb93ef4500357c3e57790d32cbd3cf26cc33f582308307e4f794ec94be0c",
+  "input_hash": "sha256:41bd4deaa60902de80baa7e4ba164ff005886276303e61e8d4dc9226809a3c95",
+  "observation_hash": "sha256:b3f04e0c805e4464d73d46980a19304b75f50ea84ac03e30a690d633c62c49b9",
   "execution_method": "node --experimental-strip-types parity/oracle/skills.mjs <locked-pi-checkout>",
   "platform": "posix",
   "environment": {

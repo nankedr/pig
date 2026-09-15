@@ -19,7 +19,7 @@ frontmatter 的 `description` 必须是非空字符串；`name` 缺省时取父�
 4. 用户 `~/.agents/skills`。
 5. 显式 `--skill` 或 `AdditionalSkillPaths`。
 
-settings 相对路径以项目 `.pig` 或 AgentDir 为基准；显式路径以 CWD 为基准，也支持 `~` 和 `file://`。settings 支持已有本地资源通配筛选、`!pattern` 排除、`+path` 恢复、`-path` 排除；`SKILL.md` 可按父目录匹配。每项保留 SourceInfo，冲突诊断包含 winner/loser 路径，真实路径相同的 symlink 重复项静默去重。
+settings 相对路径以项目 `.pig` 或 AgentDir 为基准；显式路径以 CWD 为基准，也支持 `~` 和 `file://`。settings 支持已有本地资源通配筛选、`!pattern` 排除、`+path` 恢复、`-path` 排除；`SKILL.md` 可按父目录匹配。每项保留 SourceInfo，冲突诊断包含 winner/loser 路径，真实路径相同的 symlink 重复项静默去重。自动发现先保留首个候选的禁用状态，再过滤，避免已禁用技能从别名重新出现；显式路径仍可独立加载。
 
 发现遇到 `SKILL.md` 就以该目录为技能根，不再递归；否则 `.pig`、AgentDir 和显式目录加载根层 `.md`，递归子目录只寻找 `SKILL.md`。`.agents` 只寻找 `SKILL.md`。跳过隐藏项、node_modules 和断开的 symlink，遵循 `.gitignore`、`.ignore`、`.fdignore`。Pig 跳过特殊文件及循环 symlink，避免阻塞。
 
