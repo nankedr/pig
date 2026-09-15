@@ -24,8 +24,8 @@ func TestPigThemesHTMLParity(t *testing.T) {
 		Observation struct {
 			Outcome struct {
 				Colors []struct {
-					Name string
-					HTML map[string]string
+					Name               string
+					HTML, ShadowedHTML map[string]string
 				}
 			}
 		}
@@ -61,6 +61,31 @@ func TestPigThemesHTMLParity(t *testing.T) {
 			for key, color := range want.HTML {
 				if !strings.Contains(string(html), "--"+key+": "+color+";") {
 					t.Fatalf("Pi color %s=%s missing", key, color)
+				}
+			}
+			var shadow map[string]any
+			if err = json.Unmarshal(fixture.Case.Input.Documents[i], &shadow); err != nil {
+				t.Fatal(err)
+			}
+			shadow["colors"].(map[string]any)["accent"] = "#010203"
+			shadow["export"] = map[string]any{"pageBg": "#040506"}
+			modified, _ := json.Marshal(shadow)
+			if err = os.WriteFile(themePath, modified, 0600); err != nil {
+				t.Fatal(err)
+			}
+			cmd = exec.CommandContext(ctx, binary, "--export", source, output, "--theme", themePath, "--no-themes")
+			cmd.Dir = dir
+			cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + dir, "PIG_CODING_AGENT_DIR=" + dir, "PIG_OFFLINE=1"}
+			if b, err := cmd.CombinedOutput(); err != nil {
+				t.Fatalf("%v: %s", err, b)
+			}
+			html, err = os.ReadFile(output)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for key, color := range want.ShadowedHTML {
+				if !strings.Contains(string(html), "--"+key+": "+color+";") {
+					t.Fatalf("shadowed Pi color %s=%s missing", key, color)
 				}
 			}
 			after, _ := os.ReadFile(source)

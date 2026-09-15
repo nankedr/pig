@@ -47,7 +47,11 @@ async function main() {
   outcomes.at(-1).css=api.getResolvedThemeColors(doc.name);outcomes.at(-1).export=api.getThemeExportColors(doc.name);
   const source=join(dir,"session.jsonl"),output=join(dir,"export.html");writeFileSync(source,readFileSync(join(root,"parity/export-html/session.jsonl")));
   await exportFromFile(source,{outputPath:output,themeName:doc.name});
-  const html=readFileSync(output,"utf8");outcomes.at(-1).html=Object.fromEntries([...html.matchAll(/--([A-Za-z-]+): ([^;]+);/g)].filter(m=>m[1] in outcomes.at(-1).css||["body-bg","container-bg","info-bg","exportPageBg","exportCardBg","exportInfoBg"].includes(m[1])).map(m=>[m[1],m[2]]));
+  const extract=html=>Object.fromEntries([...html.matchAll(/--([A-Za-z-]+): ([^;]+);/g)].filter(m=>m[1] in outcomes.at(-1).css||["body-bg","container-bg","info-bg","exportPageBg","exportCardBg","exportInfoBg"].includes(m[1])).map(m=>[m[1],m[2]]));
+  const html=readFileSync(output,"utf8");outcomes.at(-1).html=extract(html);
+  const shadow={...doc,colors:{...doc.colors,accent:"#010203"},export:{pageBg:"#040506"}};writeFileSync(path,JSON.stringify(shadow));api.setRegisteredThemes([api.loadThemeFromPath(path)]);
+  await exportFromFile(source,{outputPath:output,themeName:doc.name});outcomes.at(-1).shadowedHTML=extract(readFileSync(output,"utf8"));
+
  }
  const invalid=[{name:"missing",doc:{name:"bad",colors:{}}},{name:"cycle",doc:{...dark,vars:{...dark.vars,accent:"loop",loop:"accent"}}},{name:"unknown",doc:{...dark,colors:{...dark.colors,accent:"absent"}}},{name:"index",doc:{...dark,colors:{...dark.colors,accent:256}}},{name:"hex",doc:{...dark,colors:{...dark.colors,accent:"#fff"}}},{name:"slash",doc:{...dark,name:"light/dark"}},{name:"type",doc:{...dark,colors:{...dark.colors,accent:true}}}];
  const errors=invalid.map(c=>{const path=join(dir,"bad.json");writeFileSync(path,JSON.stringify(c.doc));try{api.loadThemeFromPath(path);return false}catch{return true}});
@@ -60,6 +64,8 @@ async function main() {
  {name:"disabled",disabled:true,files:{"agent/themes/global.json":theme("global"),"extra/custom.json":theme("custom")},paths:["../extra"]},
  {name:"explicit-project",files:{"repo/.pi/themes/project.json":theme("project")},paths:[".pi/themes/project.json"]},
  {name:"missing",files:{"plain.txt":"TEXT"},paths:["../absent","../plain.txt"]},
+ {name:"auto-ignore",files:{"agent/themes/.hidden.json":theme("hidden"),"agent/themes/ignored.json":theme("ignored"),"agent/themes/keep.json":theme("keep"),"agent/themes/.gitignore":"ignored.json\n","agent/themes/drop.json":theme("drop"),"agent/themes/.ignore":"drop.json\n","agent/themes/fd.json":theme("fd"),"agent/themes/.fdignore":"fd.json\n"}},
+ {name:"explicit-ignore",disabled:true,paths:["../extra"],files:{"extra/.hidden.json":theme("hidden"),"extra/ignored.json":theme("ignored"),"extra/.gitignore":"ignored.json\n"}},
  {name:"settings",trusted:true,global:["more","!**/skip.json"],project:["more"],files:{"agent/more/a.json":theme("same"),"repo/.pi/more/a.json":theme("same"),"agent/themes/skip.json":theme("skip"),"agent/themes/keep.json":theme("keep")}},
  ];
  const resources=[];

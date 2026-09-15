@@ -57,7 +57,15 @@ func loadExportTheme(ctx context.Context, settings *SettingsManager, loader Reso
 	if err != nil {
 		return nil, loaded.Diagnostics, err
 	}
-	theme, err := SelectTheme(name, loaded)
+	var theme *Theme
+	if name == "" {
+		name = "dark"
+	}
+	if name == "dark" || name == "light" {
+		theme, err = LoadBuiltinTheme(name)
+	} else {
+		theme, err = SelectTheme(name, loaded)
+	}
 	return theme, loaded.Diagnostics, err
 }
 

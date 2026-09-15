@@ -61,6 +61,10 @@ func templateMatch(pattern, value string) bool {
 }
 
 func templateFiles(path, mode string) []string {
+	extension := ".md"
+	if mode == "themes" {
+		extension = ".json"
+	}
 	files := []string{}
 	ancestors := map[string]bool{}
 	var walk func(string, []string)
@@ -70,7 +74,7 @@ func templateFiles(path, mode string) []string {
 			return
 		}
 		if info.Mode().IsRegular() {
-			if strings.HasSuffix(current, ".md") {
+			if strings.HasSuffix(current, extension) {
 				files = append(files, current)
 			}
 			return
@@ -167,7 +171,7 @@ func templateFiles(path, mode string) []string {
 				if mode == "settings" || mode == "skills" || mode == "agents" {
 					walk(full, append([]string{}, ignores...))
 				}
-			} else if stat.Mode().IsRegular() && strings.HasSuffix(name, ".md") {
+			} else if stat.Mode().IsRegular() && strings.HasSuffix(name, extension) {
 				if mode != "agents" && (mode != "skills" || current == path) || name == "SKILL.md" {
 					files = append(files, full)
 				}

@@ -846,6 +846,31 @@
           ]
         },
         {
+          "name": "auto-ignore",
+          "files": {
+            "agent/themes/.hidden.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"hidden\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"accent\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/themes/ignored.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"ignored\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"accent\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/themes/keep.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"keep\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"accent\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/themes/.gitignore": "ignored.json\n",
+            "agent/themes/drop.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"drop\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"accent\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/themes/.ignore": "drop.json\n",
+            "agent/themes/fd.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"fd\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"accent\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/themes/.fdignore": "fd.json\n"
+          }
+        },
+        {
+          "name": "explicit-ignore",
+          "disabled": true,
+          "paths": [
+            "../extra"
+          ],
+          "files": {
+            "extra/.hidden.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"hidden\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"accent\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/ignored.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"ignored\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"accent\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/.gitignore": "ignored.json\n"
+          }
+        },
+        {
           "name": "settings",
           "trusted": true,
           "global": [
@@ -1091,6 +1116,67 @@
             "infoBg": "#3c3728"
           },
           "html": {
+            "accent": "#8abeb7",
+            "border": "#5f87ff",
+            "borderAccent": "#00d7ff",
+            "borderMuted": "#505050",
+            "success": "#b5bd68",
+            "error": "#cc6666",
+            "warning": "#ffff00",
+            "muted": "#808080",
+            "dim": "#666666",
+            "text": "#d4d4d4",
+            "thinkingText": "#808080",
+            "selectedBg": "#3a3a4a",
+            "scrollbarThumb": "#3a3a4a",
+            "userMessageBg": "#343541",
+            "userMessageText": "#d4d4d4",
+            "customMessageBg": "#2d2838",
+            "customMessageText": "#d4d4d4",
+            "customMessageLabel": "#9575cd",
+            "toolPendingBg": "#282832",
+            "toolSuccessBg": "#283228",
+            "toolErrorBg": "#3c2828",
+            "toolTitle": "#d4d4d4",
+            "toolOutput": "#808080",
+            "mdHeading": "#f0c674",
+            "mdLink": "#81a2be",
+            "mdLinkUrl": "#666666",
+            "mdCode": "#8abeb7",
+            "mdCodeBlock": "#b5bd68",
+            "mdCodeBlockBorder": "#808080",
+            "mdQuote": "#808080",
+            "mdQuoteBorder": "#808080",
+            "mdHr": "#808080",
+            "mdListBullet": "#8abeb7",
+            "toolDiffAdded": "#b5bd68",
+            "toolDiffRemoved": "#cc6666",
+            "toolDiffContext": "#808080",
+            "syntaxComment": "#6A9955",
+            "syntaxKeyword": "#569CD6",
+            "syntaxFunction": "#DCDCAA",
+            "syntaxVariable": "#9CDCFE",
+            "syntaxString": "#CE9178",
+            "syntaxNumber": "#B5CEA8",
+            "syntaxType": "#4EC9B0",
+            "syntaxOperator": "#D4D4D4",
+            "syntaxPunctuation": "#D4D4D4",
+            "thinkingOff": "#505050",
+            "thinkingMinimal": "#6e6e6e",
+            "thinkingLow": "#5f87af",
+            "thinkingMedium": "#81a2be",
+            "thinkingHigh": "#b294bb",
+            "thinkingXhigh": "#d183e8",
+            "thinkingMax": "#ff5fff",
+            "bashMode": "#b5bd68",
+            "exportPageBg": "#18181e",
+            "exportCardBg": "#1e1e24",
+            "exportInfoBg": "#3c3728",
+            "body-bg": "#18181e",
+            "container-bg": "#1e1e24",
+            "info-bg": "#3c3728"
+          },
+          "shadowedHTML": {
             "accent": "#8abeb7",
             "border": "#5f87ff",
             "borderAccent": "#00d7ff",
@@ -1430,6 +1516,67 @@
             "body-bg": "#f8f8f8",
             "container-bg": "#ffffff",
             "info-bg": "#fffae6"
+          },
+          "shadowedHTML": {
+            "accent": "#5a8080",
+            "border": "#547da7",
+            "borderAccent": "#5a8080",
+            "borderMuted": "#b0b0b0",
+            "success": "#588458",
+            "error": "#aa5555",
+            "warning": "#9a7326",
+            "muted": "#6c6c6c",
+            "dim": "#767676",
+            "text": "#1f2328",
+            "thinkingText": "#6c6c6c",
+            "selectedBg": "#d0d0e0",
+            "scrollbarThumb": "#d0d0e0",
+            "userMessageBg": "#e8e8e8",
+            "userMessageText": "#1f2328",
+            "customMessageBg": "#ede7f6",
+            "customMessageText": "#1f2328",
+            "customMessageLabel": "#7e57c2",
+            "toolPendingBg": "#e8e8f0",
+            "toolSuccessBg": "#e8f0e8",
+            "toolErrorBg": "#f0e8e8",
+            "toolTitle": "#1f2328",
+            "toolOutput": "#6c6c6c",
+            "mdHeading": "#9a7326",
+            "mdLink": "#547da7",
+            "mdLinkUrl": "#767676",
+            "mdCode": "#5a8080",
+            "mdCodeBlock": "#588458",
+            "mdCodeBlockBorder": "#6c6c6c",
+            "mdQuote": "#6c6c6c",
+            "mdQuoteBorder": "#6c6c6c",
+            "mdHr": "#6c6c6c",
+            "mdListBullet": "#588458",
+            "toolDiffAdded": "#588458",
+            "toolDiffRemoved": "#aa5555",
+            "toolDiffContext": "#6c6c6c",
+            "syntaxComment": "#008000",
+            "syntaxKeyword": "#0000FF",
+            "syntaxFunction": "#795E26",
+            "syntaxVariable": "#001080",
+            "syntaxString": "#A31515",
+            "syntaxNumber": "#098658",
+            "syntaxType": "#267F99",
+            "syntaxOperator": "#000000",
+            "syntaxPunctuation": "#000000",
+            "thinkingOff": "#b0b0b0",
+            "thinkingMinimal": "#767676",
+            "thinkingLow": "#547da7",
+            "thinkingMedium": "#5a8080",
+            "thinkingHigh": "#875f87",
+            "thinkingXhigh": "#8b008b",
+            "thinkingMax": "#af005f",
+            "bashMode": "#588458",
+            "exportPageBg": "#f8f8f8",
+            "exportCardBg": "#ffffff",
+            "exportInfoBg": "#fffae6",
+            "body-bg": "#f8f8f8",
+            "container-bg": "#ffffff",
+            "info-bg": "#fffae6"
           }
         },
         {
@@ -1709,6 +1856,67 @@
             "body-bg": "#123456",
             "container-bg": "#262626",
             "info-bg": "rgb(72, 68, 65)"
+          },
+          "shadowedHTML": {
+            "accent": "#010203",
+            "border": "#ff0000",
+            "borderAccent": "#00d7ff",
+            "borderMuted": "#505050",
+            "success": "#b5bd68",
+            "error": "#cc6666",
+            "warning": "#ffff00",
+            "muted": "#808080",
+            "dim": "#666666",
+            "text": "#e5e5e7",
+            "thinkingText": "#808080",
+            "selectedBg": "#3a3a4a",
+            "userMessageBg": "#343541",
+            "userMessageText": "#d4d4d4",
+            "customMessageBg": "#2d2838",
+            "customMessageText": "#d4d4d4",
+            "customMessageLabel": "#9575cd",
+            "toolPendingBg": "#282832",
+            "toolSuccessBg": "#283228",
+            "toolErrorBg": "#3c2828",
+            "toolTitle": "#d4d4d4",
+            "toolOutput": "#808080",
+            "mdHeading": "#f0c674",
+            "mdLink": "#81a2be",
+            "mdLinkUrl": "#666666",
+            "mdCode": "#8abeb7",
+            "mdCodeBlock": "#b5bd68",
+            "mdCodeBlockBorder": "#808080",
+            "mdQuote": "#808080",
+            "mdQuoteBorder": "#808080",
+            "mdHr": "#808080",
+            "mdListBullet": "#8abeb7",
+            "toolDiffAdded": "#b5bd68",
+            "toolDiffRemoved": "#cc6666",
+            "toolDiffContext": "#808080",
+            "syntaxComment": "#6A9955",
+            "syntaxKeyword": "#569CD6",
+            "syntaxFunction": "#DCDCAA",
+            "syntaxVariable": "#9CDCFE",
+            "syntaxString": "#CE9178",
+            "syntaxNumber": "#B5CEA8",
+            "syntaxType": "#4EC9B0",
+            "syntaxOperator": "#D4D4D4",
+            "syntaxPunctuation": "#D4D4D4",
+            "thinkingOff": "#505050",
+            "thinkingMinimal": "#6e6e6e",
+            "thinkingLow": "#5f87af",
+            "thinkingMedium": "#81a2be",
+            "thinkingHigh": "#b294bb",
+            "thinkingXhigh": "#d183e8",
+            "bashMode": "#b5bd68",
+            "thinkingMax": "#d183e8",
+            "scrollbarThumb": "#3a3a4a",
+            "exportPageBg": "#040506",
+            "exportCardBg": "rgb(44, 45, 55)",
+            "exportInfoBg": "rgb(72, 68, 65)",
+            "body-bg": "#040506",
+            "container-bg": "rgb(44, 45, 55)",
+            "info-bg": "rgb(72, 68, 65)"
           }
         }
       ],
@@ -1863,6 +2071,51 @@
           ]
         },
         {
+          "name": "auto-ignore",
+          "themes": [
+            {
+              "name": "keep",
+              "path": "$ROOT/agent/themes/keep.json",
+              "source": {
+                "path": "$ROOT/agent/themes/keep.json",
+                "source": "auto",
+                "scope": "user",
+                "origin": "top-level",
+                "baseDir": "$ROOT/agent"
+              }
+            }
+          ],
+          "diagnostics": []
+        },
+        {
+          "name": "explicit-ignore",
+          "themes": [
+            {
+              "name": "hidden",
+              "path": "$ROOT/extra/.hidden.json",
+              "source": {
+                "path": "$ROOT/extra/.hidden.json",
+                "source": "local",
+                "scope": "temporary",
+                "origin": "top-level",
+                "baseDir": "$ROOT/extra"
+              }
+            },
+            {
+              "name": "ignored",
+              "path": "$ROOT/extra/ignored.json",
+              "source": {
+                "path": "$ROOT/extra/ignored.json",
+                "source": "local",
+                "scope": "temporary",
+                "origin": "top-level",
+                "baseDir": "$ROOT/extra"
+              }
+            }
+          ],
+          "diagnostics": []
+        },
+        {
           "name": "settings",
           "themes": [
             {
@@ -1905,8 +2158,8 @@
     },
     "side_effects": []
   },
-  "input_hash": "sha256:c2853a5f99868f539b75588cbeb1b005e664739ffd55992e74fb4d25af65c4ef",
-  "observation_hash": "sha256:d29051d0022697d9fae9fadd54b263fb3ce9cc2a56e50c1d773c43db098a3a32",
+  "input_hash": "sha256:278d6fc07b2589041dd630a266f5b777d094854104903ffd234a4cf00a78f6dc",
+  "observation_hash": "sha256:4594ca13452ee9cae82335658f6b74eaa3861f7403e71bea67ea49b2d8d974f3",
   "execution_method": "node --experimental-strip-types parity/oracle/themes.mjs <locked-pi-checkout>",
   "platform": "posix",
   "environment": {

@@ -84,7 +84,7 @@ func (l *DefaultResourceLoader) loadThemes(ctx context.Context, settings *Settin
 					}
 				}
 			}
-			for _, file := range themeFiles(filepath.Join(scope.base, "themes")) {
+			for _, file := range templateFiles(filepath.Join(scope.base, "themes"), "themes") {
 				if templateEnabled(file, scope.base, scope.paths, true) {
 					add(file, SourceInfo{Source: "auto", Scope: scope.scope, Origin: ResourceOriginTopLevel, BaseDir: scope.base})
 				}

@@ -23,7 +23,7 @@ colors := theme.ResolvedColors() // 独立 CSS 色值 map
 2. 全局 AgentDir 的 settings `themes` 路径及 `themes` 目录。
 3. `AdditionalThemePaths` 或 CLI `--theme` 的显式文件/目录。
 
-目录只读取直接子级 `.json` 普通文件，不递归。settings 相对路径以 `.pig` / AgentDir 为基准；显式路径以 CWD 为基准，支持 `~` 和 `file://`。沿用本地资源 `!pattern`、`+path`、`-path` 筛选。`NoThemes` / `--no-themes` 禁止自动发现，显式路径仍生效，内置主题仍可选择。
+目录只读取直接子级 `.json` 普通文件，不递归。自动发现跳过隐藏文件并遵循 `.gitignore`、`.ignore`、`.fdignore`；显式目录允许这些文件。settings 相对路径以 `.pig` / AgentDir 为基准；显式路径以 CWD 为基准，支持 `~` 和 `file://`。沿用本地资源 `!pattern`、`+path`、`-path` 筛选。`NoThemes` / `--no-themes` 禁止自动发现，显式路径仍生效，内置主题仍可选择。
 
 `GetThemes()` 返回主题及来源、冲突、无效文件和缺失显式路径诊断。项目主题和设置在首次加载前经过 trust gate；显式路径独立授权。返回的主题元数据、颜色 map、诊断与加载器隔离；重载成功后发布新快照，取消不替换旧结果。
 
@@ -39,7 +39,7 @@ colors := theme.ResolvedColors() // 独立 CSS 色值 map
 pig --export session.jsonl /tmp/session.html --theme ./custom.json --no-themes
 ```
 
-以上命令仍由全局或可信项目 settings 的 `theme` 选择 `custom`；未设置时为 dark。CLI、`ExportFromFile`、`AgentSession.ExportToHTML` 和既有 RPC 导出均使用主题。`ExportFromFileWithOptions(ctx, input, HTMLExportOptions{Theme: theme, OutputPath: path})` 可显式指定 SDK 主题，省略 Theme 时使用内置 dark；它不需要 settings。输出保留原会话 JSON，样式通过 CSS 变量注入。
+以上命令仍由全局或可信项目 settings 的 `theme` 选择 `custom`；未设置时为 dark。CLI、`ExportFromFile`、`AgentSession.ExportToHTML` 和既有 RPC 导出均使用主题。`ExportFromFileWithOptions(ctx, input, HTMLExportOptions{Theme: theme, OutputPath: path})` 可显式指定 SDK 主题，省略 Theme 时使用内置 dark；它不需要 settings。按名称导出时，dark/light 优先使用内置主题，与 Pi 一致；显式传入 `HTMLExportOptions.Theme` 则使用该实例的颜色。输出保留原会话 JSON，样式通过 CSS 变量注入。
 
 `export.pageBg/cardBg/infoBg` 可覆盖页面、卡片和信息背景，否则按 Pi 从 `userMessageBg` 推导。空终端色在 HTML 中使用可读默认色。所有进入 CSS 的值先严格校验，未知颜色键不写入 CSS；不接受任意 CSS、HTML 或脚本。保留 CSP、转义、离线资产和真实浏览器 XSS 门禁；不读取主题 `$schema` URL。畸形 hex、export 变量错误会明确失败，这是对 Pi 的安全收紧。
 
