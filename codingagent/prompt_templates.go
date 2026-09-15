@@ -116,16 +116,9 @@ func templateFiles(path, mode string) []string {
 		if err != nil {
 			return
 		}
-		for _, entry := range entries {
-			name := entry.Name()
-			if mode != "explicit" && (strings.HasPrefix(name, ".") || name == "node_modules") {
-				continue
-			}
-			full := filepath.Join(current, name)
-			stat, err := os.Stat(full)
-			if err != nil {
-				continue
-			}
+
+		isIgnored := func(full string, stat os.FileInfo) bool {
+			name := filepath.Base(full)
 			rel, _ := filepath.Rel(path, full)
 			rel = filepath.ToSlash(rel)
 			ignored := false
@@ -146,15 +139,38 @@ func templateFiles(path, mode string) []string {
 					ignored = !include
 				}
 			}
+			return ignored
+		}
+		if mode == "skills" || mode == "agents" {
+			full := filepath.Join(current, "SKILL.md")
+			if stat, err := os.Stat(full); err == nil && stat.Mode().IsRegular() && !isIgnored(full, stat) {
+				files = append(files, full)
+				return
+			}
+		}
+
+		for _, entry := range entries {
+			name := entry.Name()
+			if mode != "explicit" && (strings.HasPrefix(name, ".") || name == "node_modules") {
+				continue
+			}
+			full := filepath.Join(current, name)
+			stat, err := os.Stat(full)
+			if err != nil {
+				continue
+			}
+			ignored := isIgnored(full, stat)
 			if ignored {
 				continue
 			}
 			if stat.IsDir() {
-				if mode == "settings" {
+				if mode == "settings" || mode == "skills" || mode == "agents" {
 					walk(full, append([]string{}, ignores...))
 				}
 			} else if stat.Mode().IsRegular() && strings.HasSuffix(name, ".md") {
-				files = append(files, full)
+				if mode != "agents" && (mode != "skills" || current == path) || name == "SKILL.md" {
+					files = append(files, full)
+				}
 			}
 		}
 	}

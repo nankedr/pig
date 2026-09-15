@@ -26,6 +26,7 @@ m0-offline:
 	go run ./examples/rpc-lifecycle
 	go run ./examples/rpc-control
 	go run ./examples/rpc-chat
+	go run ./examples/skills
 	go run ./examples/prompt-templates
 	go run ./examples/system-prompts
 	go run ./examples/context-files
@@ -92,6 +93,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/rpc-lifecycle.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/rpc-control.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/rpc.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/skills.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/prompt-templates.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/system-prompts.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/context-files.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

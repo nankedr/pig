@@ -146,7 +146,7 @@ func TestDefaultResourceLoaderUnavailableBoundary(t *testing.T) {
 	created, err := codingagent.NewDefaultResourceLoader(codingagent.DefaultResourceLoaderOptions{
 		CWD:                  cwd,
 		AgentDir:             agentDir,
-		AdditionalSkillPaths: []string{"unsupported"},
+		AdditionalThemePaths: []string{"unsupported"},
 		EventBus: codingagent.EventBus{
 			Emit: nil,
 			On:   nil,

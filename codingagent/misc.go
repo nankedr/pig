@@ -503,11 +503,14 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		}
 	}
 	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
-		CWD:               cwd,
-		Models:            parsed.Models,
-		Offline:           ResolveOffline(parsed.Offline),
-		NoContextFiles:    parsed.NoContextFiles,
-		NoPromptTemplates: parsed.NoPromptTemplates, PromptTemplates: parsed.PromptTemplates,
+		CWD:                cwd,
+		Models:             parsed.Models,
+		Offline:            ResolveOffline(parsed.Offline),
+		NoContextFiles:     parsed.NoContextFiles,
+		NoSkills:           parsed.NoSkills,
+		Skills:             parsed.Skills,
+		NoPromptTemplates:  parsed.NoPromptTemplates,
+		PromptTemplates:    parsed.PromptTemplates,
 		Provider:           ai.ProviderID(optionalHeadlessString(parsed.Provider)),
 		Model:              optionalHeadlessString(parsed.Model),
 		APIKey:             parsed.APIKey,
@@ -548,7 +551,7 @@ func unsupportedHeadlessOperation(parsed Args) string {
 		return "headless.file-arguments"
 	case parsed.Resume:
 		return "headless.session-persistence"
-	case len(parsed.Extensions) != 0 || len(parsed.Skills) != 0 || len(parsed.Themes) != 0:
+	case len(parsed.Extensions) != 0 || len(parsed.Themes) != 0:
 		return "headless.resources"
 	default:
 		return ""

@@ -1,7 +1,6 @@
 package codingagent
 
 import (
-	"context"
 	"gopkg.in/yaml.v3"
 	"regexp"
 	"strconv"
@@ -55,14 +54,6 @@ type LoadSkillsFromDirOptions struct {
 type LoadSkillsResult struct {
 	Diagnostics []ResourceDiagnostic
 	Skills      []Skill
-}
-
-func LoadSkillsFromDir(context.Context, LoadSkillsFromDirOptions) (LoadSkillsResult, error) {
-	return LoadSkillsResult{}, notImplemented("LoadSkillsFromDir")
-}
-
-func LoadSkills(context.Context, string, string, []string, bool) (LoadSkillsResult, error) {
-	return LoadSkillsResult{}, notImplemented("LoadSkills")
 }
 
 func FormatSkillsForPrompt(skills []Skill) string {

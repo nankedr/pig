@@ -37,7 +37,7 @@ func startRPC94(t *testing.T, binary string, env ...string) *rpcProcess94 {
 	t.Cleanup(cancel)
 	p := &rpcProcess94{cmd: exec.CommandContext(ctx, binary, "--mode", "rpc", "--provider", "deepseek", "--model", "deepseek-v4-flash", "--api-key", "fixture", "--no-session", "--no-tools", "--no-context-files", "--offline"), lines: make(chan []byte, 1024)}
 	p.cmd.Dir = t.TempDir()
-	p.cmd.Env = append(os.Environ(), "PIG_CODING_AGENT_DIR="+t.TempDir())
+	p.cmd.Env = append(os.Environ(), "PIG_CODING_AGENT_DIR="+t.TempDir(), "HOME="+t.TempDir())
 	p.cmd.Env = append(p.cmd.Env, env...)
 	p.cmd.Stderr = &p.stderr
 	var err error

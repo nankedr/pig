@@ -1097,6 +1097,7 @@ func (s *AgentSession) expandTemplate(text string) (string, error) {
 	if !strings.HasPrefix(text, "/") || s.resourceLoader == nil {
 		return text, nil
 	}
+	text = s.expandSkill(text)
 	templates, err := s.PromptTemplates()
 	if err != nil {
 		return "", err

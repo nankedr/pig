@@ -261,7 +261,7 @@ func TestContextFilesReloadAndOwnership(t *testing.T) {
 		t.Fatalf("reload: %v", after)
 	}
 	for _, fn := range []func() error{
-		func() error { _, err := loader.GetSkills(); return err }, func() error { _, err := loader.GetThemes(); return err }, func() error { _, err := loader.GetExtensions(); return err },
+		func() error { _, err := loader.GetThemes(); return err }, func() error { _, err := loader.GetExtensions(); return err },
 	} {
 		if err := fn(); !errors.Is(err, codingagent.ErrNotImplemented) {
 			t.Fatalf("unsupported query: %v", err)
@@ -327,4 +327,8 @@ func TestContextFilesSessionServices(t *testing.T) {
 	default:
 		t.Fatal("no request")
 	}
+}
+
+func (l context100Loader) GetSkills() (codingagent.SkillLoadResult, error) {
+	return codingagent.SkillLoadResult{}, nil
 }

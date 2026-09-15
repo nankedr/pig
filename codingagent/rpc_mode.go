@@ -507,6 +507,17 @@ func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, out
 			}
 			commands = append(commands, map[string]any{"name": p.Name, "description": p.Description, "source": "prompt", "sourceInfo": source})
 		}
+		if err == nil {
+			var skills SkillLoadResult
+			skills, err = s.ResourceLoader().GetSkills()
+			for _, skill := range skills.Skills {
+				source := map[string]any{"path": skill.SourceInfo.Path, "source": skill.SourceInfo.Source, "scope": skill.SourceInfo.Scope, "origin": skill.SourceInfo.Origin}
+				if skill.SourceInfo.BaseDir != "" {
+					source["baseDir"] = skill.SourceInfo.BaseDir
+				}
+				commands = append(commands, map[string]any{"name": "skill:" + skill.Name, "description": skill.Description, "source": "skill", "sourceInfo": source})
+			}
+		}
 		response["data"] = map[string]any{"commands": commands}
 	case "extension_ui_response":
 		fail(notImplemented("rpc.extension_ui_response"))

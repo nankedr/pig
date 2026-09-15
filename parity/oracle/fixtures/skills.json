@@ -1,0 +1,928 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/resource-loader.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/codingagent/skills",
+    "catalog_id": "contract:codingagent/skills",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "name": "missing",
+          "files": {},
+          "paths": [
+            "../absent",
+            "../plain.txt"
+          ],
+          "calls": [
+            "/skill:missing hi"
+          ],
+          "extraFiles": {
+            "plain.txt": "TEXT"
+          }
+        },
+        {
+          "name": "metadata",
+          "files": {
+            "agent/skills/review/SKILL.md": "---\nname: review\ndescription: Use review for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/manual/SKILL.md": "---\nname: manual\ndescription: Use manual for this task\ndisable-model-invocation: true\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/fallback/SKILL.md": "---\ndescription: Fallback name\n---\nFALLBACK",
+            "agent/skills/bad/SKILL.md": "---\nname: -Bad--\ndescription: Use -Bad-- for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/empty/SKILL.md": "---\nname: empty\n---\nSKIP",
+            "agent/skills/space/SKILL.md": "---\ndescription: '   '\n---\nSKIP",
+            "agent/skills/long/SKILL.md": "---\nname: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ndescription: ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/hidden/SKILL.md": "---\nname: hidden\ndescription: Use hidden for this task\ndisable-model-invocation: 'true'\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "calls": [
+            "/skill:review task",
+            "/skill:manual explicit",
+            "/skill:fallback",
+            "/skill:unknown hi",
+            "/skill:review\nhi",
+            "/skill:review   a  b  "
+          ]
+        },
+        {
+          "name": "discovery",
+          "trusted": true,
+          "files": {
+            "agent/skills/root.md": "---\nname: root\ndescription: Use root for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/nested/ignore.md": "---\nname: skip-nested\ndescription: Use skip-nested for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/nested/deep/SKILL.md": "---\nname: deep\ndescription: Use deep for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/stop/SKILL.md": "---\nname: stop\ndescription: Use stop for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/stop/child/SKILL.md": "---\nname: skip-child\ndescription: Use skip-child for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/.hidden/SKILL.md": "---\nname: skip-hidden\ndescription: Use skip-hidden for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/node_modules/SKILL.md": "---\nname: skip-node\ndescription: Use skip-node for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "repo/.pi/skills/project/SKILL.md": "---\nname: project\ndescription: Use project for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "repo/.agents/skills/ancestor/SKILL.md": "---\nname: ancestor\ndescription: Use ancestor for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "home/.agents/skills/user/SKILL.md": "---\nname: user\ndescription: Use user for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "home/.agents/skills/loose.md": "---\nname: skip-loose\ndescription: Use skip-loose for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "calls": [
+            "/skill:deep"
+          ]
+        },
+        {
+          "name": "collisions",
+          "trusted": true,
+          "files": {
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: Use same for this task\n---\nGLOBAL",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: Use same for this task\n---\nPROJECT",
+            "extra/same/SKILL.md": "---\nname: same\ndescription: Use same for this task\n---\nEXPLICIT"
+          },
+          "paths": [
+            "../extra",
+            "../extra"
+          ],
+          "calls": [
+            "/skill:same"
+          ]
+        },
+        {
+          "name": "symlinks",
+          "files": {
+            "agent/skills/a/SKILL.md": "---\nname: linked\ndescription: Use linked for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "links": {
+            "agent/skills/b": "a",
+            "agent/skills/broken": "absent"
+          },
+          "paths": [
+            "../agent/skills/a/SKILL.md"
+          ],
+          "calls": [
+            "/skill:linked"
+          ]
+        },
+        {
+          "name": "untrusted",
+          "files": {
+            "agent/skills/global/SKILL.md": "---\nname: global\ndescription: Use global for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "repo/.pi/skills/secret/SKILL.md": "---\nname: secret\ndescription: Use secret for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "repo/.agents/skills/secret/SKILL.md": "---\nname: secret\ndescription: Use secret for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "calls": [
+            "/skill:secret"
+          ]
+        },
+        {
+          "name": "disabled",
+          "disabled": true,
+          "files": {
+            "agent/skills/global/SKILL.md": "---\nname: global\ndescription: Use global for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "extra/manual/SKILL.md": "---\nname: manual\ndescription: Use manual for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "paths": [
+            "../extra"
+          ],
+          "calls": [
+            "/skill:manual",
+            "/skill:global"
+          ]
+        },
+        {
+          "name": "disabled-empty",
+          "disabled": true,
+          "files": {
+            "agent/skills/global/SKILL.md": "---\nname: global\ndescription: Use global for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "calls": [
+            "/skill:global"
+          ]
+        },
+        {
+          "name": "explicit-project",
+          "files": {
+            "repo/.pi/skills/secret/SKILL.md": "---\nname: secret\ndescription: Use secret for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "paths": [
+            ".pi/skills/secret"
+          ],
+          "calls": [
+            "/skill:secret"
+          ]
+        },
+        {
+          "name": "settings",
+          "trusted": true,
+          "global": [
+            "more",
+            "!skip",
+            "!**/omit*",
+            "+skills/skip",
+            "-skills/no"
+          ],
+          "project": [
+            "more"
+          ],
+          "files": {
+            "agent/more/SKILL.md": "---\nname: same\ndescription: Use same for this task\n---\nGLOBAL_SETTING",
+            "repo/.pi/more/SKILL.md": "---\nname: same\ndescription: Use same for this task\n---\nPROJECT_SETTING",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: Use same for this task\n---\nPROJECT",
+            "agent/skills/skip/SKILL.md": "---\nname: skip\ndescription: Use skip for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/no/SKILL.md": "---\nname: no\ndescription: Use no for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/omit-one/SKILL.md": "---\nname: omit-one\ndescription: Use omit-one for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "calls": [
+            "/skill:same"
+          ]
+        },
+        {
+          "name": "ignore",
+          "files": {
+            "agent/skills/.gitignore": "skip/\n",
+            "agent/skills/skip/SKILL.md": "---\nname: skip\ndescription: Use skip for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/keep/SKILL.md": "---\nname: keep\ndescription: Use keep for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "calls": [
+            "/skill:keep"
+          ]
+        },
+        {
+          "name": "ancestor-boundary",
+          "cwd": "repo/sub/deep",
+          "trusted": true,
+          "files": {
+            "repo/.git": "gitdir: elsewhere",
+            "repo/.agents/skills/root/SKILL.md": "---\nname: root\ndescription: Use root for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "repo/sub/.agents/skills/parent/SKILL.md": "---\nname: parent\ndescription: Use parent for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "repo/sub/deep/.agents/skills/child/SKILL.md": "---\nname: child\ndescription: Use child for this task\n---\nRun scripts/check.sh using the supplied task.",
+            ".agents/skills/outside/SKILL.md": "---\nname: outside\ndescription: Use outside for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "calls": [
+            "/skill:root"
+          ]
+        },
+        {
+          "name": "ignored-root",
+          "files": {
+            "agent/skills/SKILL.md": "---\nname: ignored\ndescription: Use ignored for this task\n---\nRun scripts/check.sh using the supplied task.",
+            "agent/skills/.gitignore": "SKILL.md\n",
+            "agent/skills/root.md": "---\nname: root\ndescription: Use root for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "calls": [
+            "/skill:root"
+          ]
+        },
+        {
+          "name": "ancestor-settings-priority",
+          "trusted": true,
+          "global": [
+            "more"
+          ],
+          "files": {
+            "agent/more/SKILL.md": "---\nname: same\ndescription: Use same for this task\n---\nGLOBAL_SETTING",
+            "repo/.agents/skills/same/SKILL.md": "---\nname: same\ndescription: Use same for this task\n---\nANCESTOR"
+          },
+          "calls": [
+            "/skill:same"
+          ]
+        },
+        {
+          "name": "explicit-url",
+          "files": {
+            "extra/review/SKILL.md": "---\nname: review\ndescription: Use review for this task\n---\nRun scripts/check.sh using the supplied task."
+          },
+          "paths": [
+            "file://$ROOT/extra/review/SKILL.md"
+          ],
+          "calls": [
+            "/skill:review"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "missing",
+        "skills": [],
+        "diagnostics": [
+          {
+            "type": "warning",
+            "message": "skill path does not exist",
+            "path": "$ROOT/absent"
+          },
+          {
+            "type": "warning",
+            "message": "skill path is not a markdown file",
+            "path": "$ROOT/plain.txt"
+          }
+        ],
+        "expanded": [
+          "/skill:missing hi"
+        ],
+        "systems": [
+          "SYSTEM\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "metadata",
+        "skills": [
+          {
+            "name": "-Bad--",
+            "description": "Use -Bad-- for this task",
+            "filePath": "$ROOT/agent/skills/bad/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/bad",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/bad/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "fallback",
+            "description": "Fallback name",
+            "filePath": "$ROOT/agent/skills/fallback/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/fallback",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/fallback/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "hidden",
+            "description": "Use hidden for this task",
+            "filePath": "$ROOT/agent/skills/hidden/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/hidden",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/hidden/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "description": "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "filePath": "$ROOT/agent/skills/long/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/long",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/long/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "manual",
+            "description": "Use manual for this task",
+            "filePath": "$ROOT/agent/skills/manual/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/manual",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/manual/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": true
+          },
+          {
+            "name": "review",
+            "description": "Use review for this task",
+            "filePath": "$ROOT/agent/skills/review/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/review",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/review/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [
+          {
+            "type": "warning",
+            "message": "name contains invalid characters (must be lowercase a-z, 0-9, hyphens only)",
+            "path": "$ROOT/agent/skills/bad/SKILL.md"
+          },
+          {
+            "type": "warning",
+            "message": "name must not start or end with a hyphen",
+            "path": "$ROOT/agent/skills/bad/SKILL.md"
+          },
+          {
+            "type": "warning",
+            "message": "name must not contain consecutive hyphens",
+            "path": "$ROOT/agent/skills/bad/SKILL.md"
+          },
+          {
+            "type": "warning",
+            "message": "description is required",
+            "path": "$ROOT/agent/skills/empty/SKILL.md"
+          },
+          {
+            "type": "warning",
+            "message": "description exceeds 1024 characters (1025)",
+            "path": "$ROOT/agent/skills/long/SKILL.md"
+          },
+          {
+            "type": "warning",
+            "message": "name exceeds 64 characters (65)",
+            "path": "$ROOT/agent/skills/long/SKILL.md"
+          },
+          {
+            "type": "warning",
+            "message": "description is required",
+            "path": "$ROOT/agent/skills/space/SKILL.md"
+          }
+        ],
+        "expanded": [
+          "<skill name=\"review\" location=\"$ROOT/agent/skills/review/SKILL.md\">\nReferences are relative to $ROOT/agent/skills/review.\n\nRun scripts/check.sh using the supplied task.\n</skill>\n\ntask",
+          "<skill name=\"manual\" location=\"$ROOT/agent/skills/manual/SKILL.md\">\nReferences are relative to $ROOT/agent/skills/manual.\n\nRun scripts/check.sh using the supplied task.\n</skill>\n\nexplicit",
+          "<skill name=\"fallback\" location=\"$ROOT/agent/skills/fallback/SKILL.md\">\nReferences are relative to $ROOT/agent/skills/fallback.\n\nFALLBACK\n</skill>",
+          "/skill:unknown hi",
+          "/skill:review\nhi",
+          "<skill name=\"review\" location=\"$ROOT/agent/skills/review/SKILL.md\">\nReferences are relative to $ROOT/agent/skills/review.\n\nRun scripts/check.sh using the supplied task.\n</skill>\n\na  b"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>-Bad--</name>\n    <description>Use -Bad-- for this task</description>\n    <location>$ROOT/agent/skills/bad/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>fallback</name>\n    <description>Fallback name</description>\n    <location>$ROOT/agent/skills/fallback/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>hidden</name>\n    <description>Use hidden for this task</description>\n    <location>$ROOT/agent/skills/hidden/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</name>\n    <description>ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd</description>\n    <location>$ROOT/agent/skills/long/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>review</name>\n    <description>Use review for this task</description>\n    <location>$ROOT/agent/skills/review/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "discovery",
+        "skills": [
+          {
+            "name": "project",
+            "description": "Use project for this task",
+            "filePath": "$ROOT/repo/.pi/skills/project/SKILL.md",
+            "baseDir": "$ROOT/repo/.pi/skills/project",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.pi/skills/project/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "ancestor",
+            "description": "Use ancestor for this task",
+            "filePath": "$ROOT/repo/.agents/skills/ancestor/SKILL.md",
+            "baseDir": "$ROOT/repo/.agents/skills/ancestor",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.agents/skills/ancestor/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.agents"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "deep",
+            "description": "Use deep for this task",
+            "filePath": "$ROOT/agent/skills/nested/deep/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/nested/deep",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/nested/deep/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "root",
+            "description": "Use root for this task",
+            "filePath": "$ROOT/agent/skills/root.md",
+            "baseDir": "$ROOT/agent/skills",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/root.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "stop",
+            "description": "Use stop for this task",
+            "filePath": "$ROOT/agent/skills/stop/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/stop",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/stop/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "user",
+            "description": "Use user for this task",
+            "filePath": "$ROOT/home/.agents/skills/user/SKILL.md",
+            "baseDir": "$ROOT/home/.agents/skills/user",
+            "sourceInfo": {
+              "path": "$ROOT/home/.agents/skills/user/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/home/.agents"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"deep\" location=\"$ROOT/agent/skills/nested/deep/SKILL.md\">\nReferences are relative to $ROOT/agent/skills/nested/deep.\n\nRun scripts/check.sh using the supplied task.\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>project</name>\n    <description>Use project for this task</description>\n    <location>$ROOT/repo/.pi/skills/project/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>ancestor</name>\n    <description>Use ancestor for this task</description>\n    <location>$ROOT/repo/.agents/skills/ancestor/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>deep</name>\n    <description>Use deep for this task</description>\n    <location>$ROOT/agent/skills/nested/deep/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>root</name>\n    <description>Use root for this task</description>\n    <location>$ROOT/agent/skills/root.md</location>\n  </skill>\n  <skill>\n    <name>stop</name>\n    <description>Use stop for this task</description>\n    <location>$ROOT/agent/skills/stop/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>user</name>\n    <description>Use user for this task</description>\n    <location>$ROOT/home/.agents/skills/user/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "collisions",
+        "skills": [
+          {
+            "name": "same",
+            "description": "Use same for this task",
+            "filePath": "$ROOT/repo/.pi/skills/same/SKILL.md",
+            "baseDir": "$ROOT/repo/.pi/skills/same",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.pi/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/skills/same/SKILL.md",
+              "loserPath": "$ROOT/agent/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/extra/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/skills/same/SKILL.md",
+              "loserPath": "$ROOT/extra/same/SKILL.md"
+            }
+          }
+        ],
+        "expanded": [
+          "<skill name=\"same\" location=\"$ROOT/repo/.pi/skills/same/SKILL.md\">\nReferences are relative to $ROOT/repo/.pi/skills/same.\n\nPROJECT\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>Use same for this task</description>\n    <location>$ROOT/repo/.pi/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "symlinks",
+        "skills": [
+          {
+            "name": "linked",
+            "description": "Use linked for this task",
+            "filePath": "$ROOT/agent/skills/a/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/a",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/a/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"linked\" location=\"$ROOT/agent/skills/a/SKILL.md\">\nReferences are relative to $ROOT/agent/skills/a.\n\nRun scripts/check.sh using the supplied task.\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>linked</name>\n    <description>Use linked for this task</description>\n    <location>$ROOT/agent/skills/a/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "untrusted",
+        "skills": [
+          {
+            "name": "global",
+            "description": "Use global for this task",
+            "filePath": "$ROOT/agent/skills/global/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/global",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/global/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "/skill:secret"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>global</name>\n    <description>Use global for this task</description>\n    <location>$ROOT/agent/skills/global/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "disabled",
+        "skills": [
+          {
+            "name": "manual",
+            "description": "Use manual for this task",
+            "filePath": "$ROOT/extra/manual/SKILL.md",
+            "baseDir": "$ROOT/extra/manual",
+            "sourceInfo": {
+              "path": "$ROOT/extra/manual/SKILL.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/manual"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"manual\" location=\"$ROOT/extra/manual/SKILL.md\">\nReferences are relative to $ROOT/extra/manual.\n\nRun scripts/check.sh using the supplied task.\n</skill>",
+          "/skill:global"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>manual</name>\n    <description>Use manual for this task</description>\n    <location>$ROOT/extra/manual/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "disabled-empty",
+        "skills": [],
+        "diagnostics": [],
+        "expanded": [
+          "/skill:global"
+        ],
+        "systems": [
+          "SYSTEM\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "explicit-project",
+        "skills": [
+          {
+            "name": "secret",
+            "description": "Use secret for this task",
+            "filePath": "$ROOT/repo/.pi/skills/secret/SKILL.md",
+            "baseDir": "$ROOT/repo/.pi/skills/secret",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.pi/skills/secret/SKILL.md",
+              "source": "local",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi/skills/secret"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"secret\" location=\"$ROOT/repo/.pi/skills/secret/SKILL.md\">\nReferences are relative to $ROOT/repo/.pi/skills/secret.\n\nRun scripts/check.sh using the supplied task.\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>secret</name>\n    <description>Use secret for this task</description>\n    <location>$ROOT/repo/.pi/skills/secret/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "settings",
+        "skills": [
+          {
+            "name": "same",
+            "description": "Use same for this task",
+            "filePath": "$ROOT/repo/.pi/more/SKILL.md",
+            "baseDir": "$ROOT/repo/.pi/more",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.pi/more/SKILL.md",
+              "source": "local",
+              "scope": "project",
+              "origin": "top-level"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "skip",
+            "description": "Use skip for this task",
+            "filePath": "$ROOT/agent/skills/skip/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/skip",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/skip/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/repo/.pi/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/SKILL.md",
+              "loserPath": "$ROOT/repo/.pi/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/more/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/SKILL.md",
+              "loserPath": "$ROOT/agent/more/SKILL.md"
+            }
+          }
+        ],
+        "expanded": [
+          "<skill name=\"same\" location=\"$ROOT/repo/.pi/more/SKILL.md\">\nReferences are relative to $ROOT/repo/.pi/more.\n\nPROJECT_SETTING\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>Use same for this task</description>\n    <location>$ROOT/repo/.pi/more/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>skip</name>\n    <description>Use skip for this task</description>\n    <location>$ROOT/agent/skills/skip/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "ignore",
+        "skills": [
+          {
+            "name": "keep",
+            "description": "Use keep for this task",
+            "filePath": "$ROOT/agent/skills/keep/SKILL.md",
+            "baseDir": "$ROOT/agent/skills/keep",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/keep/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"keep\" location=\"$ROOT/agent/skills/keep/SKILL.md\">\nReferences are relative to $ROOT/agent/skills/keep.\n\nRun scripts/check.sh using the supplied task.\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>keep</name>\n    <description>Use keep for this task</description>\n    <location>$ROOT/agent/skills/keep/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "ancestor-boundary",
+        "skills": [
+          {
+            "name": "child",
+            "description": "Use child for this task",
+            "filePath": "$ROOT/repo/sub/deep/.agents/skills/child/SKILL.md",
+            "baseDir": "$ROOT/repo/sub/deep/.agents/skills/child",
+            "sourceInfo": {
+              "path": "$ROOT/repo/sub/deep/.agents/skills/child/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/sub/deep/.agents"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "parent",
+            "description": "Use parent for this task",
+            "filePath": "$ROOT/repo/sub/.agents/skills/parent/SKILL.md",
+            "baseDir": "$ROOT/repo/sub/.agents/skills/parent",
+            "sourceInfo": {
+              "path": "$ROOT/repo/sub/.agents/skills/parent/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/sub/.agents"
+            },
+            "disableModelInvocation": false
+          },
+          {
+            "name": "root",
+            "description": "Use root for this task",
+            "filePath": "$ROOT/repo/.agents/skills/root/SKILL.md",
+            "baseDir": "$ROOT/repo/.agents/skills/root",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.agents/skills/root/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.agents"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"root\" location=\"$ROOT/repo/.agents/skills/root/SKILL.md\">\nReferences are relative to $ROOT/repo/.agents/skills/root.\n\nRun scripts/check.sh using the supplied task.\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>child</name>\n    <description>Use child for this task</description>\n    <location>$ROOT/repo/sub/deep/.agents/skills/child/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>parent</name>\n    <description>Use parent for this task</description>\n    <location>$ROOT/repo/sub/.agents/skills/parent/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>root</name>\n    <description>Use root for this task</description>\n    <location>$ROOT/repo/.agents/skills/root/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo/sub/deep",
+          "SYSTEM\nCurrent working directory: $ROOT/repo/sub/deep"
+        ]
+      },
+      {
+        "name": "ignored-root",
+        "skills": [
+          {
+            "name": "root",
+            "description": "Use root for this task",
+            "filePath": "$ROOT/agent/skills/root.md",
+            "baseDir": "$ROOT/agent/skills",
+            "sourceInfo": {
+              "path": "$ROOT/agent/skills/root.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"root\" location=\"$ROOT/agent/skills/root.md\">\nReferences are relative to $ROOT/agent/skills.\n\nRun scripts/check.sh using the supplied task.\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>root</name>\n    <description>Use root for this task</description>\n    <location>$ROOT/agent/skills/root.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "ancestor-settings-priority",
+        "skills": [
+          {
+            "name": "same",
+            "description": "Use same for this task",
+            "filePath": "$ROOT/repo/.agents/skills/same/SKILL.md",
+            "baseDir": "$ROOT/repo/.agents/skills/same",
+            "sourceInfo": {
+              "path": "$ROOT/repo/.agents/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.agents"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/more/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.agents/skills/same/SKILL.md",
+              "loserPath": "$ROOT/agent/more/SKILL.md"
+            }
+          }
+        ],
+        "expanded": [
+          "<skill name=\"same\" location=\"$ROOT/repo/.agents/skills/same/SKILL.md\">\nReferences are relative to $ROOT/repo/.agents/skills/same.\n\nANCESTOR\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>Use same for this task</description>\n    <location>$ROOT/repo/.agents/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      },
+      {
+        "name": "explicit-url",
+        "skills": [
+          {
+            "name": "review",
+            "description": "Use review for this task",
+            "filePath": "$ROOT/extra/review/SKILL.md",
+            "baseDir": "$ROOT/extra/review",
+            "sourceInfo": {
+              "path": "$ROOT/extra/review/SKILL.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/review"
+            },
+            "disableModelInvocation": false
+          }
+        ],
+        "diagnostics": [],
+        "expanded": [
+          "<skill name=\"review\" location=\"$ROOT/extra/review/SKILL.md\">\nReferences are relative to $ROOT/extra/review.\n\nRun scripts/check.sh using the supplied task.\n</skill>"
+        ],
+        "systems": [
+          "SYSTEM\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>review</name>\n    <description>Use review for this task</description>\n    <location>$ROOT/extra/review/SKILL.md</location>\n  </skill>\n</available_skills>\nCurrent working directory: $ROOT/repo",
+          "SYSTEM\nCurrent working directory: $ROOT/repo"
+        ]
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:b44458a10443287620305084d8b89c2ffda00ef2a65783022b2c6e1b3fe76edb",
+  "observation_hash": "sha256:abe5bb93ef4500357c3e57790d32cbd3cf26cc33f582308307e4f794ec94be0c",
+  "execution_method": "node --experimental-strip-types parity/oracle/skills.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/resource-loader.ts"
+  }
+}

@@ -120,13 +120,16 @@ type DefaultResourceLoader struct {
 	appendPrompts     []string
 	appendSources     []ResourcePathSource
 	promptDiagnostics []ResourceDiagnostic
+	skills            SkillLoadResult
+	skillPaths        []string
+	noSkills          bool
 	templates         PromptTemplateLoadResult
 	templatePaths     []string
 	noPromptTemplates bool
 }
 
 func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultResourceLoader, error) {
-	if len(options.AdditionalExtensionPaths) > 0 || len(options.AdditionalSkillPaths) > 0 || len(options.AdditionalThemePaths) > 0 || len(options.ExtensionFactories) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
+	if len(options.AdditionalExtensionPaths) > 0 || len(options.AdditionalThemePaths) > 0 || len(options.ExtensionFactories) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
 		return nil, notImplemented("NewDefaultResourceLoader")
 	}
 	cwd, err := resolveSessionPath(options.CWD)
@@ -142,14 +145,28 @@ func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultRes
 	if err != nil {
 		return nil, err
 	}
-	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, noContextFiles: options.NoContextFiles, noPromptTemplates: options.NoPromptTemplates, templatePaths: slices.Clone(options.AdditionalPromptTemplatePaths), files: []AgentsFile{}, settings: options.SettingsManager, systemInput: cloneStringPointer(options.SystemPrompt), appendInputs: slices.Clone(options.AppendSystemPrompt)}, nil
+	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, noContextFiles: options.NoContextFiles, noSkills: options.NoSkills, skillPaths: slices.Clone(options.AdditionalSkillPaths), noPromptTemplates: options.NoPromptTemplates, templatePaths: slices.Clone(options.AdditionalPromptTemplatePaths), files: []AgentsFile{}, settings: options.SettingsManager, systemInput: cloneStringPointer(options.SystemPrompt), appendInputs: slices.Clone(options.AppendSystemPrompt)}, nil
 }
 
 func (*DefaultResourceLoader) GetExtensions() (LoadExtensionsResult, error) {
 	return LoadExtensionsResult{}, notImplemented("DefaultResourceLoader.GetExtensions")
 }
-func (*DefaultResourceLoader) GetSkills() (SkillLoadResult, error) {
-	return SkillLoadResult{}, notImplemented("DefaultResourceLoader.GetSkills")
+func (l *DefaultResourceLoader) GetSkills() (SkillLoadResult, error) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	if l.cwd == "" {
+		return SkillLoadResult{}, notImplemented("DefaultResourceLoader.GetSkills")
+	}
+	result := SkillLoadResult{Skills: append([]Skill{}, l.skills.Skills...), Diagnostics: append([]ResourceDiagnostic{}, l.skills.Diagnostics...)}
+	for i, d := range result.Diagnostics {
+		if d.Collision != nil {
+			c := *d.Collision
+			c.WinnerSource = cloneStringPointer(c.WinnerSource)
+			c.LoserSource = cloneStringPointer(c.LoserSource)
+			result.Diagnostics[i].Collision = &c
+		}
+	}
+	return result, nil
 }
 func (l *DefaultResourceLoader) GetPrompts() (PromptTemplateLoadResult, error) {
 	l.mu.RLock()
@@ -295,6 +312,11 @@ func (l *DefaultResourceLoader) Reload(ctx context.Context, options ...ResourceL
 	if err != nil {
 		return err
 	}
+	skills, err := l.loadSkills(ctx, settings, trusted)
+	if err != nil {
+		return err
+	}
+	l.skills = skills
 	l.templates = templates
 	l.files, l.diagnostics = files, diagnostics
 	l.systemPrompt, l.systemSource = system, source

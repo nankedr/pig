@@ -12,6 +12,8 @@ type codingagent.CreateHeadlessSessionOptions
 - Offline bool ""
 - ProjectTrustOverride *bool ""
 - NoContextFiles bool ""
+- NoSkills bool ""
+- Skills []string ""
 - NoPromptTemplates bool ""
 - PromptTemplates []string ""
 - CWD string ""
