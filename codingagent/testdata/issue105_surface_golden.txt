@@ -1,0 +1,81 @@
+type codingagent.PromptTemplateLoadResult
+- Prompts []codingagent.PromptTemplate ""
+- Diagnostics []codingagent.ResourceDiagnostic ""
+type codingagent.SkillLoadResult
+- Skills []codingagent.Skill ""
+- Diagnostics []codingagent.ResourceDiagnostic ""
+type codingagent.ThemeLoadResult
+- Themes []*codingagent.Theme ""
+- Diagnostics []codingagent.ResourceDiagnostic ""
+type codingagent.SourceInfo
+- BaseDir string ""
+- Origin codingagent.ResourceOrigin ""
+- Path string ""
+- Scope codingagent.SourceScope ""
+- Source string ""
+type codingagent.ResourceDiagnostic
+- Type string ""
+- Message string ""
+- Path string ""
+- Collision *codingagent.ResourceCollision ""
+type codingagent.ResourceCollision
+- ResourceType string ""
+- Name string ""
+- WinnerPath string ""
+- LoserPath string ""
+- WinnerSource *string ""
+- LoserSource *string ""
+type codingagent.PromptOptions
+- ExpandPromptTemplates *bool ""
+- Images []ai.ImageContent ""
+- PreflightResult func(bool) ""
+- Source string ""
+- StreamingBehavior string ""
+type codingagent.CreateHeadlessSessionOptions
+- ModelRuntime *codingagent.ModelRuntime ""
+- Models []string ""
+- Offline bool ""
+- ProjectTrustOverride *bool ""
+- NoContextFiles bool ""
+- NoThemes bool ""
+- Themes []string ""
+- NoSkills bool ""
+- Skills []string ""
+- NoPromptTemplates bool ""
+- PromptTemplates []string ""
+- CWD string ""
+- AgentDir string ""
+- AuthPath string ""
+- Credentials ai.CredentialStore ""
+- SettingsManager *codingagent.SettingsManager ""
+- SessionDir *string ""
+- Provider ai.ProviderID ""
+- Model string ""
+- APIKey *string ""
+- Environment ai.ProviderEnv ""
+- BaseURL *string ""
+- Thinking ai.ModelThinkingLevel ""
+- Tools []string ""
+- ExcludeTools []string ""
+- NoTools codingagent.NoToolsMode ""
+- SystemPrompt *string ""
+- AppendSystemPrompt []string ""
+- SessionManager *codingagent.SessionManager ""
+method ExtendResources func(*codingagent.DefaultResourceLoader, codingagent.ResourceExtensionPaths) error
+method GetAgentsFiles func(*codingagent.DefaultResourceLoader) ([]codingagent.AgentsFile, error)
+method GetAppendSystemPrompt func(*codingagent.DefaultResourceLoader) ([]string, error)
+method GetAppendSystemPromptSources func(*codingagent.DefaultResourceLoader) ([]codingagent.ResourcePathSource, error)
+method GetContextFileDiagnostics func(*codingagent.DefaultResourceLoader) []codingagent.ResourceDiagnostic
+method GetExtensions func(*codingagent.DefaultResourceLoader) (codingagent.LoadExtensionsResult, error)
+method GetPrompts func(*codingagent.DefaultResourceLoader) (codingagent.PromptTemplateLoadResult, error)
+method GetSkills func(*codingagent.DefaultResourceLoader) (codingagent.SkillLoadResult, error)
+method GetSystemPrompt func(*codingagent.DefaultResourceLoader) (*string, error)
+method GetSystemPromptDiagnostics func(*codingagent.DefaultResourceLoader) []codingagent.ResourceDiagnostic
+method GetSystemPromptSource func(*codingagent.DefaultResourceLoader) (*codingagent.ResourcePathSource, error)
+method GetThemes func(*codingagent.DefaultResourceLoader) (codingagent.ThemeLoadResult, error)
+method LoadProjectTrustExtensions func(*codingagent.DefaultResourceLoader, context.Context) (codingagent.LoadExtensionsResult, error)
+method Reload func(*codingagent.DefaultResourceLoader, context.Context, ...codingagent.ResourceLoaderReloadOptions) error
+func(context.Context, string, string, []string, bool) (codingagent.LoadSkillsResult, error)
+func(context.Context, codingagent.LoadSkillsFromDirOptions) (codingagent.LoadSkillsResult, error)
+func([]codingagent.Skill) string
+func(string) *codingagent.ParsedSkillBlock

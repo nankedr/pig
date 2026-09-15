@@ -1,0 +1,1815 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/resource-loader.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/codingagent/local-resources",
+    "catalog_id": "contract:codingagent/local-resources",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "name": "discovery-recursion",
+          "files": {
+            "agent/prompts/deep/nested.md": "---\ndescription: \"#123456\"\n---\n#123456 $1",
+            "agent/skills/deep/nested/SKILL.md": "---\nname: nested\ndescription: \"#123456\"\n---\n#123456",
+            "agent/themes/deep/nested.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"nested\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#123456\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/prompts/root.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/root/SKILL.md": "---\nname: root\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/root.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"root\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          }
+        },
+        {
+          "name": "settings-recursion",
+          "files": {
+            "agent/prompts/deep/nested.md": "---\ndescription: \"#123456\"\n---\n#123456 $1",
+            "agent/skills/deep/nested/SKILL.md": "---\nname: nested\ndescription: \"#123456\"\n---\n#123456",
+            "agent/themes/deep/nested.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"nested\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#123456\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "global": {
+            "prompts": [
+              "prompts"
+            ],
+            "skills": [
+              "skills"
+            ],
+            "themes": [
+              "themes"
+            ]
+          }
+        },
+        {
+          "name": "explicit-recursion",
+          "files": {
+            "agent/prompts/deep/nested.md": "---\ndescription: \"#123456\"\n---\n#123456 $1",
+            "agent/skills/deep/nested/SKILL.md": "---\nname: nested\ndescription: \"#123456\"\n---\n#123456",
+            "agent/themes/deep/nested.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"nested\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#123456\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "disabled": true,
+          "paths": {
+            "prompts": [
+              "../agent/prompts"
+            ],
+            "skills": [
+              "../agent/skills"
+            ],
+            "themes": [
+              "../agent/themes"
+            ]
+          }
+        },
+        {
+          "name": "ignore-explicit-reenable",
+          "files": {
+            "agent/prompts/skip.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/skip/SKILL.md": "---\nname: skip\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/skip.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"skip\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/prompts/.gitignore": "skip.md\n",
+            "agent/skills/.gitignore": "skip/\n",
+            "agent/themes/.gitignore": "skip.json\n"
+          },
+          "paths": {
+            "prompts": [
+              "../agent/prompts"
+            ],
+            "skills": [
+              "../agent/skills/skip"
+            ],
+            "themes": [
+              "../agent/themes"
+            ]
+          }
+        },
+        {
+          "name": "global-symlink-untrusted-project",
+          "files": {
+            "repo/.pi/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "repo/.pi/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/settings.json": "{}"
+          },
+          "links": {
+            "agent/prompts": "../repo/.pi/prompts",
+            "agent/skills": "../repo/.pi/skills",
+            "agent/themes": "../repo/.pi/themes"
+          }
+        },
+        {
+          "name": "disabled-exact-explicit",
+          "trusted": true,
+          "files": {
+            "agent/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "repo/.pi/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/prompts/same.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "extra/skills/same/SKILL.md": "---\nname: same\ndescription: \"#333333\"\n---\n#333333",
+            "extra/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "global": {
+            "prompts": [
+              "prompts",
+              "-prompts/same.md",
+              "-skills/same",
+              "-themes/same.json"
+            ],
+            "skills": [
+              "skills",
+              "-prompts/same.md",
+              "-skills/same",
+              "-themes/same.json"
+            ],
+            "themes": [
+              "themes",
+              "-prompts/same.md",
+              "-skills/same",
+              "-themes/same.json"
+            ]
+          },
+          "paths": {
+            "prompts": [
+              "../agent/prompts/same.md"
+            ],
+            "skills": [
+              "../agent/skills/same/SKILL.md"
+            ],
+            "themes": [
+              "../agent/themes/same.json"
+            ]
+          }
+        },
+        {
+          "name": "mixed-priority",
+          "trusted": true,
+          "files": {
+            "agent/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "repo/.pi/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/prompts/same.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "extra/skills/same/SKILL.md": "---\nname: same\ndescription: \"#333333\"\n---\n#333333",
+            "extra/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/more/prompts/same.md": "---\ndescription: \"#444444\"\n---\n#444444 $1",
+            "agent/more/skills/same/SKILL.md": "---\nname: same\ndescription: \"#444444\"\n---\n#444444",
+            "agent/more/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#444444\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/more/prompts/same.md": "---\ndescription: \"#555555\"\n---\n#555555 $1",
+            "repo/.pi/more/skills/same/SKILL.md": "---\nname: same\ndescription: \"#555555\"\n---\n#555555",
+            "repo/.pi/more/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#555555\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.agents/prompts/same.md": "---\ndescription: \"#666666\"\n---\n#666666 $1",
+            "repo/.agents/skills/same/SKILL.md": "---\nname: same\ndescription: \"#666666\"\n---\n#666666",
+            "repo/.agents/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#666666\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "home/.agents/prompts/same.md": "---\ndescription: \"#777777\"\n---\n#777777 $1",
+            "home/.agents/skills/same/SKILL.md": "---\nname: same\ndescription: \"#777777\"\n---\n#777777",
+            "home/.agents/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#777777\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "global": {
+            "prompts": [
+              "more/prompts"
+            ],
+            "skills": [
+              "more/skills"
+            ],
+            "themes": [
+              "more/themes"
+            ]
+          },
+          "project": {
+            "prompts": [
+              "more/prompts"
+            ],
+            "skills": [
+              "more/skills"
+            ],
+            "themes": [
+              "more/themes"
+            ]
+          },
+          "paths": {
+            "prompts": [
+              "../extra/prompts"
+            ],
+            "skills": [
+              "../extra/skills"
+            ],
+            "themes": [
+              "../extra/themes"
+            ]
+          }
+        },
+        {
+          "name": "untrusted-explicit",
+          "files": {
+            "agent/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "repo/.pi/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/prompts/same.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "extra/skills/same/SKILL.md": "---\nname: same\ndescription: \"#333333\"\n---\n#333333",
+            "extra/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.agents/prompts/same.md": "---\ndescription: \"#666666\"\n---\n#666666 $1",
+            "repo/.agents/skills/same/SKILL.md": "---\nname: same\ndescription: \"#666666\"\n---\n#666666",
+            "repo/.agents/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#666666\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "home/.agents/prompts/home.md": "---\ndescription: \"#777777\"\n---\n#777777 $1",
+            "home/.agents/skills/home/SKILL.md": "---\nname: home\ndescription: \"#777777\"\n---\n#777777",
+            "home/.agents/themes/home.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"home\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#777777\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "paths": {
+            "prompts": [
+              "../extra/prompts"
+            ],
+            "skills": [
+              "../extra/skills"
+            ],
+            "themes": [
+              "../extra/themes"
+            ]
+          }
+        },
+        {
+          "name": "disabled-explicit",
+          "trusted": true,
+          "disabled": true,
+          "files": {
+            "agent/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "repo/.pi/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/prompts/same.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "extra/skills/same/SKILL.md": "---\nname: same\ndescription: \"#333333\"\n---\n#333333",
+            "extra/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "paths": {
+            "prompts": [
+              "../extra/prompts"
+            ],
+            "skills": [
+              "../extra/skills"
+            ],
+            "themes": [
+              "../extra/themes"
+            ]
+          }
+        },
+        {
+          "name": "ancestor-boundary",
+          "cwd": "repo/sub/deep",
+          "trusted": true,
+          "files": {
+            "repo/.git": "gitdir: elsewhere",
+            "repo/.agents/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "repo/.agents/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "repo/.agents/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/sub/.agents/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "repo/sub/.agents/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "repo/sub/.agents/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/sub/deep/.agents/prompts/same.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "repo/sub/deep/.agents/skills/same/SKILL.md": "---\nname: same\ndescription: \"#333333\"\n---\n#333333",
+            "repo/sub/deep/.agents/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            ".agents/prompts/outside.md": "---\ndescription: \"#444444\"\n---\n#444444 $1",
+            ".agents/skills/outside/SKILL.md": "---\nname: outside\ndescription: \"#444444\"\n---\n#444444",
+            ".agents/themes/outside.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"outside\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#444444\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/parent.md": "---\ndescription: \"#555555\"\n---\n#555555 $1",
+            "repo/.pi/skills/parent/SKILL.md": "---\nname: parent\ndescription: \"#555555\"\n---\n#555555",
+            "repo/.pi/themes/parent.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"parent\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#555555\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "home/.agents/prompts/home.md": "---\ndescription: \"#666666\"\n---\n#666666 $1",
+            "home/.agents/skills/home/SKILL.md": "---\nname: home\ndescription: \"#666666\"\n---\n#666666",
+            "home/.agents/themes/home.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"home\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#666666\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          }
+        },
+        {
+          "name": "home-is-ancestor",
+          "cwd": "home/work",
+          "trusted": true,
+          "files": {
+            "home/.agents/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "home/.agents/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "home/.agents/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "agent/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          }
+        },
+        {
+          "name": "disabled-alias",
+          "files": {
+            "agent/prompts/a.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/a/SKILL.md": "---\nname: a\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/a.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"a\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "links": {
+            "agent/prompts/b.md": "a.md",
+            "agent/skills/b": "a",
+            "agent/themes/b.json": "a.json"
+          },
+          "global": {
+            "prompts": [
+              "prompts",
+              "-prompts/a.md"
+            ],
+            "skills": [
+              "skills",
+              "-skills/a"
+            ],
+            "themes": [
+              "themes",
+              "-themes/a.json"
+            ]
+          }
+        },
+        {
+          "name": "disabled-alias-explicit",
+          "files": {
+            "agent/prompts/a.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/a/SKILL.md": "---\nname: a\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/a.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"a\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "links": {
+            "agent/prompts/b.md": "a.md",
+            "agent/skills/b": "a",
+            "agent/themes/b.json": "a.json"
+          },
+          "global": {
+            "prompts": [
+              "prompts",
+              "-prompts/a.md"
+            ],
+            "skills": [
+              "skills",
+              "-skills/a"
+            ],
+            "themes": [
+              "themes",
+              "-themes/a.json"
+            ]
+          },
+          "paths": {
+            "prompts": [
+              "../agent/prompts/b.md"
+            ],
+            "skills": [
+              "../agent/skills/b"
+            ],
+            "themes": [
+              "../agent/themes/b.json"
+            ]
+          }
+        },
+        {
+          "name": "explicit-overlap",
+          "files": {
+            "agent/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "repo/.pi/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/prompts/same.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "extra/skills/same/SKILL.md": "---\nname: same\ndescription: \"#333333\"\n---\n#333333",
+            "extra/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "paths": {
+            "prompts": [
+              "../agent/prompts",
+              "../agent/prompts/same.md"
+            ],
+            "skills": [
+              "../agent/skills",
+              "../agent/skills/same"
+            ],
+            "themes": [
+              "../agent/themes",
+              "../agent/themes/same.json"
+            ]
+          }
+        },
+        {
+          "name": "explicit-file-alias",
+          "disabled": true,
+          "files": {
+            "extra/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "extra/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "extra/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "links": {
+            "extra/prompts/alias.md": "same.md",
+            "extra/skills/alias": "same",
+            "extra/themes/alias.json": "same.json"
+          },
+          "paths": {
+            "prompts": [
+              "../extra/prompts/same.md",
+              "../extra/prompts/alias.md"
+            ],
+            "skills": [
+              "../extra/skills/same",
+              "../extra/skills/alias"
+            ],
+            "themes": [
+              "../extra/themes/same.json",
+              "../extra/themes/alias.json"
+            ]
+          }
+        },
+        {
+          "name": "explicit-project-trust",
+          "files": {
+            "agent/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "repo/.pi/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/prompts/same.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "extra/skills/same/SKILL.md": "---\nname: same\ndescription: \"#333333\"\n---\n#333333",
+            "extra/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "paths": {
+            "prompts": [
+              ".pi/prompts"
+            ],
+            "skills": [
+              ".pi/skills"
+            ],
+            "themes": [
+              ".pi/themes"
+            ]
+          }
+        },
+        {
+          "name": "settings-filter",
+          "trusted": true,
+          "files": {
+            "agent/more/prompts/a.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/more/skills/a/SKILL.md": "---\nname: a\ndescription: \"#111111\"\n---\n#111111",
+            "agent/more/themes/a.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"a\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/more/prompts/b.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "agent/more/skills/b/SKILL.md": "---\nname: b\ndescription: \"#222222\"\n---\n#222222",
+            "agent/more/themes/b.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"b\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/more/prompts/c.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "agent/more/skills/c/SKILL.md": "---\nname: c\ndescription: \"#333333\"\n---\n#333333",
+            "agent/more/themes/c.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"c\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "global": {
+            "prompts": [
+              "more/prompts",
+              "*.md",
+              "!**/b.md",
+              "-more/prompts/c.md"
+            ],
+            "skills": [
+              "more/skills",
+              "!**/b",
+              "-more/skills/c"
+            ],
+            "themes": [
+              "more/themes",
+              "*.json",
+              "!**/b.json",
+              "-more/themes/c.json"
+            ]
+          }
+        },
+        {
+          "name": "traversal-order",
+          "trusted": true,
+          "files": {
+            "agent/prompts/zulu.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/zulu/SKILL.md": "---\nname: zulu\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/zulu.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"zulu\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "agent/prompts/alpha.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "agent/skills/alpha/SKILL.md": "---\nname: alpha\ndescription: \"#222222\"\n---\n#222222",
+            "agent/themes/alpha.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"alpha\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/middle.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "repo/.pi/skills/middle/SKILL.md": "---\nname: middle\ndescription: \"#333333\"\n---\n#333333",
+            "repo/.pi/themes/middle.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"middle\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/prompts/beta.md": "---\ndescription: \"#444444\"\n---\n#444444 $1",
+            "extra/skills/beta/SKILL.md": "---\nname: beta\ndescription: \"#444444\"\n---\n#444444",
+            "extra/themes/beta.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"beta\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#444444\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "paths": {
+            "prompts": [
+              "../extra/prompts"
+            ],
+            "skills": [
+              "../extra/skills"
+            ],
+            "themes": [
+              "../extra/themes"
+            ]
+          }
+        },
+        {
+          "name": "disabled-metadata",
+          "trusted": true,
+          "disabled": true,
+          "files": {
+            "agent/prompts/same.md": "---\ndescription: \"#111111\"\n---\n#111111 $1",
+            "agent/skills/same/SKILL.md": "---\nname: same\ndescription: \"#111111\"\n---\n#111111",
+            "agent/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#111111\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "repo/.pi/prompts/same.md": "---\ndescription: \"#222222\"\n---\n#222222 $1",
+            "repo/.pi/skills/same/SKILL.md": "---\nname: same\ndescription: \"#222222\"\n---\n#222222",
+            "repo/.pi/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#222222\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}",
+            "extra/prompts/same.md": "---\ndescription: \"#333333\"\n---\n#333333 $1",
+            "extra/skills/same/SKILL.md": "---\nname: same\ndescription: \"#333333\"\n---\n#333333",
+            "extra/themes/same.json": "{\"$schema\":\"https://raw.githubusercontent.com/earendil-works/pi/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json\",\"name\":\"same\",\"vars\":{\"cyan\":\"#00d7ff\",\"blue\":\"#5f87ff\",\"green\":\"#b5bd68\",\"red\":\"#cc6666\",\"yellow\":\"#ffff00\",\"text\":\"#d4d4d4\",\"gray\":\"#808080\",\"dimGray\":\"#666666\",\"darkGray\":\"#505050\",\"accent\":\"#8abeb7\",\"selectedBg\":\"#3a3a4a\",\"userMsgBg\":\"#343541\",\"toolPendingBg\":\"#282832\",\"toolSuccessBg\":\"#283228\",\"toolErrorBg\":\"#3c2828\",\"customMsgBg\":\"#2d2838\"},\"colors\":{\"accent\":\"#333333\",\"border\":\"blue\",\"borderAccent\":\"cyan\",\"borderMuted\":\"darkGray\",\"success\":\"green\",\"error\":\"red\",\"warning\":\"yellow\",\"muted\":\"gray\",\"dim\":\"dimGray\",\"text\":\"text\",\"thinkingText\":\"gray\",\"selectedBg\":\"selectedBg\",\"scrollbarThumb\":\"selectedBg\",\"userMessageBg\":\"userMsgBg\",\"userMessageText\":\"text\",\"customMessageBg\":\"customMsgBg\",\"customMessageText\":\"text\",\"customMessageLabel\":\"#9575cd\",\"toolPendingBg\":\"toolPendingBg\",\"toolSuccessBg\":\"toolSuccessBg\",\"toolErrorBg\":\"toolErrorBg\",\"toolTitle\":\"text\",\"toolOutput\":\"gray\",\"mdHeading\":\"#f0c674\",\"mdLink\":\"#81a2be\",\"mdLinkUrl\":\"dimGray\",\"mdCode\":\"accent\",\"mdCodeBlock\":\"green\",\"mdCodeBlockBorder\":\"gray\",\"mdQuote\":\"gray\",\"mdQuoteBorder\":\"gray\",\"mdHr\":\"gray\",\"mdListBullet\":\"accent\",\"toolDiffAdded\":\"green\",\"toolDiffRemoved\":\"red\",\"toolDiffContext\":\"gray\",\"syntaxComment\":\"#6A9955\",\"syntaxKeyword\":\"#569CD6\",\"syntaxFunction\":\"#DCDCAA\",\"syntaxVariable\":\"#9CDCFE\",\"syntaxString\":\"#CE9178\",\"syntaxNumber\":\"#B5CEA8\",\"syntaxType\":\"#4EC9B0\",\"syntaxOperator\":\"#D4D4D4\",\"syntaxPunctuation\":\"#D4D4D4\",\"thinkingOff\":\"darkGray\",\"thinkingMinimal\":\"#6e6e6e\",\"thinkingLow\":\"#5f87af\",\"thinkingMedium\":\"#81a2be\",\"thinkingHigh\":\"#b294bb\",\"thinkingXhigh\":\"#d183e8\",\"thinkingMax\":\"#ff5fff\",\"bashMode\":\"green\"},\"export\":{\"pageBg\":\"#18181e\",\"cardBg\":\"#1e1e24\",\"infoBg\":\"#3c3728\"}}"
+          },
+          "paths": {
+            "prompts": [
+              ".pi/prompts/same.md"
+            ],
+            "skills": [
+              ".pi/skills/same/SKILL.md"
+            ],
+            "themes": [
+              ".pi/themes/same.json"
+            ]
+          }
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "discovery-recursion",
+        "prompts": [
+          {
+            "name": "root",
+            "path": "$ROOT/agent/prompts/root.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/root.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "nested",
+            "path": "$ROOT/agent/skills/deep/nested/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/deep/nested/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#123456"
+          },
+          {
+            "name": "root",
+            "path": "$ROOT/agent/skills/root/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/root/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111"
+          }
+        ],
+        "themes": [
+          {
+            "name": "root",
+            "path": "$ROOT/agent/themes/root.json",
+            "source": {
+              "path": "$ROOT/agent/themes/root.json",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>nested</name>\n    <description>#123456</description>\n    <location>$ROOT/agent/skills/deep/nested/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>root</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/skills/root/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "settings-recursion",
+        "prompts": [
+          {
+            "name": "nested",
+            "path": "$ROOT/agent/prompts/deep/nested.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/deep/nested.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "effect": "#123456 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "nested",
+            "path": "$ROOT/agent/skills/deep/nested/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/deep/nested/SKILL.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "effect": "#123456"
+          }
+        ],
+        "themes": [
+          {
+            "name": "nested",
+            "path": "$ROOT/agent/themes/deep/nested.json",
+            "source": {
+              "path": "$ROOT/agent/themes/deep/nested.json",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "effect": "\u001b[38;2;18;52;86mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>nested</name>\n    <description>#123456</description>\n    <location>$ROOT/agent/skills/deep/nested/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "explicit-recursion",
+        "prompts": [],
+        "skills": [
+          {
+            "name": "nested",
+            "path": "$ROOT/agent/skills/deep/nested/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/deep/nested/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#123456"
+          }
+        ],
+        "themes": [],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>nested</name>\n    <description>#123456</description>\n    <location>$ROOT/agent/skills/deep/nested/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "ignore-explicit-reenable",
+        "prompts": [
+          {
+            "name": "skip",
+            "path": "$ROOT/agent/prompts/skip.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/skip.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent/prompts"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "skip",
+            "path": "$ROOT/agent/skills/skip/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/skip/SKILL.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent/skills/skip"
+            },
+            "effect": "#111111"
+          }
+        ],
+        "themes": [
+          {
+            "name": "skip",
+            "path": "$ROOT/agent/themes/skip.json",
+            "source": {
+              "path": "$ROOT/agent/themes/skip.json",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent/themes"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>skip</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/skills/skip/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "global-symlink-untrusted-project",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/prompts/same.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/same.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/themes/same.json",
+            "source": {
+              "path": "$ROOT/agent/themes/same.json",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "disabled-exact-explicit",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/prompts/same.md",
+            "source": {
+              "path": "$ROOT/repo/.pi/prompts/same.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "#222222 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/repo/.pi/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "#222222"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/themes/same.json",
+            "source": {
+              "path": "$ROOT/repo/.pi/themes/same.json",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "\u001b[38;2;34;34;34mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#222222</description>\n    <location>$ROOT/repo/.pi/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/agent/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/prompts/same.md",
+              "loserPath": "$ROOT/agent/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/skills/same/SKILL.md",
+              "loserPath": "$ROOT/agent/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/themes/same.json",
+            "collision": {
+              "resourceType": "theme",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/themes/same.json",
+              "loserPath": "$ROOT/agent/themes/same.json"
+            }
+          }
+        ]
+      },
+      {
+        "name": "mixed-priority",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/more/prompts/same.md",
+            "source": {
+              "path": "$ROOT/repo/.pi/more/prompts/same.md",
+              "source": "local",
+              "scope": "project",
+              "origin": "top-level"
+            },
+            "effect": "#555555 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/more/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/repo/.pi/more/skills/same/SKILL.md",
+              "source": "local",
+              "scope": "project",
+              "origin": "top-level"
+            },
+            "effect": "#555555"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/more/themes/same.json",
+            "source": {
+              "path": "$ROOT/repo/.pi/more/themes/same.json",
+              "source": "local",
+              "scope": "project",
+              "origin": "top-level"
+            },
+            "effect": "\u001b[38;2;85;85;85mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#555555</description>\n    <location>$ROOT/repo/.pi/more/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/repo/.pi/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/prompts/same.md",
+              "loserPath": "$ROOT/repo/.pi/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/agent/more/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/prompts/same.md",
+              "loserPath": "$ROOT/agent/more/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/agent/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/prompts/same.md",
+              "loserPath": "$ROOT/agent/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/extra/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/prompts/same.md",
+              "loserPath": "$ROOT/extra/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/repo/.pi/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/skills/same/SKILL.md",
+              "loserPath": "$ROOT/repo/.pi/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/repo/.agents/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/skills/same/SKILL.md",
+              "loserPath": "$ROOT/repo/.agents/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/more/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/skills/same/SKILL.md",
+              "loserPath": "$ROOT/agent/more/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/skills/same/SKILL.md",
+              "loserPath": "$ROOT/agent/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/home/.agents/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/skills/same/SKILL.md",
+              "loserPath": "$ROOT/home/.agents/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/extra/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/skills/same/SKILL.md",
+              "loserPath": "$ROOT/extra/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/repo/.pi/themes/same.json",
+            "collision": {
+              "resourceType": "theme",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/themes/same.json",
+              "loserPath": "$ROOT/repo/.pi/themes/same.json"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/more/themes/same.json",
+            "collision": {
+              "resourceType": "theme",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/themes/same.json",
+              "loserPath": "$ROOT/agent/more/themes/same.json"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/themes/same.json",
+            "collision": {
+              "resourceType": "theme",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/themes/same.json",
+              "loserPath": "$ROOT/agent/themes/same.json"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/extra/themes/same.json",
+            "collision": {
+              "resourceType": "theme",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/.pi/more/themes/same.json",
+              "loserPath": "$ROOT/extra/themes/same.json"
+            }
+          }
+        ]
+      },
+      {
+        "name": "untrusted-explicit",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/prompts/same.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/same.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111"
+          },
+          {
+            "name": "home",
+            "path": "$ROOT/home/.agents/skills/home/SKILL.md",
+            "source": {
+              "path": "$ROOT/home/.agents/skills/home/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/home/.agents"
+            },
+            "effect": "#777777"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/themes/same.json",
+            "source": {
+              "path": "$ROOT/agent/themes/same.json",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/skills/same/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>home</name>\n    <description>#777777</description>\n    <location>$ROOT/home/.agents/skills/home/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/extra/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/prompts/same.md",
+              "loserPath": "$ROOT/extra/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/extra/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/skills/same/SKILL.md",
+              "loserPath": "$ROOT/extra/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/extra/themes/same.json",
+            "collision": {
+              "resourceType": "theme",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/themes/same.json",
+              "loserPath": "$ROOT/extra/themes/same.json"
+            }
+          }
+        ]
+      },
+      {
+        "name": "disabled-explicit",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/extra/prompts/same.md",
+            "source": {
+              "path": "$ROOT/extra/prompts/same.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/prompts"
+            },
+            "effect": "#333333 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/extra/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/extra/skills/same/SKILL.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/skills/same"
+            },
+            "effect": "#333333"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/extra/themes/same.json",
+            "source": {
+              "path": "$ROOT/extra/themes/same.json",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/themes"
+            },
+            "effect": "\u001b[38;2;51;51;51mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#333333</description>\n    <location>$ROOT/extra/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "ancestor-boundary",
+        "prompts": [],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/sub/deep/.agents/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/repo/sub/deep/.agents/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/sub/deep/.agents"
+            },
+            "effect": "#333333"
+          },
+          {
+            "name": "home",
+            "path": "$ROOT/home/.agents/skills/home/SKILL.md",
+            "source": {
+              "path": "$ROOT/home/.agents/skills/home/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/home/.agents"
+            },
+            "effect": "#666666"
+          }
+        ],
+        "themes": [],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#333333</description>\n    <location>$ROOT/repo/sub/deep/.agents/skills/same/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>home</name>\n    <description>#666666</description>\n    <location>$ROOT/home/.agents/skills/home/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/repo/sub/.agents/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/sub/deep/.agents/skills/same/SKILL.md",
+              "loserPath": "$ROOT/repo/sub/.agents/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/repo/.agents/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/repo/sub/deep/.agents/skills/same/SKILL.md",
+              "loserPath": "$ROOT/repo/.agents/skills/same/SKILL.md"
+            }
+          }
+        ]
+      },
+      {
+        "name": "home-is-ancestor",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/prompts/same.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/same.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#222222 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#222222"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/themes/same.json",
+            "source": {
+              "path": "$ROOT/agent/themes/same.json",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "\u001b[38;2;34;34;34mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#222222</description>\n    <location>$ROOT/agent/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/home/.agents/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/skills/same/SKILL.md",
+              "loserPath": "$ROOT/home/.agents/skills/same/SKILL.md"
+            }
+          }
+        ]
+      },
+      {
+        "name": "disabled-alias",
+        "prompts": [],
+        "skills": [],
+        "themes": [],
+        "skillList": "",
+        "diagnostics": []
+      },
+      {
+        "name": "disabled-alias-explicit",
+        "prompts": [
+          {
+            "name": "b",
+            "path": "$ROOT/agent/prompts/b.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/b.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent/prompts"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "a",
+            "path": "$ROOT/agent/skills/b/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/b/SKILL.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent/skills/b"
+            },
+            "effect": "#111111"
+          }
+        ],
+        "themes": [
+          {
+            "name": "a",
+            "path": "$ROOT/agent/themes/b.json",
+            "source": {
+              "path": "$ROOT/agent/themes/b.json",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent/themes"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>a</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/skills/b/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "explicit-overlap",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/prompts/same.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/same.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/themes/same.json",
+            "source": {
+              "path": "$ROOT/agent/themes/same.json",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/agent/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/prompts/same.md",
+              "loserPath": "$ROOT/agent/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/agent/themes/same.json",
+            "collision": {
+              "resourceType": "theme",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/themes/same.json",
+              "loserPath": "$ROOT/agent/themes/same.json"
+            }
+          }
+        ]
+      },
+      {
+        "name": "explicit-file-alias",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/extra/prompts/same.md",
+            "source": {
+              "path": "$ROOT/extra/prompts/same.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/prompts"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/extra/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/extra/skills/same/SKILL.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/skills/same"
+            },
+            "effect": "#111111"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/extra/themes/same.json",
+            "source": {
+              "path": "$ROOT/extra/themes/same.json",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/themes"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#111111</description>\n    <location>$ROOT/extra/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "explicit-project-trust",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/prompts/same.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/same.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/agent/themes/same.json",
+            "source": {
+              "path": "$ROOT/agent/themes/same.json",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": [
+          {
+            "type": "collision",
+            "message": "name \"/same\" collision",
+            "path": "$ROOT/repo/.pi/prompts/same.md",
+            "collision": {
+              "resourceType": "prompt",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/prompts/same.md",
+              "loserPath": "$ROOT/repo/.pi/prompts/same.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/repo/.pi/skills/same/SKILL.md",
+            "collision": {
+              "resourceType": "skill",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/skills/same/SKILL.md",
+              "loserPath": "$ROOT/repo/.pi/skills/same/SKILL.md"
+            }
+          },
+          {
+            "type": "collision",
+            "message": "name \"same\" collision",
+            "path": "$ROOT/repo/.pi/themes/same.json",
+            "collision": {
+              "resourceType": "theme",
+              "name": "same",
+              "winnerPath": "$ROOT/agent/themes/same.json",
+              "loserPath": "$ROOT/repo/.pi/themes/same.json"
+            }
+          }
+        ]
+      },
+      {
+        "name": "settings-filter",
+        "prompts": [
+          {
+            "name": "a",
+            "path": "$ROOT/agent/more/prompts/a.md",
+            "source": {
+              "path": "$ROOT/agent/more/prompts/a.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "effect": "#111111 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "a",
+            "path": "$ROOT/agent/more/skills/a/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/more/skills/a/SKILL.md",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "effect": "#111111"
+          }
+        ],
+        "themes": [
+          {
+            "name": "a",
+            "path": "$ROOT/agent/more/themes/a.json",
+            "source": {
+              "path": "$ROOT/agent/more/themes/a.json",
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>a</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/more/skills/a/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "traversal-order",
+        "prompts": [
+          {
+            "name": "middle",
+            "path": "$ROOT/repo/.pi/prompts/middle.md",
+            "source": {
+              "path": "$ROOT/repo/.pi/prompts/middle.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "#333333 ARG"
+          },
+          {
+            "name": "alpha",
+            "path": "$ROOT/agent/prompts/alpha.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/alpha.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#222222 ARG"
+          },
+          {
+            "name": "zulu",
+            "path": "$ROOT/agent/prompts/zulu.md",
+            "source": {
+              "path": "$ROOT/agent/prompts/zulu.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111 ARG"
+          },
+          {
+            "name": "beta",
+            "path": "$ROOT/extra/prompts/beta.md",
+            "source": {
+              "path": "$ROOT/extra/prompts/beta.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/prompts"
+            },
+            "effect": "#444444 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "middle",
+            "path": "$ROOT/repo/.pi/skills/middle/SKILL.md",
+            "source": {
+              "path": "$ROOT/repo/.pi/skills/middle/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "#333333"
+          },
+          {
+            "name": "alpha",
+            "path": "$ROOT/agent/skills/alpha/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/alpha/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#222222"
+          },
+          {
+            "name": "zulu",
+            "path": "$ROOT/agent/skills/zulu/SKILL.md",
+            "source": {
+              "path": "$ROOT/agent/skills/zulu/SKILL.md",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "#111111"
+          },
+          {
+            "name": "beta",
+            "path": "$ROOT/extra/skills/beta/SKILL.md",
+            "source": {
+              "path": "$ROOT/extra/skills/beta/SKILL.md",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/skills/beta"
+            },
+            "effect": "#444444"
+          }
+        ],
+        "themes": [
+          {
+            "name": "middle",
+            "path": "$ROOT/repo/.pi/themes/middle.json",
+            "source": {
+              "path": "$ROOT/repo/.pi/themes/middle.json",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "\u001b[38;2;51;51;51mX\u001b[39m"
+          },
+          {
+            "name": "alpha",
+            "path": "$ROOT/agent/themes/alpha.json",
+            "source": {
+              "path": "$ROOT/agent/themes/alpha.json",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "\u001b[38;2;34;34;34mX\u001b[39m"
+          },
+          {
+            "name": "zulu",
+            "path": "$ROOT/agent/themes/zulu.json",
+            "source": {
+              "path": "$ROOT/agent/themes/zulu.json",
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            },
+            "effect": "\u001b[38;2;17;17;17mX\u001b[39m"
+          },
+          {
+            "name": "beta",
+            "path": "$ROOT/extra/themes/beta.json",
+            "source": {
+              "path": "$ROOT/extra/themes/beta.json",
+              "source": "local",
+              "scope": "temporary",
+              "origin": "top-level",
+              "baseDir": "$ROOT/extra/themes"
+            },
+            "effect": "\u001b[38;2;68;68;68mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>middle</name>\n    <description>#333333</description>\n    <location>$ROOT/repo/.pi/skills/middle/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>alpha</name>\n    <description>#222222</description>\n    <location>$ROOT/agent/skills/alpha/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>zulu</name>\n    <description>#111111</description>\n    <location>$ROOT/agent/skills/zulu/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>beta</name>\n    <description>#444444</description>\n    <location>$ROOT/extra/skills/beta/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      },
+      {
+        "name": "disabled-metadata",
+        "prompts": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/prompts/same.md",
+            "source": {
+              "path": "$ROOT/repo/.pi/prompts/same.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "#222222 ARG"
+          }
+        ],
+        "skills": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/skills/same/SKILL.md",
+            "source": {
+              "path": "$ROOT/repo/.pi/skills/same/SKILL.md",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "#222222"
+          }
+        ],
+        "themes": [
+          {
+            "name": "same",
+            "path": "$ROOT/repo/.pi/themes/same.json",
+            "source": {
+              "path": "$ROOT/repo/.pi/themes/same.json",
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            },
+            "effect": "\u001b[38;2;34;34;34mX\u001b[39m"
+          }
+        ],
+        "skillList": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>same</name>\n    <description>#222222</description>\n    <location>$ROOT/repo/.pi/skills/same/SKILL.md</location>\n  </skill>\n</available_skills>",
+        "diagnostics": []
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:0149c951b3a35aca42dfb4882d7fd87e1afc016124d5551bf5d8f19137760289",
+  "observation_hash": "sha256:0279c98c2b86a1d40810e3e57dd8485d7fe3b6ab07031e025c8cf25e179b7edc",
+  "execution_method": "node --experimental-strip-types parity/oracle/local-resources.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/resource-loader.ts"
+  }
+}

@@ -44,7 +44,8 @@ func (l *DefaultResourceLoader) loadThemes(ctx context.Context, settings *Settin
 	}
 	resources := []resource{}
 	seenPaths := map[string]bool{}
-	add := func(path string, source SourceInfo) {
+	sources := map[string]SourceInfo{}
+	add := func(path string, source SourceInfo, enabled bool) {
 		canonical, err := filepath.EvalSymlinks(path)
 		if err != nil {
 			canonical = path
@@ -54,9 +55,12 @@ func (l *DefaultResourceLoader) loadThemes(ctx context.Context, settings *Settin
 		}
 		seenPaths[canonical] = true
 		source.Path = path
-		resources = append(resources, resource{path, source})
+		sources[path] = source
+		if enabled && !l.noThemes {
+			resources = append(resources, resource{path, source})
+		}
 	}
-	if !l.noThemes {
+	{
 		global, err := settings.GetGlobalSettings()
 		if err != nil {
 			return result, err
@@ -78,18 +82,22 @@ func (l *DefaultResourceLoader) loadThemes(ctx context.Context, settings *Settin
 				if strings.ContainsAny(p, "*?") || strings.HasPrefix(p, "!") || strings.HasPrefix(p, "+") || strings.HasPrefix(p, "-") {
 					continue
 				}
-				for _, file := range themeFiles(templatePath(p, scope.base)) {
-					if templateEnabled(file, scope.base, scope.paths, false) {
-						add(file, SourceInfo{Source: "local", Scope: scope.scope, Origin: ResourceOriginTopLevel})
-					}
+				for _, file := range templateFiles(templatePath(p, scope.base), "theme-settings") {
+					add(file, SourceInfo{Source: "local", Scope: scope.scope, Origin: ResourceOriginTopLevel}, templateEnabled(file, scope.base, scope.paths, false))
 				}
 			}
 			for _, file := range templateFiles(filepath.Join(scope.base, "themes"), "themes") {
-				if templateEnabled(file, scope.base, scope.paths, true) {
-					add(file, SourceInfo{Source: "auto", Scope: scope.scope, Origin: ResourceOriginTopLevel, BaseDir: scope.base})
-				}
+				add(file, SourceInfo{Source: "auto", Scope: scope.scope, Origin: ResourceOriginTopLevel, BaseDir: scope.base}, templateEnabled(file, scope.base, scope.paths, true))
 			}
 		}
+	}
+	seenPaths = map[string]bool{}
+	for _, r := range resources {
+		canonical, err := filepath.EvalSymlinks(r.path)
+		if err != nil {
+			canonical = r.path
+		}
+		seenPaths[canonical] = true
 	}
 	missing := []string{}
 	invalid := []string{}
@@ -120,11 +128,8 @@ func (l *DefaultResourceLoader) loadThemes(ctx context.Context, settings *Settin
 					break
 				}
 			}
-			for _, existing := range resources {
-				if existing.path == file {
-					source = existing.source
-					break
-				}
+			if existing, ok := sources[file]; ok {
+				source = existing
 			}
 			source.Path = file
 			resources = append(resources, resource{file, source})
@@ -144,7 +149,7 @@ func (l *DefaultResourceLoader) loadThemes(ctx context.Context, settings *Settin
 		theme.SourceInfo = &source
 
 		if winner, ok := seen[theme.Name]; ok {
-			result.Diagnostics = append(result.Diagnostics, ResourceDiagnostic{Type: "collision", Message: fmt.Sprintf("name \"%s\" collision", theme.Name), Path: r.path, Collision: &ResourceCollision{ResourceType: "theme", Name: theme.Name, WinnerPath: winner.SourcePath, LoserPath: r.path}})
+			result.Diagnostics = append(result.Diagnostics, ResourceDiagnostic{Type: "collision", Message: fmt.Sprintf("name \"%s\" collision", theme.Name), Path: r.path, Collision: &ResourceCollision{ResourceType: "theme", Name: theme.Name, WinnerPath: winner.SourcePath, LoserPath: r.path, WinnerSource: resourceSourceLabel(*winner.SourceInfo), LoserSource: resourceSourceLabel(r.source)}})
 		} else {
 			seen[theme.Name] = theme
 			result.Themes = append(result.Themes, theme)

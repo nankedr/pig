@@ -16,6 +16,11 @@ type ResourceCollision struct {
 	LoserSource  *string
 }
 
+func resourceSourceLabel(source SourceInfo) *string {
+	label := string(source.Scope) + ":" + source.Source
+	return &label
+}
+
 type ResourceDiagnostic struct {
 	Type      string
 	Message   string
@@ -181,6 +186,8 @@ func (l *DefaultResourceLoader) GetPrompts() (PromptTemplateLoadResult, error) {
 	for i, d := range result.Diagnostics {
 		if d.Collision != nil {
 			collision := *d.Collision
+			collision.WinnerSource = cloneStringPointer(collision.WinnerSource)
+			collision.LoserSource = cloneStringPointer(collision.LoserSource)
 			result.Diagnostics[i].Collision = &collision
 		}
 	}
@@ -204,6 +211,8 @@ func (l *DefaultResourceLoader) GetThemes() (ThemeLoadResult, error) {
 	for i, d := range result.Diagnostics {
 		if d.Collision != nil {
 			c := *d.Collision
+			c.WinnerSource = cloneStringPointer(c.WinnerSource)
+			c.LoserSource = cloneStringPointer(c.LoserSource)
 			result.Diagnostics[i].Collision = &c
 		}
 	}

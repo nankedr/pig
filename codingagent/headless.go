@@ -318,7 +318,18 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		themes, _ := loader.GetThemes()
 		prompts.Diagnostics = append(append(prompts.Diagnostics, skills.Diagnostics...), themes.Diagnostics...)
 		for _, d := range append(append(loader.GetContextFileDiagnostics(), loader.GetSystemPromptDiagnostics()...), prompts.Diagnostics...) {
-			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: d.Message})
+			message := d.Message
+			if c := d.Collision; c != nil {
+				winner, loser := c.WinnerPath, c.LoserPath
+				if c.WinnerSource != nil {
+					winner += " (" + *c.WinnerSource + ")"
+				}
+				if c.LoserSource != nil {
+					loser += " (" + *c.LoserSource + ")"
+				}
+				message += ": " + winner + " overrides " + loser
+			}
+			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: d.Type, Message: message})
 		}
 	}
 	fallback := restoredModelFallback(options.SessionManager, model, options.Model != "")

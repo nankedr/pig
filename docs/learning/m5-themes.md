@@ -23,7 +23,7 @@ colors := theme.ResolvedColors() // 独立 CSS 色值 map
 2. 全局 AgentDir 的 settings `themes` 路径及 `themes` 目录。
 3. `AdditionalThemePaths` 或 CLI `--theme` 的显式文件/目录。
 
-目录只读取直接子级 `.json` 普通文件，不递归。自动发现跳过隐藏文件并遵循 `.gitignore`、`.ignore`、`.fdignore`；显式目录允许这些文件。settings 相对路径以 `.pig` / AgentDir 为基准；显式路径以 CWD 为基准，支持 `~` 和 `file://`。沿用本地资源 `!pattern`、`+path`、`-path` 筛选。`NoThemes` / `--no-themes` 禁止自动发现，显式路径仍生效，内置主题仍可选择。
+自动发现和显式目录只读取直接子级 `.json` 普通文件；settings 登记目录递归扫描 `.json`，见[本地资源交叉规则](m5-local-resources.md)。自动发现跳过隐藏文件并遵循 `.gitignore`、`.ignore`、`.fdignore`；显式目录允许这些文件。settings 相对路径以 `.pig` / AgentDir 为基准；显式路径以 CWD 为基准，支持 `~` 和 `file://`。沿用本地资源 `!pattern`、`+path`、`-path` 筛选。`NoThemes` / `--no-themes` 禁止自动发现，显式路径仍生效，内置主题仍可选择。
 
 `GetThemes()` 返回主题及来源、冲突、无效文件和缺失显式路径诊断。项目主题和设置在首次加载前经过 trust gate；显式路径独立授权。返回的主题元数据、颜色 map、诊断与加载器隔离；重载成功后发布新快照，取消不替换旧结果。
 

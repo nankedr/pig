@@ -161,7 +161,7 @@ func LoadSkills(ctx context.Context, cwd, agentDir string, paths []string, inclu
 				continue
 			}
 			if winner, ok := seen[skill.Name]; ok {
-				collisions = append(collisions, ResourceDiagnostic{Type: "collision", Message: fmt.Sprintf("name %q collision", skill.Name), Path: skill.FilePath, Collision: &ResourceCollision{ResourceType: "skill", Name: skill.Name, WinnerPath: winner.FilePath, LoserPath: skill.FilePath}})
+				collisions = append(collisions, ResourceDiagnostic{Type: "collision", Message: fmt.Sprintf("name %q collision", skill.Name), Path: skill.FilePath, Collision: &ResourceCollision{ResourceType: "skill", Name: skill.Name, WinnerPath: winner.FilePath, LoserPath: skill.FilePath, WinnerSource: resourceSourceLabel(winner.SourceInfo), LoserSource: resourceSourceLabel(skill.SourceInfo)}})
 			} else {
 				seen[skill.Name] = skill
 				realPaths[real] = true
@@ -190,14 +190,13 @@ func (l *DefaultResourceLoader) loadSkills(ctx context.Context, settings *Settin
 			return
 		}
 		seen[real] = true
-		if !enabled {
-			return
-		}
-		paths = append(paths, path)
 		source.Path = path
 		sources[path] = source
+		if enabled && !l.noSkills {
+			paths = append(paths, path)
+		}
 	}
-	if !l.noSkills {
+	{
 		global, err := settings.GetGlobalSettings()
 		if err != nil {
 			return SkillLoadResult{}, err
@@ -277,6 +276,16 @@ func (l *DefaultResourceLoader) loadSkills(ctx context.Context, settings *Settin
 	for i, skill := range loaded.Skills {
 		if source, ok := sources[skill.FilePath]; ok {
 			loaded.Skills[i].SourceInfo = source
+		}
+	}
+	for _, d := range loaded.Diagnostics {
+		if c := d.Collision; c != nil {
+			if source, ok := sources[c.WinnerPath]; ok {
+				c.WinnerSource = resourceSourceLabel(source)
+			}
+			if source, ok := sources[c.LoserPath]; ok {
+				c.LoserSource = resourceSourceLabel(source)
+			}
 		}
 	}
 	return SkillLoadResult{Skills: loaded.Skills, Diagnostics: loaded.Diagnostics}, nil

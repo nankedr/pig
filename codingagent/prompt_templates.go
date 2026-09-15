@@ -62,7 +62,7 @@ func templateMatch(pattern, value string) bool {
 
 func templateFiles(path, mode string) []string {
 	extension := ".md"
-	if mode == "themes" {
+	if mode == "themes" || mode == "theme-settings" {
 		extension = ".json"
 	}
 	files := []string{}
@@ -168,7 +168,7 @@ func templateFiles(path, mode string) []string {
 				continue
 			}
 			if stat.IsDir() {
-				if mode == "settings" || mode == "skills" || mode == "agents" {
+				if mode == "settings" || mode == "theme-settings" || mode == "skills" || mode == "agents" {
 					walk(full, append([]string{}, ignores...))
 				}
 			} else if stat.Mode().IsRegular() && strings.HasSuffix(name, extension) {
@@ -226,7 +226,8 @@ func (l *DefaultResourceLoader) loadPromptTemplates(ctx context.Context, setting
 	}
 	resources := []resource{}
 	seenPaths := map[string]bool{}
-	add := func(path string, source SourceInfo) {
+	sources := map[string]SourceInfo{}
+	add := func(path string, source SourceInfo, enabled bool) {
 		canonical, err := filepath.EvalSymlinks(path)
 		if err != nil {
 			canonical = path
@@ -236,9 +237,12 @@ func (l *DefaultResourceLoader) loadPromptTemplates(ctx context.Context, setting
 		}
 		seenPaths[canonical] = true
 		source.Path = path
-		resources = append(resources, resource{path, source})
+		sources[path] = source
+		if enabled && !l.noPromptTemplates {
+			resources = append(resources, resource{path, source})
+		}
 	}
-	if !l.noPromptTemplates {
+	{
 		global, err := settings.GetGlobalSettings()
 		if err != nil {
 			return result, err
@@ -261,17 +265,21 @@ func (l *DefaultResourceLoader) loadPromptTemplates(ctx context.Context, setting
 					continue
 				}
 				for _, file := range templateFiles(templatePath(p, scope.base), "settings") {
-					if templateEnabled(file, scope.base, scope.paths, false) {
-						add(file, SourceInfo{Source: "local", Scope: scope.scope, Origin: ResourceOriginTopLevel})
-					}
+					add(file, SourceInfo{Source: "local", Scope: scope.scope, Origin: ResourceOriginTopLevel}, templateEnabled(file, scope.base, scope.paths, false))
 				}
 			}
 			for _, file := range templateFiles(filepath.Join(scope.base, "prompts"), "auto") {
-				if templateEnabled(file, scope.base, scope.paths, true) {
-					add(file, SourceInfo{Source: "auto", Scope: scope.scope, Origin: ResourceOriginTopLevel, BaseDir: scope.base})
-				}
+				add(file, SourceInfo{Source: "auto", Scope: scope.scope, Origin: ResourceOriginTopLevel, BaseDir: scope.base}, templateEnabled(file, scope.base, scope.paths, true))
 			}
 		}
+	}
+	seenPaths = map[string]bool{}
+	for _, r := range resources {
+		canonical, err := filepath.EvalSymlinks(r.path)
+		if err != nil {
+			canonical = r.path
+		}
+		seenPaths[canonical] = true
 	}
 	missing := []string{}
 	for _, p := range l.templatePaths {
@@ -298,11 +306,8 @@ func (l *DefaultResourceLoader) loadPromptTemplates(ctx context.Context, setting
 					break
 				}
 			}
-			for _, existing := range resources {
-				if existing.path == file {
-					source = existing.source
-					break
-				}
+			if existing, ok := sources[file]; ok {
+				source = existing
 			}
 			source.Path = file
 			resources = append(resources, resource{file, source})
@@ -337,7 +342,7 @@ func (l *DefaultResourceLoader) loadPromptTemplates(ctx context.Context, setting
 		hint, _ := parsed.Frontmatter["argument-hint"].(string)
 		prompt := PromptTemplate{Name: strings.TrimSuffix(filepath.Base(r.path), ".md"), Description: description, ArgumentHint: hint, Content: parsed.Body, FilePath: r.path, SourceInfo: r.source}
 		if winner, ok := seen[prompt.Name]; ok {
-			result.Diagnostics = append(result.Diagnostics, ResourceDiagnostic{Type: "collision", Message: fmt.Sprintf("name \"/%s\" collision", prompt.Name), Path: r.path, Collision: &ResourceCollision{ResourceType: "prompt", Name: prompt.Name, WinnerPath: winner.FilePath, LoserPath: r.path}})
+			result.Diagnostics = append(result.Diagnostics, ResourceDiagnostic{Type: "collision", Message: fmt.Sprintf("name \"/%s\" collision", prompt.Name), Path: r.path, Collision: &ResourceCollision{ResourceType: "prompt", Name: prompt.Name, WinnerPath: winner.FilePath, LoserPath: r.path, WinnerSource: resourceSourceLabel(winner.SourceInfo), LoserSource: resourceSourceLabel(r.source)}})
 		} else {
 			seen[prompt.Name] = prompt
 			result.Prompts = append(result.Prompts, prompt)
