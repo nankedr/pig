@@ -88,7 +88,7 @@ def main():
     archive = dest / (bundle.name + ".tar.gz")
     with tarfile.open(archive, "w:gz") as tar:
         tar.add(bundle, arcname=bundle.name)
-    for path in [ROOT / "parity/catalog.jsonl", ROOT / "parity/catalog.manifest.json", ROOT / "internal/m5gate/testdata/catalog_scope.txt", *sorted((ROOT / "codingagent/testdata").glob("*surface*"))]:
+    for path in [ROOT / "parity/catalog.jsonl", ROOT / "parity/catalog.manifest.json", ROOT / "internal/m5gate/testdata/catalog_scope.txt", *sorted((ROOT / "codingagent/testdata").glob("*surface*")), *sorted((ROOT / "codingagent/testdata").glob("*.golden.txt"))]:
         record["hashes"][str(path.relative_to(ROOT))] = digest(path)
     for path in [*bundle_files, archive, dest / "installed-html-browser.log", dest / "installed-cli-workflow.log", dest / "sdk-workflow.log"]:
         record["hashes"][str(path.relative_to(dest))] = digest(path)
