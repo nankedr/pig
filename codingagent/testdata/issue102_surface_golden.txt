@@ -36,6 +36,7 @@ type codingagent.CreateHeadlessSessionOptions
 - Offline bool ""
 - ProjectTrustOverride *bool ""
 - NoContextFiles bool ""
+- NoExtensions bool ""
 - NoThemes bool ""
 - Themes []string ""
 - NoSkills bool ""
@@ -65,6 +66,7 @@ method GetAgentsFiles func(*codingagent.DefaultResourceLoader) ([]codingagent.Ag
 method GetAppendSystemPrompt func(*codingagent.DefaultResourceLoader) ([]string, error)
 method GetAppendSystemPromptSources func(*codingagent.DefaultResourceLoader) ([]codingagent.ResourcePathSource, error)
 method GetContextFileDiagnostics func(*codingagent.DefaultResourceLoader) []codingagent.ResourceDiagnostic
+method GetExtensionDiscovery func(*codingagent.DefaultResourceLoader) (codingagent.ExtensionDiscoveryResult, error)
 method GetExtensions func(*codingagent.DefaultResourceLoader) (codingagent.LoadExtensionsResult, error)
 method GetPrompts func(*codingagent.DefaultResourceLoader) (codingagent.PromptTemplateLoadResult, error)
 method GetSkills func(*codingagent.DefaultResourceLoader) (codingagent.SkillLoadResult, error)

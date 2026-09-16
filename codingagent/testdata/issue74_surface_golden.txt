@@ -56,6 +56,7 @@ type codingagent.CreateHeadlessSessionOptions
 - Offline bool ""
 - ProjectTrustOverride *bool ""
 - NoContextFiles bool ""
+- NoExtensions bool ""
 - NoThemes bool ""
 - Themes []string ""
 - NoSkills bool ""

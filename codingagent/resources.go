@@ -112,32 +112,35 @@ type ResourceLoader interface {
 }
 
 type DefaultResourceLoader struct {
-	mu                sync.RWMutex
-	cwd, agentDir     string
-	noContextFiles    bool
-	files             []AgentsFile
-	diagnostics       []ResourceDiagnostic
-	settings          *SettingsManager
-	systemInput       *string
-	appendInputs      []string
-	systemPrompt      *string
-	systemSource      *ResourcePathSource
-	appendPrompts     []string
-	appendSources     []ResourcePathSource
-	promptDiagnostics []ResourceDiagnostic
-	skills            SkillLoadResult
-	skillPaths        []string
-	noSkills          bool
-	themes            ThemeLoadResult
-	themePaths        []string
-	noThemes          bool
-	templates         PromptTemplateLoadResult
-	templatePaths     []string
-	noPromptTemplates bool
+	mu                 sync.RWMutex
+	cwd, agentDir      string
+	noContextFiles     bool
+	extensionPaths     []string
+	noExtensions       bool
+	extensionDiscovery ExtensionDiscoveryResult
+	files              []AgentsFile
+	diagnostics        []ResourceDiagnostic
+	settings           *SettingsManager
+	systemInput        *string
+	appendInputs       []string
+	systemPrompt       *string
+	systemSource       *ResourcePathSource
+	appendPrompts      []string
+	appendSources      []ResourcePathSource
+	promptDiagnostics  []ResourceDiagnostic
+	skills             SkillLoadResult
+	skillPaths         []string
+	noSkills           bool
+	themes             ThemeLoadResult
+	themePaths         []string
+	noThemes           bool
+	templates          PromptTemplateLoadResult
+	templatePaths      []string
+	noPromptTemplates  bool
 }
 
 func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultResourceLoader, error) {
-	if len(options.AdditionalExtensionPaths) > 0 || len(options.ExtensionFactories) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
+	if len(options.ExtensionFactories) > 0 || options.ExtensionsOverride != nil || options.SkillsOverride != nil || options.PromptsOverride != nil || options.ThemesOverride != nil || options.AgentsFilesOverride != nil || options.SystemPromptOverride != nil || options.AppendSystemPromptOverride != nil {
 		return nil, notImplemented("NewDefaultResourceLoader")
 	}
 	cwd, err := resolveSessionPath(options.CWD)
@@ -153,7 +156,7 @@ func NewDefaultResourceLoader(options DefaultResourceLoaderOptions) (*DefaultRes
 	if err != nil {
 		return nil, err
 	}
-	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, noContextFiles: options.NoContextFiles, noSkills: options.NoSkills, noThemes: options.NoThemes, themePaths: slices.Clone(options.AdditionalThemePaths), skillPaths: slices.Clone(options.AdditionalSkillPaths), noPromptTemplates: options.NoPromptTemplates, templatePaths: slices.Clone(options.AdditionalPromptTemplatePaths), files: []AgentsFile{}, settings: options.SettingsManager, systemInput: cloneStringPointer(options.SystemPrompt), appendInputs: slices.Clone(options.AppendSystemPrompt)}, nil
+	return &DefaultResourceLoader{cwd: cwd, agentDir: dir, extensionPaths: slices.Clone(options.AdditionalExtensionPaths), noExtensions: options.NoExtensions, noContextFiles: options.NoContextFiles, noSkills: options.NoSkills, noThemes: options.NoThemes, themePaths: slices.Clone(options.AdditionalThemePaths), skillPaths: slices.Clone(options.AdditionalSkillPaths), noPromptTemplates: options.NoPromptTemplates, templatePaths: slices.Clone(options.AdditionalPromptTemplatePaths), files: []AgentsFile{}, settings: options.SettingsManager, systemInput: cloneStringPointer(options.SystemPrompt), appendInputs: slices.Clone(options.AppendSystemPrompt)}, nil
 }
 
 func (*DefaultResourceLoader) GetExtensions() (LoadExtensionsResult, error) {
@@ -355,6 +358,14 @@ func (l *DefaultResourceLoader) Reload(ctx context.Context, options ...ResourceL
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+	extensions, err := l.discoverLocalExtensions(ctx, settings, trusted)
+	if err != nil {
+		return err
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	l.extensionDiscovery = extensions
 	l.themes = themes
 	l.skills = skills
 	l.templates = templates

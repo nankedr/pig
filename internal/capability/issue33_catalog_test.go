@@ -141,6 +141,8 @@ func assertIssue33EvidenceRefPath(t *testing.T, root, ref string) {
 
 func issue33EvidenceInputPaths(caseID string) []string {
 	switch caseID {
+	case "issue107-local-extensions-product":
+		return []string{"cmd/pig/issue107_extensions_test.go", "parity/oracle/fixtures/local-extensions.json"}
 	case "issue101-system-prompts-product":
 		return []string{"cmd/pig/issue101_prompt_test.go", "parity/oracle/fixtures/system-prompts.json"}
 	case "issue97-html-export-product":

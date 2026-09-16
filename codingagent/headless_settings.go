@@ -17,15 +17,6 @@ func checkHeadlessSettings(settings *SettingsManager) error {
 	if len(packages) > 0 {
 		return notImplemented("headless.settings.resources")
 	}
-	for _, get := range []func() ([]string, error){settings.GetExtensionPaths} {
-		paths, err := get()
-		if err != nil {
-			return err
-		}
-		if len(paths) > 0 {
-			return notImplemented("headless.settings.resources")
-		}
-	}
 	proxy, err := settingsValue[string](*settings, "httpProxy", "", "")
 	if err != nil {
 		return err

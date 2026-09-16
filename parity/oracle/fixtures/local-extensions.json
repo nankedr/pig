@@ -1,0 +1,543 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/package-manager.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/codingagent/local-extensions",
+    "catalog_id": "contract:codingagent/local-extensions",
+    "surface": "go-sdk",
+    "input": {
+      "scenarios": [
+        {
+          "name": "untrusted",
+          "files": {
+            "agent/extensions/a.ts": "export default 42;",
+            "agent/extensions/b/index.ts": "export default 42;",
+            "agent/extensions/b/index.js": "export default 42;",
+            "agent/extensions/ignored.ts": "export default 42;",
+            "agent/extensions/.gitignore": "ignored.ts\n",
+            "agent/extensions/deep/nested/no.ts": "export default 42;",
+            "agent/extensions/.hidden.ts": "export default 42;",
+            "agent/extensions/node_modules/no.js": "export default 42;",
+            "repo/.pi/extensions/project.js": "export default 42;",
+            "agent/more/local.js": "export default 42;",
+            "extra/explicit.js": "export default 42;"
+          },
+          "trusted": false
+        },
+        {
+          "name": "trusted",
+          "files": {
+            "agent/extensions/a.ts": "export default 42;",
+            "agent/extensions/b/index.ts": "export default 42;",
+            "agent/extensions/b/index.js": "export default 42;",
+            "agent/extensions/ignored.ts": "export default 42;",
+            "agent/extensions/.gitignore": "ignored.ts\n",
+            "agent/extensions/deep/nested/no.ts": "export default 42;",
+            "agent/extensions/.hidden.ts": "export default 42;",
+            "agent/extensions/node_modules/no.js": "export default 42;",
+            "repo/.pi/extensions/project.js": "export default 42;",
+            "agent/more/local.js": "export default 42;",
+            "extra/explicit.js": "export default 42;"
+          },
+          "trusted": true
+        },
+        {
+          "name": "global-path-before-project-auto",
+          "files": {
+            "agent/extensions/a.ts": "export default 42;",
+            "agent/extensions/b/index.ts": "export default 42;",
+            "agent/extensions/b/index.js": "export default 42;",
+            "agent/extensions/ignored.ts": "export default 42;",
+            "agent/extensions/.gitignore": "ignored.ts\n",
+            "agent/extensions/deep/nested/no.ts": "export default 42;",
+            "agent/extensions/.hidden.ts": "export default 42;",
+            "agent/extensions/node_modules/no.js": "export default 42;",
+            "repo/.pi/extensions/project.js": "export default 42;",
+            "agent/more/local.js": "export default 42;",
+            "extra/explicit.js": "export default 42;"
+          },
+          "trusted": true,
+          "global": {
+            "extensions": [
+              "../repo/.pi/extensions/project.js"
+            ]
+          }
+        },
+        {
+          "name": "global-disabled-project-auto",
+          "files": {
+            "agent/extensions/a.ts": "export default 42;",
+            "agent/extensions/b/index.ts": "export default 42;",
+            "agent/extensions/b/index.js": "export default 42;",
+            "agent/extensions/ignored.ts": "export default 42;",
+            "agent/extensions/.gitignore": "ignored.ts\n",
+            "agent/extensions/deep/nested/no.ts": "export default 42;",
+            "agent/extensions/.hidden.ts": "export default 42;",
+            "agent/extensions/node_modules/no.js": "export default 42;",
+            "repo/.pi/extensions/project.js": "export default 42;",
+            "agent/more/local.js": "export default 42;",
+            "extra/explicit.js": "export default 42;"
+          },
+          "trusted": true,
+          "global": {
+            "extensions": [
+              "../repo/.pi/extensions/project.js",
+              "-../repo/.pi/extensions/project.js"
+            ]
+          }
+        },
+        {
+          "name": "settings-filter",
+          "files": {
+            "agent/extensions/a.ts": "export default 42;",
+            "agent/extensions/b/index.ts": "export default 42;",
+            "agent/extensions/b/index.js": "export default 42;",
+            "agent/extensions/ignored.ts": "export default 42;",
+            "agent/extensions/.gitignore": "ignored.ts\n",
+            "agent/extensions/deep/nested/no.ts": "export default 42;",
+            "agent/extensions/.hidden.ts": "export default 42;",
+            "agent/extensions/node_modules/no.js": "export default 42;",
+            "repo/.pi/extensions/project.js": "export default 42;",
+            "agent/more/local.js": "export default 42;",
+            "extra/explicit.js": "export default 42;"
+          },
+          "trusted": true,
+          "global": {
+            "extensions": [
+              "more",
+              "-extensions/a.ts"
+            ]
+          }
+        },
+        {
+          "name": "explicit-disabled",
+          "files": {
+            "agent/extensions/a.ts": "export default 42;",
+            "agent/extensions/b/index.ts": "export default 42;",
+            "agent/extensions/b/index.js": "export default 42;",
+            "agent/extensions/ignored.ts": "export default 42;",
+            "agent/extensions/.gitignore": "ignored.ts\n",
+            "agent/extensions/deep/nested/no.ts": "export default 42;",
+            "agent/extensions/.hidden.ts": "export default 42;",
+            "agent/extensions/node_modules/no.js": "export default 42;",
+            "repo/.pi/extensions/project.js": "export default 42;",
+            "agent/more/local.js": "export default 42;",
+            "extra/explicit.js": "export default 42;"
+          },
+          "trusted": false,
+          "disabled": true,
+          "paths": [
+            "../extra/explicit.js"
+          ]
+        },
+        {
+          "name": "canonical-project-before-global",
+          "files": {
+            "agent/extensions/a.ts": "export default 42;",
+            "agent/extensions/b/index.ts": "export default 42;",
+            "agent/extensions/b/index.js": "export default 42;",
+            "agent/extensions/ignored.ts": "export default 42;",
+            "agent/extensions/.gitignore": "ignored.ts\n",
+            "agent/extensions/deep/nested/no.ts": "export default 42;",
+            "agent/extensions/.hidden.ts": "export default 42;",
+            "agent/extensions/node_modules/no.js": "export default 42;",
+            "repo/.pi/extensions/project.js": "export default 42;",
+            "agent/more/local.js": "export default 42;",
+            "extra/explicit.js": "export default 42;"
+          },
+          "trusted": true,
+          "global": {
+            "extensions": [
+              "extensions/alias.js"
+            ]
+          },
+          "links": {
+            "agent/extensions/alias.js": "../../repo/.pi/extensions/project.js"
+          }
+        },
+        {
+          "name": "root-index",
+          "files": {
+            "agent/extensions/a.ts": "export default 42;",
+            "agent/extensions/b/index.ts": "export default 42;",
+            "agent/extensions/b/index.js": "export default 42;",
+            "agent/extensions/ignored.ts": "export default 42;",
+            "agent/extensions/.gitignore": "ignored.ts\n",
+            "agent/extensions/deep/nested/no.ts": "export default 42;",
+            "agent/extensions/.hidden.ts": "export default 42;",
+            "agent/extensions/node_modules/no.js": "export default 42;",
+            "repo/.pi/extensions/project.js": "export default 42;",
+            "agent/more/local.js": "export default 42;",
+            "extra/explicit.js": "export default 42;",
+            "agent/extensions/index.js": "export default 42;"
+          },
+          "trusted": true
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "untrusted",
+        "entries": [
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/a.ts"
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/b/index.ts"
+          }
+        ]
+      },
+      {
+        "name": "trusted",
+        "entries": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "error": "Extension does not export a valid factory function: $ROOT/repo/.pi/extensions/project.js"
+          },
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/a.ts"
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/b/index.ts"
+          }
+        ]
+      },
+      {
+        "name": "global-path-before-project-auto",
+        "entries": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "enabled": true,
+            "metadata": {
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "error": "Extension does not export a valid factory function: $ROOT/repo/.pi/extensions/project.js"
+          },
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/a.ts"
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/b/index.ts"
+          }
+        ]
+      },
+      {
+        "name": "global-disabled-project-auto",
+        "entries": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "enabled": false,
+            "metadata": {
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/a.ts"
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/b/index.ts"
+          }
+        ]
+      },
+      {
+        "name": "settings-filter",
+        "entries": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            }
+          },
+          {
+            "path": "$ROOT/agent/more/local.js",
+            "enabled": true,
+            "metadata": {
+              "source": "local",
+              "scope": "user",
+              "origin": "top-level"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "enabled": false,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "error": "Extension does not export a valid factory function: $ROOT/repo/.pi/extensions/project.js"
+          },
+          {
+            "path": "$ROOT/agent/more/local.js",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/more/local.js"
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/b/index.ts"
+          }
+        ]
+      },
+      {
+        "name": "explicit-disabled",
+        "entries": [
+          {
+            "path": "$ROOT/extra/explicit.js",
+            "enabled": true,
+            "metadata": {
+              "source": "../extra/explicit.js",
+              "scope": "temporary",
+              "origin": "package",
+              "baseDir": "$ROOT/extra"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "path": "$ROOT/extra/explicit.js",
+            "error": "Extension does not export a valid factory function: $ROOT/extra/explicit.js"
+          }
+        ]
+      },
+      {
+        "name": "canonical-project-before-global",
+        "entries": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "error": "Extension does not export a valid factory function: $ROOT/repo/.pi/extensions/project.js"
+          },
+          {
+            "path": "$ROOT/agent/extensions/a.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/a.ts"
+          },
+          {
+            "path": "$ROOT/agent/extensions/b/index.ts",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/b/index.ts"
+          }
+        ]
+      },
+      {
+        "name": "root-index",
+        "entries": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "project",
+              "origin": "top-level",
+              "baseDir": "$ROOT/repo/.pi"
+            }
+          },
+          {
+            "path": "$ROOT/agent/extensions/index.js",
+            "enabled": true,
+            "metadata": {
+              "source": "auto",
+              "scope": "user",
+              "origin": "top-level",
+              "baseDir": "$ROOT/agent"
+            }
+          }
+        ],
+        "errors": [
+          {
+            "path": "$ROOT/repo/.pi/extensions/project.js",
+            "error": "Extension does not export a valid factory function: $ROOT/repo/.pi/extensions/project.js"
+          },
+          {
+            "path": "$ROOT/agent/extensions/index.js",
+            "error": "Extension does not export a valid factory function: $ROOT/agent/extensions/index.js"
+          }
+        ]
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:88438057cd0d2560e63805fac3abfb3dfa8373b169cff4f57af7c9393987d57d",
+  "observation_hash": "sha256:72d23335615378154b80c40b640137e50c1b30db32fb0ccd3abf21ce1d9968fd",
+  "execution_method": "node --experimental-strip-types parity/oracle/local-extensions.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "node": "v24.14.0",
+    "oracle_entry": "packages/coding-agent/src/core/package-manager.ts"
+  }
+}

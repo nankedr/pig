@@ -29,7 +29,7 @@ func TestCommandStubsHaveNoSideEffects(t *testing.T) {
 		{name: "pig print mode requires a prompt", path: "./cmd/pig", wantStderr: "Error: Headless mode requires a prompt\n"},
 		{name: "pig invalid thinking warning", path: "./cmd/pig", arguments: []string{"--thinking", "invalid"}, wantStderr: "Warning: Invalid thinking level \"invalid\". Valid values: off, minimal, low, medium, high, xhigh, max\nError: Headless mode requires a prompt\n"},
 		{name: "pig package command", path: "./cmd/pig", arguments: []string{"install", "npm:example"}, wantStderr: "codingagent.command.install: not implemented\n"},
-		{name: "pig extension discovery", path: "./cmd/pig", arguments: []string{"--extension", "extension.ts"}, wantStderr: "codingagent.extension.discovery: not implemented\n"},
+		{name: "pig extension discovery", path: "./cmd/pig", arguments: []string{"--extension", "extension.ts"}, wantStderr: "Warning: Extension path $WORK/extension.ts: no local entry; not executed (extension runtime not implemented)\ncodingagent.extension.discovery: not implemented\n"},
 		{name: "pig extension flag", path: "./cmd/pig", arguments: []string{"--review=deep"}, wantStderr: "codingagent.extension.flag.review: not implemented\n"},
 		{name: "pig-ai list", path: "./cmd/pig-ai", arguments: []string{"list"}, wantStderr: "ai.CLI.List: not implemented\n"},
 		{name: "pig-ai explicit auth path", path: "./cmd/pig-ai", arguments: []string{"login", "anthropic", "--auth-path", "explicit-auth.json"}, wantStderr: "ai.CLI.Login: not implemented\n"},
@@ -68,6 +68,11 @@ func TestCommandStubsHaveNoSideEffects(t *testing.T) {
 			if err := os.Mkdir(tempState, 0o700); err != nil {
 				t.Fatal(err)
 			}
+			canonicalWork, err := filepath.EvalSymlinks(work)
+			if err != nil {
+				t.Fatal(err)
+			}
+			tt.wantStderr = strings.ReplaceAll(tt.wantStderr, "$WORK/extension.ts", filepath.Join(canonicalWork, "extension.ts"))
 			seedContaminationSentinels(t, home, work)
 			before := snapshotTrees(t, home, work, tempState)
 			var successEvents, stderr bytes.Buffer

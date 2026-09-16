@@ -35,6 +35,7 @@ type CreateHeadlessSessionOptions struct {
 	Offline              bool
 	ProjectTrustOverride ProjectTrustDecision
 	NoContextFiles       bool
+	NoExtensions         bool
 	NoThemes             bool
 	Themes               []string
 	NoSkills             bool
@@ -269,7 +270,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			return nil, err
 		}
 	}
-	loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: options.CWD, AgentDir: options.AgentDir, SettingsManager: settings, NoContextFiles: options.NoContextFiles, NoSkills: options.NoSkills, NoThemes: options.NoThemes, AdditionalThemePaths: options.Themes, AdditionalSkillPaths: options.Skills, NoPromptTemplates: options.NoPromptTemplates, AdditionalPromptTemplatePaths: options.PromptTemplates, SystemPrompt: options.SystemPrompt, AppendSystemPrompt: options.AppendSystemPrompt})
+	loader, err := NewDefaultResourceLoader(DefaultResourceLoaderOptions{CWD: options.CWD, AgentDir: options.AgentDir, SettingsManager: settings, NoContextFiles: options.NoContextFiles, NoExtensions: options.NoExtensions, NoSkills: options.NoSkills, NoThemes: options.NoThemes, AdditionalThemePaths: options.Themes, AdditionalSkillPaths: options.Skills, NoPromptTemplates: options.NoPromptTemplates, AdditionalPromptTemplatePaths: options.PromptTemplates, SystemPrompt: options.SystemPrompt, AppendSystemPrompt: options.AppendSystemPrompt})
 	if err != nil {
 		return nil, err
 	}
@@ -313,7 +314,9 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return CreateAgentSessionRuntimeResult{CreateAgentSessionResult: CreateAgentSessionResult{Session: runtime.Session(), ModelFallbackMessage: runtime.ModelFallbackMessage()}, Services: runtime.Services()}, nil
 	}
 	if loader, ok := created.Session.ResourceLoader().(*DefaultResourceLoader); ok {
+		extensions, _ := loader.GetExtensionDiscovery()
 		prompts, _ := loader.GetPrompts()
+		prompts.Diagnostics = append(prompts.Diagnostics, extensions.Diagnostics...)
 		skills, _ := loader.GetSkills()
 		themes, _ := loader.GetThemes()
 		prompts.Diagnostics = append(append(prompts.Diagnostics, skills.Diagnostics...), themes.Diagnostics...)

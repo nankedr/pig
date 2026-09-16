@@ -363,6 +363,9 @@ func Main(ctx context.Context, arguments []string, _ ...MainOptions) error {
 			return errors.New("Error: Failed to write stdout.")
 		}
 	}
+	if isNotImplementedOperation(err, "extension.discovery") {
+		return reportCLIExtensionDiscovery(ctx, ParseArgs(arguments))
+	}
 	if isNotImplementedOperation(err, "mode.print.text") || isNotImplementedOperation(err, "mode.json") || isNotImplementedOperation(err, "mode.rpc") {
 		return runHeadlessMain(ctx, arguments)
 	}
@@ -507,6 +510,7 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 		Models:             parsed.Models,
 		Offline:            ResolveOffline(parsed.Offline),
 		NoContextFiles:     parsed.NoContextFiles,
+		NoExtensions:       parsed.NoExtensions,
 		NoSkills:           parsed.NoSkills,
 		NoThemes:           parsed.NoThemes,
 		Themes:             parsed.Themes,

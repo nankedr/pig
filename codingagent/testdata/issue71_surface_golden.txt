@@ -5,6 +5,7 @@ fields:
 - Offline bool tag=""
 - ProjectTrustOverride *bool tag=""
 - NoContextFiles bool tag=""
+- NoExtensions bool tag=""
 - NoThemes bool tag=""
 - Themes []string tag=""
 - NoSkills bool tag=""
