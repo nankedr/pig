@@ -2,7 +2,7 @@
 
 Pig V1 使用双来源对等基线：Code Baseline 是 Pi `936aff00918de1187f085f123c2812d8f2d67745`，Catalog Baseline 是 Pi v0.84.1 官方 source tar（commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model）。两者相差 40 个 commit，因此这不是 fixed-run parity；详见 ADR-0014。主学习路线一次只推进一个里程碑前沿；并行支线必须重新集成到持续可运行的 `pig`。
 
-当前 Milestone Frontier：**M5**。M4/v0.4.0 已完成 Headless 编排、JSONL RPC 和安全 HTML export；范围与证据见 [M4 集成与冻结](learning/m4-freeze.md)。M5 按 [ADR-0034](adr/0034-defer-package-ecosystem.md) 先交付本地资源，包生态延期但保留 V1 范围。逐符号状态仍以 Parity Catalog 为准，明确说明范围的 `partial` 不代表全量 Pi 对等。
+当前 Milestone Frontier：**M5**。#108/v0.5.0 的本地资源交付与冻结入口见 [M5 集成与冻结](learning/m5-freeze.md)；父 #7 关闭及前沿推进由维护者另行决定。M4/v0.4.0 已完成 Headless 编排、JSONL RPC 和安全 HTML export；范围与证据见 [M4 集成与冻结](learning/m4-freeze.md)。M5 按 [ADR-0034](adr/0034-defer-package-ecosystem.md) 先交付本地资源，包生态延期但保留 V1 范围。逐符号状态仍以 Parity Catalog 为准，明确说明范围的 `partial` 不代表全量 Pi 对等。
 
 | 阶段 | 可验收产物 |
 | --- | --- |

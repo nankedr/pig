@@ -4,7 +4,7 @@ M4.9 支持同一 Session 树的无摘要导航与继续分支，见 [学习材�
 
 M4.1 已支持显式 grep 搜索并继续编码任务，见 [grep 学习材料](docs/learning/m4-grep-tool.md)和 [TypeScript → Go](docs/mappings/typescript-to-go/m4-grep-tool.md)。
 
-Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.4.0 集成 M4 Headless 编排：七工具、消息投递与重试、动态配置、压缩与分支摘要、统计、并发 JSONL RPC 和安全 HTML export，并保留 M1–M3 的持久化、互操作与恢复能力。
+Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.5.0 交付 M5 本地资源：Context File、system prompt、模板、Skill、主题及重载，支持继续和恢复同一会话、导出主题 HTML；保留 M1–M4 的工具、编排与 JSONL RPC 能力。
 
 当前推进 [M5 本地资源](https://github.com/nankedr/pig/issues/7)。Pi 包生态兼容按 [ADR-0034](docs/adr/0034-defer-package-ecosystem.md) 延期，由 [#99](https://github.com/nankedr/pig/issues/99) 保留 V1 未完成范围，尚未排期。
 
@@ -14,6 +14,9 @@ M3.10 支持显式 bash 执行宿主命令、进程树取消与完整输出保�
 M3.11 默认启用 read/bash/edit/write，支持跨进程恢复和 fork 编码任务，见 [可恢复编码任务](docs/learning/m3-coding-task.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m3-coding-task.md)。
 M4.4 支持 Provider 错误后的整轮重试，见 [重试与取消](docs/learning/m4-turn-retry.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m4-turn-retry.md)。
 
+- [M5 集成与冻结](docs/learning/m5-freeze.md)
+- [M5 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m5-freeze.md)
+- [v0.5.0 发布说明](docs/releases/v0.5.0.md)
 - [M4 集成与冻结](docs/learning/m4-freeze.md)
 - [M4 TypeScript 到 Go 导航](docs/mappings/typescript-to-go/m4-freeze.md)
 - [v0.4.0 发布说明](docs/releases/v0.4.0.md)
@@ -80,7 +83,7 @@ Issue #84：显式选择 find/ls/read 完成文件定位与回读，详见 [M4.2
 
 M4.7 支持手动压缩后继续任务，见 [压缩与恢复](docs/learning/m4-manual-compaction.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m4-manual-compaction.md)。
 
-M4 安装：`go install github.com/nankedr/pig/cmd/pig@v0.4.0`；SDK：`go get github.com/nankedr/pig@v0.4.0`。组合示例 `go run ./examples/m4-workflow`；完整冻结和验证制品见 [M4 冻结](docs/learning/m4-freeze.md)。
+M5 安装：`go install github.com/nankedr/pig/cmd/pig@v0.5.0`；SDK：`go get github.com/nankedr/pig@v0.5.0`。组合示例 `go run ./examples/m5-workflow`；完整冻结和验证制品见 [M5 冻结](docs/learning/m5-freeze.md)。
 
 本地 Skill：`go run ./examples/skills`；[中文学习材料](docs/learning/m5-skills.md)与 [TypeScript → Go 导航](docs/mappings/typescript-to-go/m5-skills.md)。
 

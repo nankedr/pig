@@ -1,5 +1,7 @@
 # Pig 文档导航
 
+M5/v0.5.0 的本地资源组合、安装及发布制品见 [M5 集成与冻结](learning/m5-freeze.md)、[TypeScript → Go](mappings/typescript-to-go/m5-freeze.md)和 [发布说明](releases/v0.5.0.md)。包生态仍由 #99 延期跟踪。
+
 M4.10 支持导航时生成离开分支摘要，见 [学习材料](learning/m4-branch-summary.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-branch-summary.md)。
 
 M4.9 支持同一 Session 树的无摘要导航与继续分支，见 [学习材料](learning/m4-session-tree-navigation.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-session-tree-navigation.md)。

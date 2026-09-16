@@ -124,3 +124,12 @@ SHA-256 hashes and modifications are in codingagent/exporthtml/manifest.json.
 Used for local Prompt Template frontmatter parsing. The retained notices are in
 `THIRD_PARTY_LICENSES/go-yaml-v3.txt`; the Apache-2.0 license is retained in
 `THIRD_PARTY_LICENSES/jsonschema-v6-Apache-2.0.txt`.
+
+## M5 local resource assets
+
+The embedded dark/light themes in codingagent/themes are adapted from the Pi
+Code Baseline theme JSON files (MIT). Exact source paths, hashes and local
+modifications are recorded in codingagent/themes/manifest.json. These themes
+and the existing HTML export assets ship with v0.5.0; the Pi MIT notice above
+and codingagent/exporthtml/LICENSES.txt cover their attribution. No npm/git
+package runtime or extension execution dependencies are added by this release.

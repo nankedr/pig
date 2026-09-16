@@ -207,3 +207,23 @@ m4-clean:
 
 m4-freeze: m4-clean m3-node-preflight m4-gate m4-oracle m4-html-browser m0-source-drift m1-live-smoke
 	@$(MAKE) --no-print-directory m4-clean
+
+.PHONY: m5-gate m5-repeat m5-oracle m5-clean m5-freeze
+.NOTPARALLEL: m5-gate m5-freeze m5-oracle
+
+m5-gate: m4-gate m5-repeat
+	go run ./examples/m5-workflow
+	go run ./examples/local-extensions
+
+m5-repeat:
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test(SessionReload|ContextFilesReloadAndOwnership|PromptTemplatesTrustReloadAndOwnership|SkillsTrustReloadAndOwnership|ThemesTrustReloadAndOwnership|LocalExtensionsReloadAndStubBoundaries|LocalExtensionsNoSensitiveReads)' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./cmd/pig ./internal/m5gate -run 'Test(PigM5|M5Workflow|PigLocalExtensions)' -count=5 -shuffle=on
+
+m5-oracle: m4-oracle
+
+m5-clean:
+	@set -eu; state=$$(git status --porcelain=v1 --untracked-files=all); \
+		test -z "$$state" || (echo "M5 freeze requires a clean Pig checkout" >&2; exit 2)
+
+m5-freeze: m5-clean m3-node-preflight m5-gate m5-oracle m4-html-browser m0-source-drift m1-live-smoke
+	@$(MAKE) --no-print-directory m5-clean

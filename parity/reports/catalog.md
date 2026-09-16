@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9677
+- Total entries: 9678
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
 | scaffolded | 3853 |
-| partial | 364 |
+| partial | 365 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -7882,6 +7882,7 @@
 | contract:config/auth-json | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewAuthStorage | coding-agent |
 | contract:config/settings | partial | M3 | contract | github.com/nankedr/pig/codingagent.SettingsManager | coding-agent |
 | contract:model-runtime/basic | partial | M3 | contract | github.com/nankedr/pig/codingagent.NewModelRuntime | coding-agent |
+| contract:release/m5-local-workflow | partial | M5 | contract | github.com/nankedr/pig/codingagent.CreateAgentSession | coding-agent |
 | contract:rpc/jsonl-transport | partial | M4 | contract | github.com/nankedr/pig/codingagent.RunRPCMode | coding-agent |
 | contract:rpc/session-control | partial | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
 | contract:rpc/session-lifecycle | partial | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
