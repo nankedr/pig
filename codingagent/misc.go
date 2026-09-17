@@ -366,20 +366,21 @@ func Main(ctx context.Context, arguments []string, _ ...MainOptions) error {
 	if isNotImplementedOperation(err, "extension.discovery") {
 		return reportCLIExtensionDiscovery(ctx, ParseArgs(arguments))
 	}
-	if isNotImplementedOperation(err, "mode.print.text") || isNotImplementedOperation(err, "mode.json") || isNotImplementedOperation(err, "mode.rpc") {
-		return runHeadlessMain(ctx, arguments)
+	if isNotImplementedOperation(err, "mode.print.text") || isNotImplementedOperation(err, "mode.json") || isNotImplementedOperation(err, "mode.rpc") || isNotImplementedOperation(err, "mode.interactive") {
+		return runSessionMain(ctx, arguments)
 	}
 	return err
 }
 
-func runHeadlessMain(ctx context.Context, arguments []string) error {
+func runSessionMain(ctx context.Context, arguments []string) error {
 	parsed := ParseArgs(arguments)
+	interactive := !parsed.Print && parsed.Mode != ModeJSON && parsed.Mode != ModeRPC && isTerminalFile(os.Stdin) && isTerminalFile(os.Stdout)
 	if operation := unsupportedHeadlessOperation(parsed); operation != "" {
 		return notImplemented(operation)
 	}
 	messages := append([]string(nil), parsed.Messages...)
 	var initialMessage *string
-	if parsed.Mode != ModeRPC {
+	if parsed.Mode != ModeRPC && !interactive {
 		stdin, stdinErr := readHeadlessStdin()
 		if stdinErr != nil {
 			return fmt.Errorf("read stdin: %w", stdinErr)
@@ -542,6 +543,20 @@ func runHeadlessMain(ctx context.Context, arguments []string) error {
 	}
 	if parsed.Mode == ModeRPC {
 		return RunRPCMode(ctx, runtime)
+	}
+	if interactive {
+		if parsed.TUIMode == "" {
+			parsed.TUIMode, err = settings.GetTUIMode()
+			if err != nil {
+				return errors.Join(err, runtime.Dispose(context.WithoutCancel(ctx)))
+			}
+		}
+		mode := NewInteractiveMode(runtime, InteractiveModeOptions{InitialMessages: messages, TUIMode: parsed.TUIMode})
+		err := mode.Run(ctx)
+		if err == context.Canceled && ctx.Err() != nil {
+			return nil
+		}
+		return err
 	}
 	_, err = RunPrintMode(ctx, runtime, PrintModeOptions{
 		InitialMessage: initialMessage,

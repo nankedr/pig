@@ -17,6 +17,7 @@ import (
 // InteractiveModeOptions contains product-level composition options. Terminal
 // behavior itself remains owned by package tui.
 type InteractiveModeOptions struct {
+	Terminal             tui.Terminal
 	AutoTrustOnReloadCWD *string
 	InitialImages        []ai.ImageContent
 	InitialMessage       *string
@@ -33,62 +34,6 @@ type LatestRelease struct {
 	Version     string
 	PackageName *string
 	Note        *string
-}
-
-// InteractiveMode is the product-level interactive composition boundary. It
-// intentionally contains no alternate terminal or rendering implementation.
-type InteractiveMode struct {
-	runtime *AgentSessionRuntime
-	options InteractiveModeOptions
-}
-
-// NewInteractiveMode records inert dependencies without starting a terminal.
-func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveModeOptions) *InteractiveMode {
-	mode := &InteractiveMode{runtime: runtime}
-	if len(options) != 0 {
-		mode.options = options[0]
-	}
-	return mode
-}
-
-func (*InteractiveMode) ClearEditor() error {
-	return notImplemented("InteractiveMode.ClearEditor")
-}
-
-func (*InteractiveMode) GetUserInput(context.Context) (string, error) {
-	return "", notImplemented("InteractiveMode.GetUserInput")
-}
-
-func (*InteractiveMode) Init(context.Context) error {
-	return notImplemented("InteractiveMode.Init")
-}
-
-func (*InteractiveMode) RenderInitialMessages() error {
-	return notImplemented("InteractiveMode.RenderInitialMessages")
-}
-
-func (*InteractiveMode) Run(context.Context) error {
-	return notImplemented("InteractiveMode.Run")
-}
-
-func (*InteractiveMode) ShowError(string) error {
-	return notImplemented("InteractiveMode.ShowError")
-}
-
-func (*InteractiveMode) ShowNewVersionNotification(LatestRelease) error {
-	return notImplemented("InteractiveMode.ShowNewVersionNotification")
-}
-
-func (*InteractiveMode) ShowPackageUpdateNotification([]string) error {
-	return notImplemented("InteractiveMode.ShowPackageUpdateNotification")
-}
-
-func (*InteractiveMode) ShowWarning(string) error {
-	return notImplemented("InteractiveMode.ShowWarning")
-}
-
-func (*InteractiveMode) Stop(...bool) error {
-	return notImplemented("InteractiveMode.Stop")
 }
 
 // JSONAgentSessionEvent is a JSON-mode projection of a production-v3 session

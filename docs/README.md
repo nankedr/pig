@@ -1,5 +1,8 @@
 # Pig 文档导航
 
+M6.1 的真实终端、公开 SDK 和受控 PTY 验收见 [Interactive 文本对话](learning/m6-interactive-text.md)与 [源码映射](mappings/typescript-to-go/m6-interactive-text.md)。
+
+
 M5/v0.5.0 的本地资源组合、安装及发布制品见 [M5 集成与冻结](learning/m5-freeze.md)、[TypeScript → Go](mappings/typescript-to-go/m5-freeze.md)和 [发布说明](releases/v0.5.0.md)。包生态仍由 #99 延期跟踪。
 
 M4.10 支持导航时生成离开分支摘要，见 [学习材料](learning/m4-branch-summary.md)及 [TypeScript → Go](mappings/typescript-to-go/m4-branch-summary.md)。
@@ -20,7 +23,7 @@ M4.4 支持 Provider 错误后的整轮重试，见 [重试与取消](learning/m
 
 Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学习与证据”组织。阅读代码或设计任务前，先确认固定 Parity Baseline 和当前 Milestone Frontier。
 
-当前 Milestone Frontier：**M3**。M3.5 的项目信任见 [Project Trust](learning/m3-project-trust.md) 和 [源码导航](mappings/typescript-to-go/m3-project-trust.md)。M3.4 的全局 settings 驱动启动见 [全局设置](learning/m3-global-settings.md) 和 [源码导航](mappings/typescript-to-go/m3-global-settings.md)。M3.1 的 Session 创建、持久化与重开见 [v3 Session 持久化](learning/m3-session-persistence.md) 和 [源码导航](mappings/typescript-to-go/m3-session-persistence.md)；M2/v0.2.0 的公共行为与证据边界见 [M2 集成与冻结](learning/m2-freeze.md) 和 [M2 源码导航](mappings/typescript-to-go/m2-freeze.md)；M1 首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)。
+当前 Milestone Frontier：**M6**。M3.5 的项目信任见 [Project Trust](learning/m3-project-trust.md) 和 [源码导航](mappings/typescript-to-go/m3-project-trust.md)。M3.4 的全局 settings 驱动启动见 [全局设置](learning/m3-global-settings.md) 和 [源码导航](mappings/typescript-to-go/m3-global-settings.md)。M3.1 的 Session 创建、持久化与重开见 [v3 Session 持久化](learning/m3-session-persistence.md) 和 [源码导航](mappings/typescript-to-go/m3-session-persistence.md)；M2/v0.2.0 的公共行为与证据边界见 [M2 集成与冻结](learning/m2-freeze.md) 和 [M2 源码导航](mappings/typescript-to-go/m2-freeze.md)；M1 首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)。
 
 ## 首次阅读
 

@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9678
+- Total entries: 9679
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
-| scaffolded | 3853 |
-| partial | 365 |
+| scaffolded | 3830 |
+| partial | 389 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -7424,16 +7424,8 @@
 | member:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent.setOutputPad | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageComponent.SetOutputPad | coding-agent |
 | member:codingagent/src/modes/interactive/components/visual-truncate.ts#VisualTruncateResult.skippedCount | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.VisualTruncateResult.SkippedCount | coding-agent |
 | member:codingagent/src/modes/interactive/components/visual-truncate.ts#VisualTruncateResult.visualLines | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.VisualTruncateResult.VisualLines | coding-agent |
-| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.clearEditor | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ClearEditor | coding-agent |
-| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.getUserInput | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.GetUserInput | coding-agent |
-| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.init | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.Init | coding-agent |
-| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.renderInitialMessages | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.RenderInitialMessages | coding-agent |
-| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.run | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.Run | coding-agent |
-| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.showError | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ShowError | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.showNewVersionNotification | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ShowNewVersionNotification | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.showPackageUpdateNotification | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ShowPackageUpdateNotification | coding-agent |
-| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.showWarning | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ShowWarning | coding-agent |
-| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.stop | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.Stop | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions.autoTrustOnReloadCwd | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveModeOptions.AutoTrustOnReloadCWD | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions.initialImages | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveModeOptions.InitialImages | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions.initialMessage | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveModeOptions.InitialMessage | coding-agent |
@@ -7825,7 +7817,6 @@
 | symbol:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.UserMessageComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/visual-truncate.ts#VisualTruncateResult | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.VisualTruncateResult | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/visual-truncate.ts#truncateToVisualLines | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.TruncateToVisualLines | coding-agent |
-| symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveModeOptions | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#ThemeColor | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ThemeColor | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#getLanguageFromPath | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetLanguageFromPath | coding-agent |
@@ -7865,6 +7856,7 @@
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
+| contract:codingagent/interactive-text | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/local-extensions | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetExtensionDiscovery | coding-agent |
 | contract:codingagent/local-resources | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |
 | contract:codingagent/prompt-templates | partial | M5 | contract | github.com/nankedr/pig/codingagent.AgentSession.PromptTemplates | coding-agent |
@@ -7947,6 +7939,14 @@
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.description | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.Description | coding-agent |
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.disable-model-invocation | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.DisableModelInvocation | coding-agent |
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.name | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.Name | coding-agent |
+| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.clearEditor | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ClearEditor | coding-agent |
+| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.getUserInput | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.GetUserInput | coding-agent |
+| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.init | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.Init | coding-agent |
+| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.renderInitialMessages | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.RenderInitialMessages | coding-agent |
+| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.run | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.Run | coding-agent |
+| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.showError | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ShowError | coding-agent |
+| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.showWarning | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ShowWarning | coding-agent |
+| member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.stop | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.Stop | coding-agent |
 | member:codingagent/src/modes/interactive/theme/theme.ts#Theme.bg | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Bg | coding-agent |
 | member:codingagent/src/modes/interactive/theme/theme.ts#Theme.bold | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Bold | coding-agent |
 | member:codingagent/src/modes/interactive/theme/theme.ts#Theme.fg | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Fg | coding-agent |
@@ -7981,6 +7981,7 @@
 | symbol:codingagent/src/core/skills.ts#loadSkills | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadSkills | coding-agent |
 | symbol:codingagent/src/core/skills.ts#loadSkillsFromDir | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadSkillsFromDir | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
+| symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode | partial | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#Theme | partial | M6 | symbol | github.com/nankedr/pig/codingagent.Theme | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#RpcClient | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
@@ -9298,22 +9299,9 @@
 | member:tui/src/terminal-image.ts#TerminalCapabilities.images | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TerminalCapabilities.Images | tui |
 | member:tui/src/terminal-image.ts#TerminalCapabilities.trueColor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TerminalCapabilities.TrueColor | tui |
 | member:tui/src/terminal.ts#KeyboardProtocolNegotiationSequence.type | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeyboardProtocolNegotiationSequence.Type | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.clearFromCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearFromCursor | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.clearLine | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearLine | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.clearScreen | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearScreen | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.columns | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Columns | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.drainInput | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.DrainInput | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.hideCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.HideCursor | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.kittyProtocolActive | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.KittyProtocolActive | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.modifyOtherKeysActive | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ModifyOtherKeysActive | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.moveBy | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.MoveBy | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.rows | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Rows | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.setProgress | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.SetProgress | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.setTitle | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.SetTitle | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.showCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ShowCursor | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.start | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Start | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.stop | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Stop | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.write | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Write | tui |
 | member:tui/src/terminal.ts#Terminal.clearFromCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Terminal.ClearFromCursor | tui |
 | member:tui/src/terminal.ts#Terminal.clearLine | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Terminal.ClearLine | tui |
 | member:tui/src/terminal.ts#Terminal.clearScreen | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Terminal.ClearScreen | tui |
@@ -9678,7 +9666,6 @@
 | symbol:tui/src/terminal-image.ts#setCapabilities | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SetCapabilities | tui |
 | symbol:tui/src/terminal-image.ts#setCellDimensions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SetCellDimensions | tui |
 | symbol:tui/src/terminal.ts#KeyboardProtocolNegotiationSequence | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KeyboardProtocolNegotiationSequence | tui |
-| symbol:tui/src/terminal.ts#ProcessTerminal | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ProcessTerminal | tui |
 | symbol:tui/src/terminal.ts#Terminal | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Terminal | tui |
 | symbol:tui/src/terminal.ts#isAppleTerminalSession | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.IsAppleTerminalSession | tui |
 | symbol:tui/src/terminal.ts#normalizeAppleTerminalInput | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.NormalizeAppleTerminalInput | tui |
@@ -9731,7 +9718,21 @@
 | symbol:tui/src/word-navigation.ts#WordNavigationOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.WordNavigationOptions | tui |
 | symbol:tui/src/word-navigation.ts#findWordBackward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordBackward | tui |
 | symbol:tui/src/word-navigation.ts#findWordForward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordForward | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.clearFromCursor | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearFromCursor | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.clearLine | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearLine | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.clearScreen | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearScreen | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.columns | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Columns | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.hideCursor | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.HideCursor | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.kittyProtocolActive | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.KittyProtocolActive | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.modifyOtherKeysActive | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ModifyOtherKeysActive | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.moveBy | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.MoveBy | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.rows | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Rows | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.showCursor | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ShowCursor | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.start | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Start | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.stop | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Stop | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.write | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Write | tui |
 | module-tui | partial | M6 | package | github.com/nankedr/pig/tui | tui |
+| symbol:tui/src/terminal.ts#ProcessTerminal | partial | M6 | symbol | github.com/nankedr/pig/tui.ProcessTerminal | tui |
 
 ## OpenAI Chat Completions capability matrix
 

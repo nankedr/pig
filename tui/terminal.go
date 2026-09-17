@@ -2,13 +2,17 @@ package tui
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
+	"os"
+	"sync"
 	"time"
+
+	"golang.org/x/term"
 )
 
-// Terminal is the narrow process-terminal boundary consumed by a TUI. Methods
-// that can touch process input, output, or terminal state report errors so the
-// M0 capability scaffold can fail explicitly without doing I/O.
+// Terminal is the process I/O boundary consumed by a TUI.
 type Terminal interface {
 	Start(onInput func(string), onResize func()) error
 	Stop() error
@@ -27,82 +31,120 @@ type Terminal interface {
 	SetProgress(bool) error
 }
 
-// ProcessTerminal is the CGO-free process-terminal capability boundary. It is
-// deliberately inert until the interactive TUI milestone: its methods do not
-// read input, write output, register handlers, or change terminal modes.
+// ProcessTerminal owns raw mode and input polling without taking ownership of the supplied files.
 type ProcessTerminal struct {
-	input  io.Reader
-	output io.Writer
+	input   io.Reader
+	output  io.Writer
+	mu      sync.Mutex
+	writeMu sync.Mutex
+	state   *term.State
+	file    *os.File
+	stop    chan struct{}
+	done    chan struct{}
+	started bool
+	stopped bool
+	err     error
 }
 
 var _ Terminal = (*ProcessTerminal)(nil)
 
-// NewProcessTerminal records the eventual process streams without touching
-// them. Passing nil is valid for callers that only need the public contract.
 func NewProcessTerminal(input io.Reader, output io.Writer) *ProcessTerminal {
-	return &ProcessTerminal{input: input, output: output}
+	return &ProcessTerminal{input: input, output: output, stop: make(chan struct{}), done: make(chan struct{})}
 }
-
-func (*ProcessTerminal) Start(func(string), func()) error {
-	return newNotImplemented("ProcessTerminal.start")
+func (t *ProcessTerminal) Start(onInput func(string), onResize func()) error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.started {
+		return nil
+	}
+	if t.stopped {
+		return errors.New("terminal is stopped")
+	}
+	file, ok := t.input.(*os.File)
+	if !ok || file == nil || t.output == nil {
+		return errors.New("terminal requires a file input and output writer")
+	}
+	if err := terminalSupported(); err != nil {
+		return err
+	}
+	state, err := term.MakeRaw(int(file.Fd()))
+	if err != nil {
+		return err
+	}
+	if err := t.Write("\x1b[?2004h\x1b[?25l"); err != nil {
+		return errors.Join(err, term.Restore(int(file.Fd()), state), t.Write("\x1b[?2004l\x1b[?25h"))
+	}
+	t.file, t.state, t.started = file, state, true
+	go func() {
+		err := readTerminal(file, t.stop, onInput, onResize)
+		t.mu.Lock()
+		t.err = err
+		t.mu.Unlock()
+		close(t.done)
+	}()
+	return nil
 }
-
-func (*ProcessTerminal) Stop() error {
-	return newNotImplemented("ProcessTerminal.stop")
+func (t *ProcessTerminal) Stop() error {
+	t.mu.Lock()
+	if t.stopped {
+		t.mu.Unlock()
+		return nil
+	}
+	t.stopped = true
+	close(t.stop)
+	started, file, state := t.started, t.file, t.state
+	t.mu.Unlock()
+	if !started {
+		return nil
+	}
+	<-t.done
+	return errors.Join(term.Restore(int(file.Fd()), state), t.Write("\x1b[?2004l\x1b[?25h\r\n"))
 }
-
+func (t *ProcessTerminal) Done() <-chan struct{} { return t.done }
+func (t *ProcessTerminal) Err() error            { t.mu.Lock(); defer t.mu.Unlock(); return t.err }
+func (t *ProcessTerminal) Write(text string) error {
+	t.writeMu.Lock()
+	defer t.writeMu.Unlock()
+	if t.output == nil {
+		return errors.New("terminal output is nil")
+	}
+	n, err := io.WriteString(t.output, text)
+	if err == nil && n != len(text) {
+		err = io.ErrShortWrite
+	}
+	return err
+}
+func (t *ProcessTerminal) Columns() (int, error) { width, _, err := t.size(); return width, err }
+func (t *ProcessTerminal) Rows() (int, error)    { _, height, err := t.size(); return height, err }
+func (t *ProcessTerminal) size() (int, int, error) {
+	if file, ok := t.output.(*os.File); ok && file != nil {
+		return term.GetSize(int(file.Fd()))
+	}
+	if file, ok := t.input.(*os.File); ok && file != nil {
+		return term.GetSize(int(file.Fd()))
+	}
+	return 80, 24, nil
+}
 func (*ProcessTerminal) DrainInput(context.Context, time.Duration, time.Duration) error {
 	return newNotImplemented("ProcessTerminal.drainInput")
 }
-
-func (*ProcessTerminal) Write(string) error {
-	return newNotImplemented("ProcessTerminal.write")
+func (*ProcessTerminal) KittyProtocolActive() (bool, error)   { return false, nil }
+func (*ProcessTerminal) ModifyOtherKeysActive() (bool, error) { return false, nil }
+func (t *ProcessTerminal) MoveBy(lines int) error {
+	if lines < 0 {
+		return t.Write(fmt.Sprintf("\x1b[%dA", -lines))
+	}
+	if lines > 0 {
+		return t.Write(fmt.Sprintf("\x1b[%dB", lines))
+	}
+	return nil
 }
-
-func (*ProcessTerminal) Columns() (int, error) {
-	return 0, newNotImplemented("ProcessTerminal.columns")
-}
-
-func (*ProcessTerminal) Rows() (int, error) {
-	return 0, newNotImplemented("ProcessTerminal.rows")
-}
-
-func (*ProcessTerminal) KittyProtocolActive() (bool, error) {
-	return false, newNotImplemented("ProcessTerminal.kittyProtocolActive")
-}
-
-func (*ProcessTerminal) ModifyOtherKeysActive() (bool, error) {
-	return false, newNotImplemented("ProcessTerminal.modifyOtherKeysActive")
-}
-
-func (*ProcessTerminal) MoveBy(int) error {
-	return newNotImplemented("ProcessTerminal.moveBy")
-}
-
-func (*ProcessTerminal) HideCursor() error {
-	return newNotImplemented("ProcessTerminal.hideCursor")
-}
-
-func (*ProcessTerminal) ShowCursor() error {
-	return newNotImplemented("ProcessTerminal.showCursor")
-}
-
-func (*ProcessTerminal) ClearLine() error {
-	return newNotImplemented("ProcessTerminal.clearLine")
-}
-
-func (*ProcessTerminal) ClearFromCursor() error {
-	return newNotImplemented("ProcessTerminal.clearFromCursor")
-}
-
-func (*ProcessTerminal) ClearScreen() error {
-	return newNotImplemented("ProcessTerminal.clearScreen")
-}
-
-func (*ProcessTerminal) SetTitle(string) error {
-	return newNotImplemented("ProcessTerminal.setTitle")
-}
-
+func (t *ProcessTerminal) HideCursor() error      { return t.Write("\x1b[?25l") }
+func (t *ProcessTerminal) ShowCursor() error      { return t.Write("\x1b[?25h") }
+func (t *ProcessTerminal) ClearLine() error       { return t.Write("\x1b[2K") }
+func (t *ProcessTerminal) ClearFromCursor() error { return t.Write("\x1b[J") }
+func (t *ProcessTerminal) ClearScreen() error     { return t.Write("\x1b[2J\x1b[H") }
+func (*ProcessTerminal) SetTitle(string) error    { return newNotImplemented("ProcessTerminal.setTitle") }
 func (*ProcessTerminal) SetProgress(bool) error {
 	return newNotImplemented("ProcessTerminal.setProgress")
 }

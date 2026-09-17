@@ -165,8 +165,8 @@ func TestIssue31MemberMappingsMatchLockedTUISurface(t *testing.T) {
 	if got := issue31CountCatalogStatus(expected, catalog.StatusInventoried); got != 395 {
 		t.Fatalf("issue #31 inherited primitive member rows = %d, want 395", got)
 	}
-	if got := issue31CountCatalogStatus(expected, catalog.StatusScaffolded); got != 831 {
-		t.Fatalf("issue #31 scaffolded symbol/member rows = %d, want 831", got)
+	if got := issue31CountCatalogStatus(expected, catalog.StatusScaffolded); got != 817 {
+		t.Fatalf("issue #31 scaffolded symbol/member rows = %d, want 817", got)
 	}
 	if *updateIssue31Catalog {
 		issue31WriteCatalog(t, root, expected)
@@ -531,6 +531,20 @@ func issue31ExpectedCatalogEntries(symbols []surface.Symbol) []catalog.Entry {
 			entries = append(entries, entry)
 		}
 	}
+	for i := range entries {
+		e := &entries[i]
+		supported := e.ID == "symbol:tui/src/terminal.ts#ProcessTerminal"
+		for _, name := range []string{"Start", "Stop", "Write", "Columns", "Rows", "KittyProtocolActive", "ModifyOtherKeysActive", "MoveBy", "HideCursor", "ShowCursor", "ClearLine", "ClearFromCursor", "ClearScreen"} {
+			supported = supported || e.Mapping.Target == issue31GoPackage+".ProcessTerminal."+name
+		}
+		if !supported {
+			continue
+		}
+		e.Status = catalog.StatusPartial
+		e.Partial = &catalog.Partial{Supported: []string{"Issue #109: darwin/linux raw mode, stoppable input, basic output and terminal restoration through public Interactive SDK and real PTY CLI"}, Unsupported: []string{"Advanced keyboard negotiation, drain/title/progress, terminal-loss emergency exits and six-platform acceptance remain unverified or explicit Stubs"}}
+		e.Evidence = []catalog.Evidence{{Kind: "go-test", Ref: "codingagent/issue109_interactive_test.go", Baseline: issue31BaselineCommit, CaseID: e.ID, InputHash: "sha256:56d62da2adf3b299c910d5e236b24cd4ac617f4eb9d6c00a2a0b28ed05a64f87", ExecutionMethod: "go test -race ./codingagent -run '^TestInteractiveSDK' -count=1", Expected: "Interactive SDK restores raw mode and releases terminal input", Actual: "PASS; PTY lifecycle, cancellation, EOF and output failures", Platform: "darwin", CatalogID: e.ID}}
+		e.Notes = "Issue #109 minimal text runtime; behavior scope and CLI fixture are owned by contract:codingagent/interactive-text."
+	}
 	sort.Slice(entries, func(i, j int) bool { return entries[i].ID < entries[j].ID })
 	return entries
 }
@@ -634,14 +648,14 @@ func issue31WriteCatalog(t *testing.T, root string, expected []catalog.Entry) {
 			entry.Partial = &catalog.Partial{
 				Supported: []string{
 					"all fixed-snapshot TUI symbols and extracted members have compile-usable Go mappings, with safe local constructors, value access, callback wiring, container composition and kill-ring behavior",
-					"the public scaffold and its tests remain CGO-free and do not access ambient process input, terminal output, timers or native helpers",
+					"Issue #109: TextUI and ProcessTerminal provide the CGO-free minimal Interactive runtime; see contract:codingagent/interactive-text for public SDK and real-process PTY evidence",
 				},
 				Unsupported: []string{
-					"interactive terminal lifecycle, input parsing, rendering, layout, autocomplete, terminal-image and platform-helper behavior remain explicit Capability Stubs until M6",
+					"complete TUIBase, editor, Markdown, layout, autocomplete, terminal-image and advanced protocol behavior remain partial or explicit Capability Stubs",
 					"the API and Catalog checks prove contract coverage and target resolution, not runtime parity for the unsupported branches",
 				},
 			}
-			entry.Notes = "Issue #31 maps all 191 fixed-snapshot TUI symbols and all 1,035 extracted members across 38 TypeScript root and technically reachable deep-import export subpaths into the single canonical Go package github.com/nankedr/pig/tui. TypeScript default-library inherited String and Number members are inventoried on their Go carriers instead of becoming artificial methods. Safe local state behavior is implemented; interactive Capability Stubs fail explicitly without terminal input, output, mode changes, timers, native-helper loading, or other side effects, and the core remains CGO-free."
+			entry.Notes = "Issue #31 maps all 191 fixed-snapshot TUI symbols and all 1,035 extracted members across 38 TypeScript root and technically reachable deep-import export subpaths into the single canonical Go package github.com/nankedr/pig/tui. TypeScript default-library inherited String and Number members are inventoried on their Go carriers instead of becoming artificial methods. Safe local state behavior is implemented; issue #109 opens the basic interactive runtime with explicit start/stop side effects and a dedicated text behavior contract. Remaining capabilities retain explicit Stubs, and the core remains CGO-free."
 		}
 		kept = append(kept, entry)
 	}

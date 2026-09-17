@@ -58,7 +58,7 @@ Options:
   --version, -v                  Show version number
 
 Modes:
-  interactive  text mode with terminal stdin and stdout; not implemented
+  interactive  text mode with terminal stdin and stdout
   print        --print or non-terminal stdin/stdout; persisted v3 Session by default
   json         --mode json; one-way session-first newline-delimited JSON events
   rpc          --mode rpc; local JSONL prompt, events, state/messages, and abort

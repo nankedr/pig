@@ -1228,25 +1228,36 @@ type KeyboardProtocolNegotiationSequence struct {
 reference: packages/tui/src/terminal.ts#ProcessTerminal
 target: github.com/nankedr/pig/tui.ProcessTerminal
 type ProcessTerminal struct {
-	input  io.Reader
-	output io.Writer
+	input   io.Reader
+	output  io.Writer
+	mu      sync.Mutex
+	writeMu sync.Mutex
+	state   *term.State
+	file    *os.File
+	stop    chan struct{}
+	done    chan struct{}
+	started bool
+	stopped bool
+	err     error
 }
-func (*ProcessTerminal) ClearFromCursor() error
-func (*ProcessTerminal) ClearLine() error
-func (*ProcessTerminal) ClearScreen() error
-func (*ProcessTerminal) Columns() (int, error)
 func (*ProcessTerminal) DrainInput(context.Context, time.Duration, time.Duration) error
-func (*ProcessTerminal) HideCursor() error
 func (*ProcessTerminal) KittyProtocolActive() (bool, error)
 func (*ProcessTerminal) ModifyOtherKeysActive() (bool, error)
-func (*ProcessTerminal) MoveBy(int) error
-func (*ProcessTerminal) Rows() (int, error)
 func (*ProcessTerminal) SetProgress(bool) error
 func (*ProcessTerminal) SetTitle(string) error
-func (*ProcessTerminal) ShowCursor() error
-func (*ProcessTerminal) Start(func(string), func()) error
-func (*ProcessTerminal) Stop() error
-func (*ProcessTerminal) Write(string) error
+func (t *ProcessTerminal) ClearFromCursor() error
+func (t *ProcessTerminal) ClearLine() error
+func (t *ProcessTerminal) ClearScreen() error
+func (t *ProcessTerminal) Columns() (int, error)
+func (t *ProcessTerminal) Done() <-chan struct{}
+func (t *ProcessTerminal) Err() error
+func (t *ProcessTerminal) HideCursor() error
+func (t *ProcessTerminal) MoveBy(lines int) error
+func (t *ProcessTerminal) Rows() (int, error)
+func (t *ProcessTerminal) ShowCursor() error
+func (t *ProcessTerminal) Start(onInput func(string), onResize func()) error
+func (t *ProcessTerminal) Stop() error
+func (t *ProcessTerminal) Write(text string) error
 
 ## symbol:tui/src/terminal.ts#Terminal
 reference: packages/tui/src/terminal.ts#Terminal

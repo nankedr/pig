@@ -1,0 +1,48 @@
+type codingagent.InteractiveModeOptions
+Terminal tui.Terminal
+AutoTrustOnReloadCWD *string
+InitialImages []ai.ImageContent
+InitialMessage *string
+InitialMessages []string
+MigratedProviders []string
+ModelFallbackMessage *string
+TUIMode tui.TUIMode
+Verbose bool
+type *codingagent.InteractiveMode
+ClearEditor func(*codingagent.InteractiveMode) error
+GetUserInput func(*codingagent.InteractiveMode, context.Context) (string, error)
+Init func(*codingagent.InteractiveMode, context.Context) error
+RenderInitialMessages func(*codingagent.InteractiveMode) error
+Run func(*codingagent.InteractiveMode, context.Context) error
+ShowError func(*codingagent.InteractiveMode, string) error
+ShowNewVersionNotification func(*codingagent.InteractiveMode, codingagent.LatestRelease) error
+ShowPackageUpdateNotification func(*codingagent.InteractiveMode, []string) error
+ShowWarning func(*codingagent.InteractiveMode, string) error
+Stop func(*codingagent.InteractiveMode, ...bool) error
+type *tui.ProcessTerminal
+ClearFromCursor func(*tui.ProcessTerminal) error
+ClearLine func(*tui.ProcessTerminal) error
+ClearScreen func(*tui.ProcessTerminal) error
+Columns func(*tui.ProcessTerminal) (int, error)
+Done func(*tui.ProcessTerminal) <-chan struct {}
+DrainInput func(*tui.ProcessTerminal, context.Context, time.Duration, time.Duration) error
+Err func(*tui.ProcessTerminal) error
+HideCursor func(*tui.ProcessTerminal) error
+KittyProtocolActive func(*tui.ProcessTerminal) (bool, error)
+ModifyOtherKeysActive func(*tui.ProcessTerminal) (bool, error)
+MoveBy func(*tui.ProcessTerminal, int) error
+Rows func(*tui.ProcessTerminal) (int, error)
+SetProgress func(*tui.ProcessTerminal, bool) error
+SetTitle func(*tui.ProcessTerminal, string) error
+ShowCursor func(*tui.ProcessTerminal) error
+Start func(*tui.ProcessTerminal, func(string), func()) error
+Stop func(*tui.ProcessTerminal) error
+Write func(*tui.ProcessTerminal, string) error
+type *tui.TextUI
+Append func(*tui.TextUI, string) error
+ClearEditor func(*tui.TextUI) error
+Done func(*tui.TextUI) <-chan struct {}
+Err func(*tui.TextUI) error
+ReadLine func(*tui.TextUI, context.Context) (string, error)
+Start func(*tui.TextUI) error
+Stop func(*tui.TextUI) error
