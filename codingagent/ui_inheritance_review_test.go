@@ -266,11 +266,12 @@ func TestCustomEditorPromotesEditorStateAndCapabilities(t *testing.T) {
 		t.Fatalf("inherited Invalidate() error = %v, want nil", err)
 	}
 	lines, err := editor.Render(80)
-	if lines != nil {
-		t.Fatalf("Render() lines = %#v, want nil", lines)
+	if len(lines) != 4 || err != nil {
+		t.Fatalf("inherited Render() = (%#v, %v), want four editor lines", lines, err)
 	}
-	assertInheritanceStub(t, err, "tui", "Editor.render")
-	assertInheritanceStub(t, editor.AddToHistory("history"), "tui", "Editor.addToHistory")
+	if err := editor.AddToHistory("history"); err != nil {
+		t.Fatal(err)
+	}
 	assertInheritanceStub(t, editor.HandleInput("x"), "codingagent", "CustomEditor.HandleInput")
 }
 

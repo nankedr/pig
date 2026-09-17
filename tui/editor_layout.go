@@ -183,15 +183,45 @@ func (e *Editor) vertical(direction int) {
 }
 func (e *Editor) moveVisual(rows []editorVisualLine, current, target int) {
 	e.lastAction = ""
-	if e.preferredCol < 0 {
-		e.preferredCol = len(utf16.Encode([]rune(e.text[rows[current].start:e.cursor])))
+	source := rows[current]
+	currentCol := len(utf16.Encode([]rune(e.text[source.start:e.cursor])))
+	if e.snappedCol != nil {
+		base := e.cursor - e.GetCursor().Col
+		for _, row := range rows {
+			if row.start < base || row.start > e.lineEnd() {
+				continue
+			}
+			start := len(utf16.Encode([]rune(e.text[base:row.start])))
+			end := start + len(utf16.Encode([]rune(row.text)))
+			if *e.snappedCol >= start && (*e.snappedCol < end || row.last && *e.snappedCol == end) {
+				currentCol = *e.snappedCol - start
+				break
+			}
+		}
+	}
+	sourceLimit := len(utf16.Encode([]rune(source.text)))
+	if !source.last {
+		sourceLimit = max(0, sourceLimit-1)
 	}
 	row := rows[target]
 	limit := len(utf16.Encode([]rune(row.text)))
 	if !row.last {
 		limit = max(0, limit-1)
 	}
-	desired := min(e.preferredCol, limit)
+	desired := currentCol
+	if e.preferredCol < 0 || currentCol < sourceLimit {
+		e.preferredCol = -1
+		if limit < currentCol {
+			e.preferredCol = currentCol
+			desired = limit
+		}
+	} else if limit < currentCol || limit < e.preferredCol {
+		desired = limit
+	} else {
+		desired = e.preferredCol
+		e.preferredCol = -1
+	}
+
 	pos, units := row.start, 0
 	for _, r := range row.text {
 		n := 1
@@ -205,11 +235,20 @@ func (e *Editor) moveVisual(rows []editorVisualLine, current, target int) {
 		pos += len(string(r))
 	}
 	e.cursor = pos
+	e.snappedCol = nil
+	base := strings.LastIndex(e.text[:row.start], "\n") + 1
+	targetCol := len(utf16.Encode([]rune(e.text[base:row.start]))) + desired
+	if units < desired {
+		e.snappedCol = &targetCol
+	}
 	for _, seg := range e.segments(e.text) {
 		if seg.ByteOffset > pos {
 			break
 		}
 		if pos < seg.ByteOffset+len(seg.Text) {
+			if seg.ByteOffset < pos {
+				e.snappedCol = &targetCol
+			}
 			e.cursor = seg.ByteOffset
 			break
 		}

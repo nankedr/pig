@@ -121,6 +121,7 @@ type Editor struct {
 	inPaste                bool
 	width                  int
 	preferredCol           int
+	snappedCol             *int
 	scroll                 int
 	terminalRows           int
 	jump                   int

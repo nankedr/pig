@@ -44,7 +44,12 @@ func (e *Editor) restoreUndo() {
 	}
 }
 func (e *Editor) exitHistory() { e.historyIndex = -1; e.draft = editorSnapshot{} }
-func (e *Editor) move(pos int) { e.cursor = pos; e.lastAction = ""; e.preferredCol = -1 }
+func (e *Editor) move(pos int) {
+	e.cursor = pos
+	e.lastAction = ""
+	e.preferredCol = -1
+	e.snappedCol = nil
+}
 func (e *Editor) delete(start, end int, kill bool) {
 	if start != end {
 		e.snapshot()
@@ -90,7 +95,7 @@ func wordClass(r rune) int {
 	if unicode.IsSpace(r) {
 		return 0
 	}
-	if unicode.IsLetter(r) || unicode.IsNumber(r) || unicode.IsMark(r) {
+	if r == '_' || unicode.IsLetter(r) || unicode.IsNumber(r) || unicode.IsMark(r) {
 		return 1
 	}
 	return 2

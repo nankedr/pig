@@ -105,6 +105,7 @@ type Editor struct {
 	inPaste                bool
 	width                  int
 	preferredCol           int
+	snappedCol             *int
 	scroll                 int
 	terminalRows           int
 	jump                   int
@@ -197,7 +198,7 @@ func (e *Editor) HandleInput(data string) error {
 			} else if n := strings.LastIndex(e.text[:e.cursor], data); n >= 0 {
 				e.cursor = n
 			}
-			e.lastAction = ""
+			e.move(e.cursor)
 			return nil
 		}
 	}
@@ -299,6 +300,7 @@ func normalizeEditorText(text string) string {
 	return strings.NewReplacer("\r\n", "\n", "\r", "\n", "\t", "    ").Replace(text)
 }
 func (e *Editor) changed() {
+	e.snappedCol = nil
 	if e.OnChange != nil {
 		e.OnChange(e.text)
 	}

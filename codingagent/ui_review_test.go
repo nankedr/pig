@@ -30,8 +30,8 @@ func TestCustomEditorRetainsTextWithoutActivatingDeferredRuntime(t *testing.T) {
 	if err := component.HandleInput("x"); !errors.Is(err, codingagent.ErrNotImplemented) {
 		t.Fatalf("HandleInput() error = %v, want ErrNotImplemented", err)
 	}
-	if lines, err := component.Render(80); lines != nil || !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("Render() = (%v, %v), want nil, ErrNotImplemented", lines, err)
+	if lines, err := component.Render(80); len(lines) != 4 || err != nil {
+		t.Fatalf("inherited Render() = (%v, %v), want four editor lines", lines, err)
 	}
 	if err := component.Invalidate(); err != nil {
 		t.Fatalf("inherited Invalidate() error = %v, want nil", err)

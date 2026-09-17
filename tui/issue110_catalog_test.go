@@ -97,4 +97,4 @@ func TestIssue110EditorCatalog(t *testing.T) {
 	}
 }
 
-const issue110FixtureHash = "sha256:b1b02c5d9a11323d07990dce9a71823aa75842181b2cd040dec4910e4ebd364a"
+const issue110FixtureHash = "sha256:5d5ea83c0185f33a192a423840e5495aeddb7462614fb82e9641d9ca48c238a5"

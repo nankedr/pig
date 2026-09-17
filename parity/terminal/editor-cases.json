@@ -1810,5 +1810,92 @@
         "text": "\r"
       }
     ]
+  },
+  {
+    "id": "resize-sticky-column",
+    "steps": [
+      {
+        "op": "set",
+        "text": "abcdefghij\nabcdefghijklmnopqrstuvwx"
+      },
+      {
+        "op": "render",
+        "width": 11
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "render",
+        "width": 21
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      }
+    ]
+  },
+  {
+    "id": "underscore-word",
+    "steps": [
+      {
+        "op": "set",
+        "text": "foo_bar"
+      },
+      {
+        "op": "input",
+        "text": "\u001bb"
+      },
+      {
+        "op": "input",
+        "text": "\u001bf"
+      },
+      {
+        "op": "input",
+        "text": "\u0017"
+      },
+      {
+        "op": "input",
+        "text": "\u0019"
+      }
+    ]
+  },
+  {
+    "id": "glyph-snap-sticky",
+    "steps": [
+      {
+        "op": "set",
+        "text": "abcd\n😀x\nabcd"
+      },
+      {
+        "op": "render",
+        "width": 40
+      },
+      {
+        "op": "input",
+        "text": "\u001b[H"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[C"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      }
+    ]
   }
 ]

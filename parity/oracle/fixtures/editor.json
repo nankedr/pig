@@ -1825,6 +1825,93 @@
             "text": "\r"
           }
         ]
+      },
+      {
+        "id": "resize-sticky-column",
+        "steps": [
+          {
+            "op": "set",
+            "text": "abcdefghij\nabcdefghijklmnopqrstuvwx"
+          },
+          {
+            "op": "render",
+            "width": 11
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "render",
+            "width": 21
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          }
+        ]
+      },
+      {
+        "id": "underscore-word",
+        "steps": [
+          {
+            "op": "set",
+            "text": "foo_bar"
+          },
+          {
+            "op": "input",
+            "text": "\u001bb"
+          },
+          {
+            "op": "input",
+            "text": "\u001bf"
+          },
+          {
+            "op": "input",
+            "text": "\u0017"
+          },
+          {
+            "op": "input",
+            "text": "\u0019"
+          }
+        ]
+      },
+      {
+        "id": "glyph-snap-sticky",
+        "steps": [
+          {
+            "op": "set",
+            "text": "abcd\n😀x\nabcd"
+          },
+          {
+            "op": "render",
+            "width": 40
+          },
+          {
+            "op": "input",
+            "text": "\u001b[H"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[C"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          }
+        ]
       }
     ],
     "observe": [
@@ -5790,12 +5877,207 @@
         "submits": [
           "hello\nworld\ntail"
         ]
+      },
+      {
+        "id": "resize-sticky-column",
+        "states": [
+          {
+            "text": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "expanded": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "cursor": {
+              "Line": 1,
+              "Col": 24
+            }
+          },
+          {
+            "frame": [
+              "───────────",
+              "abcdefghij ",
+              "abcdefghij ",
+              "klmnopqrst ",
+              "uvwx\u001b[7m \u001b[0m      ",
+              "───────────"
+            ],
+            "text": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "expanded": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "cursor": {
+              "Line": 1,
+              "Col": 24
+            }
+          },
+          {
+            "text": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "expanded": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "cursor": {
+              "Line": 1,
+              "Col": 14
+            }
+          },
+          {
+            "frame": [
+              "─────────────────────",
+              "abcdefghij           ",
+              "abcdefghijklmn\u001b[7mo\u001b[0mpqrst ",
+              "uvwx                 ",
+              "─────────────────────"
+            ],
+            "text": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "expanded": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "cursor": {
+              "Line": 1,
+              "Col": 14
+            }
+          },
+          {
+            "text": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "expanded": "abcdefghij\nabcdefghijklmnopqrstuvwx",
+            "cursor": {
+              "Line": 0,
+              "Col": 10
+            }
+          }
+        ],
+        "changes": [
+          "abcdefghij\nabcdefghijklmnopqrstuvwx"
+        ],
+        "submits": []
+      },
+      {
+        "id": "underscore-word",
+        "states": [
+          {
+            "text": "foo_bar",
+            "expanded": "foo_bar",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "foo_bar",
+            "expanded": "foo_bar",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "foo_bar",
+            "expanded": "foo_bar",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "foo_bar",
+            "expanded": "foo_bar",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          }
+        ],
+        "changes": [
+          "foo_bar",
+          "",
+          "foo_bar"
+        ],
+        "submits": []
+      },
+      {
+        "id": "glyph-snap-sticky",
+        "states": [
+          {
+            "text": "abcd\n😀x\nabcd",
+            "expanded": "abcd\n😀x\nabcd",
+            "cursor": {
+              "Line": 2,
+              "Col": 4
+            }
+          },
+          {
+            "frame": [
+              "────────────────────────────────────────",
+              "abcd                                    ",
+              "😀x                                     ",
+              "abcd\u001b[7m \u001b[0m                                   ",
+              "────────────────────────────────────────"
+            ],
+            "text": "abcd\n😀x\nabcd",
+            "expanded": "abcd\n😀x\nabcd",
+            "cursor": {
+              "Line": 2,
+              "Col": 4
+            }
+          },
+          {
+            "text": "abcd\n😀x\nabcd",
+            "expanded": "abcd\n😀x\nabcd",
+            "cursor": {
+              "Line": 2,
+              "Col": 0
+            }
+          },
+          {
+            "text": "abcd\n😀x\nabcd",
+            "expanded": "abcd\n😀x\nabcd",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          },
+          {
+            "text": "abcd\n😀x\nabcd",
+            "expanded": "abcd\n😀x\nabcd",
+            "cursor": {
+              "Line": 1,
+              "Col": 0
+            }
+          },
+          {
+            "text": "abcd\n😀x\nabcd",
+            "expanded": "abcd\n😀x\nabcd",
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "abcd\n😀x\nabcd",
+            "expanded": "abcd\n😀x\nabcd",
+            "cursor": {
+              "Line": 1,
+              "Col": 0
+            }
+          },
+          {
+            "text": "abcd\n😀x\nabcd",
+            "expanded": "abcd\n😀x\nabcd",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          }
+        ],
+        "changes": [
+          "abcd\n😀x\nabcd"
+        ],
+        "submits": []
       }
     ],
     "side_effects": []
   },
-  "input_hash": "sha256:85bc6fa1f0b1aaf87aadace4c7c7d7328bd47b6a8e074d8a0004cf3e54b57e99",
-  "observation_hash": "sha256:b97b76cdd1829b7403d077afb59a2703641089f880baa53268e8afee7481da99",
+  "input_hash": "sha256:aa3e94d48e4c564a9e31b0f7360c7a30574a670ed8dc917205dd87373b9f39c3",
+  "observation_hash": "sha256:4e9432df8476a5bd038781d382e58ca88c43cd8a958f99728937b708d9e9c638",
   "execution_method": "node parity/oracle/editor.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {
