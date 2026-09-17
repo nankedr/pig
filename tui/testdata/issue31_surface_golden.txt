@@ -107,28 +107,45 @@ type Editor struct {
 	ui                     EditorRuntime
 	theme                  EditorTheme
 	text                   string
+	cursor                 int
+	undo                   []editorSnapshot
+	history                []string
+	historyIndex           int
+	draft                  editorSnapshot
+	lastAction             string
+	kills                  KillRing
+	yankStart, yankEnd     int
+	pastes                 map[string]string
+	pasteCounter           int
+	pasteBuffer            string
+	inPaste                bool
+	width                  int
+	preferredCol           int
+	scroll                 int
+	terminalRows           int
+	jump                   int
 	paddingX               int
 	autocompleteMaxVisible int
 }
-func (*Editor) AddToHistory(string) error
-func (*Editor) GetCursor() EditorCursor
-func (*Editor) HandleInput(string) error
-func (*Editor) InsertTextAtCursor(string) error
 func (*Editor) Invalidate() error
 func (*Editor) IsShowingAutocomplete() bool
-func (*Editor) Render(int) ([]string, error)
 func (*Editor) SetAutocompleteMaxVisible(int) error
 func (*Editor) SetAutocompleteProvider(AutocompleteProvider) error
-func (*Editor) SetPaddingX(int) error
+func (e *Editor) AddToHistory(text string) error
 func (e *Editor) GetAutocompleteMaxVisible() int
+func (e *Editor) GetCursor() EditorCursor
 func (e *Editor) GetExpandedText() (string, error)
 func (e *Editor) GetLines() []string
 func (e *Editor) GetPaddingX() int
 func (e *Editor) GetText() string
+func (e *Editor) HandleInput(data string) error
+func (e *Editor) InsertTextAtCursor(text string) error
+func (e *Editor) Render(width int) ([]string, error)
 func (e *Editor) SetBorderColor(style TextStyleFunc)
 func (e *Editor) SetFocusState(focused bool)
 func (e *Editor) SetOnChange(callback func(string))
 func (e *Editor) SetOnSubmit(callback func(string))
+func (e *Editor) SetPaddingX(value int) error
 func (e *Editor) SetText(text string) error
 
 ## symbol:tui/src/components/editor.ts#EditorOptions
@@ -159,7 +176,7 @@ type TextChunk struct {
 ## symbol:tui/src/components/editor.ts#wordWrapLine
 reference: packages/tui/src/components/editor.ts#wordWrapLine
 target: github.com/nankedr/pig/tui.WordWrapLine
-func WordWrapLine(string, int, ...[]UnicodeSegment) ([]TextChunk, error)
+func WordWrapLine(line string, width int, preSegmented ...[]UnicodeSegment) ([]TextChunk, error)
 
 ## symbol:tui/src/components/h-stack.ts#HStack
 reference: packages/tui/src/components/h-stack.ts#HStack

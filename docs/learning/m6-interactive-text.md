@@ -49,3 +49,5 @@ Parity Catalog 行 `contract:codingagent/interactive-text` 登记证据和未覆
 ## 本票边界
 
 当前硬门为 darwin 本机，darwin/linux 具有无 CGO 终端实现，其他平台启动返回明确 Stub，六平台验收留待 M13。完整 Markdown、编辑器光标移动与 grapheme、scrollback、复杂布局、fullscreen、Escape/挂起和 Kitty 协议没有声明对等；图片、扩展运行时和更新通知维持既有 Stub。终端消失或输出长期阻塞的 emergency exit 尚未验收。包生态 #99、M7、M11、M12 不在本次范围，父 issue #8 不作修改。
+
+后续 #110 已实现的多行编辑、字素导航与历史输入见 [M6.2](m6-multiline-editor.md)，上述 M6.1 范围记录保留为当时切片说明。

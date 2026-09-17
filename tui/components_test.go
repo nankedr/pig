@@ -71,9 +71,11 @@ func TestEditorStateAccessDoesNotInvokeRuntime(t *testing.T) {
 		t.Fatalf("GetLines() = %#v, want %#v", gotLines, wantLines)
 	}
 
-	assertTUIStub(t, editor.HandleInput("x"), "Editor.handleInput")
-	if got := editor.GetText(); got != "one\ntwo" {
-		t.Fatalf("failed HandleInput mutated text to %q", got)
+	if err := editor.HandleInput("x"); err != nil {
+		t.Fatal(err)
+	}
+	if got := editor.GetText(); got != "one\ntwox" {
+		t.Fatalf("HandleInput text = %q", got)
 	}
 }
 

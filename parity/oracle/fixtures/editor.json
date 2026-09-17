@@ -1,0 +1,5804 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/tui/src/components/editor.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "tui/editor/multiline",
+    "catalog_id": "contract:tui/multiline-editor",
+    "surface": "go-sdk",
+    "input": [
+      {
+        "id": "multiline-edit-submit",
+        "steps": [
+          {
+            "op": "set",
+            "text": "hello\r\nworld\t!"
+          },
+          {
+            "op": "input",
+            "text": "\u0001"
+          },
+          {
+            "op": "insert",
+            "text": "wide 中文 "
+          },
+          {
+            "op": "input",
+            "text": "\u001b[D"
+          },
+          {
+            "op": "input",
+            "text": ""
+          },
+          {
+            "op": "input",
+            "text": "\n"
+          },
+          {
+            "op": "input",
+            "text": "tail"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      },
+      {
+        "id": "undo-kill-yank",
+        "steps": [
+          {
+            "op": "input",
+            "text": "hello"
+          },
+          {
+            "op": "input",
+            "text": " "
+          },
+          {
+            "op": "input",
+            "text": "world"
+          },
+          {
+            "op": "input",
+            "text": "\u001f"
+          },
+          {
+            "op": "input",
+            "text": "\u001f"
+          },
+          {
+            "op": "input",
+            "text": "one two"
+          },
+          {
+            "op": "input",
+            "text": "\u0017"
+          },
+          {
+            "op": "input",
+            "text": "\u0019"
+          },
+          {
+            "op": "input",
+            "text": "\u0001"
+          },
+          {
+            "op": "input",
+            "text": "\u000b"
+          },
+          {
+            "op": "input",
+            "text": "\u0019"
+          },
+          {
+            "op": "input",
+            "text": "\u001by"
+          },
+          {
+            "op": "input",
+            "text": "\u001f"
+          }
+        ]
+      },
+      {
+        "id": "history-draft-boundaries",
+        "steps": [
+          {
+            "op": "history",
+            "text": " first "
+          },
+          {
+            "op": "history",
+            "text": "second\nline"
+          },
+          {
+            "op": "history",
+            "text": "second\nline"
+          },
+          {
+            "op": "history",
+            "text": " "
+          },
+          {
+            "op": "set",
+            "text": "draft"
+          },
+          {
+            "op": "input",
+            "text": "\u0001"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          }
+        ]
+      },
+      {
+        "id": "paste-buffer-controls",
+        "steps": [
+          {
+            "op": "input",
+            "text": "\u001b[200~a\r"
+          },
+          {
+            "op": "input",
+            "text": "\nb\t中\u0003\u001b[106;5u"
+          },
+          {
+            "op": "input",
+            "text": "tail\u001b[201~"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      },
+      {
+        "id": "paste-collapse-undo",
+        "steps": [
+          {
+            "op": "input",
+            "text": "\u001b[200~a\na\na\na\na\na\na\na\na\na\na\n尾\u001b[201~"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[D"
+          },
+          {
+            "op": "insert",
+            "text": "prefix "
+          },
+          {
+            "op": "input",
+            "text": "\u001b[C"
+          },
+          {
+            "op": "input",
+            "text": ""
+          },
+          {
+            "op": "input",
+            "text": "\u001f"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      },
+      {
+        "id": "paste-long-emoji",
+        "steps": [
+          {
+            "op": "input",
+            "text": "\u001b[200~😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\u001b[201~"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      },
+      {
+        "id": "paste-path",
+        "steps": [
+          {
+            "op": "set",
+            "text": "read"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[200~/tmp/file\u001b[201~"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      },
+      {
+        "id": "unicode-wrap-resize",
+        "steps": [
+          {
+            "op": "focus",
+            "value": true
+          },
+          {
+            "op": "set",
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end"
+          },
+          {
+            "op": "render",
+            "width": 12
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "render",
+            "width": 12
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "render",
+            "width": 12
+          },
+          {
+            "op": "render",
+            "width": 24
+          },
+          {
+            "op": "input",
+            "text": "\u001b[H"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[C"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[3~"
+          },
+          {
+            "op": "render",
+            "width": 12
+          },
+          {
+            "op": "input",
+            "text": "\u001b[F"
+          },
+          {
+            "op": "input",
+            "text": ""
+          },
+          {
+            "op": "render",
+            "width": 12
+          }
+        ]
+      },
+      {
+        "id": "grapheme-delete",
+        "steps": [
+          {
+            "op": "set",
+            "text": "a中é👨‍👩‍👧‍👦🇨🇳"
+          },
+          {
+            "op": "input",
+            "text": ""
+          },
+          {
+            "op": "input",
+            "text": ""
+          },
+          {
+            "op": "input",
+            "text": ""
+          },
+          {
+            "op": "input",
+            "text": "\u0001"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[3~"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      },
+      {
+        "id": "page-word-jump",
+        "steps": [
+          {
+            "op": "set",
+            "text": "one-two  three\nnext\nlast"
+          },
+          {
+            "op": "render",
+            "width": 20
+          },
+          {
+            "op": "input",
+            "text": "\u001b[5~"
+          },
+          {
+            "op": "input",
+            "text": "\u0001"
+          },
+          {
+            "op": "input",
+            "text": "\u001bf"
+          },
+          {
+            "op": "input",
+            "text": "\u001bf"
+          },
+          {
+            "op": "input",
+            "text": "\u001bf"
+          },
+          {
+            "op": "input",
+            "text": "\u001bb"
+          },
+          {
+            "op": "input",
+            "text": "\u001bd"
+          },
+          {
+            "op": "input",
+            "text": "\u0019"
+          },
+          {
+            "op": "input",
+            "text": "\u001d"
+          },
+          {
+            "op": "input",
+            "text": "a"
+          },
+          {
+            "op": "input",
+            "text": "\u001b\u001d"
+          },
+          {
+            "op": "input",
+            "text": "o"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[6~"
+          }
+        ]
+      },
+      {
+        "id": "paste-renumber",
+        "steps": [
+          {
+            "op": "input",
+            "text": "\u001b[200~aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\u001b[201~"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[200~bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\u001b[201~"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[D"
+          },
+          {
+            "op": "input",
+            "text": ""
+          },
+          {
+            "op": "input",
+            "text": "\u001f"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      },
+      {
+        "id": "empty-disabled-clear",
+        "steps": [
+          {
+            "op": "input",
+            "text": "\r"
+          },
+          {
+            "op": "set",
+            "text": "  a  "
+          },
+          {
+            "op": "disable",
+            "value": true
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          },
+          {
+            "op": "disable",
+            "value": false
+          },
+          {
+            "op": "set",
+            "text": ""
+          },
+          {
+            "op": "input",
+            "text": "\u001f"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          },
+          {
+            "op": "input",
+            "text": "\u001f"
+          }
+        ]
+      },
+      {
+        "id": "word-paste-atomic",
+        "steps": [
+          {
+            "op": "input",
+            "text": "\u001b[200~xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u001b[201~"
+          },
+          {
+            "op": "input",
+            "text": "\u001bb"
+          },
+          {
+            "op": "input",
+            "text": "\u001bf"
+          },
+          {
+            "op": "input",
+            "text": "\u0017"
+          },
+          {
+            "op": "input",
+            "text": "\u0019"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      },
+      {
+        "id": "unicode-vertical-sticky",
+        "steps": [
+          {
+            "op": "set",
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz"
+          },
+          {
+            "op": "render",
+            "width": 20
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u0001"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          }
+        ]
+      },
+      {
+        "id": "history-limit",
+        "steps": [
+          {
+            "op": "history",
+            "text": "0"
+          },
+          {
+            "op": "history",
+            "text": "1"
+          },
+          {
+            "op": "history",
+            "text": "2"
+          },
+          {
+            "op": "history",
+            "text": "3"
+          },
+          {
+            "op": "history",
+            "text": "4"
+          },
+          {
+            "op": "history",
+            "text": "5"
+          },
+          {
+            "op": "history",
+            "text": "6"
+          },
+          {
+            "op": "history",
+            "text": "7"
+          },
+          {
+            "op": "history",
+            "text": "8"
+          },
+          {
+            "op": "history",
+            "text": "9"
+          },
+          {
+            "op": "history",
+            "text": "10"
+          },
+          {
+            "op": "history",
+            "text": "11"
+          },
+          {
+            "op": "history",
+            "text": "12"
+          },
+          {
+            "op": "history",
+            "text": "13"
+          },
+          {
+            "op": "history",
+            "text": "14"
+          },
+          {
+            "op": "history",
+            "text": "15"
+          },
+          {
+            "op": "history",
+            "text": "16"
+          },
+          {
+            "op": "history",
+            "text": "17"
+          },
+          {
+            "op": "history",
+            "text": "18"
+          },
+          {
+            "op": "history",
+            "text": "19"
+          },
+          {
+            "op": "history",
+            "text": "20"
+          },
+          {
+            "op": "history",
+            "text": "21"
+          },
+          {
+            "op": "history",
+            "text": "22"
+          },
+          {
+            "op": "history",
+            "text": "23"
+          },
+          {
+            "op": "history",
+            "text": "24"
+          },
+          {
+            "op": "history",
+            "text": "25"
+          },
+          {
+            "op": "history",
+            "text": "26"
+          },
+          {
+            "op": "history",
+            "text": "27"
+          },
+          {
+            "op": "history",
+            "text": "28"
+          },
+          {
+            "op": "history",
+            "text": "29"
+          },
+          {
+            "op": "history",
+            "text": "30"
+          },
+          {
+            "op": "history",
+            "text": "31"
+          },
+          {
+            "op": "history",
+            "text": "32"
+          },
+          {
+            "op": "history",
+            "text": "33"
+          },
+          {
+            "op": "history",
+            "text": "34"
+          },
+          {
+            "op": "history",
+            "text": "35"
+          },
+          {
+            "op": "history",
+            "text": "36"
+          },
+          {
+            "op": "history",
+            "text": "37"
+          },
+          {
+            "op": "history",
+            "text": "38"
+          },
+          {
+            "op": "history",
+            "text": "39"
+          },
+          {
+            "op": "history",
+            "text": "40"
+          },
+          {
+            "op": "history",
+            "text": "41"
+          },
+          {
+            "op": "history",
+            "text": "42"
+          },
+          {
+            "op": "history",
+            "text": "43"
+          },
+          {
+            "op": "history",
+            "text": "44"
+          },
+          {
+            "op": "history",
+            "text": "45"
+          },
+          {
+            "op": "history",
+            "text": "46"
+          },
+          {
+            "op": "history",
+            "text": "47"
+          },
+          {
+            "op": "history",
+            "text": "48"
+          },
+          {
+            "op": "history",
+            "text": "49"
+          },
+          {
+            "op": "history",
+            "text": "50"
+          },
+          {
+            "op": "history",
+            "text": "51"
+          },
+          {
+            "op": "history",
+            "text": "52"
+          },
+          {
+            "op": "history",
+            "text": "53"
+          },
+          {
+            "op": "history",
+            "text": "54"
+          },
+          {
+            "op": "history",
+            "text": "55"
+          },
+          {
+            "op": "history",
+            "text": "56"
+          },
+          {
+            "op": "history",
+            "text": "57"
+          },
+          {
+            "op": "history",
+            "text": "58"
+          },
+          {
+            "op": "history",
+            "text": "59"
+          },
+          {
+            "op": "history",
+            "text": "60"
+          },
+          {
+            "op": "history",
+            "text": "61"
+          },
+          {
+            "op": "history",
+            "text": "62"
+          },
+          {
+            "op": "history",
+            "text": "63"
+          },
+          {
+            "op": "history",
+            "text": "64"
+          },
+          {
+            "op": "history",
+            "text": "65"
+          },
+          {
+            "op": "history",
+            "text": "66"
+          },
+          {
+            "op": "history",
+            "text": "67"
+          },
+          {
+            "op": "history",
+            "text": "68"
+          },
+          {
+            "op": "history",
+            "text": "69"
+          },
+          {
+            "op": "history",
+            "text": "70"
+          },
+          {
+            "op": "history",
+            "text": "71"
+          },
+          {
+            "op": "history",
+            "text": "72"
+          },
+          {
+            "op": "history",
+            "text": "73"
+          },
+          {
+            "op": "history",
+            "text": "74"
+          },
+          {
+            "op": "history",
+            "text": "75"
+          },
+          {
+            "op": "history",
+            "text": "76"
+          },
+          {
+            "op": "history",
+            "text": "77"
+          },
+          {
+            "op": "history",
+            "text": "78"
+          },
+          {
+            "op": "history",
+            "text": "79"
+          },
+          {
+            "op": "history",
+            "text": "80"
+          },
+          {
+            "op": "history",
+            "text": "81"
+          },
+          {
+            "op": "history",
+            "text": "82"
+          },
+          {
+            "op": "history",
+            "text": "83"
+          },
+          {
+            "op": "history",
+            "text": "84"
+          },
+          {
+            "op": "history",
+            "text": "85"
+          },
+          {
+            "op": "history",
+            "text": "86"
+          },
+          {
+            "op": "history",
+            "text": "87"
+          },
+          {
+            "op": "history",
+            "text": "88"
+          },
+          {
+            "op": "history",
+            "text": "89"
+          },
+          {
+            "op": "history",
+            "text": "90"
+          },
+          {
+            "op": "history",
+            "text": "91"
+          },
+          {
+            "op": "history",
+            "text": "92"
+          },
+          {
+            "op": "history",
+            "text": "93"
+          },
+          {
+            "op": "history",
+            "text": "94"
+          },
+          {
+            "op": "history",
+            "text": "95"
+          },
+          {
+            "op": "history",
+            "text": "96"
+          },
+          {
+            "op": "history",
+            "text": "97"
+          },
+          {
+            "op": "history",
+            "text": "98"
+          },
+          {
+            "op": "history",
+            "text": "99"
+          },
+          {
+            "op": "history",
+            "text": "100"
+          },
+          {
+            "op": "history",
+            "text": "101"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[A"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          },
+          {
+            "op": "input",
+            "text": "\u001b[B"
+          }
+        ]
+      },
+      {
+        "id": "backslash-newline-focus",
+        "steps": [
+          {
+            "op": "input",
+            "text": "hello\\"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          },
+          {
+            "op": "input",
+            "text": "world"
+          },
+          {
+            "op": "focus",
+            "value": false
+          },
+          {
+            "op": "render",
+            "width": 15
+          },
+          {
+            "op": "input",
+            "text": "\u001b\r"
+          },
+          {
+            "op": "input",
+            "text": "tail"
+          },
+          {
+            "op": "input",
+            "text": "\r"
+          }
+        ]
+      }
+    ],
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "multiline-edit-submit",
+        "states": [
+          {
+            "text": "hello\nworld    !",
+            "expanded": "hello\nworld    !",
+            "cursor": {
+              "Line": 1,
+              "Col": 10
+            }
+          },
+          {
+            "text": "hello\nworld    !",
+            "expanded": "hello\nworld    !",
+            "cursor": {
+              "Line": 1,
+              "Col": 0
+            }
+          },
+          {
+            "text": "hello\nwide 中文 world    !",
+            "expanded": "hello\nwide 中文 world    !",
+            "cursor": {
+              "Line": 1,
+              "Col": 12
+            }
+          },
+          {
+            "text": "hello\nwide 中文 world    !",
+            "expanded": "hello\nwide 中文 world    !",
+            "cursor": {
+              "Line": 1,
+              "Col": 11
+            }
+          },
+          {
+            "text": "hello\nwide 中 world    !",
+            "expanded": "hello\nwide 中 world    !",
+            "cursor": {
+              "Line": 1,
+              "Col": 8
+            }
+          },
+          {
+            "text": "hello\nwide 中\n world    !",
+            "expanded": "hello\nwide 中\n world    !",
+            "cursor": {
+              "Line": 2,
+              "Col": 0
+            }
+          },
+          {
+            "text": "hello\nwide 中\ntail world    !",
+            "expanded": "hello\nwide 中\ntail world    !",
+            "cursor": {
+              "Line": 2,
+              "Col": 4
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "hello\nworld    !",
+          "hello\nwide 中文 world    !",
+          "hello\nwide 中 world    !",
+          "hello\nwide 中\n world    !",
+          "hello\nwide 中\ntail world    !",
+          ""
+        ],
+        "submits": [
+          "hello\nwide 中\ntail world    !"
+        ]
+      },
+      {
+        "id": "undo-kill-yank",
+        "states": [
+          {
+            "text": "hello",
+            "expanded": "hello",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "hello ",
+            "expanded": "hello ",
+            "cursor": {
+              "Line": 0,
+              "Col": 6
+            }
+          },
+          {
+            "text": "hello world",
+            "expanded": "hello world",
+            "cursor": {
+              "Line": 0,
+              "Col": 11
+            }
+          },
+          {
+            "text": "hello",
+            "expanded": "hello",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "one two",
+            "expanded": "one two",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "one ",
+            "expanded": "one ",
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "one two",
+            "expanded": "one two",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "one two",
+            "expanded": "one two",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "one two",
+            "expanded": "one two",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "two",
+            "expanded": "two",
+            "cursor": {
+              "Line": 0,
+              "Col": 3
+            }
+          },
+          {
+            "text": "one two",
+            "expanded": "one two",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          }
+        ],
+        "changes": [
+          "hello",
+          "hello ",
+          "hello world",
+          "hello",
+          "",
+          "one two",
+          "one ",
+          "one two",
+          "",
+          "one two",
+          "",
+          "two",
+          "one two"
+        ],
+        "submits": []
+      },
+      {
+        "id": "history-draft-boundaries",
+        "states": [
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "draft",
+            "expanded": "draft",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "draft",
+            "expanded": "draft",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "second\nline",
+            "expanded": "second\nline",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "first",
+            "expanded": "first",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "first",
+            "expanded": "first",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "second\nline",
+            "expanded": "second\nline",
+            "cursor": {
+              "Line": 1,
+              "Col": 4
+            }
+          },
+          {
+            "text": "draft",
+            "expanded": "draft",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "draft",
+            "expanded": "draft",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "draft",
+            "expanded": "draft",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          }
+        ],
+        "changes": [
+          "draft",
+          "second\nline",
+          "first",
+          "second\nline",
+          "draft"
+        ],
+        "submits": []
+      },
+      {
+        "id": "paste-buffer-controls",
+        "states": [
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "a\nb    中\ntail",
+            "expanded": "a\nb    中\ntail",
+            "cursor": {
+              "Line": 2,
+              "Col": 4
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "a\nb    中\ntail",
+          ""
+        ],
+        "submits": [
+          "a\nb    中\ntail"
+        ]
+      },
+      {
+        "id": "paste-collapse-undo",
+        "states": [
+          {
+            "text": "[paste #1 +12 lines]",
+            "expanded": "a\na\na\na\na\na\na\na\na\na\na\n尾",
+            "cursor": {
+              "Line": 0,
+              "Col": 20
+            }
+          },
+          {
+            "text": "[paste #1 +12 lines]",
+            "expanded": "a\na\na\na\na\na\na\na\na\na\na\n尾",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "prefix [paste #1 +12 lines]",
+            "expanded": "prefix a\na\na\na\na\na\na\na\na\na\na\n尾",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "prefix [paste #1 +12 lines]",
+            "expanded": "prefix a\na\na\na\na\na\na\na\na\na\na\n尾",
+            "cursor": {
+              "Line": 0,
+              "Col": 27
+            }
+          },
+          {
+            "text": "prefix ",
+            "expanded": "prefix ",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "prefix [paste #1 +12 lines]",
+            "expanded": "prefix a\na\na\na\na\na\na\na\na\na\na\n尾",
+            "cursor": {
+              "Line": 0,
+              "Col": 27
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "[paste #1 +12 lines]",
+          "prefix [paste #1 +12 lines]",
+          "prefix ",
+          "prefix [paste #1 +12 lines]",
+          ""
+        ],
+        "submits": [
+          "prefix a\na\na\na\na\na\na\na\na\na\na\n尾"
+        ]
+      },
+      {
+        "id": "paste-long-emoji",
+        "states": [
+          {
+            "text": "[paste #1 1002 chars]",
+            "expanded": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+            "cursor": {
+              "Line": 0,
+              "Col": 21
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "[paste #1 1002 chars]",
+          ""
+        ],
+        "submits": [
+          "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀"
+        ]
+      },
+      {
+        "id": "paste-path",
+        "states": [
+          {
+            "text": "read",
+            "expanded": "read",
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "read /tmp/file",
+            "expanded": "read /tmp/file",
+            "cursor": {
+              "Line": 0,
+              "Col": 14
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "read",
+          "read /tmp/file",
+          ""
+        ],
+        "submits": [
+          "read /tmp/file"
+        ]
+      },
+      {
+        "id": "unicode-wrap-resize",
+        "states": [
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 24
+            }
+          },
+          {
+            "frame": [
+              "────────────",
+              "中文a é👨‍👩‍👧‍👦🇨🇳 ",
+              "            ",
+              "long word   ",
+              "1234567890  ",
+              "end\u001b_pi:c\u0007\u001b[7m \u001b[0m        ",
+              "────────────"
+            ],
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 24
+            }
+          },
+          {
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 13
+            }
+          },
+          {
+            "frame": [
+              "────────────",
+              "中文a é👨‍👩‍👧‍👦🇨🇳 ",
+              "            ",
+              "long word   ",
+              "123\u001b_pi:c\u0007\u001b[7m4\u001b[0m567890  ",
+              "end         ",
+              "────────────"
+            ],
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 13
+            }
+          },
+          {
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 3
+            }
+          },
+          {
+            "frame": [
+              "────────────",
+              "中文a é👨‍👩‍👧‍👦🇨🇳 ",
+              "            ",
+              "lon\u001b_pi:c\u0007\u001b[7mg\u001b[0m word   ",
+              "1234567890  ",
+              "end         ",
+              "────────────"
+            ],
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 3
+            }
+          },
+          {
+            "frame": [
+              "────────────────────────",
+              "中文a é👨‍👩‍👧‍👦🇨🇳             ",
+              "                        ",
+              "lon\u001b_pi:c\u0007\u001b[7mg\u001b[0m word 1234567890    ",
+              "end                     ",
+              "────────────────────────"
+            ],
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 3
+            }
+          },
+          {
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 0
+            }
+          },
+          {
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          },
+          {
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          },
+          {
+            "frame": [
+              "────────────",
+              "中文a é👨‍👩‍👧‍👦🇨🇳 ",
+              "            ",
+              "l\u001b_pi:c\u0007\u001b[7mn\u001b[0mg word    ",
+              "1234567890  ",
+              "end         ",
+              "────────────"
+            ],
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          },
+          {
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 end",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 end",
+            "cursor": {
+              "Line": 2,
+              "Col": 23
+            }
+          },
+          {
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 en",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 en",
+            "cursor": {
+              "Line": 2,
+              "Col": 22
+            }
+          },
+          {
+            "frame": [
+              "────────────",
+              "中文a é👨‍👩‍👧‍👦🇨🇳 ",
+              "            ",
+              "lng word    ",
+              "1234567890  ",
+              "en\u001b_pi:c\u0007\u001b[7m \u001b[0m         ",
+              "────────────"
+            ],
+            "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 en",
+            "expanded": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 en",
+            "cursor": {
+              "Line": 2,
+              "Col": 22
+            }
+          }
+        ],
+        "changes": [
+          "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end",
+          "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 end",
+          "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlng word 1234567890 en"
+        ],
+        "submits": []
+      },
+      {
+        "id": "grapheme-delete",
+        "states": [
+          {
+            "text": "a中é👨‍👩‍👧‍👦🇨🇳",
+            "expanded": "a中é👨‍👩‍👧‍👦🇨🇳",
+            "cursor": {
+              "Line": 0,
+              "Col": 40
+            }
+          },
+          {
+            "text": "a中é👨‍👩‍👧‍👦",
+            "expanded": "a中é👨‍👩‍👧‍👦",
+            "cursor": {
+              "Line": 0,
+              "Col": 32
+            }
+          },
+          {
+            "text": "a中é",
+            "expanded": "a中é",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "a中",
+            "expanded": "a中",
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "a中",
+            "expanded": "a中",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "中",
+            "expanded": "中",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "a中é👨‍👩‍👧‍👦🇨🇳",
+          "a中é👨‍👩‍👧‍👦",
+          "a中é",
+          "a中",
+          "中",
+          ""
+        ],
+        "submits": [
+          "中"
+        ]
+      },
+      {
+        "id": "page-word-jump",
+        "states": [
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 2,
+              "Col": 4
+            }
+          },
+          {
+            "frame": [
+              "────────────────────",
+              "one-two  three      ",
+              "next                ",
+              "last\u001b[7m \u001b[0m               ",
+              "────────────────────"
+            ],
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 2,
+              "Col": 4
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 3
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "one-  three\nnext\nlast",
+            "expanded": "one-  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 0,
+              "Col": 6
+            }
+          },
+          {
+            "text": "one-two  three\nnext\nlast",
+            "expanded": "one-two  three\nnext\nlast",
+            "cursor": {
+              "Line": 2,
+              "Col": 4
+            }
+          }
+        ],
+        "changes": [
+          "one-two  three\nnext\nlast",
+          "one-  three\nnext\nlast",
+          "one-two  three\nnext\nlast"
+        ],
+        "submits": []
+      },
+      {
+        "id": "paste-renumber",
+        "states": [
+          {
+            "text": "[paste #1 1001 chars]",
+            "expanded": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "cursor": {
+              "Line": 0,
+              "Col": 21
+            }
+          },
+          {
+            "text": "[paste #1 1001 chars][paste #2 1001 chars]",
+            "expanded": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "cursor": {
+              "Line": 0,
+              "Col": 42
+            }
+          },
+          {
+            "text": "[paste #1 1001 chars][paste #2 1001 chars]",
+            "expanded": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "cursor": {
+              "Line": 0,
+              "Col": 21
+            }
+          },
+          {
+            "text": "[paste #1 1001 chars]",
+            "expanded": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "[paste #1 1001 chars][paste #2 1001 chars]",
+            "expanded": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "cursor": {
+              "Line": 0,
+              "Col": 21
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "[paste #1 1001 chars]",
+          "[paste #1 1001 chars][paste #2 1001 chars]",
+          "[paste #1 1001 chars]",
+          "[paste #1 1001 chars][paste #2 1001 chars]",
+          ""
+        ],
+        "submits": [
+          "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        ]
+      },
+      {
+        "id": "empty-disabled-clear",
+        "states": [
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "  a  ",
+            "expanded": "  a  ",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "  a  ",
+            "expanded": "  a  ",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "  a  ",
+            "expanded": "  a  ",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "  a  ",
+            "expanded": "  a  ",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "  a  ",
+            "expanded": "  a  ",
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "",
+          "  a  ",
+          "",
+          "  a  ",
+          ""
+        ],
+        "submits": [
+          "",
+          "a"
+        ]
+      },
+      {
+        "id": "word-paste-atomic",
+        "states": [
+          {
+            "text": "[paste #1 1001 chars]",
+            "expanded": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "cursor": {
+              "Line": 0,
+              "Col": 21
+            }
+          },
+          {
+            "text": "[paste #1 1001 chars]",
+            "expanded": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "[paste #1 1001 chars]",
+            "expanded": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "cursor": {
+              "Line": 0,
+              "Col": 21
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "[paste #1 1001 chars]",
+            "expanded": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            "cursor": {
+              "Line": 0,
+              "Col": 21
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "[paste #1 1001 chars]",
+          "",
+          "[paste #1 1001 chars]",
+          ""
+        ],
+        "submits": [
+          "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        ]
+      },
+      {
+        "id": "unicode-vertical-sticky",
+        "states": [
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 3,
+              "Col": 29
+            }
+          },
+          {
+            "frame": [
+              "────────────────────",
+              "abcd                ",
+              "中🙂éz              ",
+              "x                   ",
+              "ab👨‍👩‍👧‍👦yz\u001b[7m \u001b[0m             ",
+              "────────────────────"
+            ],
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 3,
+              "Col": 29
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 1,
+              "Col": 11
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 1,
+              "Col": 11
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 3,
+              "Col": 29
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 3,
+              "Col": 0
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 3,
+              "Col": 29
+            }
+          },
+          {
+            "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "expanded": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz",
+            "cursor": {
+              "Line": 2,
+              "Col": 1
+            }
+          }
+        ],
+        "changes": [
+          "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz"
+        ],
+        "submits": []
+      },
+      {
+        "id": "history-limit",
+        "states": [
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "101",
+            "expanded": "101",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "100",
+            "expanded": "100",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "99",
+            "expanded": "99",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "98",
+            "expanded": "98",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "97",
+            "expanded": "97",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "96",
+            "expanded": "96",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "95",
+            "expanded": "95",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "94",
+            "expanded": "94",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "93",
+            "expanded": "93",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "92",
+            "expanded": "92",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "91",
+            "expanded": "91",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "90",
+            "expanded": "90",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "89",
+            "expanded": "89",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "88",
+            "expanded": "88",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "87",
+            "expanded": "87",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "86",
+            "expanded": "86",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "85",
+            "expanded": "85",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "84",
+            "expanded": "84",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "83",
+            "expanded": "83",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "82",
+            "expanded": "82",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "81",
+            "expanded": "81",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "80",
+            "expanded": "80",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "79",
+            "expanded": "79",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "78",
+            "expanded": "78",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "77",
+            "expanded": "77",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "76",
+            "expanded": "76",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "75",
+            "expanded": "75",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "74",
+            "expanded": "74",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "73",
+            "expanded": "73",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "72",
+            "expanded": "72",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "71",
+            "expanded": "71",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "70",
+            "expanded": "70",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "69",
+            "expanded": "69",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "68",
+            "expanded": "68",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "67",
+            "expanded": "67",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "66",
+            "expanded": "66",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "65",
+            "expanded": "65",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "64",
+            "expanded": "64",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "63",
+            "expanded": "63",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "62",
+            "expanded": "62",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "61",
+            "expanded": "61",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "60",
+            "expanded": "60",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "59",
+            "expanded": "59",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "58",
+            "expanded": "58",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "57",
+            "expanded": "57",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "56",
+            "expanded": "56",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "55",
+            "expanded": "55",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "54",
+            "expanded": "54",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "53",
+            "expanded": "53",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "52",
+            "expanded": "52",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "51",
+            "expanded": "51",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "50",
+            "expanded": "50",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "49",
+            "expanded": "49",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "48",
+            "expanded": "48",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "47",
+            "expanded": "47",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "46",
+            "expanded": "46",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "45",
+            "expanded": "45",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "44",
+            "expanded": "44",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "43",
+            "expanded": "43",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "42",
+            "expanded": "42",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "41",
+            "expanded": "41",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "40",
+            "expanded": "40",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "39",
+            "expanded": "39",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "38",
+            "expanded": "38",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "37",
+            "expanded": "37",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "36",
+            "expanded": "36",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "35",
+            "expanded": "35",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "34",
+            "expanded": "34",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "33",
+            "expanded": "33",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "32",
+            "expanded": "32",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "31",
+            "expanded": "31",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "30",
+            "expanded": "30",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "29",
+            "expanded": "29",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "28",
+            "expanded": "28",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "27",
+            "expanded": "27",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "26",
+            "expanded": "26",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "25",
+            "expanded": "25",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "24",
+            "expanded": "24",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "23",
+            "expanded": "23",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "22",
+            "expanded": "22",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "21",
+            "expanded": "21",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "20",
+            "expanded": "20",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "19",
+            "expanded": "19",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "18",
+            "expanded": "18",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "17",
+            "expanded": "17",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "16",
+            "expanded": "16",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "15",
+            "expanded": "15",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "14",
+            "expanded": "14",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "13",
+            "expanded": "13",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "12",
+            "expanded": "12",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "11",
+            "expanded": "11",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "10",
+            "expanded": "10",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "9",
+            "expanded": "9",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "8",
+            "expanded": "8",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "7",
+            "expanded": "7",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "6",
+            "expanded": "6",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "5",
+            "expanded": "5",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "4",
+            "expanded": "4",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "3",
+            "expanded": "3",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "2",
+            "expanded": "2",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "2",
+            "expanded": "2",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "2",
+            "expanded": "2",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "3",
+            "expanded": "3",
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "4",
+            "expanded": "4",
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "5",
+            "expanded": "5",
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "6",
+            "expanded": "6",
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "7",
+            "expanded": "7",
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "8",
+            "expanded": "8",
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "9",
+            "expanded": "9",
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "10",
+            "expanded": "10",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "11",
+            "expanded": "11",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "12",
+            "expanded": "12",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "13",
+            "expanded": "13",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "14",
+            "expanded": "14",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "15",
+            "expanded": "15",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "16",
+            "expanded": "16",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "17",
+            "expanded": "17",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "18",
+            "expanded": "18",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "19",
+            "expanded": "19",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "20",
+            "expanded": "20",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "21",
+            "expanded": "21",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "22",
+            "expanded": "22",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "23",
+            "expanded": "23",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "24",
+            "expanded": "24",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "25",
+            "expanded": "25",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "26",
+            "expanded": "26",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "27",
+            "expanded": "27",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "28",
+            "expanded": "28",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "29",
+            "expanded": "29",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "30",
+            "expanded": "30",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "31",
+            "expanded": "31",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "32",
+            "expanded": "32",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "33",
+            "expanded": "33",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "34",
+            "expanded": "34",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "35",
+            "expanded": "35",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "36",
+            "expanded": "36",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "37",
+            "expanded": "37",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "38",
+            "expanded": "38",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "39",
+            "expanded": "39",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "40",
+            "expanded": "40",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "41",
+            "expanded": "41",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "42",
+            "expanded": "42",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "43",
+            "expanded": "43",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "44",
+            "expanded": "44",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "45",
+            "expanded": "45",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "46",
+            "expanded": "46",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "47",
+            "expanded": "47",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "48",
+            "expanded": "48",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "49",
+            "expanded": "49",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "50",
+            "expanded": "50",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "51",
+            "expanded": "51",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "52",
+            "expanded": "52",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "53",
+            "expanded": "53",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "54",
+            "expanded": "54",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "55",
+            "expanded": "55",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "56",
+            "expanded": "56",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "57",
+            "expanded": "57",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "58",
+            "expanded": "58",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "59",
+            "expanded": "59",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "60",
+            "expanded": "60",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "61",
+            "expanded": "61",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "62",
+            "expanded": "62",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "63",
+            "expanded": "63",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "64",
+            "expanded": "64",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "65",
+            "expanded": "65",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "66",
+            "expanded": "66",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "67",
+            "expanded": "67",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "68",
+            "expanded": "68",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "69",
+            "expanded": "69",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "70",
+            "expanded": "70",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "71",
+            "expanded": "71",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "72",
+            "expanded": "72",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "73",
+            "expanded": "73",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "74",
+            "expanded": "74",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "75",
+            "expanded": "75",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "76",
+            "expanded": "76",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "77",
+            "expanded": "77",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "78",
+            "expanded": "78",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "79",
+            "expanded": "79",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "80",
+            "expanded": "80",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "81",
+            "expanded": "81",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "82",
+            "expanded": "82",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "83",
+            "expanded": "83",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "84",
+            "expanded": "84",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "85",
+            "expanded": "85",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "86",
+            "expanded": "86",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "87",
+            "expanded": "87",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "88",
+            "expanded": "88",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "89",
+            "expanded": "89",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "90",
+            "expanded": "90",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "91",
+            "expanded": "91",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "92",
+            "expanded": "92",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "93",
+            "expanded": "93",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "94",
+            "expanded": "94",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "95",
+            "expanded": "95",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "96",
+            "expanded": "96",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "97",
+            "expanded": "97",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "98",
+            "expanded": "98",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "99",
+            "expanded": "99",
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "100",
+            "expanded": "100",
+            "cursor": {
+              "Line": 0,
+              "Col": 3
+            }
+          },
+          {
+            "text": "101",
+            "expanded": "101",
+            "cursor": {
+              "Line": 0,
+              "Col": 3
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "101",
+          "100",
+          "99",
+          "98",
+          "97",
+          "96",
+          "95",
+          "94",
+          "93",
+          "92",
+          "91",
+          "90",
+          "89",
+          "88",
+          "87",
+          "86",
+          "85",
+          "84",
+          "83",
+          "82",
+          "81",
+          "80",
+          "79",
+          "78",
+          "77",
+          "76",
+          "75",
+          "74",
+          "73",
+          "72",
+          "71",
+          "70",
+          "69",
+          "68",
+          "67",
+          "66",
+          "65",
+          "64",
+          "63",
+          "62",
+          "61",
+          "60",
+          "59",
+          "58",
+          "57",
+          "56",
+          "55",
+          "54",
+          "53",
+          "52",
+          "51",
+          "50",
+          "49",
+          "48",
+          "47",
+          "46",
+          "45",
+          "44",
+          "43",
+          "42",
+          "41",
+          "40",
+          "39",
+          "38",
+          "37",
+          "36",
+          "35",
+          "34",
+          "33",
+          "32",
+          "31",
+          "30",
+          "29",
+          "28",
+          "27",
+          "26",
+          "25",
+          "24",
+          "23",
+          "22",
+          "21",
+          "20",
+          "19",
+          "18",
+          "17",
+          "16",
+          "15",
+          "14",
+          "13",
+          "12",
+          "11",
+          "10",
+          "9",
+          "8",
+          "7",
+          "6",
+          "5",
+          "4",
+          "3",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40",
+          "41",
+          "42",
+          "43",
+          "44",
+          "45",
+          "46",
+          "47",
+          "48",
+          "49",
+          "50",
+          "51",
+          "52",
+          "53",
+          "54",
+          "55",
+          "56",
+          "57",
+          "58",
+          "59",
+          "60",
+          "61",
+          "62",
+          "63",
+          "64",
+          "65",
+          "66",
+          "67",
+          "68",
+          "69",
+          "70",
+          "71",
+          "72",
+          "73",
+          "74",
+          "75",
+          "76",
+          "77",
+          "78",
+          "79",
+          "80",
+          "81",
+          "82",
+          "83",
+          "84",
+          "85",
+          "86",
+          "87",
+          "88",
+          "89",
+          "90",
+          "91",
+          "92",
+          "93",
+          "94",
+          "95",
+          "96",
+          "97",
+          "98",
+          "99",
+          "100",
+          "101",
+          ""
+        ],
+        "submits": []
+      },
+      {
+        "id": "backslash-newline-focus",
+        "states": [
+          {
+            "text": "hello\\",
+            "expanded": "hello\\",
+            "cursor": {
+              "Line": 0,
+              "Col": 6
+            }
+          },
+          {
+            "text": "hello\n",
+            "expanded": "hello\n",
+            "cursor": {
+              "Line": 1,
+              "Col": 0
+            }
+          },
+          {
+            "text": "hello\nworld",
+            "expanded": "hello\nworld",
+            "cursor": {
+              "Line": 1,
+              "Col": 5
+            }
+          },
+          {
+            "text": "hello\nworld",
+            "expanded": "hello\nworld",
+            "cursor": {
+              "Line": 1,
+              "Col": 5
+            }
+          },
+          {
+            "frame": [
+              "───────────────",
+              "hello          ",
+              "world\u001b[7m \u001b[0m         ",
+              "───────────────"
+            ],
+            "text": "hello\nworld",
+            "expanded": "hello\nworld",
+            "cursor": {
+              "Line": 1,
+              "Col": 5
+            }
+          },
+          {
+            "text": "hello\nworld\n",
+            "expanded": "hello\nworld\n",
+            "cursor": {
+              "Line": 2,
+              "Col": 0
+            }
+          },
+          {
+            "text": "hello\nworld\ntail",
+            "expanded": "hello\nworld\ntail",
+            "cursor": {
+              "Line": 2,
+              "Col": 4
+            }
+          },
+          {
+            "text": "",
+            "expanded": "",
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "changes": [
+          "hello\\",
+          "hello",
+          "hello\n",
+          "hello\nworld",
+          "hello\nworld\n",
+          "hello\nworld\ntail",
+          ""
+        ],
+        "submits": [
+          "hello\nworld\ntail"
+        ]
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:85bc6fa1f0b1aaf87aadace4c7c7d7328bd47b6a8e074d8a0004cf3e54b57e99",
+  "observation_hash": "sha256:b97b76cdd1829b7403d077afb59a2703641089f880baa53268e8afee7481da99",
+  "execution_method": "node parity/oracle/editor.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "cursor": "UTF-8 byte offsets projected from Pi UTF-16 offsets"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/interactive-mode.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/interactive/multiline-editor",
+    "catalog_id": "contract:tui/multiline-editor",
+    "surface": "cli",
+    "input": {
+      "turns": [
+        {
+          "chunks": [
+            "one\n二",
+            "\u001b[D",
+            "X",
+            "\r"
+          ]
+        },
+        {
+          "chunks": [
+            "\u001b[A",
+            "\u001b[B",
+            "\u001b[F",
+            "!",
+            "\r"
+          ]
+        },
+        {
+          "chunks": [
+            "a中é👨‍👩‍👧‍👦🇨🇳",
+            "",
+            "",
+            "\r"
+          ]
+        },
+        {
+          "chunks": [
+            "\u001b[20",
+            "0~line 1\r",
+            "\nline 2\t中文\u0003",
+            "\u001b[201",
+            "~",
+            "\r"
+          ]
+        },
+        {
+          "chunks": [
+            "\u001b[200~row\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\n尾\u001b[201~",
+            "\r"
+          ]
+        },
+        {
+          "chunks": [
+            "\u001b[200~中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂\u001b[201~",
+            "\u001b[D",
+            "",
+            "\r"
+          ],
+          "columns": 24
+        },
+        {
+          "chunks": [
+            "hello world",
+            "\u0017",
+            "\u0019",
+            "\u001f",
+            "end",
+            "\r"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "prompts": [
+        "one\nX二",
+        "one\nX二!",
+        "a中é",
+        "line 1\nline 2    中文",
+        "row\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\n尾",
+        "中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中文🙂中🙂",
+        "hello end"
+      ],
+      "exit_code": 0
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:bdef1635cbb4fe09b4912c8d5c59c7dac2deb29213507f9de2803fd61164ae26",
+  "observation_hash": "sha256:2495a6a04f823c4eac738784da848e125d18b86c10b3330f152f3268b27c6ea5",
+  "execution_method": "node parity/oracle/editor-cli.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "terminal": "xterm-256color",
+    "transport": "real child process + PTY + gated loopback SSE"
+  }
+}

@@ -39,6 +39,7 @@ Start func(*tui.ProcessTerminal, func(string), func()) error
 Stop func(*tui.ProcessTerminal) error
 Write func(*tui.ProcessTerminal, string) error
 type *tui.TextUI
+AddToHistory func(*tui.TextUI, string) error
 Append func(*tui.TextUI, string) error
 ClearEditor func(*tui.TextUI) error
 Done func(*tui.TextUI) <-chan struct {}

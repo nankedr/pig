@@ -12,6 +12,7 @@ m0-offline:
 	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./... -count=1
 	go vet ./...
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build ./...
+	go run ./examples/multiline-editor
 	go run ./examples/m0-contracts
 	go run ./examples/session-messages
 	go run ./examples/sdk-agent-session

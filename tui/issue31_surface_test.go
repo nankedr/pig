@@ -165,8 +165,8 @@ func TestIssue31MemberMappingsMatchLockedTUISurface(t *testing.T) {
 	if got := issue31CountCatalogStatus(expected, catalog.StatusInventoried); got != 395 {
 		t.Fatalf("issue #31 inherited primitive member rows = %d, want 395", got)
 	}
-	if got := issue31CountCatalogStatus(expected, catalog.StatusScaffolded); got != 817 {
-		t.Fatalf("issue #31 scaffolded symbol/member rows = %d, want 817", got)
+	if got := issue31CountCatalogStatus(expected, catalog.StatusScaffolded); got != 800 {
+		t.Fatalf("issue #31 scaffolded symbol/member rows = %d, want 800", got)
 	}
 	if *updateIssue31Catalog {
 		issue31WriteCatalog(t, root, expected)
@@ -533,6 +533,9 @@ func issue31ExpectedCatalogEntries(symbols []surface.Symbol) []catalog.Entry {
 	}
 	for i := range entries {
 		e := &entries[i]
+		if issue110Promote(e) {
+			continue
+		}
 		supported := e.ID == "symbol:tui/src/terminal.ts#ProcessTerminal"
 		for _, name := range []string{"Start", "Stop", "Write", "Columns", "Rows", "KittyProtocolActive", "ModifyOtherKeysActive", "MoveBy", "HideCursor", "ShowCursor", "ClearLine", "ClearFromCursor", "ClearScreen"} {
 			supported = supported || e.Mapping.Target == issue31GoPackage+".ProcessTerminal."+name
@@ -648,6 +651,7 @@ func issue31WriteCatalog(t *testing.T, root string, expected []catalog.Entry) {
 			entry.Partial = &catalog.Partial{
 				Supported: []string{
 					"all fixed-snapshot TUI symbols and extracted members have compile-usable Go mappings, with safe local constructors, value access, callback wiring, container composition and kill-ring behavior",
+					"Issue #110: shared multiline Editor, grapheme editing, history, undo, kill/yank, wrapping and paste expansion; see contract:tui/multiline-editor",
 					"Issue #109: TextUI and ProcessTerminal provide the CGO-free minimal Interactive runtime; see contract:codingagent/interactive-text for public SDK and real-process PTY evidence",
 				},
 				Unsupported: []string{

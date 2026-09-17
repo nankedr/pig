@@ -1,0 +1,1814 @@
+[
+  {
+    "id": "multiline-edit-submit",
+    "steps": [
+      {
+        "op": "set",
+        "text": "hello\r\nworld\t!"
+      },
+      {
+        "op": "input",
+        "text": "\u0001"
+      },
+      {
+        "op": "insert",
+        "text": "wide 中文 "
+      },
+      {
+        "op": "input",
+        "text": "\u001b[D"
+      },
+      {
+        "op": "input",
+        "text": ""
+      },
+      {
+        "op": "input",
+        "text": "\n"
+      },
+      {
+        "op": "input",
+        "text": "tail"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  },
+  {
+    "id": "undo-kill-yank",
+    "steps": [
+      {
+        "op": "input",
+        "text": "hello"
+      },
+      {
+        "op": "input",
+        "text": " "
+      },
+      {
+        "op": "input",
+        "text": "world"
+      },
+      {
+        "op": "input",
+        "text": "\u001f"
+      },
+      {
+        "op": "input",
+        "text": "\u001f"
+      },
+      {
+        "op": "input",
+        "text": "one two"
+      },
+      {
+        "op": "input",
+        "text": "\u0017"
+      },
+      {
+        "op": "input",
+        "text": "\u0019"
+      },
+      {
+        "op": "input",
+        "text": "\u0001"
+      },
+      {
+        "op": "input",
+        "text": "\u000b"
+      },
+      {
+        "op": "input",
+        "text": "\u0019"
+      },
+      {
+        "op": "input",
+        "text": "\u001by"
+      },
+      {
+        "op": "input",
+        "text": "\u001f"
+      }
+    ]
+  },
+  {
+    "id": "history-draft-boundaries",
+    "steps": [
+      {
+        "op": "history",
+        "text": " first "
+      },
+      {
+        "op": "history",
+        "text": "second\nline"
+      },
+      {
+        "op": "history",
+        "text": "second\nline"
+      },
+      {
+        "op": "history",
+        "text": " "
+      },
+      {
+        "op": "set",
+        "text": "draft"
+      },
+      {
+        "op": "input",
+        "text": "\u0001"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      }
+    ]
+  },
+  {
+    "id": "paste-buffer-controls",
+    "steps": [
+      {
+        "op": "input",
+        "text": "\u001b[200~a\r"
+      },
+      {
+        "op": "input",
+        "text": "\nb\t中\u0003\u001b[106;5u"
+      },
+      {
+        "op": "input",
+        "text": "tail\u001b[201~"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  },
+  {
+    "id": "paste-collapse-undo",
+    "steps": [
+      {
+        "op": "input",
+        "text": "\u001b[200~a\na\na\na\na\na\na\na\na\na\na\n尾\u001b[201~"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[D"
+      },
+      {
+        "op": "insert",
+        "text": "prefix "
+      },
+      {
+        "op": "input",
+        "text": "\u001b[C"
+      },
+      {
+        "op": "input",
+        "text": ""
+      },
+      {
+        "op": "input",
+        "text": "\u001f"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  },
+  {
+    "id": "paste-long-emoji",
+    "steps": [
+      {
+        "op": "input",
+        "text": "\u001b[200~😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\u001b[201~"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  },
+  {
+    "id": "paste-path",
+    "steps": [
+      {
+        "op": "set",
+        "text": "read"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[200~/tmp/file\u001b[201~"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  },
+  {
+    "id": "unicode-wrap-resize",
+    "steps": [
+      {
+        "op": "focus",
+        "value": true
+      },
+      {
+        "op": "set",
+        "text": "中文a é👨‍👩‍👧‍👦🇨🇳\n\nlong word 1234567890 end"
+      },
+      {
+        "op": "render",
+        "width": 12
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "render",
+        "width": 12
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "render",
+        "width": 12
+      },
+      {
+        "op": "render",
+        "width": 24
+      },
+      {
+        "op": "input",
+        "text": "\u001b[H"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[C"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[3~"
+      },
+      {
+        "op": "render",
+        "width": 12
+      },
+      {
+        "op": "input",
+        "text": "\u001b[F"
+      },
+      {
+        "op": "input",
+        "text": ""
+      },
+      {
+        "op": "render",
+        "width": 12
+      }
+    ]
+  },
+  {
+    "id": "grapheme-delete",
+    "steps": [
+      {
+        "op": "set",
+        "text": "a中é👨‍👩‍👧‍👦🇨🇳"
+      },
+      {
+        "op": "input",
+        "text": ""
+      },
+      {
+        "op": "input",
+        "text": ""
+      },
+      {
+        "op": "input",
+        "text": ""
+      },
+      {
+        "op": "input",
+        "text": "\u0001"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[3~"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  },
+  {
+    "id": "page-word-jump",
+    "steps": [
+      {
+        "op": "set",
+        "text": "one-two  three\nnext\nlast"
+      },
+      {
+        "op": "render",
+        "width": 20
+      },
+      {
+        "op": "input",
+        "text": "\u001b[5~"
+      },
+      {
+        "op": "input",
+        "text": "\u0001"
+      },
+      {
+        "op": "input",
+        "text": "\u001bf"
+      },
+      {
+        "op": "input",
+        "text": "\u001bf"
+      },
+      {
+        "op": "input",
+        "text": "\u001bf"
+      },
+      {
+        "op": "input",
+        "text": "\u001bb"
+      },
+      {
+        "op": "input",
+        "text": "\u001bd"
+      },
+      {
+        "op": "input",
+        "text": "\u0019"
+      },
+      {
+        "op": "input",
+        "text": "\u001d"
+      },
+      {
+        "op": "input",
+        "text": "a"
+      },
+      {
+        "op": "input",
+        "text": "\u001b\u001d"
+      },
+      {
+        "op": "input",
+        "text": "o"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[6~"
+      }
+    ]
+  },
+  {
+    "id": "paste-renumber",
+    "steps": [
+      {
+        "op": "input",
+        "text": "\u001b[200~aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\u001b[201~"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[200~bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\u001b[201~"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[D"
+      },
+      {
+        "op": "input",
+        "text": ""
+      },
+      {
+        "op": "input",
+        "text": "\u001f"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  },
+  {
+    "id": "empty-disabled-clear",
+    "steps": [
+      {
+        "op": "input",
+        "text": "\r"
+      },
+      {
+        "op": "set",
+        "text": "  a  "
+      },
+      {
+        "op": "disable",
+        "value": true
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      },
+      {
+        "op": "disable",
+        "value": false
+      },
+      {
+        "op": "set",
+        "text": ""
+      },
+      {
+        "op": "input",
+        "text": "\u001f"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      },
+      {
+        "op": "input",
+        "text": "\u001f"
+      }
+    ]
+  },
+  {
+    "id": "word-paste-atomic",
+    "steps": [
+      {
+        "op": "input",
+        "text": "\u001b[200~xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u001b[201~"
+      },
+      {
+        "op": "input",
+        "text": "\u001bb"
+      },
+      {
+        "op": "input",
+        "text": "\u001bf"
+      },
+      {
+        "op": "input",
+        "text": "\u0017"
+      },
+      {
+        "op": "input",
+        "text": "\u0019"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  },
+  {
+    "id": "unicode-vertical-sticky",
+    "steps": [
+      {
+        "op": "set",
+        "text": "abcd\n中🙂éz\nx\nab👨‍👩‍👧‍👦yz"
+      },
+      {
+        "op": "render",
+        "width": 20
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u0001"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      }
+    ]
+  },
+  {
+    "id": "history-limit",
+    "steps": [
+      {
+        "op": "history",
+        "text": "0"
+      },
+      {
+        "op": "history",
+        "text": "1"
+      },
+      {
+        "op": "history",
+        "text": "2"
+      },
+      {
+        "op": "history",
+        "text": "3"
+      },
+      {
+        "op": "history",
+        "text": "4"
+      },
+      {
+        "op": "history",
+        "text": "5"
+      },
+      {
+        "op": "history",
+        "text": "6"
+      },
+      {
+        "op": "history",
+        "text": "7"
+      },
+      {
+        "op": "history",
+        "text": "8"
+      },
+      {
+        "op": "history",
+        "text": "9"
+      },
+      {
+        "op": "history",
+        "text": "10"
+      },
+      {
+        "op": "history",
+        "text": "11"
+      },
+      {
+        "op": "history",
+        "text": "12"
+      },
+      {
+        "op": "history",
+        "text": "13"
+      },
+      {
+        "op": "history",
+        "text": "14"
+      },
+      {
+        "op": "history",
+        "text": "15"
+      },
+      {
+        "op": "history",
+        "text": "16"
+      },
+      {
+        "op": "history",
+        "text": "17"
+      },
+      {
+        "op": "history",
+        "text": "18"
+      },
+      {
+        "op": "history",
+        "text": "19"
+      },
+      {
+        "op": "history",
+        "text": "20"
+      },
+      {
+        "op": "history",
+        "text": "21"
+      },
+      {
+        "op": "history",
+        "text": "22"
+      },
+      {
+        "op": "history",
+        "text": "23"
+      },
+      {
+        "op": "history",
+        "text": "24"
+      },
+      {
+        "op": "history",
+        "text": "25"
+      },
+      {
+        "op": "history",
+        "text": "26"
+      },
+      {
+        "op": "history",
+        "text": "27"
+      },
+      {
+        "op": "history",
+        "text": "28"
+      },
+      {
+        "op": "history",
+        "text": "29"
+      },
+      {
+        "op": "history",
+        "text": "30"
+      },
+      {
+        "op": "history",
+        "text": "31"
+      },
+      {
+        "op": "history",
+        "text": "32"
+      },
+      {
+        "op": "history",
+        "text": "33"
+      },
+      {
+        "op": "history",
+        "text": "34"
+      },
+      {
+        "op": "history",
+        "text": "35"
+      },
+      {
+        "op": "history",
+        "text": "36"
+      },
+      {
+        "op": "history",
+        "text": "37"
+      },
+      {
+        "op": "history",
+        "text": "38"
+      },
+      {
+        "op": "history",
+        "text": "39"
+      },
+      {
+        "op": "history",
+        "text": "40"
+      },
+      {
+        "op": "history",
+        "text": "41"
+      },
+      {
+        "op": "history",
+        "text": "42"
+      },
+      {
+        "op": "history",
+        "text": "43"
+      },
+      {
+        "op": "history",
+        "text": "44"
+      },
+      {
+        "op": "history",
+        "text": "45"
+      },
+      {
+        "op": "history",
+        "text": "46"
+      },
+      {
+        "op": "history",
+        "text": "47"
+      },
+      {
+        "op": "history",
+        "text": "48"
+      },
+      {
+        "op": "history",
+        "text": "49"
+      },
+      {
+        "op": "history",
+        "text": "50"
+      },
+      {
+        "op": "history",
+        "text": "51"
+      },
+      {
+        "op": "history",
+        "text": "52"
+      },
+      {
+        "op": "history",
+        "text": "53"
+      },
+      {
+        "op": "history",
+        "text": "54"
+      },
+      {
+        "op": "history",
+        "text": "55"
+      },
+      {
+        "op": "history",
+        "text": "56"
+      },
+      {
+        "op": "history",
+        "text": "57"
+      },
+      {
+        "op": "history",
+        "text": "58"
+      },
+      {
+        "op": "history",
+        "text": "59"
+      },
+      {
+        "op": "history",
+        "text": "60"
+      },
+      {
+        "op": "history",
+        "text": "61"
+      },
+      {
+        "op": "history",
+        "text": "62"
+      },
+      {
+        "op": "history",
+        "text": "63"
+      },
+      {
+        "op": "history",
+        "text": "64"
+      },
+      {
+        "op": "history",
+        "text": "65"
+      },
+      {
+        "op": "history",
+        "text": "66"
+      },
+      {
+        "op": "history",
+        "text": "67"
+      },
+      {
+        "op": "history",
+        "text": "68"
+      },
+      {
+        "op": "history",
+        "text": "69"
+      },
+      {
+        "op": "history",
+        "text": "70"
+      },
+      {
+        "op": "history",
+        "text": "71"
+      },
+      {
+        "op": "history",
+        "text": "72"
+      },
+      {
+        "op": "history",
+        "text": "73"
+      },
+      {
+        "op": "history",
+        "text": "74"
+      },
+      {
+        "op": "history",
+        "text": "75"
+      },
+      {
+        "op": "history",
+        "text": "76"
+      },
+      {
+        "op": "history",
+        "text": "77"
+      },
+      {
+        "op": "history",
+        "text": "78"
+      },
+      {
+        "op": "history",
+        "text": "79"
+      },
+      {
+        "op": "history",
+        "text": "80"
+      },
+      {
+        "op": "history",
+        "text": "81"
+      },
+      {
+        "op": "history",
+        "text": "82"
+      },
+      {
+        "op": "history",
+        "text": "83"
+      },
+      {
+        "op": "history",
+        "text": "84"
+      },
+      {
+        "op": "history",
+        "text": "85"
+      },
+      {
+        "op": "history",
+        "text": "86"
+      },
+      {
+        "op": "history",
+        "text": "87"
+      },
+      {
+        "op": "history",
+        "text": "88"
+      },
+      {
+        "op": "history",
+        "text": "89"
+      },
+      {
+        "op": "history",
+        "text": "90"
+      },
+      {
+        "op": "history",
+        "text": "91"
+      },
+      {
+        "op": "history",
+        "text": "92"
+      },
+      {
+        "op": "history",
+        "text": "93"
+      },
+      {
+        "op": "history",
+        "text": "94"
+      },
+      {
+        "op": "history",
+        "text": "95"
+      },
+      {
+        "op": "history",
+        "text": "96"
+      },
+      {
+        "op": "history",
+        "text": "97"
+      },
+      {
+        "op": "history",
+        "text": "98"
+      },
+      {
+        "op": "history",
+        "text": "99"
+      },
+      {
+        "op": "history",
+        "text": "100"
+      },
+      {
+        "op": "history",
+        "text": "101"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[A"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      },
+      {
+        "op": "input",
+        "text": "\u001b[B"
+      }
+    ]
+  },
+  {
+    "id": "backslash-newline-focus",
+    "steps": [
+      {
+        "op": "input",
+        "text": "hello\\"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      },
+      {
+        "op": "input",
+        "text": "world"
+      },
+      {
+        "op": "focus",
+        "value": false
+      },
+      {
+        "op": "render",
+        "width": 15
+      },
+      {
+        "op": "input",
+        "text": "\u001b\r"
+      },
+      {
+        "op": "input",
+        "text": "tail"
+      },
+      {
+        "op": "input",
+        "text": "\r"
+      }
+    ]
+  }
+]

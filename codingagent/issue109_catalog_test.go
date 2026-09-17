@@ -17,7 +17,7 @@ func issue109InteractivePartial() *catalog.Partial {
 		"Public SDK Init/Run/Stop, EOF, context cancellation, initialization/output failures and visible Provider failures; offline replay without Pi, Python or Node",
 		"Raw SIGINT preserves signal termination after cleanup; pinned Pi leaves terminal modes active on this path, so cleanup intentionally follows issue109 restoration requirement and is not claimed identical",
 	}, Unsupported: []string{
-		"Full editor/Markdown/layout parity, multiline cursor movement, grapheme editing, scrollback, overlays, fullscreen, advanced key protocols and Escape/suspend behavior remain partial or explicit stubs",
+		"Full Markdown/layout parity, scrollback, overlays, fullscreen, advanced key protocols and Escape/suspend behavior remain partial or explicit stubs; issue110 editor evidence is owned by contract:tui/multiline-editor",
 		"Image input, extension runtime, package ecosystem, update notifications, terminal-loss/stalled-output emergency exits and six-platform runtime acceptance remain unverified/deferred to their scheduled milestones",
 	}}
 }

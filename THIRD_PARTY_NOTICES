@@ -133,3 +133,14 @@ modifications are recorded in codingagent/themes/manifest.json. These themes
 and the existing HTML export assets ship with v0.5.0; the Pi MIT notice above
 and codingagent/exporthtml/LICENSES.txt cover their attribution. No npm/git
 package runtime or extension execution dependencies are added by this release.
+
+## Unicode grapheme segmentation and cell widths
+
+- Source: https://github.com/rivo/uniseg
+- Module/version: github.com/rivo/uniseg v0.4.3
+- License: MIT, Copyright (c) 2019 Oliver Kuederle
+
+The editor uses this CGO-free implementation for grapheme boundaries and
+terminal widths. The retained notice is THIRD_PARTY_LICENSES/uniseg-MIT.txt.
+Editor wrapping, history, undo and paste semantics follow Pi's editor.ts at
+the pinned Code Baseline under the Pi MIT attribution above.

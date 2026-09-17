@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9679
+- Total entries: 9680
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5167 |
-| scaffolded | 3830 |
-| partial | 389 |
+| scaffolded | 3813 |
+| partial | 407 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -8941,27 +8941,12 @@
 | member:tui/src/components/cancellable-loader.ts#CancellableLoader.signal | scaffolded | M6 | contract | github.com/nankedr/pig/tui.CancellableLoader.Signal | tui |
 | member:tui/src/components/cancellable-loader.ts#CancellableLoader.start | scaffolded | M6 | contract | github.com/nankedr/pig/tui.CancellableLoader.Start | tui |
 | member:tui/src/components/cancellable-loader.ts#CancellableLoader.stop | scaffolded | M6 | contract | github.com/nankedr/pig/tui.CancellableLoader.Stop | tui |
-| member:tui/src/components/editor.ts#Editor.addToHistory | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.AddToHistory | tui |
-| member:tui/src/components/editor.ts#Editor.borderColor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.BorderColor | tui |
-| member:tui/src/components/editor.ts#Editor.disableSubmit | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.DisableSubmit | tui |
-| member:tui/src/components/editor.ts#Editor.focused | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.Focused | tui |
 | member:tui/src/components/editor.ts#Editor.getAutocompleteMaxVisible | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.GetAutocompleteMaxVisible | tui |
-| member:tui/src/components/editor.ts#Editor.getCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.GetCursor | tui |
-| member:tui/src/components/editor.ts#Editor.getExpandedText | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.GetExpandedText | tui |
-| member:tui/src/components/editor.ts#Editor.getLines | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.GetLines | tui |
 | member:tui/src/components/editor.ts#Editor.getPaddingX | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.GetPaddingX | tui |
-| member:tui/src/components/editor.ts#Editor.getText | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.GetText | tui |
-| member:tui/src/components/editor.ts#Editor.handleInput | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.HandleInput | tui |
-| member:tui/src/components/editor.ts#Editor.insertTextAtCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.InsertTextAtCursor | tui |
 | member:tui/src/components/editor.ts#Editor.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.Invalidate | tui |
 | member:tui/src/components/editor.ts#Editor.isShowingAutocomplete | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.IsShowingAutocomplete | tui |
-| member:tui/src/components/editor.ts#Editor.onChange | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.OnChange | tui |
-| member:tui/src/components/editor.ts#Editor.onSubmit | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.OnSubmit | tui |
-| member:tui/src/components/editor.ts#Editor.render | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.Render | tui |
 | member:tui/src/components/editor.ts#Editor.setAutocompleteMaxVisible | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.SetAutocompleteMaxVisible | tui |
 | member:tui/src/components/editor.ts#Editor.setAutocompleteProvider | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.SetAutocompleteProvider | tui |
-| member:tui/src/components/editor.ts#Editor.setPaddingX | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.SetPaddingX | tui |
-| member:tui/src/components/editor.ts#Editor.setText | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.SetText | tui |
 | member:tui/src/components/editor.ts#EditorOptions.autocompleteMaxVisible | scaffolded | M6 | contract | github.com/nankedr/pig/tui.EditorOptions.AutocompleteMaxVisible | tui |
 | member:tui/src/components/editor.ts#EditorOptions.paddingX | scaffolded | M6 | contract | github.com/nankedr/pig/tui.EditorOptions.PaddingX | tui |
 | member:tui/src/components/editor.ts#EditorTheme.borderColor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.EditorTheme.BorderColor | tui |
@@ -9536,11 +9521,9 @@
 | symbol:tui/src/components/alt-screen-flash.ts#AltScreenFlashContainer | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.AltScreenFlashContainer | tui |
 | symbol:tui/src/components/box.ts#Box | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Box | tui |
 | symbol:tui/src/components/cancellable-loader.ts#CancellableLoader | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.CancellableLoader | tui |
-| symbol:tui/src/components/editor.ts#Editor | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Editor | tui |
 | symbol:tui/src/components/editor.ts#EditorOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.EditorOptions | tui |
 | symbol:tui/src/components/editor.ts#EditorTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.EditorTheme | tui |
 | symbol:tui/src/components/editor.ts#TextChunk | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.TextChunk | tui |
-| symbol:tui/src/components/editor.ts#wordWrapLine | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.WordWrapLine | tui |
 | symbol:tui/src/components/h-stack.ts#HStack | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.HStack | tui |
 | symbol:tui/src/components/image.ts#Image | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Image | tui |
 | symbol:tui/src/components/image.ts#ImageOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ImageOptions | tui |
@@ -9718,6 +9701,22 @@
 | symbol:tui/src/word-navigation.ts#WordNavigationOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.WordNavigationOptions | tui |
 | symbol:tui/src/word-navigation.ts#findWordBackward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordBackward | tui |
 | symbol:tui/src/word-navigation.ts#findWordForward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordForward | tui |
+| contract:tui/multiline-editor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor | tui |
+| member:tui/src/components/editor.ts#Editor.addToHistory | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.AddToHistory | tui |
+| member:tui/src/components/editor.ts#Editor.borderColor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.BorderColor | tui |
+| member:tui/src/components/editor.ts#Editor.disableSubmit | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.DisableSubmit | tui |
+| member:tui/src/components/editor.ts#Editor.focused | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.Focused | tui |
+| member:tui/src/components/editor.ts#Editor.getCursor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.GetCursor | tui |
+| member:tui/src/components/editor.ts#Editor.getExpandedText | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.GetExpandedText | tui |
+| member:tui/src/components/editor.ts#Editor.getLines | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.GetLines | tui |
+| member:tui/src/components/editor.ts#Editor.getText | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.GetText | tui |
+| member:tui/src/components/editor.ts#Editor.handleInput | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.HandleInput | tui |
+| member:tui/src/components/editor.ts#Editor.insertTextAtCursor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.InsertTextAtCursor | tui |
+| member:tui/src/components/editor.ts#Editor.onChange | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.OnChange | tui |
+| member:tui/src/components/editor.ts#Editor.onSubmit | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.OnSubmit | tui |
+| member:tui/src/components/editor.ts#Editor.render | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.Render | tui |
+| member:tui/src/components/editor.ts#Editor.setPaddingX | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetPaddingX | tui |
+| member:tui/src/components/editor.ts#Editor.setText | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetText | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.clearFromCursor | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearFromCursor | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.clearLine | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearLine | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.clearScreen | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearScreen | tui |
@@ -9732,6 +9731,8 @@
 | member:tui/src/terminal.ts#ProcessTerminal.stop | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Stop | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.write | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Write | tui |
 | module-tui | partial | M6 | package | github.com/nankedr/pig/tui | tui |
+| symbol:tui/src/components/editor.ts#Editor | partial | M6 | symbol | github.com/nankedr/pig/tui.Editor | tui |
+| symbol:tui/src/components/editor.ts#wordWrapLine | partial | M6 | symbol | github.com/nankedr/pig/tui.WordWrapLine | tui |
 | symbol:tui/src/terminal.ts#ProcessTerminal | partial | M6 | symbol | github.com/nankedr/pig/tui.ProcessTerminal | tui |
 
 ## OpenAI Chat Completions capability matrix

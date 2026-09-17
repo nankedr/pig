@@ -114,6 +114,11 @@ func (m *InteractiveMode) RenderInitialMessages() error {
 			}
 		}
 		if text != "" {
+			if message.MessageRole() == "user" {
+				if err := m.ui.AddToHistory(text); err != nil {
+					return err
+				}
+			}
 			if err := m.ui.Append(fmt.Sprintf("%s: %s\n", message.MessageRole(), text)); err != nil {
 				return err
 			}

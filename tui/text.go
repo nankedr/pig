@@ -3,30 +3,46 @@ package tui
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 	"sync"
 	"time"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/rivo/uniseg"
 )
 
 // TextUI is the minimal text conversation renderer. Advanced layouts remain separate capabilities.
 type TextUI struct {
-	terminal                    Terminal
-	mu                          sync.Mutex
-	transcript, editor, pending string
-	inputs                      []string
-	ready                       chan struct{}
-	done                        chan struct{}
-	err                         error
-	started, stopped            bool
-	lastInterrupt               time.Time
-	paste                       bool
+	terminal            Terminal
+	mu                  sync.Mutex
+	transcript, pending string
+	editor              *Editor
+	inputs              []string
+	ready               chan struct{}
+	done                chan struct{}
+	err                 error
+	started, stopped    bool
+	lastInterrupt       time.Time
+	paste               bool
 }
 
 func NewTextUI(terminal Terminal) *TextUI {
-	return &TextUI{terminal: terminal, ready: make(chan struct{}, 1), done: make(chan struct{})}
+	u := &TextUI{terminal: terminal, ready: make(chan struct{}, 1), done: make(chan struct{}), editor: NewEditor(nil, EditorTheme{})}
+	u.editor.Focused = true
+	u.editor.OnSubmit = func(text string) {
+		if text != "" {
+			u.editor.AddToHistory(text)
+			u.inputs = append(u.inputs, text)
+			select {
+			case u.ready <- struct{}{}:
+			default:
+			}
+		}
+	}
+	return u
 }
 func (u *TextUI) Done() <-chan struct{} { return u.done }
 func (u *TextUI) Err() error            { u.mu.Lock(); defer u.mu.Unlock(); return u.err }
@@ -121,8 +137,13 @@ func (u *TextUI) ReadLine(ctx context.Context) (string, error) {
 func (u *TextUI) ClearEditor() error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
-	u.editor = ""
+	_ = u.editor.SetText("")
 	return u.render()
+}
+func (u *TextUI) AddToHistory(text string) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	return u.editor.AddToHistory(text)
 }
 func (u *TextUI) Append(text string) error {
 	u.mu.Lock()
@@ -150,12 +171,53 @@ func (u *TextUI) render() error {
 		u.finish(err)
 		return err
 	}
-	lines := strings.Split(u.transcript, "\n")
-	if rows > 2 && len(lines) > rows-2 {
-		lines = lines[len(lines)-(rows-2):]
+	columns, err := u.terminal.Columns()
+	if err != nil {
+		u.finish(err)
+		return err
 	}
-	frame := strings.Join(lines, "\r\n") + "\r\n> " + strings.ReplaceAll(u.editor, "\n", "\r\n  ")
-	err = u.terminal.Write("\x1b[H\x1b[2J" + frame + "\x1b[?25h")
+	columns = max(4, columns)
+	rows = max(1, rows)
+	u.editor.terminalRows = rows
+	editorLines, err := u.editor.Render(columns - 2)
+	if err != nil {
+		return err
+	}
+	editorLines = editorLines[1 : len(editorLines)-1]
+	cursorRow, cursorCol := 0, 2
+	for i, line := range editorLines {
+		if n := strings.Index(line, CursorMarker); n >= 0 {
+			cursorRow = i
+			cursorCol = 2 + uniseg.StringWidth(line[:n])
+			editorLines[i] = strings.ReplaceAll(line, CursorMarker, "")
+		}
+	}
+	if len(editorLines) > rows {
+		start := max(0, cursorRow-rows+1)
+		editorLines = editorLines[start:min(len(editorLines), start+rows)]
+		cursorRow -= start
+	}
+	var lines []string
+	for _, line := range strings.Split(u.transcript, "\n") {
+		chunks, _ := WordWrapLine(line, columns-1)
+		for _, chunk := range chunks {
+			lines = append(lines, chunk.Text)
+		}
+	}
+	available := max(0, rows-len(editorLines))
+	if len(lines) > available {
+		lines = lines[len(lines)-available:]
+	}
+	cursorRow += len(lines)
+	for i, line := range editorLines {
+		prefix := "  "
+		if i == 0 {
+			prefix = "> "
+		}
+		lines = append(lines, prefix+line)
+	}
+	frame := strings.Join(lines, "\r\n")
+	err = u.terminal.Write("\x1b[H\x1b[2J" + frame + fmt.Sprintf("\x1b[%d;%dH\x1b[?25h", cursorRow+1, cursorCol+1))
 	if err != nil {
 		u.finish(err)
 	}
@@ -169,78 +231,67 @@ func (u *TextUI) input(data string) {
 	}
 	u.pending += data
 	for len(u.pending) > 0 {
-		if u.pending[0] == 0x1b {
-			if len(u.pending) == 1 {
-				return
-			}
-			if u.pending[1] == '[' {
-				end := 2
-				for end < len(u.pending) && (u.pending[end] < 0x40 || u.pending[end] > 0x7e) {
-					end++
-				}
-				if end == len(u.pending) {
-					return
-				}
-				sequence := u.pending[:end+1]
-				u.pending = u.pending[end+1:]
-				if sequence == "\x1b[200~" {
-					u.paste = true
-				}
-				if sequence == "\x1b[201~" {
-					u.paste = false
-				}
-				continue
-			}
-			u.pending = u.pending[2:]
-			continue
-		}
-		if !utf8.FullRuneInString(u.pending) {
-			return
-		}
-		r, n := utf8.DecodeRuneInString(u.pending)
-		u.pending = u.pending[n:]
 		if u.paste {
-			if r == '\r' {
-				r = '\n'
+			end := strings.Index(u.pending, "\x1b[201~")
+			if end < 0 {
+				break
 			}
-			if r == '\n' || r == '\t' || !unicode.IsControl(r) {
-				u.editor += string(r)
-			}
+			_ = u.editor.HandleInput("\x1b[200~" + u.pending[:end+6])
+			u.pending = u.pending[end+6:]
+			u.paste = false
 			continue
 		}
-		switch r {
-		case '\x04':
-			if u.editor == "" {
-				u.finish(nil)
-				return
+		size := 1
+		if u.pending[0] == 0x1b {
+			if len(u.pending) < 2 {
+				break
 			}
-		case '\x03':
+			size = 2
+			if u.pending[1] == '[' || u.pending[1] == 'O' {
+				size = 2
+				for size < len(u.pending) && (u.pending[size] < 0x40 || u.pending[size] > 0x7e) {
+					size++
+				}
+				if size == len(u.pending) {
+					break
+				}
+				size++
+			} else {
+				if !utf8.FullRuneInString(u.pending[1:]) {
+					break
+				}
+				_, n := utf8.DecodeRuneInString(u.pending[1:])
+				size = 1 + n
+			}
+		} else {
+			if !utf8.FullRuneInString(u.pending) {
+				break
+			}
+			_, size = utf8.DecodeRuneInString(u.pending)
+		}
+		key := u.pending[:size]
+		u.pending = u.pending[size:]
+		switch key {
+		case "\x1b[200~":
+			u.paste = true
+		case "\x03":
 			now := time.Now()
 			if now.Sub(u.lastInterrupt) < 500*time.Millisecond {
 				u.finish(nil)
 				return
 			}
 			u.lastInterrupt = now
-			u.editor = ""
-		case '\r', '\n':
-			if strings.TrimSpace(u.editor) != "" {
-				u.inputs = append(u.inputs, u.editor)
-				select {
-				case u.ready <- struct{}{}:
-				default:
-				}
-				u.editor = ""
+			_ = u.editor.SetText("")
+			u.editor.undo = nil
+		case "\x04":
+			if u.editor.GetText() == "" {
+				u.finish(nil)
+				return
 			}
-		case '\x7f', '\b':
-			if len(u.editor) > 0 {
-				_, n := utf8.DecodeLastRuneInString(u.editor)
-				u.editor = u.editor[:len(u.editor)-n]
-			}
+			_ = u.editor.HandleInput(key)
 		default:
-			if !unicode.IsControl(r) {
-				u.editor += string(r)
-			}
+			_ = u.editor.HandleInput(key)
 		}
 	}
-	u.render()
+	_ = u.render()
 }
