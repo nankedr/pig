@@ -1,6 +1,7 @@
 # Pig
 
 M6.3 的终端按键协议、自定义快捷键与生命周期验证见 [终端按键与快捷键](docs/learning/m6-terminal-keys.md)。
+M6.5 的布局、历史滚动、全屏与缩放验证见 [长对话与终端布局](docs/learning/m6-layout-scrolling.md)。
 M6.1 开启真实终端文本对话，见 [Interactive 学习材料](docs/learning/m6-interactive-text.md)和 [源码映射](docs/mappings/typescript-to-go/m6-interactive-text.md)。
 
 

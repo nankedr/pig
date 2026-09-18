@@ -14,6 +14,9 @@ Keybindings *tui.KeybindingsManager
 OnInterrupt func()
 RenderTranscript func(int, bool, bool) ([]string, error)
 HideThinking bool
+Mode tui.TUIMode
+Scrollbar tui.ScrollViewScrollbar
+PreserveScreen bool
 type tui.TextInput
 Text string
 Action tui.Keybinding
@@ -53,9 +56,13 @@ Append func(*tui.TextUI, string) error
 ClearEditor func(*tui.TextUI) error
 Done func(*tui.TextUI) <-chan struct {}
 Err func(*tui.TextUI) error
+Mode func(*tui.TextUI) tui.TUIMode
 ReadInput func(*tui.TextUI, context.Context) (tui.TextInput, error)
 ReadLine func(*tui.TextUI, context.Context) (string, error)
 Refresh func(*tui.TextUI) error
+ScrollToBottom func(*tui.TextUI) error
+ScrollToTop func(*tui.TextUI) error
+SetMode func(*tui.TextUI, tui.TUIMode) error
 Start func(*tui.TextUI) error
 Stop func(*tui.TextUI) error
 Suspend func(*tui.TextUI) error

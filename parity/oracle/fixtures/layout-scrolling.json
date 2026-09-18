@@ -1,0 +1,404 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/tui/src/layout.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "tui/layout-scrolling",
+    "catalog_id": "contract:tui/layout-scrolling",
+    "surface": "go-sdk",
+    "input": {
+      "allocation": [
+        {
+          "entries": [
+            {
+              "basis": 8,
+              "shrink": 1
+            },
+            {
+              "basis": 6,
+              "shrink": 1
+            }
+          ],
+          "intrinsic": [
+            8,
+            6
+          ],
+          "available": 8,
+          "gap": 1
+        },
+        {
+          "entries": [
+            {
+              "basis": 0,
+              "grow": 1,
+              "maxSize": 3
+            },
+            {
+              "basis": 0,
+              "grow": 2
+            }
+          ],
+          "intrinsic": [
+            0,
+            0
+          ],
+          "available": 11,
+          "gap": 1
+        },
+        {
+          "entries": [
+            {
+              "minSize": 4
+            },
+            {
+              "minSize": 2
+            }
+          ],
+          "intrinsic": [
+            10,
+            8
+          ],
+          "available": 3,
+          "gap": 0
+        }
+      ],
+      "scenario": "follow, history, append, resize, end, shrink, tiny viewport; nested hit; horizontal alignment",
+      "viewportSteps": [
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          12,
+          7
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          3
+        ]
+      ],
+      "initialRows": 12,
+      "appendRows": 2,
+      "scrollDelta": -3,
+      "mouse": {
+        "overscroll": [
+          "chain",
+          "contain"
+        ],
+        "wheelLines": 3,
+        "keys": [
+          "\u001b[<65;2;2M",
+          "\u001b[<65;2;5M",
+          "\u001b[H",
+          "\u001b[<0;12;2M",
+          "\u001b[<32;12;1M",
+          "\u001b[<0;12;1m"
+        ]
+      },
+      "trackDrag": {
+        "modes": [
+          "always",
+          "auto"
+        ],
+        "rows": 20,
+        "height": 5,
+        "keys": [
+          "\u001b[<0;12;4M",
+          "\u001b[<32;12;5M"
+        ]
+      }
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "states": [
+        {
+          "lines": [
+            "row 7",
+            "row 8",
+            "row 9",
+            "row 10",
+            "row 11",
+            "input",
+            "cursor"
+          ],
+          "top": 7,
+          "following": true,
+          "viewport": 5,
+          "geometry": {
+            "column": 11,
+            "trackTop": 0,
+            "trackHeight": 5,
+            "thumbTop": 3,
+            "thumbHeight": 2,
+            "maxScrollTop": 7
+          }
+        },
+        {
+          "lines": [
+            "row 4",
+            "row 5",
+            "row 6",
+            "row 7",
+            "row 8",
+            "input",
+            "cursor"
+          ],
+          "top": 4,
+          "following": false,
+          "viewport": 5,
+          "geometry": {
+            "column": 11,
+            "trackTop": 0,
+            "trackHeight": 5,
+            "thumbTop": 2,
+            "thumbHeight": 2,
+            "maxScrollTop": 7
+          }
+        },
+        {
+          "lines": [
+            "row 4",
+            "row 5",
+            "row 6",
+            "row 7",
+            "row 8",
+            "input",
+            "cursor"
+          ],
+          "top": 4,
+          "following": false,
+          "viewport": 5,
+          "geometry": {
+            "column": 11,
+            "trackTop": 0,
+            "trackHeight": 5,
+            "thumbTop": 1,
+            "thumbHeight": 2,
+            "maxScrollTop": 9
+          }
+        },
+        {
+          "lines": [
+            "row 4",
+            "row 5",
+            "row 6",
+            "row 7",
+            "input",
+            "cursor"
+          ],
+          "top": 4,
+          "following": false,
+          "viewport": 4,
+          "geometry": {
+            "column": 7,
+            "trackTop": 0,
+            "trackHeight": 4,
+            "thumbTop": 1,
+            "thumbHeight": 2,
+            "maxScrollTop": 10
+          }
+        },
+        {
+          "lines": [
+            "row 10",
+            "row 11",
+            "row 12",
+            "row 13",
+            "input",
+            "cursor"
+          ],
+          "top": 10,
+          "following": true,
+          "viewport": 4,
+          "geometry": {
+            "column": 7,
+            "trackTop": 0,
+            "trackHeight": 4,
+            "thumbTop": 2,
+            "thumbHeight": 2,
+            "maxScrollTop": 10
+          }
+        },
+        {
+          "lines": [
+            "short",
+            "",
+            "",
+            "",
+            "input",
+            "cursor"
+          ],
+          "top": 0,
+          "following": true,
+          "viewport": 4,
+          "geometry": {
+            "column": 7,
+            "trackTop": 0,
+            "trackHeight": 4,
+            "thumbTop": 0,
+            "thumbHeight": 4,
+            "maxScrollTop": 0
+          }
+        },
+        {
+          "lines": [
+            "short",
+            "input",
+            "cursor"
+          ],
+          "top": 0,
+          "following": true,
+          "viewport": 1,
+          "geometry": {
+            "column": 7,
+            "trackTop": 0,
+            "trackHeight": 1,
+            "thumbTop": 0,
+            "thumbHeight": 1,
+            "maxScrollTop": 0
+          }
+        }
+      ],
+      "mouse": [
+        {
+          "overscroll": "chain",
+          "positions": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "overscroll": "contain",
+          "positions": [
+            [
+              2,
+              1
+            ],
+            [
+              2,
+              4
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              0,
+              0
+            ],
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ],
+      "trackDrag": {
+        "always": [
+          0,
+          0
+        ],
+        "auto": [
+          0,
+          0
+        ]
+      },
+      "wideLines": [
+        "中",
+        "中"
+      ],
+      "allocation": [
+        [
+          3,
+          4
+        ],
+        [
+          3,
+          7
+        ],
+        [
+          4,
+          2
+        ]
+      ],
+      "hits": [
+        [
+          "inner",
+          "outer"
+        ],
+        [
+          "outer"
+        ],
+        []
+      ],
+      "horizontal": [
+        "",
+        "",
+        "input",
+        "curso short"
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:196f14357d8646ea64dfb50e9dab74fa23d1d314292f1d8c98566d38f4967828",
+  "observation_hash": "sha256:9f2f7c84f199862de0bd96366bffa62783a80c85c3547a4c0eb4ccf04f666860",
+  "execution_method": "node parity/oracle/layout-scrolling.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "colors": "stripped"
+  }
+}

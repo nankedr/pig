@@ -353,7 +353,7 @@ func TestPigInteractiveSIGINTPreservesSignalAfterCleanup(t *testing.T) {
 	}
 }
 
-func TestPigInteractiveFullscreenIsExplicitStub(t *testing.T) {
+func TestPigInteractiveFullscreen113(t *testing.T) {
 	binary := buildPigBinary(t)
 	for _, fromSettings := range []bool{false, true} {
 		t.Run(fmt.Sprint(fromSettings), func(t *testing.T) {
@@ -379,14 +379,20 @@ func TestPigInteractiveFullscreenIsExplicitStub(t *testing.T) {
 			cmd.Stdin = tty.Slave
 			cmd.Stdout = tty.Slave
 			cmd.Stderr = tty.Slave
-			err := cmd.Run()
-			if err == nil || ctx.Err() != nil {
-				t.Fatalf("fullscreen must fail explicitly: %v", err)
+			if err := cmd.Start(); err != nil {
+				t.Fatal(err)
 			}
-			tty.Wait(t, "InteractiveMode.fullscreen: not implemented")
-			if !tty.Restored(t) || strings.Contains(tty.Output(), "\x1b[?2004h") {
-				t.Fatal("fullscreen stub started terminal")
+			tty.Wait(t, "\x1b[?1049h")
+			tty.Wait(t, "> ")
+			tty.Send(t, "\x04")
+			if err := cmd.Wait(); err != nil {
+				t.Fatal(err)
 			}
+			tty.Wait(t, "\x1b[?1049l")
+			if !tty.Restored(t) {
+				t.Fatal("fullscreen did not restore terminal")
+			}
+
 		})
 	}
 }

@@ -104,19 +104,3 @@ type ScrollbarGeometry struct {
 	ThumbHeight  int
 	MaxScrollTop int
 }
-
-func GetScrollbarGeometry(*LayoutBox) (ScrollbarGeometry, bool, error) {
-	return ScrollbarGeometry{}, false, newNotImplemented("getScrollbarGeometry")
-}
-
-func RenderLayoutFrame(Component, int, int, func()) (LayoutFrame, error) {
-	return LayoutFrame{}, newNotImplemented("renderLayoutFrame")
-}
-
-func GetScrollViewBox(LayoutFrame, *ScrollView) (*LayoutBox, bool, error) {
-	return nil, false, newNotImplemented("getScrollViewBox")
-}
-
-func GetScrollViewsAt(LayoutFrame, int, int) ([]*ScrollView, error) {
-	return nil, newNotImplemented("getScrollViewsAt")
-}

@@ -1,6 +1,10 @@
 package tui
 
-import "context"
+import (
+	"context"
+	"sync"
+	"time"
+)
 
 // TextStyleFunc applies terminal styling to text. Themes use functions rather
 // than encoded color values so callers retain control of their ANSI library.
@@ -317,21 +321,24 @@ type ScrollViewOptions struct {
 	ScrollbarHideDelayMS *int64
 }
 
-// ScrollView is a single-child viewport contract. It records immutable options
-// but does not install hide timers or request renders in the scaffold.
+// ScrollView owns one child and preserves its viewport while reading history.
 type ScrollView struct {
-	Primary              bool
-	Overscroll           ScrollViewOverscroll
-	ScrollbarStyle       TextStyleFunc
-	child                Component
-	axis                 ScrollViewAxis
-	follow               ScrollViewFollow
-	followingEnd         bool
-	scrollbar            ScrollViewScrollbar
-	scrollTop            int
-	viewportHeight       int
-	contentHeight        int
-	scrollbarHideDelayMS int64
+	Primary                                    bool
+	Overscroll                                 ScrollViewOverscroll
+	ScrollbarStyle                             TextStyleFunc
+	child                                      Component
+	axis                                       ScrollViewAxis
+	follow                                     ScrollViewFollow
+	followingEnd                               bool
+	scrollbar                                  ScrollViewScrollbar
+	scrollTop                                  int
+	viewportHeight                             int
+	contentHeight                              int
+	scrollbarHideDelayMS                       int64
+	scrollMu                                   sync.Mutex
+	requestRender                              func()
+	scrollbarActive, transientScrollbarVisible bool
+	scrollbarTimer                             *time.Timer
 }
 
 func NewScrollView(component Component, options ...ScrollViewOptions) *ScrollView {
@@ -371,37 +378,6 @@ func (s *ScrollView) Children() []Component {
 	}
 	return []Component{s.child}
 }
-
-func (*ScrollView) AddChild(Component) error    { return newNotImplemented("ScrollView.addChild") }
-func (*ScrollView) RemoveChild(Component) error { return newNotImplemented("ScrollView.removeChild") }
-func (*ScrollView) Clear() error                { return newNotImplemented("ScrollView.clear") }
-func (*ScrollView) GetContentWidth(int) (int, error) {
-	return 0, newNotImplemented("ScrollView.getContentWidth")
-}
-func (*ScrollView) Invalidate() error      { return nil }
-func (s *ScrollView) IsFollowingEnd() bool { return s.followingEnd }
-func (s *ScrollView) IsScrollbarVisible() bool {
-	return s.scrollbar == ScrollViewScrollbarAlways && s.viewportHeight > 0
-}
-func (s *ScrollView) IsPrimary() bool                          { return s.Primary }
-func (s *ScrollView) OverscrollBehavior() ScrollViewOverscroll { return s.Overscroll }
-func (*ScrollView) Render(int) ([]string, error)               { return nil, newNotImplemented("ScrollView.render") }
-func (*ScrollView) ScrollBy(int) (int, error)                  { return 0, newNotImplemented("ScrollView.scrollBy") }
-func (*ScrollView) ScrollTo(int) error                         { return newNotImplemented("ScrollView.scrollTo") }
-func (*ScrollView) ScrollToEnd() error                         { return newNotImplemented("ScrollView.scrollToEnd") }
-func (*ScrollView) ScrollToStart() error                       { return newNotImplemented("ScrollView.scrollToStart") }
-func (s *ScrollView) ScrollTop() int                           { return s.scrollTop }
-func (s *ScrollView) Scrollbar() ScrollViewScrollbar           { return s.scrollbar }
-func (*ScrollView) SetScrollbar(ScrollViewScrollbar) error {
-	return newNotImplemented("ScrollView.setScrollbar")
-}
-func (*ScrollView) SetScrollbarActive(bool) error {
-	return newNotImplemented("ScrollView.setScrollbarActive")
-}
-func (*ScrollView) UpdateLayout(int, int, func()) error {
-	return newNotImplemented("ScrollView.updateLayout")
-}
-func (s *ScrollView) ViewportHeight() int { return s.viewportHeight }
 
 type SelectItem struct {
 	Value       string
@@ -572,7 +548,7 @@ func NewStack(children []StackChild, options ...StackOptions) *Stack {
 	s := &Stack{align: StackAlignStretch}
 	if len(options) != 0 {
 		if options[0].Gap != nil {
-			s.gap = *options[0].Gap
+			s.gap = max(0, *options[0].Gap)
 		}
 		if options[0].Align != nil {
 			s.align = *options[0].Align
@@ -596,49 +572,17 @@ func (s *Stack) Children() []Component {
 	return children
 }
 
-func (*Stack) AddChild(Component, ...StackEntryOptions) error {
-	return newNotImplemented("Stack.addChild")
-}
-func (*Stack) RemoveChild(Component) error  { return newNotImplemented("Stack.removeChild") }
-func (*Stack) Clear() error                 { return newNotImplemented("Stack.clear") }
-func (*Stack) Invalidate() error            { return nil }
-func (*Stack) Render(int) ([]string, error) { return nil, newNotImplemented("Stack.render") }
-
-func VisibleStackEntries([]StackEntry, LayoutViewport) ([]StackEntry, error) {
-	return nil, newNotImplemented("visibleStackEntries")
-}
-
-func AllocateStackSizes([]StackEntry, []int, *int, int) ([]int, error) {
-	return nil, newNotImplemented("allocateStackSizes")
-}
-
 type VStack struct{ Stack }
 
 func NewVStack(children []StackChild, options ...StackOptions) *VStack {
 	return &VStack{Stack: *NewStack(children, options...)}
 }
-func (*VStack) AddChild(Component, ...StackEntryOptions) error {
-	return newNotImplemented("VStack.addChild")
-}
-func (*VStack) RemoveChild(Component) error {
-	return newNotImplemented("VStack.removeChild")
-}
-func (*VStack) Clear() error                 { return newNotImplemented("VStack.clear") }
-func (*VStack) Render(int) ([]string, error) { return nil, newNotImplemented("VStack.render") }
 
 type HStack struct{ Stack }
 
 func NewHStack(children []StackChild, options ...StackOptions) *HStack {
 	return &HStack{Stack: *NewStack(children, options...)}
 }
-func (*HStack) AddChild(Component, ...StackEntryOptions) error {
-	return newNotImplemented("HStack.addChild")
-}
-func (*HStack) RemoveChild(Component) error {
-	return newNotImplemented("HStack.removeChild")
-}
-func (*HStack) Clear() error                 { return newNotImplemented("HStack.clear") }
-func (*HStack) Render(int) ([]string, error) { return nil, newNotImplemented("HStack.render") }
 
 type TruncatedText struct {
 	text     string

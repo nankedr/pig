@@ -1,0 +1,141 @@
+*tui.ScrollView
+AddChild func(*tui.ScrollView, tui.Component) error
+Children func(*tui.ScrollView) []tui.Component
+Clear func(*tui.ScrollView) error
+GetContentWidth func(*tui.ScrollView, int) (int, error)
+Invalidate func(*tui.ScrollView) error
+IsFollowingEnd func(*tui.ScrollView) bool
+IsPrimary func(*tui.ScrollView) bool
+IsScrollbarVisible func(*tui.ScrollView) bool
+LayoutNode func(*tui.ScrollView) tui.LayoutNode
+OverscrollBehavior func(*tui.ScrollView) tui.ScrollViewOverscroll
+RemoveChild func(*tui.ScrollView, tui.Component) error
+Render func(*tui.ScrollView, int) ([]string, error)
+ScrollBy func(*tui.ScrollView, int) (int, error)
+ScrollTo func(*tui.ScrollView, int) error
+ScrollToEnd func(*tui.ScrollView) error
+ScrollToStart func(*tui.ScrollView) error
+ScrollTop func(*tui.ScrollView) int
+Scrollbar func(*tui.ScrollView) tui.ScrollViewScrollbar
+SetScrollbar func(*tui.ScrollView, tui.ScrollViewScrollbar) error
+SetScrollbarActive func(*tui.ScrollView, bool) error
+UpdateLayout func(*tui.ScrollView, int, int, func()) error
+ViewportHeight func(*tui.ScrollView) int
+*tui.VStack
+AddChild func(*tui.VStack, tui.Component, ...tui.StackEntryOptions) error
+Children func(*tui.VStack) []tui.Component
+Clear func(*tui.VStack) error
+Invalidate func(*tui.VStack) error
+LayoutNode func(*tui.VStack) tui.LayoutNode
+RemoveChild func(*tui.VStack, tui.Component) error
+Render func(*tui.VStack, int) ([]string, error)
+*tui.HStack
+AddChild func(*tui.HStack, tui.Component, ...tui.StackEntryOptions) error
+Children func(*tui.HStack) []tui.Component
+Clear func(*tui.HStack) error
+Invalidate func(*tui.HStack) error
+LayoutNode func(*tui.HStack) tui.LayoutNode
+RemoveChild func(*tui.HStack, tui.Component) error
+Render func(*tui.HStack, int) ([]string, error)
+*tui.TUIAltScreen
+AddChild func(*tui.TUIAltScreen, tui.Component)
+AddInputListener func(*tui.TUIAltScreen, tui.TUIInputListener) (tui.TUIUnsubscribe, error)
+Children func(*tui.TUIAltScreen) []tui.Component
+Clear func(*tui.TUIAltScreen)
+Flash func(*tui.TUIAltScreen, string, ...int64) error
+FullRedraws func(*tui.TUIAltScreen) int
+GetClearOnShrink func(*tui.TUIAltScreen) bool
+GetFocusedComponent func(*tui.TUIAltScreen) tui.Component
+GetShowHardwareCursor func(*tui.TUIAltScreen) bool
+HandleInput func(*tui.TUIAltScreen, string) error
+HasOverlay func(*tui.TUIAltScreen) bool
+HasOverlayEntries func(*tui.TUIAltScreen) bool
+HideOverlay func(*tui.TUIAltScreen) error
+Invalidate func(*tui.TUIAltScreen) error
+IsFollowingOutput func(*tui.TUIAltScreen) bool
+IsViewportTUI func(*tui.TUIAltScreen) bool
+Mode func(*tui.TUIAltScreen) tui.TUIMode
+OnDebug func(*tui.TUIAltScreen) func()
+OnTerminalColorSchemeChange func(*tui.TUIAltScreen, tui.TerminalColorSchemeListener) (tui.TUIUnsubscribe, error)
+QueryTerminalBackgroundColor func(*tui.TUIAltScreen, context.Context, tui.TerminalColorQueryOptions) (tui.RGBColor, bool, error)
+QueryTerminalColorScheme func(*tui.TUIAltScreen, context.Context, tui.TerminalColorQueryOptions) (tui.TerminalColorScheme, bool, error)
+RemoveChild func(*tui.TUIAltScreen, tui.Component)
+RemoveInputListener func(*tui.TUIAltScreen, tui.TUIInputListener) error
+Render func(*tui.TUIAltScreen, int) ([]string, error)
+RenderNow func(*tui.TUIAltScreen, ...bool) error
+RequestRender func(*tui.TUIAltScreen, ...bool) error
+ScrollBy func(*tui.TUIAltScreen, int) error
+ScrollToBottom func(*tui.TUIAltScreen) error
+ScrollToTop func(*tui.TUIAltScreen) error
+SetClearOnShrink func(*tui.TUIAltScreen, bool) error
+SetFocus func(*tui.TUIAltScreen, tui.Component) error
+SetLayoutRoot func(*tui.TUIAltScreen, tui.Component) error
+SetOnDebug func(*tui.TUIAltScreen, func())
+SetShowHardwareCursor func(*tui.TUIAltScreen, bool) error
+SetTerminalColorSchemeNotifications func(*tui.TUIAltScreen, bool) error
+ShowOverlay func(*tui.TUIAltScreen, tui.Component, ...tui.OverlayOptions) (tui.OverlayHandle, error)
+Start func(*tui.TUIAltScreen) error
+Stop func(*tui.TUIAltScreen, ...tui.TUIStopOptions) error
+Terminal func(*tui.TUIAltScreen) tui.Terminal
+ViewportTop func(*tui.TUIAltScreen) int
+WantsKeyRelease func(*tui.TUIAltScreen) bool
+*tui.TUIMainScreen
+AddChild func(*tui.TUIMainScreen, tui.Component)
+AddInputListener func(*tui.TUIMainScreen, tui.TUIInputListener) (tui.TUIUnsubscribe, error)
+CaptureRenderState func(*tui.TUIMainScreen) tui.TUIMainScreenRenderState
+Children func(*tui.TUIMainScreen) []tui.Component
+Clear func(*tui.TUIMainScreen)
+FullRedraws func(*tui.TUIMainScreen) int
+GetClearOnShrink func(*tui.TUIMainScreen) bool
+GetFocusedComponent func(*tui.TUIMainScreen) tui.Component
+GetShowHardwareCursor func(*tui.TUIMainScreen) bool
+HandleInput func(*tui.TUIMainScreen, string) error
+HasOverlay func(*tui.TUIMainScreen) bool
+HasOverlayEntries func(*tui.TUIMainScreen) bool
+HideOverlay func(*tui.TUIMainScreen) error
+Invalidate func(*tui.TUIMainScreen) error
+Mode func(*tui.TUIMainScreen) tui.TUIMode
+OnDebug func(*tui.TUIMainScreen) func()
+OnTerminalColorSchemeChange func(*tui.TUIMainScreen, tui.TerminalColorSchemeListener) (tui.TUIUnsubscribe, error)
+QueryTerminalBackgroundColor func(*tui.TUIMainScreen, context.Context, tui.TerminalColorQueryOptions) (tui.RGBColor, bool, error)
+QueryTerminalColorScheme func(*tui.TUIMainScreen, context.Context, tui.TerminalColorQueryOptions) (tui.TerminalColorScheme, bool, error)
+RemoveChild func(*tui.TUIMainScreen, tui.Component)
+RemoveInputListener func(*tui.TUIMainScreen, tui.TUIInputListener) error
+Render func(*tui.TUIMainScreen, int) ([]string, error)
+RenderNow func(*tui.TUIMainScreen, ...bool) error
+RequestRender func(*tui.TUIMainScreen, ...bool) error
+RestoreRenderState func(*tui.TUIMainScreen, tui.TUIMainScreenRenderState) error
+SetClearOnShrink func(*tui.TUIMainScreen, bool) error
+SetFocus func(*tui.TUIMainScreen, tui.Component) error
+SetOnDebug func(*tui.TUIMainScreen, func())
+SetShowHardwareCursor func(*tui.TUIMainScreen, bool) error
+SetTerminalColorSchemeNotifications func(*tui.TUIMainScreen, bool) error
+ShowOverlay func(*tui.TUIMainScreen, tui.Component, ...tui.OverlayOptions) (tui.OverlayHandle, error)
+Start func(*tui.TUIMainScreen) error
+Stop func(*tui.TUIMainScreen, ...tui.TUIStopOptions) error
+Terminal func(*tui.TUIMainScreen) tui.Terminal
+WantsKeyRelease func(*tui.TUIMainScreen) bool
+*tui.TextUI
+AddToHistory func(*tui.TextUI, string) error
+Append func(*tui.TextUI, string) error
+ClearEditor func(*tui.TextUI) error
+Done func(*tui.TextUI) <-chan struct {}
+Err func(*tui.TextUI) error
+Mode func(*tui.TextUI) tui.TUIMode
+ReadInput func(*tui.TextUI, context.Context) (tui.TextInput, error)
+ReadLine func(*tui.TextUI, context.Context) (string, error)
+Refresh func(*tui.TextUI) error
+ScrollToBottom func(*tui.TextUI) error
+ScrollToTop func(*tui.TextUI) error
+SetMode func(*tui.TextUI, tui.TUIMode) error
+Start func(*tui.TextUI) error
+Stop func(*tui.TextUI) error
+Suspend func(*tui.TextUI) error
+tui.TextUIOptions
+Keybindings *tui.KeybindingsManager
+OnInterrupt func()
+RenderTranscript func(int, bool, bool) ([]string, error)
+HideThinking bool
+Mode tui.TUIMode
+Scrollbar tui.ScrollViewScrollbar
+PreserveScreen bool

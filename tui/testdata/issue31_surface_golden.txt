@@ -186,10 +186,8 @@ func WordWrapLine(line string, width int, preSegmented ...[]UnicodeSegment) ([]T
 reference: packages/tui/src/components/h-stack.ts#HStack
 target: github.com/nankedr/pig/tui.HStack
 type HStack struct{ Stack }
-func (*HStack) AddChild(Component, ...StackEntryOptions) error
-func (*HStack) Clear() error
-func (*HStack) RemoveChild(Component) error
-func (*HStack) Render(int) ([]string, error)
+func (s *HStack) LayoutNode() LayoutNode
+func (s *HStack) Render(width int) ([]string, error)
 
 ## symbol:tui/src/components/image.ts#Image
 reference: packages/tui/src/components/image.ts#Image
@@ -330,39 +328,44 @@ type MarkdownTheme struct {
 reference: packages/tui/src/components/scroll-view.ts#ScrollView
 target: github.com/nankedr/pig/tui.ScrollView
 type ScrollView struct {
-	Primary              bool
-	Overscroll           ScrollViewOverscroll
-	ScrollbarStyle       TextStyleFunc
-	child                Component
-	axis                 ScrollViewAxis
-	follow               ScrollViewFollow
-	followingEnd         bool
-	scrollbar            ScrollViewScrollbar
-	scrollTop            int
-	viewportHeight       int
-	contentHeight        int
-	scrollbarHideDelayMS int64
+	Primary                                    bool
+	Overscroll                                 ScrollViewOverscroll
+	ScrollbarStyle                             TextStyleFunc
+	child                                      Component
+	axis                                       ScrollViewAxis
+	follow                                     ScrollViewFollow
+	followingEnd                               bool
+	scrollbar                                  ScrollViewScrollbar
+	scrollTop                                  int
+	viewportHeight                             int
+	contentHeight                              int
+	scrollbarHideDelayMS                       int64
+	scrollMu                                   sync.Mutex
+	requestRender                              func()
+	scrollbarActive, transientScrollbarVisible bool
+	scrollbarTimer                             *time.Timer
 }
 func (*ScrollView) AddChild(Component) error
 func (*ScrollView) Clear() error
-func (*ScrollView) GetContentWidth(int) (int, error)
-func (*ScrollView) Invalidate() error
 func (*ScrollView) RemoveChild(Component) error
-func (*ScrollView) Render(int) ([]string, error)
-func (*ScrollView) ScrollBy(int) (int, error)
-func (*ScrollView) ScrollTo(int) error
-func (*ScrollView) ScrollToEnd() error
-func (*ScrollView) ScrollToStart() error
-func (*ScrollView) SetScrollbar(ScrollViewScrollbar) error
-func (*ScrollView) SetScrollbarActive(bool) error
-func (*ScrollView) UpdateLayout(int, int, func()) error
 func (s *ScrollView) Children() []Component
+func (s *ScrollView) GetContentWidth(width int) (int, error)
+func (s *ScrollView) Invalidate() error
 func (s *ScrollView) IsFollowingEnd() bool
 func (s *ScrollView) IsPrimary() bool
 func (s *ScrollView) IsScrollbarVisible() bool
+func (s *ScrollView) LayoutNode() LayoutNode
 func (s *ScrollView) OverscrollBehavior() ScrollViewOverscroll
+func (s *ScrollView) Render(width int) ([]string, error)
+func (s *ScrollView) ScrollBy(lines int) (int, error)
+func (s *ScrollView) ScrollTo(top int) error
+func (s *ScrollView) ScrollToEnd() error
+func (s *ScrollView) ScrollToStart() error
 func (s *ScrollView) ScrollTop() int
 func (s *ScrollView) Scrollbar() ScrollViewScrollbar
+func (s *ScrollView) SetScrollbar(mode ScrollViewScrollbar) error
+func (s *ScrollView) SetScrollbarActive(active bool) error
+func (s *ScrollView) UpdateLayout(content, viewport int, callback func()) error
 func (s *ScrollView) ViewportHeight() int
 
 ## symbol:tui/src/components/scroll-view.ts#ScrollViewOptions
@@ -504,12 +507,12 @@ type Stack struct {
 	gap     int
 	align   StackAlign
 }
-func (*Stack) AddChild(Component, ...StackEntryOptions) error
-func (*Stack) Clear() error
-func (*Stack) Invalidate() error
-func (*Stack) RemoveChild(Component) error
-func (*Stack) Render(int) ([]string, error)
+func (s *Stack) AddChild(c Component, options ...StackEntryOptions) error
 func (s *Stack) Children() []Component
+func (s *Stack) Clear() error
+func (s *Stack) Invalidate() error
+func (s *Stack) RemoveChild(c Component) error
+func (s *Stack) Render(width int) ([]string, error)
 
 ## symbol:tui/src/components/stack.ts#StackChild
 reference: packages/tui/src/components/stack.ts#StackChild
@@ -550,12 +553,12 @@ type StackOptions struct {
 ## symbol:tui/src/components/stack.ts#allocateStackSizes
 reference: packages/tui/src/components/stack.ts#allocateStackSizes
 target: github.com/nankedr/pig/tui.AllocateStackSizes
-func AllocateStackSizes([]StackEntry, []int, *int, int) ([]int, error)
+func AllocateStackSizes(entries []StackEntry, intrinsic []int, available *int, gap int) ([]int, error)
 
 ## symbol:tui/src/components/stack.ts#visibleStackEntries
 reference: packages/tui/src/components/stack.ts#visibleStackEntries
 target: github.com/nankedr/pig/tui.VisibleStackEntries
-func VisibleStackEntries([]StackEntry, LayoutViewport) ([]StackEntry, error)
+func VisibleStackEntries(entries []StackEntry, viewport LayoutViewport) ([]StackEntry, error)
 
 ## symbol:tui/src/components/text.ts#Text
 reference: packages/tui/src/components/text.ts#Text
@@ -586,10 +589,8 @@ func (*TruncatedText) Render(int) ([]string, error)
 reference: packages/tui/src/components/v-stack.ts#VStack
 target: github.com/nankedr/pig/tui.VStack
 type VStack struct{ Stack }
-func (*VStack) AddChild(Component, ...StackEntryOptions) error
-func (*VStack) Clear() error
-func (*VStack) RemoveChild(Component) error
-func (*VStack) Render(int) ([]string, error)
+func (s *VStack) LayoutNode() LayoutNode
+func (s *VStack) Render(width int) ([]string, error)
 
 ## symbol:tui/src/editor-component.ts#EditorComponent
 reference: packages/tui/src/editor-component.ts#EditorComponent
@@ -947,22 +948,22 @@ type ScrollbarGeometry struct {
 ## symbol:tui/src/layout.ts#getScrollViewBox
 reference: packages/tui/src/layout.ts#getScrollViewBox
 target: github.com/nankedr/pig/tui.GetScrollViewBox
-func GetScrollViewBox(LayoutFrame, *ScrollView) (*LayoutBox, bool, error)
+func GetScrollViewBox(frame LayoutFrame, scroll *ScrollView) (*LayoutBox, bool, error)
 
 ## symbol:tui/src/layout.ts#getScrollViewsAt
 reference: packages/tui/src/layout.ts#getScrollViewsAt
 target: github.com/nankedr/pig/tui.GetScrollViewsAt
-func GetScrollViewsAt(LayoutFrame, int, int) ([]*ScrollView, error)
+func GetScrollViewsAt(frame LayoutFrame, x, y int) ([]*ScrollView, error)
 
 ## symbol:tui/src/layout.ts#getScrollbarGeometry
 reference: packages/tui/src/layout.ts#getScrollbarGeometry
 target: github.com/nankedr/pig/tui.GetScrollbarGeometry
-func GetScrollbarGeometry(*LayoutBox) (ScrollbarGeometry, bool, error)
+func GetScrollbarGeometry(box *LayoutBox) (ScrollbarGeometry, bool, error)
 
 ## symbol:tui/src/layout.ts#renderLayoutFrame
 reference: packages/tui/src/layout.ts#renderLayoutFrame
 target: github.com/nankedr/pig/tui.RenderLayoutFrame
-func RenderLayoutFrame(Component, int, int, func()) (LayoutFrame, error)
+func RenderLayoutFrame(root Component, width, height int, request func()) (LayoutFrame, error)
 
 ## symbol:tui/src/native-modifiers.ts#ModifierKey
 reference: packages/tui/src/native-modifiers.ts#ModifierKey
@@ -1345,20 +1346,18 @@ type TUIAltScreen struct {
 	wheelScrollLines  int
 	mouseEnabled      bool
 	layoutRoot        Component
-	viewportTop       int
-	followingOutput   bool
 	openURL           func(string)
 	onRightClickPaste func()
 }
 func (*TUIAltScreen) Flash(string, ...int64) error
 func (*TUIAltScreen) IsViewportTUI() bool
 func (*TUIAltScreen) Mode() TUIMode
-func (*TUIAltScreen) Render(int) ([]string, error)
-func (*TUIAltScreen) ScrollBy(int) error
-func (*TUIAltScreen) ScrollToBottom() error
-func (*TUIAltScreen) ScrollToTop() error
-func (*TUIAltScreen) SetLayoutRoot(Component) error
 func (t *TUIAltScreen) IsFollowingOutput() bool
+func (t *TUIAltScreen) Render(width int) ([]string, error)
+func (t *TUIAltScreen) ScrollBy(lines int) error
+func (t *TUIAltScreen) ScrollToBottom() error
+func (t *TUIAltScreen) ScrollToTop() error
+func (t *TUIAltScreen) SetLayoutRoot(root Component) error
 func (t *TUIAltScreen) ViewportTop() int
 
 ## symbol:tui/src/tui-alt-screen.ts#TuiAltScreenOptions
@@ -1378,12 +1377,11 @@ reference: packages/tui/src/tui-main-screen.ts#TuiMainScreen
 target: github.com/nankedr/pig/tui.TUIMainScreen
 type TUIMainScreen struct {
 	*TUIBase
-	renderState TUIMainScreenRenderState
 }
 func (*TUIMainScreen) Mode() TUIMode
-func (*TUIMainScreen) Render(int) ([]string, error)
-func (*TUIMainScreen) RestoreRenderState(TUIMainScreenRenderState) error
 func (t *TUIMainScreen) CaptureRenderState() TUIMainScreenRenderState
+func (t *TUIMainScreen) Render(width int) ([]string, error)
+func (t *TUIMainScreen) RestoreRenderState(state TUIMainScreenRenderState) error
 
 ## symbol:tui/src/tui-main-screen.ts#TuiMainScreenRenderState
 reference: packages/tui/src/tui-main-screen.ts#TuiMainScreenRenderState
@@ -1539,34 +1537,48 @@ type TUIBase struct {
 	fullRedraws        int
 	focusedComponent   Component
 	overlays           []Component
+	renderMu           sync.Mutex
+	started            bool
+	screenMode         TUIMode
+	root               Component
+	frame              LayoutFrame
+	defaultScroll      *ScrollView
+	mouse              scrollMouse
+	wheelLines         int
+	mouseCapture       bool
+	renderWake         chan struct{}
+	renderStop         chan struct{}
+	listeners          map[uint64]TUIInputListener
+	listenerID         uint64
+	mainState          TUIMainScreenRenderState
 }
-func (*TUIBase) AddInputListener(TUIInputListener) (TUIUnsubscribe, error)
-func (*TUIBase) HandleInput(string) error
 func (*TUIBase) HideOverlay() error
 func (*TUIBase) Mode() TUIMode
 func (*TUIBase) OnTerminalColorSchemeChange(TerminalColorSchemeListener) (TUIUnsubscribe, error)
 func (*TUIBase) QueryTerminalBackgroundColor(context.Context, TerminalColorQueryOptions) (RGBColor, bool, error)
 func (*TUIBase) QueryTerminalColorScheme(context.Context, TerminalColorQueryOptions) (TerminalColorScheme, bool, error)
-func (*TUIBase) RemoveInputListener(TUIInputListener) error
-func (*TUIBase) Render(int) ([]string, error)
-func (*TUIBase) RenderNow(...bool) error
-func (*TUIBase) RequestRender(...bool) error
-func (*TUIBase) SetClearOnShrink(bool) error
-func (*TUIBase) SetFocus(Component) error
-func (*TUIBase) SetShowHardwareCursor(bool) error
 func (*TUIBase) SetTerminalColorSchemeNotifications(bool) error
 func (*TUIBase) ShowOverlay(Component, ...OverlayOptions) (OverlayHandle, error)
-func (*TUIBase) Start() error
-func (*TUIBase) Stop(...TUIStopOptions) error
 func (*TUIBase) WantsKeyRelease() bool
+func (t *TUIBase) AddInputListener(listener TUIInputListener) (TUIUnsubscribe, error)
 func (t *TUIBase) FullRedraws() int
 func (t *TUIBase) GetClearOnShrink() bool
 func (t *TUIBase) GetFocusedComponent() Component
 func (t *TUIBase) GetShowHardwareCursor() bool
+func (t *TUIBase) HandleInput(data string) error
 func (t *TUIBase) HasOverlay() bool
 func (t *TUIBase) HasOverlayEntries() bool
 func (t *TUIBase) OnDebug() func()
+func (t *TUIBase) RemoveInputListener(listener TUIInputListener) error
+func (t *TUIBase) Render(width int) ([]string, error)
+func (t *TUIBase) RenderNow(_ ...bool) error
+func (t *TUIBase) RequestRender(_ ...bool) error
+func (t *TUIBase) SetClearOnShrink(clear bool) error
+func (t *TUIBase) SetFocus(c Component) error
 func (t *TUIBase) SetOnDebug(callback func())
+func (t *TUIBase) SetShowHardwareCursor(show bool) error
+func (t *TUIBase) Start() error
+func (t *TUIBase) Stop(options ...TUIStopOptions) error
 func (t *TUIBase) Terminal() Terminal
 
 ## symbol:tui/src/tui.ts#TuiInputListener
@@ -1611,7 +1623,7 @@ type ViewportTUI interface {
 ## symbol:tui/src/tui.ts#compositeTuiLine
 reference: packages/tui/src/tui.ts#compositeTuiLine
 target: github.com/nankedr/pig/tui.CompositeTUILine
-func CompositeTUILine(string, string, int, int, int) (string, error)
+func CompositeTUILine(base, overlay string, start, width, total int) (string, error)
 
 ## symbol:tui/src/tui.ts#isFocusable
 reference: packages/tui/src/tui.ts#isFocusable

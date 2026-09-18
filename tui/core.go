@@ -3,6 +3,7 @@ package tui
 import (
 	"context"
 	"reflect"
+	"sync"
 )
 
 // CursorMarker is the zero-width marker emitted by a focused component at its
@@ -104,12 +105,6 @@ func sameComponent(left, right Component) bool {
 		return leftValue.Interface() == rightValue.Interface()
 	}
 	return false
-}
-
-// CompositeTUILine will provide ANSI- and grapheme-aware overlay composition
-// at the interactive TUI milestone.
-func CompositeTUILine(string, string, int, int, int) (string, error) {
-	return "", newNotImplemented("compositeTuiLine")
 }
 
 type OverlayAnchor string
@@ -261,6 +256,20 @@ type TUIBase struct {
 	fullRedraws        int
 	focusedComponent   Component
 	overlays           []Component
+	renderMu           sync.Mutex
+	started            bool
+	screenMode         TUIMode
+	root               Component
+	frame              LayoutFrame
+	defaultScroll      *ScrollView
+	mouse              scrollMouse
+	wheelLines         int
+	mouseCapture       bool
+	renderWake         chan struct{}
+	renderStop         chan struct{}
+	listeners          map[uint64]TUIInputListener
+	listenerID         uint64
+	mainState          TUIMainScreenRenderState
 }
 
 func NewTUIBase(terminal Terminal, options ...TUIBaseOptions) *TUIBase {
@@ -271,6 +280,8 @@ func NewTUIBase(terminal Terminal, options ...TUIBaseOptions) *TUIBase {
 			base.showHardwareCursor = *options[0].ShowHardwareCursor
 		}
 	}
+	base.wheelLines = 1
+	base.renderWake = make(chan struct{}, 1)
 	return base
 }
 
@@ -285,26 +296,9 @@ func (t *TUIBase) GetClearOnShrink() bool         { return t.clearOnShrink }
 func (t *TUIBase) GetFocusedComponent() Component { return t.focusedComponent }
 func (t *TUIBase) HasOverlay() bool               { return len(t.overlays) != 0 }
 func (*TUIBase) WantsKeyRelease() bool            { return false }
-func (*TUIBase) HandleInput(string) error         { return newNotImplemented("TUIBase.handleInput") }
-func (*TUIBase) Render(int) ([]string, error)     { return nil, newNotImplemented("TUIBase.render") }
-func (*TUIBase) Start() error                     { return newNotImplemented("TUIBase.start") }
-func (*TUIBase) Stop(...TUIStopOptions) error     { return newNotImplemented("TUIBase.stop") }
-func (*TUIBase) RenderNow(...bool) error          { return newNotImplemented("TUIBase.renderNow") }
-func (*TUIBase) RequestRender(...bool) error      { return newNotImplemented("TUIBase.requestRender") }
-func (*TUIBase) SetFocus(Component) error         { return newNotImplemented("TUIBase.setFocus") }
 func (*TUIBase) HideOverlay() error               { return newNotImplemented("TUIBase.hideOverlay") }
-func (*TUIBase) SetShowHardwareCursor(bool) error {
-	return newNotImplemented("TUIBase.setShowHardwareCursor")
-}
-func (*TUIBase) SetClearOnShrink(bool) error { return newNotImplemented("TUIBase.setClearOnShrink") }
 func (*TUIBase) ShowOverlay(Component, ...OverlayOptions) (OverlayHandle, error) {
 	return nil, newNotImplemented("TUIBase.showOverlay")
-}
-func (*TUIBase) AddInputListener(TUIInputListener) (TUIUnsubscribe, error) {
-	return nil, newNotImplemented("TUIBase.addInputListener")
-}
-func (*TUIBase) RemoveInputListener(TUIInputListener) error {
-	return newNotImplemented("TUIBase.removeInputListener")
 }
 func (*TUIBase) OnTerminalColorSchemeChange(TerminalColorSchemeListener) (TUIUnsubscribe, error) {
 	return nil, newNotImplemented("TUIBase.onTerminalColorSchemeChange")
@@ -333,14 +327,14 @@ type TUIAltScreen struct {
 	wheelScrollLines  int
 	mouseEnabled      bool
 	layoutRoot        Component
-	viewportTop       int
-	followingOutput   bool
 	openURL           func(string)
 	onRightClickPaste func()
 }
 
 func NewTUIAltScreen(terminal Terminal, options ...TUIAltScreenOptions) *TUIAltScreen {
-	alt := &TUIAltScreen{TUIBase: NewTUIBase(terminal), wheelScrollLines: 1, mouseEnabled: true, followingOutput: true}
+	alt := &TUIAltScreen{TUIBase: NewTUIBase(terminal), wheelScrollLines: 1, mouseEnabled: true}
+	alt.screenMode = TUIModeFullscreen
+	alt.mouseCapture = true
 	if len(options) == 0 {
 		return alt
 	}
@@ -355,30 +349,16 @@ func NewTUIAltScreen(terminal Terminal, options ...TUIAltScreenOptions) *TUIAltS
 	if option.Mouse != nil {
 		alt.mouseEnabled = *option.Mouse
 	}
+	alt.screenMode = TUIModeFullscreen
+	alt.wheelLines = max(1, alt.wheelScrollLines)
+	alt.mouseCapture = alt.mouseEnabled
 	alt.openURL = option.OpenURL
 	alt.onRightClickPaste = option.OnRightClickPaste
 	return alt
 }
 
-func (*TUIAltScreen) Mode() TUIMode             { return TUIModeFullscreen }
-func (*TUIAltScreen) IsViewportTUI() bool       { return true }
-func (t *TUIAltScreen) ViewportTop() int        { return t.viewportTop }
-func (t *TUIAltScreen) IsFollowingOutput() bool { return t.followingOutput }
-func (*TUIAltScreen) Render(int) ([]string, error) {
-	return nil, newNotImplemented("TUIAltScreen.render")
-}
-func (*TUIAltScreen) SetLayoutRoot(Component) error {
-	return newNotImplemented("TUIAltScreen.setLayoutRoot")
-}
-func (*TUIAltScreen) ScrollBy(int) error {
-	return newNotImplemented("TUIAltScreen.scrollBy")
-}
-func (*TUIAltScreen) ScrollToTop() error {
-	return newNotImplemented("TUIAltScreen.scrollToTop")
-}
-func (*TUIAltScreen) ScrollToBottom() error {
-	return newNotImplemented("TUIAltScreen.scrollToBottom")
-}
+func (*TUIAltScreen) Mode() TUIMode       { return TUIModeFullscreen }
+func (*TUIAltScreen) IsViewportTUI() bool { return true }
 func (*TUIAltScreen) Flash(string, ...int64) error {
 	return newNotImplemented("TUIAltScreen.flash")
 }
@@ -395,7 +375,6 @@ type TUIMainScreenRenderState struct {
 
 type TUIMainScreen struct {
 	*TUIBase
-	renderState TUIMainScreenRenderState
 }
 
 func NewTUIMainScreen(terminal Terminal, options ...TUIBaseOptions) *TUIMainScreen {
@@ -403,17 +382,6 @@ func NewTUIMainScreen(terminal Terminal, options ...TUIBaseOptions) *TUIMainScre
 }
 
 func (*TUIMainScreen) Mode() TUIMode { return TUIModeRegular }
-func (*TUIMainScreen) Render(int) ([]string, error) {
-	return nil, newNotImplemented("TUIMainScreen.render")
-}
-func (t *TUIMainScreen) CaptureRenderState() TUIMainScreenRenderState {
-	state := t.renderState
-	state.PreviousLines = append([]string(nil), state.PreviousLines...)
-	return state
-}
-func (*TUIMainScreen) RestoreRenderState(TUIMainScreenRenderState) error {
-	return newNotImplemented("TUIMainScreen.restoreRenderState")
-}
 
 var (
 	_ TUI         = (*TUIBase)(nil)

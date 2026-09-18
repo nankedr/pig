@@ -3,17 +3,15 @@ package tui
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/rivo/uniseg"
 )
 
-// TextUI is the minimal text conversation renderer. Advanced layouts remain separate capabilities.
+// TextUI renders a scrollable conversation and multiline editor.
 type TextUI struct {
+	renderWake             chan struct{}
 	terminal               Terminal
 	mu                     sync.Mutex
 	transcript             string
@@ -29,6 +27,12 @@ type TextUI struct {
 	generation             uint64
 	renderTranscript       func(int, bool, bool) ([]string, error)
 	expanded, hideThinking bool
+	mode                   TUIMode
+	scroll                 *ScrollView
+	frame                  LayoutFrame
+	mouse                  scrollMouse
+	scrollbar              ScrollViewScrollbar
+	exitTranscript         bool
 }
 
 type TextInput struct {
@@ -40,6 +44,9 @@ type TextUIOptions struct {
 	OnInterrupt      func()
 	RenderTranscript func(width int, toolsExpanded, hideThinking bool) ([]string, error)
 	HideThinking     bool
+	Mode             TUIMode
+	Scrollbar        ScrollViewScrollbar
+	PreserveScreen   bool
 }
 
 func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
@@ -49,6 +56,9 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 		u.onInterrupt = options[0].OnInterrupt
 		u.renderTranscript = options[0].RenderTranscript
 		u.hideThinking = options[0].HideThinking
+		u.mode = options[0].Mode
+		u.scrollbar = options[0].Scrollbar
+		u.exitTranscript = !options[0].PreserveScreen
 	}
 	if u.keybindings == nil {
 		defs := NewTUIKeybindings()
@@ -61,6 +71,15 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 		}
 		u.keybindings = NewKeybindingsManager(defs)
 	}
+	if u.mode == "" {
+		u.mode = TUIModeRegular
+	}
+	if u.scrollbar == "" {
+		u.scrollbar = ScrollViewScrollbarAuto
+	}
+	follow := ScrollViewFollowEnd
+	u.scroll = NewScrollView(nil, ScrollViewOptions{Follow: &follow, Scrollbar: &u.scrollbar})
+	u.renderWake = make(chan struct{}, 1)
 	u.editor.keybindings = u.keybindings
 	u.editor.kitty = func() bool { active, _ := u.terminal.KittyProtocolActive(); return active }
 	u.editor.Focused = true
@@ -90,6 +109,9 @@ func (u *TextUI) Start() error {
 	}
 	u.started = true
 	u.mu.Unlock()
+	if u.mode != TUIModeRegular && u.mode != TUIModeFullscreen {
+		return errors.New("invalid TUI mode")
+	}
 	if u.terminal == nil {
 		return errors.New("text UI requires a terminal")
 	}
@@ -97,12 +119,28 @@ func (u *TextUI) Start() error {
 		return errors.Join(err, u.Stop())
 	}
 	u.mu.Lock()
+	if u.mode == TUIModeFullscreen {
+		if err := u.terminal.Write(enterAltScreen + enableMouse()); err != nil {
+			u.mu.Unlock()
+			return errors.Join(err, u.Stop())
+		}
+	}
 	err := u.render()
 	u.mu.Unlock()
 	if err != nil {
 		return errors.Join(err, u.Stop())
 	}
 	u.watchTerminal()
+	go func() {
+		for {
+			select {
+			case <-u.done:
+				return
+			case <-u.renderWake:
+				_ = u.Refresh()
+			}
+		}
+	}()
 	return nil
 }
 func (u *TextUI) Stop() error {
@@ -112,7 +150,19 @@ func (u *TextUI) Stop() error {
 	u.started = false
 	u.mu.Unlock()
 	if started && u.terminal != nil {
-		return errors.Join(u.terminal.DrainInput(context.Background(), time.Second, 50*time.Millisecond), u.terminal.Stop())
+		var screenErr error
+		if u.mode == TUIModeFullscreen {
+			screenErr = u.terminal.Write(leaveAltScreen)
+			if u.exitTranscript && u.renderTranscript != nil {
+				width, _ := u.terminal.Columns()
+				lines, err := u.renderTranscript(max(1, width), u.expanded, u.hideThinking)
+				screenErr = errors.Join(screenErr, err)
+				if err == nil {
+					screenErr = errors.Join(screenErr, u.terminal.Write(strings.Join(lines, "\r\n")+"\r\n"))
+				}
+			}
+		}
+		return errors.Join(screenErr, u.terminal.DrainInput(context.Background(), time.Second, 50*time.Millisecond), u.terminal.Stop())
 	}
 	return nil
 }
@@ -199,26 +249,24 @@ func (u *TextUI) render() error {
 		u.finish(err)
 		return err
 	}
-	columns = max(4, columns)
+	columns = max(1, columns)
 	rows = max(1, rows)
 	u.editor.terminalRows = rows
-	editorLines, err := u.editor.Render(columns - 2)
+	prefixWidth := min(2, columns-1)
+	editorLines, err := u.editor.Render(columns - prefixWidth)
 	if err != nil {
 		return err
 	}
 	editorLines = editorLines[1 : len(editorLines)-1]
-	cursorRow, cursorCol := 0, 2
+	cursorRow := 0
 	for i, line := range editorLines {
-		if n := strings.Index(line, CursorMarker); n >= 0 {
+		if strings.Contains(line, CursorMarker) {
 			cursorRow = i
-			cursorCol = 2 + uniseg.StringWidth(line[:n])
-			editorLines[i] = strings.ReplaceAll(line, CursorMarker, "")
 		}
 	}
 	if len(editorLines) > rows {
 		start := max(0, cursorRow-rows+1)
 		editorLines = editorLines[start:min(len(editorLines), start+rows)]
-		cursorRow -= start
 	}
 	var lines []string
 	if u.renderTranscript != nil {
@@ -233,19 +281,38 @@ func (u *TextUI) render() error {
 		lines = append(lines, extra...)
 	}
 	available := max(0, rows-len(editorLines))
-	if len(lines) > available {
-		lines = lines[len(lines)-available:]
+	content := renderedLines(lines)
+	u.scroll.child = &content
+	if u.mode == TUIModeFullscreen {
+		_ = u.scroll.UpdateLayout(len(lines), available, func() {
+			select {
+			case u.renderWake <- struct{}{}:
+			default:
+			}
+		})
+	} else {
+		_ = u.scroll.UpdateLayout(len(lines), available, nil)
 	}
-	cursorRow += len(lines)
+	top := u.scroll.ScrollTop()
+	visible := append([]string(nil), lines[top:min(len(lines), top+available)]...)
+	if u.mode == TUIModeFullscreen {
+		visible = append(visible, make([]string, max(0, available-len(visible)))...)
+	}
+	clip := LayoutRect{Width: columns, Height: len(visible)}
+	box := &LayoutBox{Rect: clip, Clip: clip, ScrollView: u.scroll, ScrollContentLines: lines}
+	u.frame = LayoutFrame{Root: box, Width: columns, Height: rows, PrimaryScrollView: u.scroll}
+	if u.mode == TUIModeFullscreen {
+		paintLayout(box, visible, columns)
+	}
 	for i, line := range editorLines {
 		prefix := "  "
 		if i == 0 {
 			prefix = "> "
 		}
-		lines = append(lines, prefix+line)
+		visible = append(visible, prefix[:prefixWidth]+line)
 	}
-	frame := strings.Join(lines, "\r\n")
-	err = u.terminal.Write("\x1b[H\x1b[2J" + frame + fmt.Sprintf("\x1b[%d;%dH\x1b[?25h", cursorRow+1, cursorCol+1))
+	err = u.terminal.Write(screenFrame(visible, columns, rows, true))
+
 	if err != nil {
 		u.finish(err)
 	}
@@ -262,6 +329,19 @@ func (u *TextUI) input(data string) {
 	}
 	active, _ := u.terminal.KittyProtocolActive()
 	match := func(action Keybinding) bool { return u.keybindings.matches(data, action, active) }
+	if !strings.HasPrefix(data, "\x1b[200~") {
+		scrollInput := u.mode == TUIModeFullscreen || match(KeybindingAltScreenPageUp) || match(KeybindingAltScreenPageDown)
+		if scrollInput {
+			if handled, err := u.mouse.handle(data, u.frame, u.scroll, 1, u.keybindings, active); handled || err != nil {
+				if err != nil {
+					u.finish(err)
+				} else {
+					_ = u.render()
+				}
+				return
+			}
+		}
+	}
 	switch {
 	case strings.HasPrefix(data, "\x1b[200~"):
 		_ = u.editor.HandleInput(data)
@@ -335,6 +415,11 @@ func (u *TextUI) Suspend() error {
 	}
 	u.generation++
 	u.mu.Unlock()
+	if u.mode == TUIModeFullscreen {
+		if err := u.terminal.Write(leaveAltScreen); err != nil {
+			return err
+		}
+	}
 	if err := u.terminal.Stop(); err != nil {
 		return err
 	}
@@ -344,8 +429,64 @@ func (u *TextUI) Suspend() error {
 	if err := u.terminal.Start(u.input, func() { u.mu.Lock(); defer u.mu.Unlock(); _ = u.render() }); err != nil {
 		return err
 	}
+	if u.mode == TUIModeFullscreen {
+		if err := u.terminal.Write(enterAltScreen + enableMouse()); err != nil {
+			return err
+		}
+	}
 	u.watchTerminal()
 	u.mu.Lock()
 	defer u.mu.Unlock()
+	return u.render()
+}
+
+type renderedLines []string
+
+func (l *renderedLines) Render(int) ([]string, error) { return []string(*l), nil }
+func (*renderedLines) Invalidate() error              { return nil }
+func (u *TextUI) Mode() TUIMode                       { u.mu.Lock(); defer u.mu.Unlock(); return u.mode }
+func (u *TextUI) SetMode(mode TUIMode) error {
+	if mode != TUIModeRegular && mode != TUIModeFullscreen {
+		return errors.New("invalid TUI mode")
+	}
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	if u.stopped {
+		return errors.New("text UI is stopped")
+	}
+	if mode == u.mode {
+		return nil
+	}
+	if u.started && !u.stopped {
+		seq := leaveAltScreen
+		if mode == TUIModeFullscreen {
+			seq = enterAltScreen + enableMouse()
+		}
+		if err := u.terminal.Write(seq); err != nil {
+			u.finish(err)
+			return err
+		}
+	}
+	u.mode = mode
+	u.mouse = scrollMouse{}
+	if u.started {
+		return u.render()
+	}
+	return nil
+}
+func (u *TextUI) ScrollToTop() error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	if err := u.scroll.ScrollToStart(); err != nil {
+		return err
+	}
+	return u.render()
+}
+func (u *TextUI) ScrollToBottom() error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	if err := u.scroll.ScrollToEnd(); err != nil {
+		return err
+	}
 	return u.render()
 }

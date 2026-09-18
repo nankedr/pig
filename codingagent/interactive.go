@@ -53,10 +53,15 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 		manager = &bindings.KeybindingsManager
 	}
 	hide := false
+	scrollbar := tui.ScrollViewScrollbarAuto
+	preserve := false
 	if runtime != nil && runtime.Session() != nil {
 		hide, _ = runtime.Session().SettingsManager().GetHideThinkingBlock()
+		scrollbar, _ = runtime.Session().SettingsManager().GetFullscreenScrollbar()
+		exit, _ := runtime.Session().SettingsManager().GetFullscreenExitOutput()
+		preserve = exit != FullscreenExitOutputTranscript
 	}
-	mode.ui = tui.NewTextUI(terminal, tui.TextUIOptions{Keybindings: manager, HideThinking: hide, RenderTranscript: func(width int, expanded, hide bool) ([]string, error) {
+	mode.ui = tui.NewTextUI(terminal, tui.TextUIOptions{Mode: mode.options.TUIMode, Scrollbar: scrollbar, PreserveScreen: preserve, Keybindings: manager, HideThinking: hide, RenderTranscript: func(width int, expanded, hide bool) ([]string, error) {
 		mode.transcript.SetExpanded(expanded)
 		mode.transcript.SetHideThinkingBlock(hide)
 		return mode.transcript.Render(width)
@@ -100,9 +105,7 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 	if len(m.options.InitialImages) > 0 {
 		return notImplemented("InteractiveMode.images")
 	}
-	if m.options.TUIMode != "" && m.options.TUIMode != tui.TUIModeRegular {
-		return notImplemented("InteractiveMode.fullscreen")
-	}
+
 	if err := m.ui.Start(); err != nil {
 		return err
 	}
