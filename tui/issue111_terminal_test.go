@@ -4,10 +4,13 @@ package tui_test
 
 import (
 	"context"
-	"github.com/nankedr/pig/internal/terminaltest"
-	"github.com/nankedr/pig/tui"
+	"fmt"
+	"strings"
 	"testing"
 	"time"
+
+	"github.com/nankedr/pig/internal/terminaltest"
+	"github.com/nankedr/pig/tui"
 )
 
 func TestTerminalNegotiationRestart111(t *testing.T) {
@@ -62,5 +65,57 @@ func TestTerminalNegotiationRestart111(t *testing.T) {
 			t.Fatalf("late callback %q", got)
 		case <-time.After(30 * time.Millisecond):
 		}
+	}
+}
+
+func TestTerminalCallbackLifecycle111(t *testing.T) {
+	for _, test := range []struct {
+		key   string
+		drain bool
+	}{{"a", false}, {"\x1b", false}, {"a", true}, {"\x1b", true}} {
+		t.Run(fmt.Sprintf("%q/drain=%v", test.key, test.drain), func(t *testing.T) {
+			tty := terminaltest.Open(t)
+			terminal := tui.NewProcessTerminal(tty.Slave, tty.Slave)
+			finished := make(chan error, 1)
+			entered, release := make(chan struct{}), make(chan struct{})
+			if err := terminal.Start(func(string) {
+				close(entered)
+				<-release
+				if test.drain {
+					if err := terminal.DrainInput(context.Background(), 20*time.Millisecond, time.Millisecond); err != nil {
+						finished <- err
+						return
+					}
+				}
+				finished <- terminal.Stop()
+			}, nil); err != nil {
+				t.Fatal(err)
+			}
+			tty.Send(t, test.key)
+			select {
+			case <-entered:
+			case <-time.After(time.Second):
+				t.Fatal("input callback not entered")
+			}
+			tty.Send(t, strings.Repeat("x", 256))
+			time.Sleep(20 * time.Millisecond)
+			close(release)
+			select {
+			case err := <-finished:
+				if err != nil {
+					t.Fatal(err)
+				}
+			case <-time.After(time.Second):
+				t.Fatal("input callback could not drain and stop terminal")
+			}
+			if !tty.Restored(t) {
+				t.Fatal("raw mode left enabled")
+			}
+			select {
+			case <-terminal.Done():
+			case <-time.After(time.Second):
+				t.Fatal("terminal callback dispatcher did not finish")
+			}
+		})
 	}
 }

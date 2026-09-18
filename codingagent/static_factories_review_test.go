@@ -119,9 +119,6 @@ func TestStaticFactoryProjectionsAreInertCapabilityStubs(t *testing.T) {
 				OnListenerError: func(error) { callbackCalls++ },
 			})
 		}},
-		{"NewKeybindingsManager", func() (any, error) {
-			return codingagent.NewKeybindingsManager(invalidPath)
-		}},
 		{"NewModelRuntime", func() (any, error) {
 			return codingagent.NewModelRuntime(canceled, codingagent.CreateModelRuntimeOptions{
 				AuthPath:        invalidPath,

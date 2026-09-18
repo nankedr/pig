@@ -743,7 +743,11 @@ func TestIssue32InheritedTUIMemberProjectionsResolve(t *testing.T) {
 		if !strings.HasPrefix(entry.Mapping.Target, issue32TUIPackage+".") {
 			continue
 		}
-		if entry.Mapping.Module != "codingagent" || entry.Mapping.Kind != "contract" || entry.Status != catalog.StatusInventoried {
+		wantStatus := catalog.StatusInventoried
+		if strings.HasPrefix(entry.Mapping.Target, issue32TUIPackage+".KeybindingsManager.") {
+			wantStatus = catalog.StatusPartial
+		}
+		if entry.Mapping.Module != "codingagent" || entry.Mapping.Kind != "contract" || entry.Status != wantStatus {
 			t.Errorf("%s has invalid inherited dependency projection: %+v", entry.ID, entry)
 		}
 		typeName, member, ok := strings.Cut(strings.TrimPrefix(entry.Mapping.Target, issue32TUIPackage+"."), ".")
@@ -796,8 +800,8 @@ func TestIssue32ScaffoldedStaticMemberTargetsResolve(t *testing.T) {
 			wrongKind[name] = true
 		}
 	}
-	if resolved != 14 {
-		t.Errorf("resolved Coding Agent static-member rows = %d, want 14", resolved)
+	if resolved != 13 {
+		t.Errorf("resolved Coding Agent static-member rows = %d, want 13", resolved)
 	}
 	if len(missing) != 0 || len(wrongKind) != 0 {
 		t.Fatalf("unresolved scaffolded static targets: missing declarations=%v non-package-functions=%v", issue32SortedKeys(missing), issue32SortedKeys(wrongKind))

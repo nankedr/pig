@@ -31,6 +31,19 @@ var csiKey = regexp.MustCompile(`^\x1b\[(\d+)(?::(\d*))?(?::(\d+))?(?:;(\d+))?(?
 var csiFunctional = regexp.MustCompile(`^\x1b\[(\d+)(?:;(\d+))?(?::(\d+))?([~ABCDHF])$`)
 var modifyKey = regexp.MustCompile(`^\x1b\[27;(\d+);(\d+)~$`)
 
+const (
+	keyUp       = -1
+	keyDown     = -2
+	keyRight    = -3
+	keyLeft     = -4
+	keyDelete   = -10
+	keyInsert   = -11
+	keyPageUp   = -12
+	keyPageDown = -13
+	keyHome     = -14
+	keyEnd      = -15
+)
+
 type terminalKey struct {
 	cp, shifted, base, mod int
 	kitty                  bool
@@ -57,9 +70,9 @@ func parseTerminalKey(data string) (terminalKey, bool) {
 	if m := csiFunctional.FindStringSubmatch(data); m != nil {
 		cp := 0
 		if m[4] == "~" {
-			cp = map[int]int{2: -11, 3: -10, 5: -12, 6: -13, 7: -14, 8: -15}[number(m[1])]
+			cp = map[int]int{2: keyInsert, 3: keyDelete, 5: keyPageUp, 6: keyPageDown, 7: keyHome, 8: keyEnd}[number(m[1])]
 		} else if m[1] == "1" && m[2] != "" {
-			cp = map[string]int{"A": -1, "B": -2, "C": -3, "D": -4, "H": -14, "F": -15}[m[4]]
+			cp = map[string]int{"A": keyUp, "B": keyDown, "C": keyRight, "D": keyLeft, "H": keyHome, "F": keyEnd}[m[4]]
 		}
 		if cp != 0 {
 			mod := 0
@@ -76,7 +89,7 @@ func keypad(cp int) int {
 		return cp - 57399 + 48
 	}
 	if cp >= 57409 && cp <= 57426 {
-		return []int{46, 47, 42, 45, 43, 57414, 61, 44, -4, -3, -1, -2, -12, -13, -14, -15, -11, -10}[cp-57409]
+		return []int{46, 47, 42, 45, 43, 57414, 61, 44, keyLeft, keyRight, keyUp, keyDown, keyPageUp, keyPageDown, keyHome, keyEnd, keyInsert, keyDelete}[cp-57409]
 	}
 	return cp
 }
@@ -96,7 +109,7 @@ func formatKey(cp, mod, base int) (KeyID, bool) {
 	if !knownLetter(cp) && !(cp >= 48 && cp <= 57) && !knownSymbol(cp) && base >= 0 {
 		cp = base
 	}
-	key := map[int]string{27: "escape", 9: "tab", 13: "enter", 57414: "enter", 32: "space", 127: "backspace", -1: "up", -2: "down", -3: "right", -4: "left", -10: "delete", -11: "insert", -12: "pageUp", -13: "pageDown", -14: "home", -15: "end"}[cp]
+	key := map[int]string{27: "escape", 9: "tab", 13: "enter", 57414: "enter", 32: "space", 127: "backspace", keyUp: "up", keyDown: "down", keyRight: "right", keyLeft: "left", keyDelete: "delete", keyInsert: "insert", keyPageUp: "pageUp", keyPageDown: "pageDown", keyHome: "home", keyEnd: "end"}[cp]
 	if key == "" && (knownLetter(cp) || cp >= 48 && cp <= 57 || knownSymbol(cp)) {
 		key = string(rune(cp))
 	}
@@ -183,7 +196,7 @@ func matchesKey(data string, id KeyID, active bool) bool {
 	if name == "return" {
 		name = "enter"
 	}
-	cp, special := map[string]int{"escape": 27, "enter": 13, "tab": 9, "space": 32, "backspace": 127, "up": -1, "down": -2, "right": -3, "left": -4, "delete": -10, "insert": -11, "pageup": -12, "pagedown": -13, "home": -14, "end": -15}[name]
+	cp, special := map[string]int{"escape": 27, "enter": 13, "tab": 9, "space": 32, "backspace": 127, "up": keyUp, "down": keyDown, "right": keyRight, "left": keyLeft, "delete": keyDelete, "insert": keyInsert, "pageup": keyPageUp, "pagedown": keyPageDown, "home": keyHome, "end": keyEnd}[name]
 	printable := len(name) == 1 && (knownLetter(int(name[0])) || name[0] >= '0' && name[0] <= '9' || knownSymbol(int(name[0])))
 	if printable {
 		cp = int(name[0])

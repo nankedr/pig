@@ -55,7 +55,7 @@ func TestIssue111TerminalKeysCatalog(t *testing.T) {
 		{"go-test", "codingagent/issue109_interactive_test.go", "go test -race ./codingagent -run '^TestInteractiveSDKInterruptKey111$' -count=1"},
 		{"go-test", "tui/testdata/issue31_surface_golden.txt", "go test ./tui -run '^TestIssue31LockedGoAPISnapshot$' -count=1"},
 		{"go-test", "cmd/pig/issue111_suspend_test.go", "go test ./cmd/pig -run '^TestPigSuspend111$' -count=1"},
-		{"go-test", "tui/issue111_terminal_test.go", "go test -race ./tui -run '^TestTerminalNegotiationRestart111$' -count=1"},
+		{"go-test", "tui/issue111_terminal_test.go", "go test -race ./tui -run '^TestTerminal(NegotiationRestart|CallbackLifecycle)111$' -count=1"},
 		{"go-test", "tui/issue111_buffer_test.go", "go test -race ./tui -run '^TestStdinBuffer.*111$' -count=1"},
 		{"go-test", "codingagent/issue111_keybindings_test.go", "go test ./codingagent -run '^TestKeybindingsFile111$' -count=1"},
 		{"manual", "examples/terminal-keys/main.go", "go run ./examples/terminal-keys"},

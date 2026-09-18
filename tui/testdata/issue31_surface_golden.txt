@@ -1271,6 +1271,8 @@ type ProcessTerminal struct {
 	file                    *os.File
 	stop                    chan struct{}
 	done                    chan struct{}
+	readDone                chan struct{}
+	inputStop               chan struct{}
 	started                 bool
 	stopped                 bool
 	err                     error

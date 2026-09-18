@@ -34,6 +34,9 @@ type Terminal interface {
 }
 
 // ProcessTerminal owns raw mode and input polling without taking ownership of the supplied files.
+// Input and resize callbacks are serialized and may call Stop or DrainInput.
+// Stop cancels queued callbacks; an already running callback may finish afterward.
+// Done closes after the reader and callback dispatcher finish.
 type ProcessTerminal struct {
 	input                   io.Reader
 	output                  io.Writer
@@ -48,6 +51,8 @@ type ProcessTerminal struct {
 	file                    *os.File
 	stop                    chan struct{}
 	done                    chan struct{}
+	readDone                chan struct{}
+	inputStop               chan struct{}
 	started                 bool
 	stopped                 bool
 	err                     error
@@ -86,21 +91,55 @@ func (t *ProcessTerminal) Start(onInput func(string), onResize func()) error {
 	b := NewStdinBuffer()
 	b.negotiation = true
 	t.buffer = b
-	b.SetHandlers(StdinBufferEventMap{Data: func(seq string) { t.forward(seq, onInput) }, Paste: func(text string) { t.forward("\x1b[200~"+text+"\x1b[201~", onInput) }})
-	stop, done := t.stop, t.done
+	t.readDone, t.inputStop = make(chan struct{}), make(chan struct{})
+	stop, done, readDone, inputStop := t.stop, t.done, t.readDone, t.inputStop
+	type event struct {
+		data   string
+		resize bool
+	}
+	events := make(chan event, 64)
+	enqueue := func(e event) {
+		select {
+		case events <- e:
+		case <-inputStop:
+		}
+	}
+	b.SetHandlers(StdinBufferEventMap{
+		Data:  func(seq string) { enqueue(event{data: seq}) },
+		Paste: func(text string) { enqueue(event{data: "\x1b[200~" + text + "\x1b[201~"}) },
+	})
 	go func() {
-		err := readTerminal(file, stop, func(data string) { t.mu.Lock(); t.lastInput = time.Now(); t.mu.Unlock(); _ = b.Process([]byte(data)) }, onResize)
+		defer close(done)
+		for e := range events {
+			t.mu.Lock()
+			active := t.stop == stop && !t.stopped && !t.draining
+			t.mu.Unlock()
+			if !active {
+				continue
+			}
+			if e.resize {
+				if onResize != nil {
+					onResize()
+				}
+			} else {
+				t.forward(e.data, onInput, stop)
+			}
+		}
+	}()
+	go func() {
+		err := readTerminal(file, stop, func(data string) { t.mu.Lock(); t.lastInput = time.Now(); t.mu.Unlock(); _ = b.Process([]byte(data)) }, func() { enqueue(event{resize: true}) })
 		b.Destroy()
 		t.mu.Lock()
 		t.err = errors.Join(t.err, err)
 		t.mu.Unlock()
-		close(done)
+		close(events)
+		close(readDone)
 	}()
 	return nil
 }
-func (t *ProcessTerminal) forward(seq string, onInput func(string)) {
+func (t *ProcessTerminal) forward(seq string, onInput func(string), stop chan struct{}) {
 	t.mu.Lock()
-	if t.stopped || t.draining {
+	if t.stop != stop || t.stopped || t.draining {
 		t.mu.Unlock()
 		return
 	}
@@ -159,12 +198,15 @@ func (t *ProcessTerminal) Stop() error {
 		return nil
 	}
 	t.stopped = true
+	if !t.draining {
+		close(t.inputStop)
+	}
 	close(t.stop)
-	file, state, done, b := t.file, t.state, t.done, t.buffer
+	file, state, readDone, b := t.file, t.state, t.readDone, t.buffer
 	err := t.disableProtocols()
 	t.mu.Unlock()
 	b.Destroy()
-	<-done
+	<-readDone
 	err = errors.Join(err, term.Restore(int(file.Fd()), state), t.Write("\x1b[?2004l\x1b[?25h\r\n"))
 	t.mu.Lock()
 	t.started = false
@@ -205,11 +247,14 @@ func (t *ProcessTerminal) DrainInput(ctx context.Context, maxTime, idleTime time
 		t.mu.Unlock()
 		return nil
 	}
+	if !t.draining && !t.stopped {
+		close(t.inputStop)
+	}
 	t.draining = true
 	t.lastInput = time.Now()
 	err := t.disableProtocols()
 	b := t.buffer
-	done := t.done
+	done := t.readDone
 	t.mu.Unlock()
 	b.Destroy()
 	if err != nil {

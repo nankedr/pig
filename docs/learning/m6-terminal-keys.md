@@ -12,6 +12,8 @@
 
 终端启动发送 `CSI >7u`、`CSI ?u` 和 DA 查询。非零 Kitty flags 启用 Kitty；DA 或零 flags 在尚未启用 Kitty 时选择 modifyOtherKeys。协商响应被消费，不进入草稿；迟到 Kitty 会关闭 fallback。停止和 drain 只弹出本次推入的协议一次。暂停恢复保留草稿并重新协商，读取循环和 buffer 计时器随生命周期收回。
 
+`ProcessTerminal.Start` 的输入与 resize 回调在独立队列中串行执行，允许回调内调用 `DrainInput` 或 `Stop`。停止会取消排队事件、收回 reader 和计时器并恢复终端；已开始执行的回调可以继续返回。需要等待这些回调全部结束时，在回调外等待 `Done()`。
+
 ## 用户配置
 
 配置位置为 `$PIG_CODING_AGENT_DIR/keybindings.json`，默认 `~/.pig/agent/keybindings.json`。支持单个键名或数组；缺省使用默认值，空数组解绑。旧式名称（例如 `submit`）迁移到完整名称；若两者同时出现，完整名称优先。无效文件或无效字段按 Pi 行为回退，不写回配置文件。
