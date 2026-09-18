@@ -12,6 +12,7 @@ m0-offline:
 	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./... -count=1
 	go vet ./...
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build ./...
+	go run ./examples/terminal-keys
 	go run ./examples/multiline-editor
 	go run ./examples/m0-contracts
 	go run ./examples/session-messages
@@ -228,3 +229,8 @@ m5-clean:
 
 m5-freeze: m5-clean m3-node-preflight m5-gate m5-oracle m4-html-browser m0-source-drift m1-live-smoke
 	@$(MAKE) --no-print-directory m5-clean
+
+.PHONY: m6-keys-oracle
+m6-keys-oracle: m0-node-preflight
+	node parity/oracle/keys.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/keys-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"reflect"
 	"sync"
 	"testing"
@@ -21,24 +22,31 @@ import (
 	"github.com/nankedr/pig/internal/terminaltest"
 )
 
-func TestPigMultilineEditor110(t *testing.T) {
+func TestPigMultilineEditor110(t *testing.T) { runEditorCLI(t, "editor-cli.json") }
+func TestPigTerminalKeys111(t *testing.T)    { runEditorCLI(t, "keys-cli.json") }
+func runEditorCLI(t *testing.T, fixtureName string) {
 	lock, _, err := baseline.Load("../../parity/baseline")
 	if err != nil {
 		t.Fatal(err)
 	}
-	fixture, err := parity.LoadFixture("../../parity/oracle/fixtures/editor-cli.json", parity.Baseline{ID: lock.BaselineID, Commit: lock.Upstream.Commit, Repository: lock.Upstream.Repository})
+	fixture, err := parity.LoadFixture("../../parity/oracle/fixtures/"+fixtureName, parity.Baseline{ID: lock.BaselineID, Commit: lock.Upstream.Commit, Repository: lock.Upstream.Repository})
 	if err != nil {
 		t.Fatal(err)
 	}
 	var input struct {
-		Turns []struct {
+		Config      json.RawMessage
+		Negotiation []string
+		Exit        string
+		Clear       string
+		Turns       []struct {
 			Chunks  []string
 			Columns uint16
 		}
 	}
 	var want struct {
-		Prompts  []string
-		ExitCode int `json:"exit_code"`
+		Prompts    []string
+		UserCounts []int `json:"user_counts"`
+		ExitCode   int   `json:"exit_code"`
 	}
 	if err := json.Unmarshal(fixture.Case.Input, &input); err != nil {
 		t.Fatal(err)
@@ -48,6 +56,7 @@ func TestPigMultilineEditor110(t *testing.T) {
 	}
 	var mu sync.Mutex
 	var prompts []string
+	var userCounts []int
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var request struct {
 			Messages []struct {
@@ -60,8 +69,10 @@ func TestPigMultilineEditor110(t *testing.T) {
 			return
 		}
 		prompt := ""
+		userCount := 0
 		for _, m := range request.Messages {
 			if m.Role == "user" {
+				userCount++
 				if json.Unmarshal(m.Content, &prompt) != nil {
 					var blocks []struct{ Text string }
 					if err := json.Unmarshal(m.Content, &blocks); err != nil {
@@ -77,6 +88,7 @@ func TestPigMultilineEditor110(t *testing.T) {
 		}
 		mu.Lock()
 		prompts = append(prompts, prompt)
+		userCounts = append(userCounts, userCount)
 		turn := len(prompts)
 		mu.Unlock()
 		w.Header().Set("Content-Type", "text/event-stream")
@@ -85,6 +97,15 @@ func TestPigMultilineEditor110(t *testing.T) {
 	defer server.Close()
 	tty := terminaltest.Open(t)
 	root := t.TempDir()
+	if len(input.Config) > 0 {
+		dir := filepath.Join(root, ".pig", "agent")
+		if err := os.MkdirAll(dir, 0700); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(dir, "keybindings.json"), input.Config, 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, buildPigBinary(t), "--provider", "deepseek", "--model", "deepseek-v4-flash", "--api-key", "synthetic", "--no-session", "--no-tools", "--no-extensions", "--no-skills")
@@ -99,7 +120,18 @@ func TestPigMultilineEditor110(t *testing.T) {
 	done := make(chan error, 1)
 	go func() { done <- cmd.Wait() }()
 	tty.Wait(t, "> ")
-	tty.Send(t, "\r   \rdiscard\x03")
+	if fixtureName == "keys-cli.json" {
+		tty.Wait(t, "Keybinding conflict ctrl+g")
+	}
+	if input.Clear == "" {
+		tty.Send(t, "\r   \rdiscard\x03")
+	} else {
+		tty.Send(t, "discard"+input.Clear)
+	}
+	for _, chunk := range input.Negotiation {
+		tty.Send(t, chunk)
+		time.Sleep(30 * time.Millisecond)
+	}
 	for index, turn := range input.Turns {
 		for j, chunk := range turn.Chunks {
 			tty.Send(t, chunk)
@@ -112,7 +144,10 @@ func TestPigMultilineEditor110(t *testing.T) {
 		}
 		tty.Wait(t, fmt.Sprintf("EDITOR_DONE_%d", index+1))
 	}
-	tty.Send(t, "\x04")
+	if input.Exit == "" {
+		input.Exit = "\x04"
+	}
+	tty.Send(t, input.Exit)
 	select {
 	case err := <-done:
 		if err != nil {
@@ -125,6 +160,9 @@ func TestPigMultilineEditor110(t *testing.T) {
 	defer mu.Unlock()
 	if !reflect.DeepEqual(prompts, want.Prompts) {
 		t.Fatalf("Provider prompts got %#v want %#v", prompts, want.Prompts)
+	}
+	if want.UserCounts != nil && !reflect.DeepEqual(userCounts, want.UserCounts) {
+		t.Fatalf("session user counts %v want %v", userCounts, want.UserCounts)
 	}
 	if cmd.ProcessState.ExitCode() != want.ExitCode {
 		t.Fatal("exit mismatch")

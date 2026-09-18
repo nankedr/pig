@@ -24,6 +24,9 @@ type InteractiveMode struct {
 	cancel                        context.CancelFunc
 	stopOnce                      sync.Once
 	stopErr                       error
+	turnMu                        sync.Mutex
+	turnCancel                    context.CancelFunc
+	setupErr                      error
 }
 
 func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveModeOptions) *InteractiveMode {
@@ -35,7 +38,26 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 	if terminal == nil {
 		terminal = tui.NewProcessTerminal(os.Stdin, os.Stdout)
 	}
-	mode.ui = tui.NewTextUI(terminal)
+	bindings := mode.options.Keybindings
+	if bindings == nil {
+		dir := ""
+		if runtime != nil {
+			dir = runtime.Services().AgentDir
+		}
+		bindings, mode.setupErr = NewKeybindingsManager(dir)
+	}
+	mode.options.Keybindings = bindings
+	var manager *tui.KeybindingsManager
+	if bindings != nil {
+		manager = &bindings.KeybindingsManager
+	}
+	mode.ui = tui.NewTextUI(terminal, tui.TextUIOptions{Keybindings: manager, OnInterrupt: func() {
+		mode.turnMu.Lock()
+		defer mode.turnMu.Unlock()
+		if mode.turnCancel != nil {
+			mode.turnCancel()
+		}
+	}})
 	return mode
 }
 func (m *InteractiveMode) Init(ctx context.Context) (err error) {
@@ -60,6 +82,9 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 	if m.initialized {
 		return nil
 	}
+	if m.setupErr != nil {
+		return m.setupErr
+	}
 	if m.runtime == nil || m.runtime.Session() == nil {
 		return errors.New("Interactive mode requires an AgentSession runtime")
 	}
@@ -72,12 +97,40 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 	if err := m.ui.Start(); err != nil {
 		return err
 	}
+	if m.options.Keybindings != nil {
+		conflicts, _ := m.options.Keybindings.GetConflicts()
+		for _, conflict := range conflicts {
+			if err := m.ShowWarning(fmt.Sprintf("Keybinding conflict %s: %s", conflict.Key, strings.Join(conflict.Keybindings, ", "))); err != nil {
+				return err
+			}
+		}
+	}
 	m.initialized = true
 	return nil
 }
 func (m *InteractiveMode) ClearEditor() error { return m.ui.ClearEditor() }
 func (m *InteractiveMode) GetUserInput(ctx context.Context) (string, error) {
-	return m.ui.ReadLine(ctx)
+	for {
+		input, err := m.ui.ReadInput(ctx)
+		if err != nil {
+			return "", err
+		}
+		switch input.Action {
+		case "app.session.new":
+			_, err = m.runtime.NewSession(ctx)
+			if err != nil {
+				_ = m.ShowError(err.Error())
+			} else {
+				_ = m.ui.Append("\nNew session\n")
+			}
+		case "app.suspend":
+			if err = m.ui.Suspend(); err != nil {
+				return "", err
+			}
+		default:
+			return input.Text, nil
+		}
+	}
 }
 func (m *InteractiveMode) ShowError(message string) error {
 	return m.ui.Append("\nError: " + message + "\n")
@@ -184,13 +237,21 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		if err = m.ui.Append("\nuser: " + prompt + "\nassistant: "); err != nil {
 			break
 		}
-		outcome, promptErr := RunHeadless(runCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, OnEvent: func(event AgentSessionEvent) {
+		turnCtx, turnCancel := context.WithCancel(runCtx)
+		m.turnMu.Lock()
+		m.turnCancel = turnCancel
+		m.turnMu.Unlock()
+		outcome, promptErr := RunHeadless(turnCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, OnEvent: func(event AgentSessionEvent) {
 			if update, ok := event.(AgentSessionMessageUpdateEvent); ok {
 				if delta, ok := update.AssistantMessageEvent.(ai.AssistantMessageTextDeltaEvent); ok {
 					_ = m.ui.Append(delta.Delta)
 				}
 			}
 		}})
+		m.turnMu.Lock()
+		m.turnCancel = nil
+		m.turnMu.Unlock()
+		turnCancel()
 		if runCtx.Err() != nil {
 			err = runCtx.Err()
 			break

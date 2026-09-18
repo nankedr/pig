@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9680
+- Total entries: 9681
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5167 |
-| scaffolded | 3813 |
-| partial | 407 |
+| inventoried | 5159 |
+| scaffolded | 3779 |
+| partial | 450 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -5417,7 +5417,6 @@
 | ID | Status | Milestone | Kind | Target | Upstream |
 | --- | --- | --- | --- | --- | --- |
 | constructor:codingagent/src/core/extensions/runner.ts#ExtensionRunner | inventoried | M7 | contract | github.com/nankedr/pig/codingagent.ExtensionRunner | coding-agent |
-| constructor:codingagent/src/core/keybindings.ts#KeybindingsManager | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.KeybindingsManager | coding-agent |
 | constructor:codingagent/src/core/model-runtime.ts#CredentialSynchronizationError | inventoried | M3 | contract | github.com/nankedr/pig/codingagent.CredentialSynchronizationError | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/armin.ts#ArminComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent | coding-agent |
@@ -5764,13 +5763,6 @@
 | member:codingagent/src/core/keybindings.ts#AppKeybinding.trimRight | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.AppKeybinding | coding-agent |
 | member:codingagent/src/core/keybindings.ts#AppKeybinding.trimStart | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.AppKeybinding | coding-agent |
 | member:codingagent/src/core/keybindings.ts#AppKeybinding.valueOf | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.AppKeybinding | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getConflicts | inventoried | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetConflicts | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getDefinition | inventoried | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetDefinition | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getKeys | inventoried | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetKeys | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getResolvedBindings | inventoried | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetResolvedBindings | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getUserBindings | inventoried | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetUserBindings | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.matches | inventoried | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.Matches | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.setUserBindings | inventoried | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.SetUserBindings | coding-agent |
 | member:codingagent/src/core/model-runtime.ts#CreateModelRuntimeOptions.signal | inventoried | M3 | contract | github.com/nankedr/pig/codingagent.NewModelRuntime | coding-agent |
 | member:codingagent/src/core/model-runtime.ts#CredentialSynchronizationOperation.anchor | inventoried | M3 | contract | github.com/nankedr/pig/codingagent.CredentialSynchronizationOperation | coding-agent |
 | member:codingagent/src/core/model-runtime.ts#CredentialSynchronizationOperation.at | inventoried | M3 | contract | github.com/nankedr/pig/codingagent.CredentialSynchronizationOperation | coding-agent |
@@ -6765,8 +6757,6 @@
 | member:codingagent/src/core/footer-data-provider.ts#ReadonlyFooterDataProvider.getExtensionStatuses | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ReadonlyFooterDataProvider.GetExtensionStatuses | coding-agent |
 | member:codingagent/src/core/footer-data-provider.ts#ReadonlyFooterDataProvider.getGitBranch | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ReadonlyFooterDataProvider.GetGitBranch | coding-agent |
 | member:codingagent/src/core/footer-data-provider.ts#ReadonlyFooterDataProvider.onBranchChange | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ReadonlyFooterDataProvider.OnBranchChange | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getEffectiveConfig | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.KeybindingsManager.GetEffectiveConfig | coding-agent |
-| member:codingagent/src/core/keybindings.ts#KeybindingsManager.reload | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.KeybindingsManager.Reload | coding-agent |
 | member:codingagent/src/core/model-registry.ts#ModelRegistry.complete | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.ModelRegistry.Complete | coding-agent |
 | member:codingagent/src/core/model-registry.ts#ModelRegistry.find | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.ModelRegistry.Find | coding-agent |
 | member:codingagent/src/core/model-registry.ts#ModelRegistry.getAll | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.ModelRegistry.GetAll | coding-agent |
@@ -7481,7 +7471,6 @@
 | member:codingagent/src/utils/image-resize-core.ts#ResizedImage.width | scaffolded | M12 | contract | github.com/nankedr/pig/codingagent.ResizedImage.Width | coding-agent |
 | static-member:codingagent/src/client/remote-session.ts#RemoteSession.create | scaffolded | M9 | contract | github.com/nankedr/pig/codingagent.CreateRemoteSession | coding-agent |
 | static-member:codingagent/src/client/remote-session.ts#RemoteSession.open | scaffolded | M9 | contract | github.com/nankedr/pig/codingagent.OpenRemoteSession | coding-agent |
-| static-member:codingagent/src/core/keybindings.ts#KeybindingsManager.create | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewKeybindingsManager | coding-agent |
 | static-member:codingagent/src/core/model-runtime.ts#ModelRuntime.create | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.NewModelRuntime | coding-agent |
 | static-member:codingagent/src/core/session-manager.ts#SessionManager.continueRecent | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.ContinueRecentSessionManager | coding-agent |
 | static-member:codingagent/src/core/session-manager.ts#SessionManager.create | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.NewSessionManager | coding-agent |
@@ -7654,7 +7643,6 @@
 | symbol:codingagent/src/core/extensions/wrapper.ts#wrapRegisteredTools | scaffolded | M7 | symbol | github.com/nankedr/pig/codingagent.WrapRegisteredTools | coding-agent |
 | symbol:codingagent/src/core/footer-data-provider.ts#ReadonlyFooterDataProvider | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ReadonlyFooterDataProvider | coding-agent |
 | symbol:codingagent/src/core/keybindings.ts#AppKeybinding | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.AppKeybinding | coding-agent |
-| symbol:codingagent/src/core/keybindings.ts#KeybindingsManager | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.KeybindingsManager | coding-agent |
 | symbol:codingagent/src/core/messages.ts#convertToLlm | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.ConvertToLLM | coding-agent |
 | symbol:codingagent/src/core/model-registry.ts#ModelRegistry | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.ModelRegistry | coding-agent |
 | symbol:codingagent/src/core/model-resolver.ts#ModelScopeDiagnostic | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.ModelScopeDiagnostic | coding-agent |
@@ -7841,6 +7829,7 @@
 | symbol:codingagent/src/utils/image-resize.ts#resizeImage | scaffolded | M12 | symbol | github.com/nankedr/pig/codingagent.ResizeImage | coding-agent |
 | symbol:codingagent/src/utils/shell.ts#getShellConfig | scaffolded | M13 | symbol | github.com/nankedr/pig/codingagent.GetShellConfig | coding-agent |
 | cmd-pig | partial | M1 | command | github.com/nankedr/pig/cmd/pig | coding-agent |
+| constructor:codingagent/src/core/keybindings.ts#KeybindingsManager | partial | M6 | contract | github.com/nankedr/pig/codingagent.KeybindingsManager | coding-agent |
 | constructor:codingagent/src/core/resource-loader.ts#DefaultResourceLoader | partial | M5 | contract | github.com/nankedr/pig/codingagent.NewDefaultResourceLoader | coding-agent |
 | contract:cli/pig/args | partial | M3 | contract | github.com/nankedr/pig/codingagent.RunCLI | coding-agent |
 | contract:cli/pig/exit-codes | partial | M3 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
@@ -7910,6 +7899,15 @@
 | member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.message | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Message | coding-agent |
 | member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.path | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Path | coding-agent |
 | member:codingagent/src/core/diagnostics.ts#ResourceDiagnostic.type | partial | M5 | contract | github.com/nankedr/pig/codingagent.ResourceDiagnostic.Type | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getConflicts | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetConflicts | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getDefinition | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetDefinition | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getEffectiveConfig | partial | M6 | contract | github.com/nankedr/pig/codingagent.KeybindingsManager.GetEffectiveConfig | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getKeys | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetKeys | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getResolvedBindings | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetResolvedBindings | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.getUserBindings | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetUserBindings | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.matches | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.Matches | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.reload | partial | M6 | contract | github.com/nankedr/pig/codingagent.KeybindingsManager.Reload | coding-agent |
+| member:codingagent/src/core/keybindings.ts#KeybindingsManager.setUserBindings | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.SetUserBindings | coding-agent |
 | member:codingagent/src/core/prompt-templates.ts#PromptTemplate.argumentHint | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.ArgumentHint | coding-agent |
 | member:codingagent/src/core/prompt-templates.ts#PromptTemplate.content | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Content | coding-agent |
 | member:codingagent/src/core/prompt-templates.ts#PromptTemplate.description | partial | M5 | contract | github.com/nankedr/pig/codingagent.PromptTemplate.Description | coding-agent |
@@ -7964,12 +7962,14 @@
 | member:codingagent/src/modes/interactive/theme/theme.ts#Theme.underline | partial | M6 | contract | github.com/nankedr/pig/codingagent.Theme.Underline | coding-agent |
 | member:codingagent/src/modes/rpc/rpc-client.ts#RpcClient.exportHtml | partial | M4 | contract | github.com/nankedr/pig/codingagent.RPCClient.ExportHTML | coding-agent |
 | module-codingagent | partial | M3 | package | github.com/nankedr/pig/codingagent | coding-agent |
+| static-member:codingagent/src/core/keybindings.ts#KeybindingsManager.create | partial | M6 | contract | github.com/nankedr/pig/codingagent.NewKeybindingsManager | coding-agent |
 | symbol:codingagent/src/core/compaction/branch-summarization.ts#generateBranchSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateBranchSummary | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#compact | partial | M4 | symbol | github.com/nankedr/pig/codingagent.Compact | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#generateSummary | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummary | coding-agent |
 | symbol:codingagent/src/core/compaction/compaction.ts#generateSummaryWithUsage | partial | M4 | symbol | github.com/nankedr/pig/codingagent.GenerateSummaryWithUsage | coding-agent |
 | symbol:codingagent/src/core/diagnostics.ts#ResourceCollision | partial | M5 | symbol | github.com/nankedr/pig/codingagent.ResourceCollision | coding-agent |
 | symbol:codingagent/src/core/diagnostics.ts#ResourceDiagnostic | partial | M5 | symbol | github.com/nankedr/pig/codingagent.ResourceDiagnostic | coding-agent |
+| symbol:codingagent/src/core/keybindings.ts#KeybindingsManager | partial | M6 | symbol | github.com/nankedr/pig/codingagent.KeybindingsManager | coding-agent |
 | symbol:codingagent/src/core/prompt-templates.ts#PromptTemplate | partial | M5 | symbol | github.com/nankedr/pig/codingagent.PromptTemplate | coding-agent |
 | symbol:codingagent/src/core/resource-loader.ts#DefaultResourceLoader | partial | M5 | symbol | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |
 | symbol:codingagent/src/core/resource-loader.ts#loadProjectContextFiles | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadProjectContextFiles | coding-agent |
@@ -9183,13 +9183,6 @@
 | member:tui/src/keybindings.ts#Keybindings.tui.select.pageDown | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Keybindings.TUISelectPageDown | tui |
 | member:tui/src/keybindings.ts#Keybindings.tui.select.pageUp | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Keybindings.TUISelectPageUp | tui |
 | member:tui/src/keybindings.ts#Keybindings.tui.select.up | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Keybindings.TUISelectUp | tui |
-| member:tui/src/keybindings.ts#KeybindingsManager.getConflicts | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetConflicts | tui |
-| member:tui/src/keybindings.ts#KeybindingsManager.getDefinition | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetDefinition | tui |
-| member:tui/src/keybindings.ts#KeybindingsManager.getKeys | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetKeys | tui |
-| member:tui/src/keybindings.ts#KeybindingsManager.getResolvedBindings | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetResolvedBindings | tui |
-| member:tui/src/keybindings.ts#KeybindingsManager.getUserBindings | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetUserBindings | tui |
-| member:tui/src/keybindings.ts#KeybindingsManager.matches | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.Matches | tui |
-| member:tui/src/keybindings.ts#KeybindingsManager.setUserBindings | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.SetUserBindings | tui |
 | member:tui/src/kill-ring.ts#KillRing.length | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KillRing.Length | tui |
 | member:tui/src/kill-ring.ts#KillRing.peek | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KillRing.Peek | tui |
 | member:tui/src/kill-ring.ts#KillRing.push | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KillRing.Push | tui |
@@ -9247,11 +9240,6 @@
 | member:tui/src/layout.ts#ScrollbarGeometry.thumbTop | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ScrollbarGeometry.ThumbTop | tui |
 | member:tui/src/layout.ts#ScrollbarGeometry.trackHeight | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ScrollbarGeometry.TrackHeight | tui |
 | member:tui/src/layout.ts#ScrollbarGeometry.trackTop | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ScrollbarGeometry.TrackTop | tui |
-| member:tui/src/stdin-buffer.ts#StdinBuffer.clear | scaffolded | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.Clear | tui |
-| member:tui/src/stdin-buffer.ts#StdinBuffer.destroy | scaffolded | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.Destroy | tui |
-| member:tui/src/stdin-buffer.ts#StdinBuffer.flush | scaffolded | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.Flush | tui |
-| member:tui/src/stdin-buffer.ts#StdinBuffer.getBuffer | scaffolded | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.GetBuffer | tui |
-| member:tui/src/stdin-buffer.ts#StdinBuffer.process | scaffolded | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.Process | tui |
 | member:tui/src/stdin-buffer.ts#StdinBufferEventMap.data | scaffolded | M6 | contract | github.com/nankedr/pig/tui.StdinBufferEventMap.Data | tui |
 | member:tui/src/stdin-buffer.ts#StdinBufferEventMap.paste | scaffolded | M6 | contract | github.com/nankedr/pig/tui.StdinBufferEventMap.Paste | tui |
 | member:tui/src/stdin-buffer.ts#StdinBufferOptions.timeout | scaffolded | M6 | contract | github.com/nankedr/pig/tui.StdinBufferOptions.Timeout | tui |
@@ -9284,7 +9272,6 @@
 | member:tui/src/terminal-image.ts#TerminalCapabilities.images | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TerminalCapabilities.Images | tui |
 | member:tui/src/terminal-image.ts#TerminalCapabilities.trueColor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TerminalCapabilities.TrueColor | tui |
 | member:tui/src/terminal.ts#KeyboardProtocolNegotiationSequence.type | scaffolded | M6 | contract | github.com/nankedr/pig/tui.KeyboardProtocolNegotiationSequence.Type | tui |
-| member:tui/src/terminal.ts#ProcessTerminal.drainInput | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.DrainInput | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.setProgress | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.SetProgress | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.setTitle | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.SetTitle | tui |
 | member:tui/src/terminal.ts#Terminal.clearFromCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Terminal.ClearFromCursor | tui |
@@ -9568,21 +9555,10 @@
 | symbol:tui/src/keybindings.ts#KeybindingDefinitions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KeybindingDefinitions | tui |
 | symbol:tui/src/keybindings.ts#Keybindings | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Keybindings | tui |
 | symbol:tui/src/keybindings.ts#KeybindingsConfig | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KeybindingsConfig | tui |
-| symbol:tui/src/keybindings.ts#KeybindingsManager | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KeybindingsManager | tui |
 | symbol:tui/src/keybindings.ts#TUI_KEYBINDINGS | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.TUIKeybindings | tui |
-| symbol:tui/src/keybindings.ts#getKeybindings | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.GetKeybindings | tui |
-| symbol:tui/src/keybindings.ts#setKeybindings | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SetKeybindings | tui |
 | symbol:tui/src/keys.ts#Key | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Key | tui |
 | symbol:tui/src/keys.ts#KeyEventType | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KeyEventType | tui |
 | symbol:tui/src/keys.ts#KeyId | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KeyID | tui |
-| symbol:tui/src/keys.ts#decodeKittyPrintable | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.DecodeKittyPrintable | tui |
-| symbol:tui/src/keys.ts#decodePrintableKey | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.DecodePrintableKey | tui |
-| symbol:tui/src/keys.ts#isKeyRelease | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.IsKeyRelease | tui |
-| symbol:tui/src/keys.ts#isKeyRepeat | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.IsKeyRepeat | tui |
-| symbol:tui/src/keys.ts#isKittyProtocolActive | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.IsKittyProtocolActive | tui |
-| symbol:tui/src/keys.ts#matchesKey | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.MatchesKey | tui |
-| symbol:tui/src/keys.ts#parseKey | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ParseKey | tui |
-| symbol:tui/src/keys.ts#setKittyProtocolActive | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SetKittyProtocolActive | tui |
 | symbol:tui/src/kill-ring.ts#KillRing | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KillRing | tui |
 | symbol:tui/src/latex.ts#RenderLatexOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.RenderLaTeXOptions | tui |
 | symbol:tui/src/latex.ts#renderLatex | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.RenderLaTeX | tui |
@@ -9604,8 +9580,6 @@
 | symbol:tui/src/layout.ts#getScrollbarGeometry | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.GetScrollbarGeometry | tui |
 | symbol:tui/src/layout.ts#renderLayoutFrame | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.RenderLayoutFrame | tui |
 | symbol:tui/src/native-modifiers.ts#ModifierKey | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ModifierKey | tui |
-| symbol:tui/src/native-modifiers.ts#isNativeModifierPressed | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.IsNativeModifierPressed | tui |
-| symbol:tui/src/stdin-buffer.ts#StdinBuffer | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.StdinBuffer | tui |
 | symbol:tui/src/stdin-buffer.ts#StdinBufferEventMap | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.StdinBufferEventMap | tui |
 | symbol:tui/src/stdin-buffer.ts#StdinBufferOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.StdinBufferOptions | tui |
 | symbol:tui/src/terminal-colors.ts#RgbColor | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.RGBColor | tui |
@@ -9650,10 +9624,6 @@
 | symbol:tui/src/terminal-image.ts#setCellDimensions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SetCellDimensions | tui |
 | symbol:tui/src/terminal.ts#KeyboardProtocolNegotiationSequence | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KeyboardProtocolNegotiationSequence | tui |
 | symbol:tui/src/terminal.ts#Terminal | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Terminal | tui |
-| symbol:tui/src/terminal.ts#isAppleTerminalSession | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.IsAppleTerminalSession | tui |
-| symbol:tui/src/terminal.ts#normalizeAppleTerminalInput | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.NormalizeAppleTerminalInput | tui |
-| symbol:tui/src/terminal.ts#normalizeNativeShiftEnterInput | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.NormalizeNativeShiftEnterInput | tui |
-| symbol:tui/src/terminal.ts#parseKeyboardProtocolNegotiationSequence | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ParseKeyboardProtocolNegotiationSequence | tui |
 | symbol:tui/src/tui-alt-screen.ts#TuiAltScreen | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.TUIAltScreen | tui |
 | symbol:tui/src/tui-alt-screen.ts#TuiAltScreenOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.TUIAltScreenOptions | tui |
 | symbol:tui/src/tui-main-screen.ts#TuiMainScreen | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.TUIMainScreen | tui |
@@ -9702,6 +9672,7 @@
 | symbol:tui/src/word-navigation.ts#findWordBackward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordBackward | tui |
 | symbol:tui/src/word-navigation.ts#findWordForward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordForward | tui |
 | contract:tui/multiline-editor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor | tui |
+| contract:tui/terminal-keys | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager | tui |
 | member:tui/src/components/editor.ts#Editor.addToHistory | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.AddToHistory | tui |
 | member:tui/src/components/editor.ts#Editor.borderColor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.BorderColor | tui |
 | member:tui/src/components/editor.ts#Editor.disableSubmit | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.DisableSubmit | tui |
@@ -9717,10 +9688,23 @@
 | member:tui/src/components/editor.ts#Editor.render | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.Render | tui |
 | member:tui/src/components/editor.ts#Editor.setPaddingX | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetPaddingX | tui |
 | member:tui/src/components/editor.ts#Editor.setText | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetText | tui |
+| member:tui/src/keybindings.ts#KeybindingsManager.getConflicts | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetConflicts | tui |
+| member:tui/src/keybindings.ts#KeybindingsManager.getDefinition | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetDefinition | tui |
+| member:tui/src/keybindings.ts#KeybindingsManager.getKeys | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetKeys | tui |
+| member:tui/src/keybindings.ts#KeybindingsManager.getResolvedBindings | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetResolvedBindings | tui |
+| member:tui/src/keybindings.ts#KeybindingsManager.getUserBindings | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetUserBindings | tui |
+| member:tui/src/keybindings.ts#KeybindingsManager.matches | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.Matches | tui |
+| member:tui/src/keybindings.ts#KeybindingsManager.setUserBindings | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.SetUserBindings | tui |
+| member:tui/src/stdin-buffer.ts#StdinBuffer.clear | partial | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.Clear | tui |
+| member:tui/src/stdin-buffer.ts#StdinBuffer.destroy | partial | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.Destroy | tui |
+| member:tui/src/stdin-buffer.ts#StdinBuffer.flush | partial | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.Flush | tui |
+| member:tui/src/stdin-buffer.ts#StdinBuffer.getBuffer | partial | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.GetBuffer | tui |
+| member:tui/src/stdin-buffer.ts#StdinBuffer.process | partial | M6 | contract | github.com/nankedr/pig/tui.StdinBuffer.Process | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.clearFromCursor | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearFromCursor | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.clearLine | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearLine | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.clearScreen | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ClearScreen | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.columns | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Columns | tui |
+| member:tui/src/terminal.ts#ProcessTerminal.drainInput | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.DrainInput | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.hideCursor | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.HideCursor | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.kittyProtocolActive | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.KittyProtocolActive | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.modifyOtherKeysActive | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.ModifyOtherKeysActive | tui |
@@ -9733,7 +9717,24 @@
 | module-tui | partial | M6 | package | github.com/nankedr/pig/tui | tui |
 | symbol:tui/src/components/editor.ts#Editor | partial | M6 | symbol | github.com/nankedr/pig/tui.Editor | tui |
 | symbol:tui/src/components/editor.ts#wordWrapLine | partial | M6 | symbol | github.com/nankedr/pig/tui.WordWrapLine | tui |
+| symbol:tui/src/keybindings.ts#KeybindingsManager | partial | M6 | symbol | github.com/nankedr/pig/tui.KeybindingsManager | tui |
+| symbol:tui/src/keybindings.ts#getKeybindings | partial | M6 | symbol | github.com/nankedr/pig/tui.GetKeybindings | tui |
+| symbol:tui/src/keybindings.ts#setKeybindings | partial | M6 | symbol | github.com/nankedr/pig/tui.SetKeybindings | tui |
+| symbol:tui/src/keys.ts#decodeKittyPrintable | partial | M6 | symbol | github.com/nankedr/pig/tui.DecodeKittyPrintable | tui |
+| symbol:tui/src/keys.ts#decodePrintableKey | partial | M6 | symbol | github.com/nankedr/pig/tui.DecodePrintableKey | tui |
+| symbol:tui/src/keys.ts#isKeyRelease | partial | M6 | symbol | github.com/nankedr/pig/tui.IsKeyRelease | tui |
+| symbol:tui/src/keys.ts#isKeyRepeat | partial | M6 | symbol | github.com/nankedr/pig/tui.IsKeyRepeat | tui |
+| symbol:tui/src/keys.ts#isKittyProtocolActive | partial | M6 | symbol | github.com/nankedr/pig/tui.IsKittyProtocolActive | tui |
+| symbol:tui/src/keys.ts#matchesKey | partial | M6 | symbol | github.com/nankedr/pig/tui.MatchesKey | tui |
+| symbol:tui/src/keys.ts#parseKey | partial | M6 | symbol | github.com/nankedr/pig/tui.ParseKey | tui |
+| symbol:tui/src/keys.ts#setKittyProtocolActive | partial | M6 | symbol | github.com/nankedr/pig/tui.SetKittyProtocolActive | tui |
+| symbol:tui/src/native-modifiers.ts#isNativeModifierPressed | partial | M6 | symbol | github.com/nankedr/pig/tui.IsNativeModifierPressed | tui |
+| symbol:tui/src/stdin-buffer.ts#StdinBuffer | partial | M6 | symbol | github.com/nankedr/pig/tui.StdinBuffer | tui |
 | symbol:tui/src/terminal.ts#ProcessTerminal | partial | M6 | symbol | github.com/nankedr/pig/tui.ProcessTerminal | tui |
+| symbol:tui/src/terminal.ts#isAppleTerminalSession | partial | M6 | symbol | github.com/nankedr/pig/tui.IsAppleTerminalSession | tui |
+| symbol:tui/src/terminal.ts#normalizeAppleTerminalInput | partial | M6 | symbol | github.com/nankedr/pig/tui.NormalizeAppleTerminalInput | tui |
+| symbol:tui/src/terminal.ts#normalizeNativeShiftEnterInput | partial | M6 | symbol | github.com/nankedr/pig/tui.NormalizeNativeShiftEnterInput | tui |
+| symbol:tui/src/terminal.ts#parseKeyboardProtocolNegotiationSequence | partial | M6 | symbol | github.com/nankedr/pig/tui.ParseKeyboardProtocolNegotiationSequence | tui |
 
 ## OpenAI Chat Completions capability matrix
 

@@ -66,6 +66,7 @@ type EditorTheme struct {
 // EditorOptions configures the editor's horizontal padding and autocomplete
 // list height. Pointers preserve absent versus explicitly-zero inputs.
 type EditorOptions struct {
+	Keybindings            *KeybindingsManager
 	PaddingX               *int
 	AutocompleteMaxVisible *int
 }
@@ -89,6 +90,8 @@ type Editor struct {
 	OnChange      func(string)
 
 	ui                     EditorRuntime
+	keybindings            *KeybindingsManager
+	kitty                  func() bool
 	theme                  EditorTheme
 	text                   string
 	cursor                 int
@@ -128,6 +131,7 @@ func NewEditor(ui EditorRuntime, theme EditorTheme, options ...EditorOptions) *E
 		autocompleteMaxVisible: 5,
 	}
 	if len(options) != 0 {
+		e.keybindings = options[0].Keybindings
 		if options[0].PaddingX != nil {
 			e.paddingX = *options[0].PaddingX
 		}
@@ -187,7 +191,22 @@ func (e *Editor) HandleInput(data string) error {
 	if e.inPaste || strings.Contains(data, "\x1b[200~") {
 		return e.handlePasteInput(data)
 	}
+	if release, _ := IsKeyRelease(data); release {
+		return nil
+	}
+	kb := e.keybindings
+	if kb == nil {
+		kb, _ = GetKeybindings()
+	}
+	active := kittyActive.Load()
+	if e.kitty != nil {
+		active = e.kitty()
+	}
+	match := func(action Keybinding) bool { return kb.matches(data, action, active) }
 	if e.jump != 0 {
+		if printable, ok, _ := DecodePrintableKey(data); ok {
+			data = printable
+		}
 		direction := e.jump
 		e.jump = 0
 		if data != "" && data[0] >= 32 {
@@ -202,60 +221,50 @@ func (e *Editor) HandleInput(data string) error {
 			return nil
 		}
 	}
-	switch data {
-	case "\x1f", "\x1b[45;5u":
+	switch {
+	case match(KeybindingInputCopy), match(KeybindingInputTab):
+		return nil
+	case match(KeybindingEditorUndo):
 		e.restoreUndo()
-	case "\x01", "\x1b[H", "\x1b[1~", "\x1b[1;5H":
-		e.move(strings.LastIndex(e.text[:e.cursor], "\n") + 1)
-	case "\x05", "\x1b[F", "\x1b[4~", "\x1b[1;5F":
-		e.move(e.lineEnd())
-	case "\x02", "\x1b[D":
-		e.move(e.previous())
-	case "\x06", "\x1b[C":
-		e.move(e.next())
-	case "\x1bb", "\x1b[1;3D", "\x1b[1;5D":
-		e.move(e.word(-1))
-	case "\x1bf", "\x1b[1;3C", "\x1b[1;5C":
-		e.move(e.word(1))
-	case "\x1b[5~", "\x1b[5;5~":
-		e.page(-1)
-	case "\x1b[6~", "\x1b[6;5~":
-		e.page(1)
-	case "\x1b[A":
-		e.vertical(-1)
-	case "\x1b[B":
-		e.vertical(1)
-	case "\x7f", "\b":
-		e.delete(e.previous(), e.cursor, false)
-	case "\x04", "\x1b[3~":
-		e.delete(e.cursor, e.next(), false)
-	case "\x17", "\x1b\x7f":
-		e.delete(e.word(-1), e.cursor, true)
-	case "\x1bd", "\x1b[3;3~":
-		e.delete(e.cursor, e.word(1), true)
-	case "\x15":
-		start := strings.LastIndex(e.text[:e.cursor], "\n") + 1
-		if start == e.cursor && start > 0 {
-			start--
-		}
-		e.delete(start, e.cursor, true)
-	case "\x0b":
+	case match(KeybindingEditorDeleteToLineEnd):
 		end := e.lineEnd()
 		if end == e.cursor && end < len(e.text) {
 			end++
 		}
 		e.delete(e.cursor, end, true)
-	case "\x19":
+	case match(KeybindingEditorDeleteToLineStart):
+		start := strings.LastIndex(e.text[:e.cursor], "\n") + 1
+		if start == e.cursor && start > 0 {
+			start--
+		}
+		e.delete(start, e.cursor, true)
+	case match(KeybindingEditorDeleteWordBackward):
+		e.delete(e.word(-1), e.cursor, true)
+	case match(KeybindingEditorDeleteWordForward):
+		e.delete(e.cursor, e.word(1), true)
+	case match(KeybindingEditorDeleteCharBackward) || matchesKey(data, "shift+backspace", active):
+		e.delete(e.previous(), e.cursor, false)
+	case match(KeybindingEditorDeleteCharForward) || matchesKey(data, "shift+delete", active):
+		e.delete(e.cursor, e.next(), false)
+	case match(KeybindingEditorYank):
 		e.yank(false)
-	case "\x1by":
+	case match(KeybindingEditorYankPop):
 		e.yank(true)
-	case "\x1d":
-		e.jump = 1
-	case "\x1b\x1d":
-		e.jump = -1
-	case "\n", "\x1b\r", "\x1b[13;2u", "\x1b[13;2~":
+	case match(KeybindingEditorHistoryPrevious):
+		e.navigateHistory(-1)
+	case match(KeybindingEditorHistoryNext):
+		e.navigateHistory(1)
+	case match(KeybindingEditorCursorLineStart):
+		e.move(strings.LastIndex(e.text[:e.cursor], "\n") + 1)
+	case match(KeybindingEditorCursorLineEnd):
+		e.move(e.lineEnd())
+	case match(KeybindingEditorCursorWordLeft):
+		e.move(e.word(-1))
+	case match(KeybindingEditorCursorWordRight):
+		e.move(e.word(1))
+	case match(KeybindingInputNewLine) || data == "\n" || data == "\x1b\r" || data == "\x1b[13;2~":
 		return e.InsertTextAtCursor("\n")
-	case "\r", "\x1b[13u":
+	case match(KeybindingInputSubmit):
 		if e.DisableSubmit {
 			return nil
 		}
@@ -275,7 +284,26 @@ func (e *Editor) HandleInput(data string) error {
 		if e.OnSubmit != nil {
 			e.OnSubmit(strings.TrimSpace(result))
 		}
+	case match(KeybindingEditorCursorUp):
+		e.vertical(-1)
+	case match(KeybindingEditorCursorDown):
+		e.vertical(1)
+	case match(KeybindingEditorCursorRight):
+		e.move(e.next())
+	case match(KeybindingEditorCursorLeft):
+		e.move(e.previous())
+	case match(KeybindingEditorPageUp):
+		e.page(-1)
+	case match(KeybindingEditorPageDown):
+		e.page(1)
+	case match(KeybindingEditorJumpForward):
+		e.jump = 1
+	case match(KeybindingEditorJumpBackward):
+		e.jump = -1
 	default:
+		if printable, ok, _ := DecodePrintableKey(data); ok {
+			data = printable
+		}
 		if data != "" && data[0] >= 32 {
 			if strings.TrimSpace(data) == "" || e.lastAction != "type-word" {
 				e.snapshot()

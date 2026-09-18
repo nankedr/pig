@@ -1,10 +1,8 @@
 package tui_test
 
 import (
-	"context"
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/nankedr/pig/tui"
 )
@@ -38,9 +36,6 @@ func TestProcessTerminalCapabilityStubHasNoTerminalSideEffects(t *testing.T) {
 		name string
 		call func() error
 	}{
-		{name: "drainInput", call: func() error {
-			return terminal.DrainInput(context.Background(), time.Second, 50*time.Millisecond)
-		}},
 		{name: "setTitle", call: func() error { return terminal.SetTitle("pig") }},
 		{name: "setProgress", call: func() error { return terminal.SetProgress(true) }},
 	}

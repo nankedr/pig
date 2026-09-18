@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1677, catalog.StatusInventoried: 744, catalog.StatusPartial: 108, catalog.StatusImplemented: 71}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1673, catalog.StatusInventoried: 736, catalog.StatusPartial: 120, catalog.StatusImplemented: 71}); !reflect.DeepEqual(gotByStatus, want) {
 
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
@@ -1439,10 +1439,12 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 				return nil, err
 			}
 			issue100PromoteRuntimeEntry(&entry)
+			issue111PromoteRuntimeEntry(&entry)
 			entries = append(entries, entry)
 		}
 	}
 	for i := range entries {
+		issue111PromoteRuntimeEntry(&entries[i])
 		if strings.Contains(entries[i].ID, "core/package-manager.ts#DefaultPackageManager") || strings.Contains(entries[i].ID, "core/package-manager.ts#PackageManager") {
 			entries[i].Notes += " ADR-0034 / issue #99 defers executable Pi package ecosystem behavior beyond M5; see deferred-package-ecosystem. This row preserves its static surface evidence and original M5 attribution, not a current delivery promise; shared local-resource metadata remains available to M5."
 		}
@@ -1452,7 +1454,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
-	if issue109PromoteRuntimeEntry(entry) || issue106PromoteRuntimeEntry(entry) || issue105PromoteRuntimeEntry(entry) || issue104PromoteRuntimeEntry(entry) || issue103PromoteRuntimeEntry(entry) || issue102PromoteRuntimeEntry(entry) || issue101PromoteRuntimeEntry(entry) || issue100PromoteRuntimeEntry(entry) || issue97PromoteRuntimeEntry(entry) || issue96PromoteRuntimeEntry(entry) || issue95PromoteRuntimeEntry(entry) || issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
+	if issue111PromoteRuntimeEntry(entry) || issue109PromoteRuntimeEntry(entry) || issue106PromoteRuntimeEntry(entry) || issue105PromoteRuntimeEntry(entry) || issue104PromoteRuntimeEntry(entry) || issue103PromoteRuntimeEntry(entry) || issue102PromoteRuntimeEntry(entry) || issue101PromoteRuntimeEntry(entry) || issue100PromoteRuntimeEntry(entry) || issue97PromoteRuntimeEntry(entry) || issue96PromoteRuntimeEntry(entry) || issue95PromoteRuntimeEntry(entry) || issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
 
 		return
 	}
@@ -2249,9 +2251,9 @@ func issue32ModuleEvidenceDescriptors(t *testing.T) []issue32ModuleEvidenceDescr
 				Ref:             "codingagent/extensions_abi_final_review_test.go#TestExtensionBoundaryDeclaresNoExecutableFunctionFields",
 				Baseline:        issue32BaselineCommit,
 				CaseID:          "issue32-codingagent-extension-abi-stubs",
-				ExecutionMethod: "go test ./codingagent -run '^(TestExtensionBoundaryDeclaresNoExecutableFunctionFields|TestExtensionExecutableTypesRemainOpaqueUntilM7|TestExtensionOperationSlotsUseOpaqueCarrier|TestKeybindingsManagerEffectiveConfigIsExplicitlyUnavailable)$' -count=1",
-				Expected:        "the extension boundary exposes no executable function declarations or fields before M7, executable concepts and operation slots remain opaque carriers, and effective keybinding lookup is explicitly unavailable",
-				Actual:          "PASS; extension ABI declarations remained non-executable and opaque, operation slots used the opaque carrier, and effective keybinding lookup returned structured ErrNotImplemented",
+				ExecutionMethod: "go test ./codingagent -run '^(TestExtensionBoundaryDeclaresNoExecutableFunctionFields|TestExtensionExecutableTypesRemainOpaqueUntilM7|TestExtensionOperationSlotsUseOpaqueCarrier)$' -count=1",
+				Expected:        "the extension boundary exposes no executable function declarations or fields before M7, executable concepts and operation slots remain opaque carriers",
+				Actual:          "PASS; extension ABI declarations remained non-executable and opaque, operation slots used the opaque carrier",
 				Platform:        "any",
 				CatalogID:       issue32ModuleCatalogID,
 			},

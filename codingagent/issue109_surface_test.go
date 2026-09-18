@@ -16,12 +16,15 @@ var updateIssue109Surface = flag.Bool("update-issue109-surface", false, "regener
 
 func TestIssue109InteractiveAPISnapshot(t *testing.T) {
 	var out strings.Builder
-	typ := reflect.TypeOf(codingagent.InteractiveModeOptions{})
-	fmt.Fprintln(&out, "type", typ)
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-		fmt.Fprintln(&out, field.Name, field.Type)
+	for _, value := range []any{codingagent.InteractiveModeOptions{}, tui.TextUIOptions{}, tui.TextInput{}} {
+		typ := reflect.TypeOf(value)
+		fmt.Fprintln(&out, "type", typ)
+		for i := 0; i < typ.NumField(); i++ {
+			field := typ.Field(i)
+			fmt.Fprintln(&out, field.Name, field.Type)
+		}
 	}
+
 	for _, value := range []any{(*codingagent.InteractiveMode)(nil), (*tui.ProcessTerminal)(nil), (*tui.TextUI)(nil)} {
 		typ := reflect.TypeOf(value)
 		fmt.Fprintln(&out, "type", typ)

@@ -105,6 +105,8 @@ type Editor struct {
 	OnChange      func(string)
 
 	ui                     EditorRuntime
+	keybindings            *KeybindingsManager
+	kitty                  func() bool
 	theme                  EditorTheme
 	text                   string
 	cursor                 int
@@ -153,6 +155,7 @@ func (e *Editor) SetText(text string) error
 reference: packages/tui/src/components/editor.ts#EditorOptions
 target: github.com/nankedr/pig/tui.EditorOptions
 type EditorOptions struct {
+	Keybindings            *KeybindingsManager
 	PaddingX               *int
 	AutocompleteMaxVisible *int
 }
@@ -701,13 +704,13 @@ type KeybindingsManager struct {
 	definitions  KeybindingDefinitions
 	userBindings KeybindingsConfig
 }
-func (*KeybindingsManager) GetConflicts() ([]KeybindingConflict, error)
-func (*KeybindingsManager) GetDefinition(Keybinding) (KeybindingDefinition, bool, error)
-func (*KeybindingsManager) GetKeys(Keybinding) ([]KeyID, error)
-func (*KeybindingsManager) GetResolvedBindings() (KeybindingsConfig, error)
-func (*KeybindingsManager) GetUserBindings() (KeybindingsConfig, error)
-func (*KeybindingsManager) Matches(string, Keybinding) (bool, error)
-func (*KeybindingsManager) SetUserBindings(KeybindingsConfig) error
+func (m *KeybindingsManager) GetConflicts() ([]KeybindingConflict, error)
+func (m *KeybindingsManager) GetDefinition(action Keybinding) (KeybindingDefinition, bool, error)
+func (m *KeybindingsManager) GetKeys(action Keybinding) ([]KeyID, error)
+func (m *KeybindingsManager) GetResolvedBindings() (KeybindingsConfig, error)
+func (m *KeybindingsManager) GetUserBindings() (KeybindingsConfig, error)
+func (m *KeybindingsManager) Matches(data string, action Keybinding) (bool, error)
+func (m *KeybindingsManager) SetUserBindings(config KeybindingsConfig) error
 
 ## symbol:tui/src/keybindings.ts#TUI_KEYBINDINGS
 reference: packages/tui/src/keybindings.ts#TUI_KEYBINDINGS
@@ -722,7 +725,7 @@ func GetKeybindings() (*KeybindingsManager, error)
 ## symbol:tui/src/keybindings.ts#setKeybindings
 reference: packages/tui/src/keybindings.ts#setKeybindings
 target: github.com/nankedr/pig/tui.SetKeybindings
-func SetKeybindings(*KeybindingsManager) error
+func SetKeybindings(m *KeybindingsManager) error
 
 ## symbol:tui/src/keys.ts#Key
 reference: packages/tui/src/keys.ts#Key
@@ -757,22 +760,22 @@ type KeyID string
 ## symbol:tui/src/keys.ts#decodeKittyPrintable
 reference: packages/tui/src/keys.ts#decodeKittyPrintable
 target: github.com/nankedr/pig/tui.DecodeKittyPrintable
-func DecodeKittyPrintable(string) (string, bool, error)
+func DecodeKittyPrintable(data string) (string, bool, error)
 
 ## symbol:tui/src/keys.ts#decodePrintableKey
 reference: packages/tui/src/keys.ts#decodePrintableKey
 target: github.com/nankedr/pig/tui.DecodePrintableKey
-func DecodePrintableKey(string) (string, bool, error)
+func DecodePrintableKey(data string) (string, bool, error)
 
 ## symbol:tui/src/keys.ts#isKeyRelease
 reference: packages/tui/src/keys.ts#isKeyRelease
 target: github.com/nankedr/pig/tui.IsKeyRelease
-func IsKeyRelease(string) (bool, error)
+func IsKeyRelease(data string) (bool, error)
 
 ## symbol:tui/src/keys.ts#isKeyRepeat
 reference: packages/tui/src/keys.ts#isKeyRepeat
 target: github.com/nankedr/pig/tui.IsKeyRepeat
-func IsKeyRepeat(string) (bool, error)
+func IsKeyRepeat(data string) (bool, error)
 
 ## symbol:tui/src/keys.ts#isKittyProtocolActive
 reference: packages/tui/src/keys.ts#isKittyProtocolActive
@@ -782,17 +785,17 @@ func IsKittyProtocolActive() (bool, error)
 ## symbol:tui/src/keys.ts#matchesKey
 reference: packages/tui/src/keys.ts#matchesKey
 target: github.com/nankedr/pig/tui.MatchesKey
-func MatchesKey(string, KeyID) (bool, error)
+func MatchesKey(data string, key KeyID) (bool, error)
 
 ## symbol:tui/src/keys.ts#parseKey
 reference: packages/tui/src/keys.ts#parseKey
 target: github.com/nankedr/pig/tui.ParseKey
-func ParseKey(string) (KeyID, bool, error)
+func ParseKey(data string) (KeyID, bool, error)
 
 ## symbol:tui/src/keys.ts#setKittyProtocolActive
 reference: packages/tui/src/keys.ts#setKittyProtocolActive
 target: github.com/nankedr/pig/tui.SetKittyProtocolActive
-func SetKittyProtocolActive(bool) error
+func SetKittyProtocolActive(active bool) error
 
 ## symbol:tui/src/kill-ring.ts#KillRing
 reference: packages/tui/src/kill-ring.ts#KillRing
@@ -969,19 +972,28 @@ type ModifierKey string
 ## symbol:tui/src/native-modifiers.ts#isNativeModifierPressed
 reference: packages/tui/src/native-modifiers.ts#isNativeModifierPressed
 target: github.com/nankedr/pig/tui.IsNativeModifierPressed
-func IsNativeModifierPressed(ModifierKey) (bool, error)
+func IsNativeModifierPressed(key ModifierKey) (bool, error)
 
 ## symbol:tui/src/stdin-buffer.ts#StdinBuffer
 reference: packages/tui/src/stdin-buffer.ts#StdinBuffer
 target: github.com/nankedr/pig/tui.StdinBuffer
 type StdinBuffer struct {
-	options StdinBufferOptions
+	negotiation bool
+	mu          sync.Mutex
+	buffer      string
+	paste       bool
+	pending     int
+	timeout     time.Duration
+	timer       *time.Timer
+	generation  uint64
+	handlers    StdinBufferEventMap
 }
-func (*StdinBuffer) Clear() error
-func (*StdinBuffer) Destroy() error
-func (*StdinBuffer) Flush() ([]string, error)
-func (*StdinBuffer) GetBuffer() (string, error)
-func (*StdinBuffer) Process([]byte) error
+func (b *StdinBuffer) Clear() error
+func (b *StdinBuffer) Destroy() error
+func (b *StdinBuffer) Flush() ([]string, error)
+func (b *StdinBuffer) GetBuffer() (string, error)
+func (b *StdinBuffer) Process(data []byte) error
+func (b *StdinBuffer) SetHandlers(handlers StdinBufferEventMap)
 
 ## symbol:tui/src/stdin-buffer.ts#StdinBufferEventMap
 reference: packages/tui/src/stdin-buffer.ts#StdinBufferEventMap
@@ -1246,21 +1258,23 @@ type KeyboardProtocolNegotiationSequence struct {
 reference: packages/tui/src/terminal.ts#ProcessTerminal
 target: github.com/nankedr/pig/tui.ProcessTerminal
 type ProcessTerminal struct {
-	input   io.Reader
-	output  io.Writer
-	mu      sync.Mutex
-	writeMu sync.Mutex
-	state   *term.State
-	file    *os.File
-	stop    chan struct{}
-	done    chan struct{}
-	started bool
-	stopped bool
-	err     error
+	input                   io.Reader
+	output                  io.Writer
+	mu                      sync.Mutex
+	lifecycle               sync.Mutex
+	buffer                  *StdinBuffer
+	kitty, modify, draining bool
+	pushed                  bool
+	lastInput               time.Time
+	writeMu                 sync.Mutex
+	state                   *term.State
+	file                    *os.File
+	stop                    chan struct{}
+	done                    chan struct{}
+	started                 bool
+	stopped                 bool
+	err                     error
 }
-func (*ProcessTerminal) DrainInput(context.Context, time.Duration, time.Duration) error
-func (*ProcessTerminal) KittyProtocolActive() (bool, error)
-func (*ProcessTerminal) ModifyOtherKeysActive() (bool, error)
 func (*ProcessTerminal) SetProgress(bool) error
 func (*ProcessTerminal) SetTitle(string) error
 func (t *ProcessTerminal) ClearFromCursor() error
@@ -1268,8 +1282,11 @@ func (t *ProcessTerminal) ClearLine() error
 func (t *ProcessTerminal) ClearScreen() error
 func (t *ProcessTerminal) Columns() (int, error)
 func (t *ProcessTerminal) Done() <-chan struct{}
+func (t *ProcessTerminal) DrainInput(ctx context.Context, maxTime, idleTime time.Duration) error
 func (t *ProcessTerminal) Err() error
 func (t *ProcessTerminal) HideCursor() error
+func (t *ProcessTerminal) KittyProtocolActive() (bool, error)
+func (t *ProcessTerminal) ModifyOtherKeysActive() (bool, error)
 func (t *ProcessTerminal) MoveBy(lines int) error
 func (t *ProcessTerminal) Rows() (int, error)
 func (t *ProcessTerminal) ShowCursor() error
@@ -1306,17 +1323,17 @@ func IsAppleTerminalSession() (bool, error)
 ## symbol:tui/src/terminal.ts#normalizeAppleTerminalInput
 reference: packages/tui/src/terminal.ts#normalizeAppleTerminalInput
 target: github.com/nankedr/pig/tui.NormalizeAppleTerminalInput
-func NormalizeAppleTerminalInput(string, bool, bool) (string, error)
+func NormalizeAppleTerminalInput(data string, apple, shift bool) (string, error)
 
 ## symbol:tui/src/terminal.ts#normalizeNativeShiftEnterInput
 reference: packages/tui/src/terminal.ts#normalizeNativeShiftEnterInput
 target: github.com/nankedr/pig/tui.NormalizeNativeShiftEnterInput
-func NormalizeNativeShiftEnterInput(string, bool, bool) (string, error)
+func NormalizeNativeShiftEnterInput(data string, detect, shift bool) (string, error)
 
 ## symbol:tui/src/terminal.ts#parseKeyboardProtocolNegotiationSequence
 reference: packages/tui/src/terminal.ts#parseKeyboardProtocolNegotiationSequence
 target: github.com/nankedr/pig/tui.ParseKeyboardProtocolNegotiationSequence
-func ParseKeyboardProtocolNegotiationSequence(string) (KeyboardProtocolNegotiationSequence, bool, error)
+func ParseKeyboardProtocolNegotiationSequence(data string) (KeyboardProtocolNegotiationSequence, bool, error)
 
 ## symbol:tui/src/tui-alt-screen.ts#TuiAltScreen
 reference: packages/tui/src/tui-alt-screen.ts#TuiAltScreen

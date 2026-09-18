@@ -1,7 +1,6 @@
 package codingagent_test
 
 import (
-	"errors"
 	"reflect"
 	"testing"
 
@@ -58,95 +57,4 @@ func TestKeybindingsManagerInheritance(t *testing.T) {
 		}
 	})
 
-	t.Run("promoted methods retain TUI ownership on the zero value", func(t *testing.T) {
-		manager := &codingagent.KeybindingsManager{}
-		tests := []struct {
-			operation string
-			call      func() error
-		}{
-			{"KeybindingsManager.matches", func() error {
-				matched, err := manager.Matches("enter", tui.KeybindingInputSubmit)
-				if matched {
-					t.Error("Matches result = true, want false")
-				}
-				return err
-			}},
-			{"KeybindingsManager.getKeys", func() error {
-				keys, err := manager.GetKeys(tui.KeybindingInputSubmit)
-				if keys != nil {
-					t.Errorf("GetKeys result = %#v, want nil", keys)
-				}
-				return err
-			}},
-			{"KeybindingsManager.getDefinition", func() error {
-				definition, ok, err := manager.GetDefinition(tui.KeybindingInputSubmit)
-				if ok || !reflect.DeepEqual(definition, tui.KeybindingDefinition{}) {
-					t.Errorf("GetDefinition result = (%#v, %t), want zero definition and false", definition, ok)
-				}
-				return err
-			}},
-			{"KeybindingsManager.getConflicts", func() error {
-				conflicts, err := manager.GetConflicts()
-				if conflicts != nil {
-					t.Errorf("GetConflicts result = %#v, want nil", conflicts)
-				}
-				return err
-			}},
-			{"KeybindingsManager.setUserBindings", func() error {
-				return manager.SetUserBindings(tui.KeybindingsConfig{tui.KeybindingInputSubmit: {"ctrl+enter"}})
-			}},
-			{"KeybindingsManager.getUserBindings", func() error {
-				bindings, err := manager.GetUserBindings()
-				if bindings != nil {
-					t.Errorf("GetUserBindings result = %#v, want nil", bindings)
-				}
-				return err
-			}},
-			{"KeybindingsManager.getResolvedBindings", func() error {
-				bindings, err := manager.GetResolvedBindings()
-				if bindings != nil {
-					t.Errorf("GetResolvedBindings result = %#v, want nil", bindings)
-				}
-				return err
-			}},
-		}
-
-		for _, test := range tests {
-			t.Run(test.operation, func(t *testing.T) {
-				assertKeybindingsNotImplemented(t, test.call(), "tui", test.operation)
-			})
-		}
-	})
-
-	t.Run("local methods retain Coding Agent ownership", func(t *testing.T) {
-		manager := &codingagent.KeybindingsManager{}
-		config, err := manager.GetEffectiveConfig()
-		if config != nil {
-			t.Fatalf("GetEffectiveConfig result = %#v, want nil", config)
-		}
-		assertKeybindingsNotImplemented(t, err, "codingagent", "KeybindingsManager.GetEffectiveConfig")
-		assertKeybindingsNotImplemented(t, manager.Reload(), "codingagent", "KeybindingsManager.Reload")
-	})
-
-	t.Run("constructor remains an inert capability stub", func(t *testing.T) {
-		manager, err := codingagent.NewKeybindingsManager("invalid\x00path")
-		if manager != nil {
-			t.Fatalf("NewKeybindingsManager result = %#v, want nil", manager)
-		}
-		assertKeybindingsNotImplemented(t, err, "codingagent", "NewKeybindingsManager")
-	})
-}
-
-func assertKeybindingsNotImplemented(t *testing.T, err error, module, operation string) {
-	t.Helper()
-	if !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("error = %v, want ErrNotImplemented", err)
-	}
-	var unavailable *codingagent.NotImplementedError
-	if !errors.As(err, &unavailable) {
-		t.Fatalf("error = %T, want *codingagent.NotImplementedError", err)
-	}
-	if unavailable.Module != module || unavailable.Operation != operation {
-		t.Fatalf("NotImplementedError = %#v, want module %q operation %q", unavailable, module, operation)
-	}
 }

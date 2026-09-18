@@ -6,3 +6,5 @@ import "os"
 
 func terminalSupported() error                                           { return newNotImplemented("ProcessTerminal.start.platform") }
 func readTerminal(*os.File, <-chan struct{}, func(string), func()) error { return terminalSupported() }
+
+func suspendProcess() error { return newNotImplemented("ProcessTerminal.suspend.platform") }

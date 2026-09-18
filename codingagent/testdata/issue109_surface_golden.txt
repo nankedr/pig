@@ -1,5 +1,6 @@
 type codingagent.InteractiveModeOptions
 Terminal tui.Terminal
+Keybindings *codingagent.KeybindingsManager
 AutoTrustOnReloadCWD *string
 InitialImages []ai.ImageContent
 InitialMessage *string
@@ -8,6 +9,12 @@ MigratedProviders []string
 ModelFallbackMessage *string
 TUIMode tui.TUIMode
 Verbose bool
+type tui.TextUIOptions
+Keybindings *tui.KeybindingsManager
+OnInterrupt func()
+type tui.TextInput
+Text string
+Action tui.Keybinding
 type *codingagent.InteractiveMode
 ClearEditor func(*codingagent.InteractiveMode) error
 GetUserInput func(*codingagent.InteractiveMode, context.Context) (string, error)
@@ -44,6 +51,8 @@ Append func(*tui.TextUI, string) error
 ClearEditor func(*tui.TextUI) error
 Done func(*tui.TextUI) <-chan struct {}
 Err func(*tui.TextUI) error
+ReadInput func(*tui.TextUI, context.Context) (tui.TextInput, error)
 ReadLine func(*tui.TextUI, context.Context) (string, error)
 Start func(*tui.TextUI) error
 Stop func(*tui.TextUI) error
+Suspend func(*tui.TextUI) error

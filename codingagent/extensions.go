@@ -11,7 +11,6 @@ import (
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
-	"github.com/nankedr/pig/tui"
 )
 
 // EventBus inventories the extension-facing named-channel boundary without
@@ -97,20 +96,6 @@ const (
 	AppKeybindingTreeFilterCycleForward   AppKeybinding = "app.tree.filter.cycleForward"
 	AppKeybindingTreeFilterCycleBackward  AppKeybinding = "app.tree.filter.cycleBackward"
 )
-
-type KeybindingsManager struct {
-	tui.KeybindingsManager
-}
-
-func NewKeybindingsManager(...string) (*KeybindingsManager, error) {
-	return nil, notImplemented("NewKeybindingsManager")
-}
-func (*KeybindingsManager) GetEffectiveConfig() (tui.KeybindingsConfig, error) {
-	return nil, notImplemented("KeybindingsManager.GetEffectiveConfig")
-}
-func (*KeybindingsManager) Reload() error {
-	return notImplemented("KeybindingsManager.Reload")
-}
 
 // ConvertToLLM projects persisted Coding Agent messages into Provider input.
 func ConvertToLLM(messages []agent.AgentMessage) []ai.Message {

@@ -144,3 +144,9 @@ The editor uses this CGO-free implementation for grapheme boundaries and
 terminal widths. The retained notice is THIRD_PARTY_LICENSES/uniseg-MIT.txt.
 Editor wrapping, history, undo and paste semantics follow Pi's editor.ts at
 the pinned Code Baseline under the Pi MIT attribution above.
+
+purego v0.8.4 (github.com/ebitengine/purego)
+Copyright 2022 The Ebitengine Authors.
+Used for CGO-free macOS CoreGraphics modifier-state queries.
+Licensed under the Apache License, Version 2.0; see licenses/purego-LICENSE.
+No Pi native binary is copied or distributed.

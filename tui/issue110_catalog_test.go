@@ -26,7 +26,7 @@ func issue110Partial() *catalog.Partial {
 			"Real PTY CLI compares edited Provider inputs with pinned Pi; empty input and canceled drafts produce no unintended requests; restored Session user messages seed input history",
 		}, Unsupported: []string{
 			"ICU dictionary word segmentation, Unicode-version/terminal-width differences and all atomic-marker vertical-navigation combinations remain partial",
-			"Full Kitty/modifyOtherKeys negotiation, configurable keybindings and autocomplete remain unverified or explicit Stubs; fullscreen/Markdown/scrollback, images, extensions and six-platform acceptance remain outside this slice",
+			"Issue #111 keyboard negotiation/keybindings evidence is owned by contract:tui/terminal-keys; autocomplete remains an explicit Stub; fullscreen/Markdown/scrollback, images, extensions and six-platform acceptance remain outside this slice",
 		}}
 }
 func issue110Promote(entry *catalog.Entry) bool {

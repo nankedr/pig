@@ -312,20 +312,3 @@ func TestExtensionOperationSlotsUseOpaqueCarrier(t *testing.T) {
 		}
 	}
 }
-
-func TestKeybindingsManagerEffectiveConfigIsExplicitlyUnavailable(t *testing.T) {
-	config, err := (&codingagent.KeybindingsManager{}).GetEffectiveConfig()
-	if config != nil {
-		t.Fatalf("GetEffectiveConfig result = %#v, want nil", config)
-	}
-	if !errors.Is(err, codingagent.ErrNotImplemented) {
-		t.Fatalf("GetEffectiveConfig error = %v, want ErrNotImplemented", err)
-	}
-	var unavailable *codingagent.NotImplementedError
-	if !errors.As(err, &unavailable) {
-		t.Fatalf("GetEffectiveConfig error = %T, want *codingagent.NotImplementedError", err)
-	}
-	if unavailable.Module != "codingagent" || unavailable.Operation != "KeybindingsManager.GetEffectiveConfig" {
-		t.Fatalf("NotImplementedError = %#v, want codingagent.KeybindingsManager.GetEffectiveConfig", unavailable)
-	}
-}

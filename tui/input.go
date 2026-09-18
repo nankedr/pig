@@ -211,40 +211,6 @@ func (keyNames) SuperAlt(key KeyID) KeyID       { return modifiedKey("super+alt+
 func (keyNames) CtrlShiftAlt(key KeyID) KeyID   { return modifiedKey("ctrl+shift+alt+", key) }
 func (keyNames) CtrlShiftSuper(key KeyID) KeyID { return modifiedKey("ctrl+shift+super+", key) }
 
-// SetKittyProtocolActive is deferred because changing package-global parsing
-// mode would make the M0 scaffold stateful.
-func SetKittyProtocolActive(bool) error {
-	return newNotImplemented("setKittyProtocolActive")
-}
-
-func IsKittyProtocolActive() (bool, error) {
-	return false, newNotImplemented("isKittyProtocolActive")
-}
-
-func IsKeyRelease(string) (bool, error) {
-	return false, newNotImplemented("isKeyRelease")
-}
-
-func IsKeyRepeat(string) (bool, error) {
-	return false, newNotImplemented("isKeyRepeat")
-}
-
-func MatchesKey(string, KeyID) (bool, error) {
-	return false, newNotImplemented("matchesKey")
-}
-
-func ParseKey(string) (KeyID, bool, error) {
-	return "", false, newNotImplemented("parseKey")
-}
-
-func DecodeKittyPrintable(string) (string, bool, error) {
-	return "", false, newNotImplemented("decodeKittyPrintable")
-}
-
-func DecodePrintableKey(string) (string, bool, error) {
-	return "", false, newNotImplemented("decodePrintableKey")
-}
-
 // Keybinding identifies one extensible TUI action.
 type Keybinding string
 
@@ -412,106 +378,16 @@ func NewTUIKeybindings() KeybindingDefinitions {
 // must be treated as read-only; NewTUIKeybindings returns an independent map.
 var TUIKeybindings = NewTUIKeybindings()
 
-// KeybindingsManager records definition and user-binding inputs. Rebuilding and
-// matching remain deferred because they depend on the terminal key parser.
-type KeybindingsManager struct {
-	definitions  KeybindingDefinitions
-	userBindings KeybindingsConfig
-}
-
-func NewKeybindingsManager(definitions KeybindingDefinitions, userBindings ...KeybindingsConfig) *KeybindingsManager {
-	manager := &KeybindingsManager{definitions: cloneKeybindingDefinitions(definitions)}
-	if len(userBindings) != 0 {
-		manager.userBindings = cloneKeybindingsConfig(userBindings[0])
-	}
-	return manager
-}
-
-func (*KeybindingsManager) Matches(string, Keybinding) (bool, error) {
-	return false, newNotImplemented("KeybindingsManager.matches")
-}
-
-func (*KeybindingsManager) GetKeys(Keybinding) ([]KeyID, error) {
-	return nil, newNotImplemented("KeybindingsManager.getKeys")
-}
-
-func (*KeybindingsManager) GetDefinition(Keybinding) (KeybindingDefinition, bool, error) {
-	return KeybindingDefinition{}, false, newNotImplemented("KeybindingsManager.getDefinition")
-}
-
-func (*KeybindingsManager) GetConflicts() ([]KeybindingConflict, error) {
-	return nil, newNotImplemented("KeybindingsManager.getConflicts")
-}
-
-func (*KeybindingsManager) SetUserBindings(KeybindingsConfig) error {
-	return newNotImplemented("KeybindingsManager.setUserBindings")
-}
-
-func (*KeybindingsManager) GetUserBindings() (KeybindingsConfig, error) {
-	return nil, newNotImplemented("KeybindingsManager.getUserBindings")
-}
-
-func (*KeybindingsManager) GetResolvedBindings() (KeybindingsConfig, error) {
-	return nil, newNotImplemented("KeybindingsManager.getResolvedBindings")
-}
-
-// SetKeybindings does not mutate global state in the capability scaffold.
-func SetKeybindings(*KeybindingsManager) error {
-	return newNotImplemented("setKeybindings")
-}
-
-// GetKeybindings does not lazily create a process-global manager in the
-// capability scaffold.
-func GetKeybindings() (*KeybindingsManager, error) {
-	return nil, newNotImplemented("getKeybindings")
-}
-
 // StdinBufferOptions uses milliseconds to preserve the fixed baseline's number
 // unit. A nil Timeout selects the eventual implementation's default.
 type StdinBufferOptions struct {
 	Timeout *int64
 }
 
-// StdinBufferEventMap gives the typed callback shape for the two emitted event
-// names. Callbacks are never invoked by the capability scaffold.
+// StdinBufferEventMap contains handlers for complete key sequences and bracketed pastes.
 type StdinBufferEventMap struct {
 	Data  func(string)
 	Paste func(string)
-}
-
-// StdinBuffer is an inert input-sequence buffering capability. Construction
-// never starts its eventual incomplete-sequence timer.
-type StdinBuffer struct {
-	options StdinBufferOptions
-}
-
-func NewStdinBuffer(options ...StdinBufferOptions) *StdinBuffer {
-	buffer := &StdinBuffer{}
-	if len(options) != 0 {
-		buffer.options = options[0]
-		buffer.options.Timeout = inputCloneInt64Pointer(options[0].Timeout)
-	}
-	return buffer
-}
-
-func (*StdinBuffer) Process([]byte) error {
-	return newNotImplemented("StdinBuffer.process")
-}
-
-func (*StdinBuffer) Flush() ([]string, error) {
-	return nil, newNotImplemented("StdinBuffer.flush")
-}
-
-func (*StdinBuffer) Clear() error {
-	return newNotImplemented("StdinBuffer.clear")
-}
-
-func (*StdinBuffer) GetBuffer() (string, error) {
-	return "", newNotImplemented("StdinBuffer.getBuffer")
-}
-
-func (*StdinBuffer) Destroy() error {
-	return newNotImplemented("StdinBuffer.destroy")
 }
 
 // KillRingPushOptions controls how a kill is combined with the newest entry.

@@ -59,3 +59,5 @@ func readTerminal(file *os.File, stop <-chan struct{}, onInput func(string), onR
 		}
 	}
 }
+
+func suspendProcess() error { return unix.Kill(os.Getpid(), unix.SIGTSTP) }

@@ -38,8 +38,5 @@ const (
 	ModifierKeyOption  ModifierKey = "option"
 )
 
-// IsNativeModifierPressed never loads a native helper or inspects platform
-// state in the CGO-free capability scaffold.
-func IsNativeModifierPressed(ModifierKey) (bool, error) {
-	return false, newNotImplemented("isNativeModifierPressed")
-}
+// IsNativeModifierPressed queries supported platform state, falling back to false when unavailable.
+func IsNativeModifierPressed(key ModifierKey) (bool, error) { return nativeModifierPressed(key), nil }

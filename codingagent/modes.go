@@ -18,6 +18,7 @@ import (
 // behavior itself remains owned by package tui.
 type InteractiveModeOptions struct {
 	Terminal             tui.Terminal
+	Keybindings          *KeybindingsManager
 	AutoTrustOnReloadCWD *string
 	InitialImages        []ai.ImageContent
 	InitialMessage       *string

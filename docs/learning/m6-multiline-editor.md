@@ -48,3 +48,5 @@ node parity/oracle/editor-cli.mjs /path/to/locked-pi --check
 普通测试离线重放锁定 fixture，CLI 使用真实 pig 子进程、PTY 与回环 Provider，直接比较每轮 Provider 收到的文本；同时覆盖空输入、取消、分段粘贴与缩放。SDK fixture 比较每一步文本、光标、展开结果、完整渲染帧与回调序列。快照在 `tui/testdata/issue31_surface_golden.txt`，目录条目为 `contract:tui/multiline-editor`。
 
 此切片保持 partial：ICU 的中文/泰语等词典分词、不同 Unicode 版本与终端宽度差异、完整 Kitty/modifyOtherKeys 协议、可配置键绑定、自动补全、复杂粘贴占位符跨视觉行的所有跳转组合仍未声明全面对等。自动补全 setter 保留明确 Stub。完整 TUI/Markdown、scrollback、fullscreen、图片、扩展运行时、认证、包生态及六平台运行验收沿用后续里程碑边界。
+
+下一切片：[M6.3 终端按键与快捷键](m6-terminal-keys.md)，包含协议、配置和生命周期验证。

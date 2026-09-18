@@ -9,33 +9,60 @@ import (
 	"sync"
 	"time"
 	"unicode"
-	"unicode/utf8"
 
 	"github.com/rivo/uniseg"
 )
 
 // TextUI is the minimal text conversation renderer. Advanced layouts remain separate capabilities.
 type TextUI struct {
-	terminal            Terminal
-	mu                  sync.Mutex
-	transcript, pending string
-	editor              *Editor
-	inputs              []string
-	ready               chan struct{}
-	done                chan struct{}
-	err                 error
-	started, stopped    bool
-	lastInterrupt       time.Time
-	paste               bool
+	terminal         Terminal
+	mu               sync.Mutex
+	transcript       string
+	editor           *Editor
+	inputs           []TextInput
+	ready            chan struct{}
+	done             chan struct{}
+	err              error
+	started, stopped bool
+	lastInterrupt    time.Time
+	keybindings      *KeybindingsManager
+	onInterrupt      func()
+	generation       uint64
 }
 
-func NewTextUI(terminal Terminal) *TextUI {
+type TextInput struct {
+	Text   string
+	Action Keybinding
+}
+type TextUIOptions struct {
+	Keybindings *KeybindingsManager
+	OnInterrupt func()
+}
+
+func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 	u := &TextUI{terminal: terminal, ready: make(chan struct{}, 1), done: make(chan struct{}), editor: NewEditor(nil, EditorTheme{})}
+	if len(options) > 0 {
+		u.keybindings = options[0].Keybindings
+		u.onInterrupt = options[0].OnInterrupt
+	}
+	if u.keybindings == nil {
+		defs := NewTUIKeybindings()
+		for action, key := range map[Keybinding]KeyID{"app.clear": "ctrl+c", "app.exit": "ctrl+d", "app.interrupt": "escape", "app.suspend": "ctrl+z", "app.session.new": ""} {
+			keys := []KeyID{}
+			if key != "" {
+				keys = append(keys, key)
+			}
+			defs[action] = KeybindingDefinition{DefaultKeys: keys}
+		}
+		u.keybindings = NewKeybindingsManager(defs)
+	}
+	u.editor.keybindings = u.keybindings
+	u.editor.kitty = func() bool { active, _ := u.terminal.KittyProtocolActive(); return active }
 	u.editor.Focused = true
 	u.editor.OnSubmit = func(text string) {
 		if text != "" {
 			u.editor.AddToHistory(text)
-			u.inputs = append(u.inputs, text)
+			u.inputs = append(u.inputs, TextInput{Text: text})
 			select {
 			case u.ready <- struct{}{}:
 			default:
@@ -70,21 +97,7 @@ func (u *TextUI) Start() error {
 	if err != nil {
 		return errors.Join(err, u.Stop())
 	}
-	if source, ok := u.terminal.(interface {
-		Done() <-chan struct{}
-		Err() error
-	}); ok {
-		go func() {
-			select {
-			case <-u.done:
-				return
-			case <-source.Done():
-				u.mu.Lock()
-				defer u.mu.Unlock()
-				u.finish(source.Err())
-			}
-		}()
-	}
+	u.watchTerminal()
 	return nil
 }
 func (u *TextUI) Stop() error {
@@ -94,7 +107,7 @@ func (u *TextUI) Stop() error {
 	u.started = false
 	u.mu.Unlock()
 	if started && u.terminal != nil {
-		return u.terminal.Stop()
+		return errors.Join(u.terminal.DrainInput(context.Background(), time.Second, 50*time.Millisecond), u.terminal.Stop())
 	}
 	return nil
 }
@@ -110,14 +123,25 @@ func (u *TextUI) finish(err error) {
 }
 func (u *TextUI) ReadLine(ctx context.Context) (string, error) {
 	for {
+		input, err := u.ReadInput(ctx)
+		if err != nil {
+			return "", err
+		}
+		if input.Action == "" {
+			return input.Text, nil
+		}
+	}
+}
+func (u *TextUI) ReadInput(ctx context.Context) (TextInput, error) {
+	for {
 		u.mu.Lock()
 		if u.stopped {
 			err := u.err
 			u.mu.Unlock()
 			if err != nil {
-				return "", err
+				return TextInput{}, err
 			}
-			return "", io.EOF
+			return TextInput{}, io.EOF
 		}
 		if len(u.inputs) > 0 {
 			line := u.inputs[0]
@@ -128,7 +152,7 @@ func (u *TextUI) ReadLine(ctx context.Context) (string, error) {
 		u.mu.Unlock()
 		select {
 		case <-ctx.Done():
-			return "", ctx.Err()
+			return TextInput{}, ctx.Err()
 		case <-u.done:
 		case <-u.ready:
 		}
@@ -229,69 +253,91 @@ func (u *TextUI) input(data string) {
 	if u.stopped {
 		return
 	}
-	u.pending += data
-	for len(u.pending) > 0 {
-		if u.paste {
-			end := strings.Index(u.pending, "\x1b[201~")
-			if end < 0 {
-				break
-			}
-			_ = u.editor.HandleInput("\x1b[200~" + u.pending[:end+6])
-			u.pending = u.pending[end+6:]
-			u.paste = false
-			continue
+	if release, _ := IsKeyRelease(data); release {
+		return
+	}
+	active, _ := u.terminal.KittyProtocolActive()
+	match := func(action Keybinding) bool { return u.keybindings.matches(data, action, active) }
+	switch {
+	case strings.HasPrefix(data, "\x1b[200~"):
+		_ = u.editor.HandleInput(data)
+	case match("app.clear"):
+		now := time.Now()
+		if now.Sub(u.lastInterrupt) < 500*time.Millisecond {
+			u.finish(nil)
+			return
 		}
-		size := 1
-		if u.pending[0] == 0x1b {
-			if len(u.pending) < 2 {
-				break
-			}
-			size = 2
-			if u.pending[1] == '[' || u.pending[1] == 'O' {
-				size = 2
-				for size < len(u.pending) && (u.pending[size] < 0x40 || u.pending[size] > 0x7e) {
-					size++
-				}
-				if size == len(u.pending) {
-					break
-				}
-				size++
-			} else {
-				if !utf8.FullRuneInString(u.pending[1:]) {
-					break
-				}
-				_, n := utf8.DecodeRuneInString(u.pending[1:])
-				size = 1 + n
-			}
+		u.lastInterrupt = now
+		_ = u.editor.SetText("")
+		u.editor.undo = nil
+	case match("app.exit") && u.editor.GetText() == "":
+		u.finish(nil)
+		return
+	case match("app.interrupt"):
+		if u.onInterrupt != nil {
+			u.onInterrupt()
+		}
+	case match("app.session.new"), match("app.suspend"):
+		action := Keybinding("app.session.new")
+		if match("app.suspend") {
+			action = "app.suspend"
 		} else {
-			if !utf8.FullRuneInString(u.pending) {
-				break
-			}
-			_, size = utf8.DecodeRuneInString(u.pending)
-		}
-		key := u.pending[:size]
-		u.pending = u.pending[size:]
-		switch key {
-		case "\x1b[200~":
-			u.paste = true
-		case "\x03":
-			now := time.Now()
-			if now.Sub(u.lastInterrupt) < 500*time.Millisecond {
-				u.finish(nil)
-				return
-			}
-			u.lastInterrupt = now
 			_ = u.editor.SetText("")
-			u.editor.undo = nil
-		case "\x04":
-			if u.editor.GetText() == "" {
-				u.finish(nil)
-				return
-			}
-			_ = u.editor.HandleInput(key)
-		default:
-			_ = u.editor.HandleInput(key)
 		}
+		u.inputs = append(u.inputs, TextInput{Action: action})
+		select {
+		case u.ready <- struct{}{}:
+		default:
+		}
+	default:
+		_ = u.editor.HandleInput(data)
 	}
 	_ = u.render()
+}
+func (u *TextUI) watchTerminal() {
+	source, ok := u.terminal.(interface {
+		Done() <-chan struct{}
+		Err() error
+	})
+	if !ok {
+		return
+	}
+	u.mu.Lock()
+	generation := u.generation
+	done := source.Done()
+	u.mu.Unlock()
+	go func() {
+		select {
+		case <-u.done:
+			return
+		case <-done:
+			u.mu.Lock()
+			defer u.mu.Unlock()
+			if generation == u.generation {
+				u.finish(source.Err())
+			}
+		}
+	}()
+}
+func (u *TextUI) Suspend() error {
+	u.mu.Lock()
+	if u.stopped {
+		u.mu.Unlock()
+		return io.EOF
+	}
+	u.generation++
+	u.mu.Unlock()
+	if err := u.terminal.Stop(); err != nil {
+		return err
+	}
+	if err := suspendProcess(); err != nil {
+		return err
+	}
+	if err := u.terminal.Start(u.input, func() { u.mu.Lock(); defer u.mu.Unlock(); _ = u.render() }); err != nil {
+		return err
+	}
+	u.watchTerminal()
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	return u.render()
 }

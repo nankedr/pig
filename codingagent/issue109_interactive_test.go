@@ -185,7 +185,9 @@ func TestInteractiveSDKEOF(t *testing.T) {
 	}
 }
 
-func TestInteractiveSDKCancelActiveTurn(t *testing.T) {
+func TestInteractiveSDKCancelActiveTurn(t *testing.T) { testInteractiveCancel(t, false) }
+func TestInteractiveSDKInterruptKey111(t *testing.T)  { testInteractiveCancel(t, true) }
+func testInteractiveCancel(t *testing.T, shortcut bool) {
 	canceled := make(chan struct{})
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
@@ -201,7 +203,12 @@ func TestInteractiveSDKCancelActiveTurn(t *testing.T) {
 		t.Fatal(err)
 	}
 	tty := terminaltest.Open(t)
-	mode := codingagent.NewInteractiveMode(runtime, codingagent.InteractiveModeOptions{Terminal: tui.NewProcessTerminal(tty.Slave, tty.Slave)})
+	bindings, err := codingagent.NewKeybindingsManager(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	bindings.SetUserBindings(tui.KeybindingsConfig{"app.interrupt": {"ctrl+g"}})
+	mode := codingagent.NewInteractiveMode(runtime, codingagent.InteractiveModeOptions{Terminal: tui.NewProcessTerminal(tty.Slave, tty.Slave), Keybindings: bindings})
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	done := make(chan error, 1)
@@ -209,15 +216,30 @@ func TestInteractiveSDKCancelActiveTurn(t *testing.T) {
 	tty.Wait(t, "> ")
 	tty.Send(t, "hold request\r")
 	tty.Wait(t, "PARTIAL_BEFORE_CANCEL")
-	cancel()
-	if err := awaitInteractive(t, done); !errors.Is(err, context.Canceled) {
-		t.Fatalf("active cancel: %v", err)
+	if shortcut {
+		tty.Send(t, "\x1b[103;5:3u")
+		select {
+		case <-canceled:
+			t.Fatal("release aborted turn")
+		case <-time.After(30 * time.Millisecond):
+		}
+		tty.Send(t, "\x1b[103;5u")
+	} else {
+		cancel()
 	}
+
 	select {
 	case <-canceled:
 	case <-time.After(5 * time.Second):
 		t.Fatal("Provider request survived cancellation")
 	}
+	if shortcut {
+		tty.Send(t, "\x04")
+	}
+	if err := awaitInteractive(t, done); shortcut && err != nil || !shortcut && !errors.Is(err, context.Canceled) {
+		t.Fatalf("active cancel: %v", err)
+	}
+
 	if !tty.Restored(t) {
 		t.Fatal("raw mode survived active cancellation")
 	}

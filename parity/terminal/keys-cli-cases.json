@@ -1,0 +1,44 @@
+{
+  "config": {
+    "tui.input.submit": "ctrl+s",
+    "tui.editor.cursorLeft": "ctrl+h",
+    "tui.editor.cursorRight": [],
+    "app.clear": "ctrl+r",
+    "app.exit": "ctrl+q",
+    "app.session.new": "ctrl+n",
+    "app.model.select": "ctrl+g",
+    "app.message.copy": "ctrl+g"
+  },
+  "clear": "\u0012",
+  "exit": "\u0011",
+  "negotiation": [
+    "\u001b[?1;2c",
+    "\u001b[?",
+    "7u"
+  ],
+  "turns": [
+    {
+      "chunks": [
+        "\u001b[97ua",
+        "\u001b[98;1:2u",
+        "\u001b[98;1:3u",
+        "\u001b[13;2u",
+        "中",
+        "\u001b[27;2;65~",
+        "\u001b[13;1:3u",
+        "\u0013"
+      ]
+    },
+    {
+      "chunks": [
+        "\u000e",
+        "world",
+        "\b",
+        "!",
+        "\u001b[C",
+        "?",
+        "\u0013"
+      ]
+    }
+  ]
+}

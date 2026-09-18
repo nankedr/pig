@@ -10,8 +10,6 @@ import (
 
 func TestInputAndPlatformCapabilityStubsAreExplicit(t *testing.T) {
 	provider := tui.NewCombinedAutocompleteProvider(nil, ".", nil)
-	buffer := tui.NewStdinBuffer()
-	manager := tui.NewKeybindingsManager(tui.TUIKeybindings)
 
 	operations := []struct {
 		name string
@@ -25,29 +23,12 @@ func TestInputAndPlatformCapabilityStubsAreExplicit(t *testing.T) {
 			_, err := provider.ApplyCompletion(nil, 0, 0, tui.AutocompleteItem{}, "")
 			return err
 		}},
-		{name: "key matching", call: func() error {
-			_, err := tui.MatchesKey("", tui.Key.Enter)
-			return err
-		}},
-		{name: "key parsing", call: func() error {
-			_, _, err := tui.ParseKey("")
-			return err
-		}},
-		{name: "keybinding resolution", call: func() error {
-			_, err := manager.GetResolvedBindings()
-			return err
-		}},
-		{name: "stdin processing", call: func() error { return buffer.Process([]byte("x")) }},
 		{name: "word navigation", call: func() error {
 			_, err := tui.FindWordForward("word", 0)
 			return err
 		}},
 		{name: "terminal color parsing", call: func() error {
 			_, _, err := tui.ParseOSC11BackgroundColor("\x1b]11;#000000\x07")
-			return err
-		}},
-		{name: "native modifier inspection", call: func() error {
-			_, err := tui.IsNativeModifierPressed(tui.ModifierKeyShift)
 			return err
 		}},
 	}
