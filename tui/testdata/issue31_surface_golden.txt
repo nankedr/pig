@@ -1551,6 +1551,7 @@ type TUIBase struct {
 	listeners          map[uint64]TUIInputListener
 	listenerID         uint64
 	mainState          TUIMainScreenRenderState
+	forceRender        atomic.Bool
 }
 func (*TUIBase) HideOverlay() error
 func (*TUIBase) Mode() TUIMode
@@ -1571,8 +1572,8 @@ func (t *TUIBase) HasOverlayEntries() bool
 func (t *TUIBase) OnDebug() func()
 func (t *TUIBase) RemoveInputListener(listener TUIInputListener) error
 func (t *TUIBase) Render(width int) ([]string, error)
-func (t *TUIBase) RenderNow(_ ...bool) error
-func (t *TUIBase) RequestRender(_ ...bool) error
+func (t *TUIBase) RenderNow(force ...bool) error
+func (t *TUIBase) RequestRender(force ...bool) error
 func (t *TUIBase) SetClearOnShrink(clear bool) error
 func (t *TUIBase) SetFocus(c Component) error
 func (t *TUIBase) SetOnDebug(callback func())

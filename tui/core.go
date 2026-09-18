@@ -4,6 +4,7 @@ import (
 	"context"
 	"reflect"
 	"sync"
+	"sync/atomic"
 )
 
 // CursorMarker is the zero-width marker emitted by a focused component at its
@@ -270,6 +271,7 @@ type TUIBase struct {
 	listeners          map[uint64]TUIInputListener
 	listenerID         uint64
 	mainState          TUIMainScreenRenderState
+	forceRender        atomic.Bool
 }
 
 func NewTUIBase(terminal Terminal, options ...TUIBaseOptions) *TUIBase {
@@ -285,11 +287,15 @@ func NewTUIBase(terminal Terminal, options ...TUIBaseOptions) *TUIBase {
 	return base
 }
 
-func (*TUIBase) Mode() TUIMode                    { return TUIModeRegular }
-func (t *TUIBase) Terminal() Terminal             { return t.terminal }
-func (t *TUIBase) OnDebug() func()                { return t.onDebug }
-func (t *TUIBase) SetOnDebug(callback func())     { t.onDebug = callback }
-func (t *TUIBase) FullRedraws() int               { return t.fullRedraws }
+func (*TUIBase) Mode() TUIMode                { return TUIModeRegular }
+func (t *TUIBase) Terminal() Terminal         { return t.terminal }
+func (t *TUIBase) OnDebug() func()            { return t.onDebug }
+func (t *TUIBase) SetOnDebug(callback func()) { t.onDebug = callback }
+func (t *TUIBase) FullRedraws() int {
+	t.renderMu.Lock()
+	defer t.renderMu.Unlock()
+	return t.fullRedraws
+}
 func (t *TUIBase) HasOverlayEntries() bool        { return len(t.overlays) != 0 }
 func (t *TUIBase) GetShowHardwareCursor() bool    { return t.showHardwareCursor }
 func (t *TUIBase) GetClearOnShrink() bool         { return t.clearOnShrink }

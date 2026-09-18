@@ -3,6 +3,7 @@ package tui_test
 import (
 	"context"
 	"encoding/json"
+	"github.com/nankedr/pig/internal/terminaltest"
 	"github.com/nankedr/pig/tui"
 	"os"
 	"reflect"
@@ -31,8 +32,8 @@ func (t *terminal113) Write(s string) error {
 	t.output += s
 	return nil
 }
-func (t *terminal113) Columns() (int, error)                                        { return t.width, nil }
-func (t *terminal113) Rows() (int, error)                                           { return t.height, nil }
+func (t *terminal113) Columns() (int, error)                                        { t.mu.Lock(); defer t.mu.Unlock(); return t.width, nil }
+func (t *terminal113) Rows() (int, error)                                           { t.mu.Lock(); defer t.mu.Unlock(); return t.height, nil }
 func (*terminal113) DrainInput(context.Context, time.Duration, time.Duration) error { return nil }
 func (t *terminal113) text() string                                                 { t.mu.Lock(); defer t.mu.Unlock(); return t.output }
 func TestFullscreenRendererScroll113(t *testing.T) {
@@ -181,8 +182,11 @@ func TestTextUIModeSwitchAndEditor113(t *testing.T) {
 	if err := ui.ScrollToTop(); err != nil {
 		t.Fatal(err)
 	}
+	screen := terminaltest.NewScreen(20, 5)
 	output := terminal.text()
-	frame := output[strings.LastIndex(output, "\x1b[H\x1b[2J"):]
+	screen.Feed(output)
+	offset := len(output)
+	frame := screen.Text()
 	if !strings.Contains(frame, "first") {
 		t.Fatalf("history missing %q", frame)
 	}
@@ -190,7 +194,9 @@ func TestTextUIModeSwitchAndEditor113(t *testing.T) {
 		t.Fatal(err)
 	}
 	output = terminal.text()
-	frame = output[strings.LastIndex(output, "\x1b[H\x1b[2J"):]
+	screen.Feed(output[offset:])
+	offset = len(output)
+	frame = screen.Text()
 	if !strings.Contains(frame, "first") || strings.Contains(frame, "new last") {
 		t.Fatalf("append moved reading position %q", frame)
 	}
@@ -198,7 +204,9 @@ func TestTextUIModeSwitchAndEditor113(t *testing.T) {
 		t.Fatal(err)
 	}
 	output = terminal.text()
-	frame = output[strings.LastIndex(output, "\x1b[H\x1b[2J"):]
+	screen.Feed(output[offset:])
+	offset = len(output)
+	frame = screen.Text()
 	if !strings.Contains(frame, "new last") {
 		t.Fatal("cannot resume following")
 	}

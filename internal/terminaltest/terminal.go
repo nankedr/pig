@@ -19,6 +19,8 @@ type Terminal struct {
 	before        *term.State
 	mu            sync.Mutex
 	output        string
+	screen        *Screen
+	screenOffset  int
 }
 
 func Open(t *testing.T) *Terminal {
@@ -34,7 +36,7 @@ func Open(t *testing.T) *Terminal {
 	if err := pty.Setsize(slave, &pty.Winsize{Rows: 32, Cols: 100}); err != nil {
 		t.Fatal(err)
 	}
-	terminal := &Terminal{Master: master, Slave: slave, before: before}
+	terminal := &Terminal{Master: master, Slave: slave, before: before, screen: NewScreen(100, 32)}
 	t.Cleanup(func() { master.Close(); slave.Close() })
 	go func() {
 		data := make([]byte, 65536)
@@ -85,4 +87,31 @@ func (p *Terminal) CursorVisible() bool {
 func (p *Terminal) PasteDisabled() bool {
 	output := p.Output()
 	return strings.LastIndex(output, "\x1b[?2004l") > strings.LastIndex(output, "\x1b[?2004h")
+}
+
+func (p *Terminal) updateScreen() {
+	p.screen.Feed(p.output[p.screenOffset:])
+	p.screenOffset = len(p.output)
+}
+func (p *Terminal) ScreenText() string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.updateScreen()
+	return p.screen.Text()
+}
+func (p *Terminal) ScrollbackText() string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.updateScreen()
+	return strings.Join(p.screen.History, "\n")
+}
+func (p *Terminal) SetSize(rows, cols uint16) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.updateScreen()
+	if err := pty.Setsize(p.Slave, &pty.Winsize{Rows: rows, Cols: cols}); err != nil {
+		return err
+	}
+	p.screen.Resize(int(cols), int(rows))
+	return nil
 }

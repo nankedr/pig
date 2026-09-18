@@ -20,9 +20,9 @@ for mode in ['regular','fullscreen']:
   master,slave=pty.openpty();before=termios.tcgetattr(slave);fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',24,60,0,0))
   env={'PATH':os.environ['PATH'],'HOME':str(root),'TERM':'xterm-256color','PI_CODING_AGENT_DIR':str(agent),'PI_OFFLINE':'1','PI_SKIP_VERSION_CHECK':'1'}
   cmd=['node',str(pi/'packages/coding-agent/dist/cli.js'),'--provider','deepseek','--model','deepseek-v4-flash','--api-key','synthetic','--no-session','--no-tools','--no-extensions','--no-skills']
-  process=subprocess.Popen(cmd,stdin=slave,stdout=slave,stderr=slave,cwd=root,env=env);output=b'';screen=[[' ']*60 for _ in range(24)];row=col=0;pending=''
+  process=subprocess.Popen(cmd,stdin=slave,stdout=slave,stderr=slave,cwd=root,env=env);output=b'';screen=[[' ']*60 for _ in range(24)];row=col=0;pending='';history=[]
   def feed(data):
-   global screen,row,col,pending
+   global screen,row,col,pending,history
    pending+=data.decode('utf8',errors='replace')
    while pending:
     if pending[0]=='\x1b':
@@ -41,7 +41,8 @@ for mode in ['regular','fullscreen']:
      elif final=='D':col=max(0,col-n)
      elif final=='G':col=max(0,min(len(screen[0])-1,n-1))
      elif final=='J':
-      if nums and nums[0] in (2,3):screen=[[' ']*len(screen[0]) for _ in screen]
+      if nums and nums[0]==3:history=[]
+      elif nums and nums[0]==2:screen=[[' ']*len(screen[0]) for _ in screen]
       else:
        screen[row][col:]=[' ']*(len(screen[0])-col)
        for i in range(row+1,len(screen)):screen[i]=[' ']*len(screen[0])
@@ -53,7 +54,7 @@ for mode in ['regular','fullscreen']:
     if c=='\r':col=0
     elif c=='\n':
      row+=1
-     if row>=len(screen):screen.pop(0);screen.append([' ']*len(screen[0]));row=len(screen)-1
+     if row>=len(screen):history.append(''.join(screen.pop(0)));screen.append([' ']*len(screen[0]));row=len(screen)-1
     elif c>=' ':
      screen[row][min(col,len(screen[0])-1)]=c;col=min(len(screen[0])-1,col+1)
   def text():return '\n'.join(''.join(l) for l in screen)
@@ -76,7 +77,10 @@ for mode in ['regular','fullscreen']:
     os.write(master,b'\x1b[F');wait(lambda:'STREAM_DONE' in text());result['end_restores_tail']=True
     os.write(master,b'\x1b[<64;2;2M');pump(.15)
    else:release.set();wait(lambda:'STREAM_DONE' in text())
-   os.write(master,b'DRAFT\x1b[D\x1b[D');wait(lambda:'DRAFT' in text())
+   if mode=='regular':result['native_scrollback']='ROW000' in '\n'.join(history) and 'ROW020' in '\n'.join(history)
+   pump(.2);edit_offset=len(output)
+   os.write(master,b'DRAFT\x1b[D\x1b[D');wait(lambda:'DRAFT' in text());pump(.15)
+   if mode=='regular':result['incremental_editor']=b'ROW000' not in output[edit_offset:] and b'\x1b[2J' not in output[edit_offset:]
    for rows,cols in [(12,28),(30,80),(8,18),(24,60)]:
     screen=[[' ']*cols for _ in range(rows)];row=col=0;fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',rows,cols,0,0));process.send_signal(signal.SIGWINCH);pump(.2);wait(lambda:'DRAFT' in text())
    if mode=='fullscreen':os.write(master,b'\x1b[F')

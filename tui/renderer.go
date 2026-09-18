@@ -141,7 +141,7 @@ func (t *TUIBase) Start() error {
 	t.renderStop = make(chan struct{})
 	stop := t.renderStop
 	t.renderMu.Unlock()
-	if err := t.terminal.Start(func(data string) { _ = t.HandleInput(data) }, func() { _ = t.RequestRender(true) }); err != nil {
+	if err := t.terminal.Start(func(data string) { _ = t.HandleInput(data) }, func() { _ = t.RequestRender() }); err != nil {
 		_ = t.Stop()
 		return err
 	}
@@ -155,7 +155,7 @@ func (t *TUIBase) Start() error {
 			return err
 		}
 	}
-	if err := t.RenderNow(true); err != nil {
+	if err := t.RenderNow(); err != nil {
 		_ = t.Stop()
 		return err
 	}
@@ -202,18 +202,23 @@ func (t *TUIBase) Stop(options ...TUIStopOptions) error {
 				}
 			}
 		}
+	} else if len(options) == 0 || options[0].PreserveScreen == nil || !*options[0].PreserveScreen {
+		err = t.terminal.Write(mainScreenStop(t.mainState))
 	}
 	t.renderMu.Unlock()
 	return errors.Join(err, t.terminal.DrainInput(context.Background(), time.Second, 50*time.Millisecond), t.terminal.Stop())
 }
-func (t *TUIBase) RequestRender(_ ...bool) error {
+func (t *TUIBase) RequestRender(force ...bool) error {
+	if len(force) > 0 && force[0] {
+		t.forceRender.Store(true)
+	}
 	select {
 	case t.renderWake <- struct{}{}:
 	default:
 	}
 	return nil
 }
-func (t *TUIBase) RenderNow(_ ...bool) error {
+func (t *TUIBase) RenderNow(force ...bool) error {
 	t.renderMu.Lock()
 	defer t.renderMu.Unlock()
 	if !t.started {
@@ -227,35 +232,80 @@ func (t *TUIBase) RenderNow(_ ...bool) error {
 	if err != nil {
 		return err
 	}
+	pendingForce := t.forceRender.Swap(false)
+	if pendingForce || len(force) > 0 && force[0] {
+		t.mainState = TUIMainScreenRenderState{PreviousWidth: -1, PreviousHeight: -1}
+	}
+	if t.screenMode != TUIModeFullscreen {
+		lines, err := t.Container.Render(width)
+		if err != nil {
+			return err
+		}
+		output, state, full := mainScreenFrame(t.mainState, lines, width, height, t.showHardwareCursor, t.clearOnShrink)
+		if err = t.terminal.Write(output); err != nil {
+			return err
+		}
+		t.mainState = state
+		if full {
+			t.fullRedraws++
+		}
+		return nil
+	}
 	frame, err := t.layoutFrame(width, height)
 	if err != nil {
 		return err
 	}
-	output := screenFrame(frame.Lines, width, height, t.showHardwareCursor)
+	output, state, full := screenFrame(t.mainState, frame.Lines, width, height, t.showHardwareCursor)
 	if err = t.terminal.Write(output); err != nil {
 		return err
 	}
-	t.fullRedraws++
-	t.mainState = TUIMainScreenRenderState{PreviousLines: append([]string(nil), frame.Lines...), PreviousWidth: width, PreviousHeight: height, MaxLinesRendered: len(frame.Lines)}
+	if full {
+		t.fullRedraws++
+	}
+	t.mainState = state
 	return nil
 }
-func screenFrame(lines []string, width, height int, showCursor bool) string {
+func screenFrame(previous TUIMainScreenRenderState, lines []string, width, height int, showCursor bool) (string, TUIMainScreenRenderState, bool) {
 	width, height = max(1, width), max(1, height)
 	row, col := -1, 0
-	out := make([]string, min(len(lines), height))
-	for i, l := range lines[:len(out)] {
-		l = sliceCells(l, 0, width)
-		if at := strings.Index(l, CursorMarker); at >= 0 {
+	next := make([]string, min(len(lines), height))
+	for i, line := range lines[:len(next)] {
+		line = sliceCells(normalizeRenderLine(line), 0, width)
+		if at := strings.Index(line, CursorMarker); at >= 0 {
 			row = i
-			col, _ = VisibleWidth(l[:at])
+			col, _ = VisibleWidth(line[:at])
 		}
-		out[i] = strings.ReplaceAll(l, CursorMarker, "")
+		next[i] = strings.ReplaceAll(line, CursorMarker, "") + lineReset
 	}
-	suffix := "\x1b[?25l"
+	full := len(previous.PreviousLines) == 0 || previous.PreviousWidth != width || previous.PreviousHeight != height
+	var output strings.Builder
+	output.WriteString("\x1b[?2026h")
+	if full {
+		output.WriteString("\x1b[2J")
+	}
+	for i := 0; i < height; i++ {
+		line, old := "", ""
+		if i < len(next) {
+			line = next[i]
+		}
+		if i < len(previous.PreviousLines) {
+			old = previous.PreviousLines[i]
+		}
+		if full || line != old {
+			fmt.Fprintf(&output, "\x1b[%d;1H\x1b[2K%s", i+1, line)
+		}
+	}
+	if row >= 0 {
+		fmt.Fprintf(&output, "\x1b[%d;%dH", row+1, min(width, col+1))
+	}
 	if showCursor && row >= 0 {
-		suffix = fmt.Sprintf("\x1b[%d;%dH\x1b[?25h", row+1, min(width, col+1))
+		output.WriteString("\x1b[?25h")
+	} else {
+		output.WriteString("\x1b[?25l")
 	}
-	return "\x1b[?2026h\x1b[H\x1b[2J" + strings.Join(out, "\r\n") + suffix + "\x1b[?2026l"
+	output.WriteString("\x1b[?2026l")
+	state := TUIMainScreenRenderState{PreviousLines: next, PreviousWidth: width, PreviousHeight: height}
+	return output.String(), state, full
 }
 func (t *TUIBase) HandleInput(data string) error {
 	t.renderMu.Lock()

@@ -6,8 +6,8 @@
 | VStack / HStack / allocateStackSizes | tui.VStack / HStack / AllocateStackSizes | basis、grow、shrink、约束、间距、可见性 |
 | renderLayoutFrame | tui.RenderLayoutFrame | 嵌套布局、裁剪、光标可见行、主 ScrollView |
 | getScrollViewsAt / getScrollbarGeometry | tui.GetScrollViewsAt / GetScrollbarGeometry | 命中次序、滑块几何 |
-| TuiAltScreen | tui.TUIAltScreen | 普通组件或自定义布局根，键盘、鼠标、首尾 |
-| TuiMainScreen | tui.TUIMainScreen | 普通屏幕、渲染状态；增量重绘和原生 scrollback partial |
+| TuiAltScreen | tui.TUIAltScreen | 普通组件或自定义布局根，逐行差分，键盘、鼠标、首尾 |
+| TuiMainScreen | tui.TUIMainScreen | 原生 scrollback、增量重绘、光标、捕获／恢复状态、强制重绘 |
 | InteractiveMode | codingagent.InteractiveMode + tui.TextUI | 同一 Transcript 与 Editor、CLI 参数和 settings 选择模式 |
 
 `TextUI.SetMode` 是 Go 对话组合的公开模式切换入口。布局组件通过 `LayoutComponent.LayoutNode()` 表达 Pi 的 symbol capability。Go 的 `Component.Render` 和布局操作显式返回 error。

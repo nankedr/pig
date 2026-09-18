@@ -25,7 +25,7 @@ func run() error {
 	for i := 0; i < 80; i++ {
 		fmt.Fprintf(&text, "历史 %02d — 中文与 emoji 👋\n", i)
 	}
-	text.WriteString("输入 /mode 切换普通/全屏，/top 回到开头，/end 返回末尾，/quit 退出。\n全屏支持 Home/End、PageUp/PageDown、鼠标滚轮与滚动条拖动。\n")
+	text.WriteString("输入 /mode 切换普通/全屏，/top、/end 进入全屏并跳到首尾，/quit 退出。\n全屏支持 Home/End、PageUp/PageDown、鼠标滚轮与滚动条拖动。\n")
 	if err := ui.Append(text.String()); err != nil {
 		return err
 	}
@@ -47,9 +47,13 @@ func run() error {
 			}
 			err = ui.SetMode(mode)
 		case "/top":
-			err = ui.ScrollToTop()
+			if err = ui.SetMode(tui.TUIModeFullscreen); err == nil {
+				err = ui.ScrollToTop()
+			}
 		case "/end":
-			err = ui.ScrollToBottom()
+			if err = ui.SetMode(tui.TUIModeFullscreen); err == nil {
+				err = ui.ScrollToBottom()
+			}
 		default:
 			err = ui.Append(input + "\n")
 		}

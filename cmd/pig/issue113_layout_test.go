@@ -6,7 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/creack/pty"
+
 	"github.com/nankedr/pig/internal/terminaltest"
 	"github.com/nankedr/pig/tui"
 	"net/http"
@@ -61,7 +61,7 @@ func TestPigLayoutScrolling113(t *testing.T) {
 			}))
 			defer server.Close()
 			tty := terminaltest.Open(t)
-			if err := pty.Setsize(tty.Slave, &pty.Winsize{Rows: 24, Cols: 60}); err != nil {
+			if err := tty.SetSize(24, 60); err != nil {
 				t.Fatal(err)
 			}
 			root := t.TempDir()
@@ -87,7 +87,7 @@ func TestPigLayoutScrolling113(t *testing.T) {
 					cmd.Wait()
 				}
 			}()
-			frame := func() string { return latestFrame112(tty.Output()) }
+			frame := func() string { return tty.ScreenText() }
 			wait := func(predicate func(string) bool) {
 				t.Helper()
 				deadline := time.Now().Add(5 * time.Second)
@@ -119,10 +119,29 @@ func TestPigLayoutScrolling113(t *testing.T) {
 				once.Do(func() { close(release) })
 				wait(func(s string) bool { return strings.Contains(s, "STREAM_DONE") })
 			}
+			if mode == "regular" {
+				history := tty.ScrollbackText()
+				if !strings.Contains(history, "ROW000") || !strings.Contains(history, "ROW020") {
+					t.Fatalf("native scrollback lost history: %q", history)
+				}
+			}
+			if mode == "regular" {
+				got["native_scrollback"] = true
+			}
+			editOffset := len(tty.Output())
 			tty.Send(t, "DRAFT\x1b[D\x1b[D")
 			wait(func(s string) bool { return strings.Contains(s, "DRAFT") })
+			if mode == "regular" {
+				delta := tty.Output()[editOffset:]
+				if strings.Contains(delta, "ROW000") || strings.Contains(delta, "\x1b[2J") {
+					t.Fatalf("editing replayed the transcript: %q", delta)
+				}
+			}
+			if mode == "regular" {
+				got["incremental_editor"] = true
+			}
 			for _, size := range [][2]uint16{{12, 28}, {30, 80}, {8, 18}, {24, 60}} {
-				if err := pty.Setsize(tty.Slave, &pty.Winsize{Rows: size[0], Cols: size[1]}); err != nil {
+				if err := tty.SetSize(size[0], size[1]); err != nil {
 					t.Fatal(err)
 				}
 				if err := cmd.Process.Signal(syscall.SIGWINCH); err != nil {

@@ -6,7 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/creack/pty"
+
 	"github.com/nankedr/pig/codingagent"
 	"github.com/nankedr/pig/internal/terminaltest"
 	"github.com/nankedr/pig/tui"
@@ -74,7 +74,7 @@ func TestPigTextRendering112(t *testing.T) {
 	binary := buildPigBinary(t)
 	launch := func(extra ...string) (*terminaltest.Terminal, <-chan error) {
 		tty := terminaltest.Open(t)
-		if err := pty.Setsize(tty.Slave, &pty.Winsize{Rows: 40, Cols: 44}); err != nil {
+		if err := tty.SetSize(40, 44); err != nil {
 			t.Fatal(err)
 		}
 		argv := []string{"--provider", "deepseek", "--model", "deepseek-v4-flash", "--api-key", "synthetic", "--no-extensions", "--no-skills", "--session-dir", sessions}
@@ -107,7 +107,7 @@ func TestPigTextRendering112(t *testing.T) {
 	waitFrame := func(tty *terminaltest.Terminal, contains string) string {
 		deadline := time.Now().Add(5 * time.Second)
 		for time.Now().Before(deadline) {
-			s := latestFrame112(tty.Output())
+			s := tty.ScreenText()
 			if strings.Contains(s, contains) {
 				return s
 			}
@@ -162,18 +162,6 @@ func TestPigTextRendering112(t *testing.T) {
 		}
 	}
 }
-func latestFrame112(output string) string {
-	parts := strings.Split(output, "\x1b[H\x1b[2J")
-	s := parts[len(parts)-1]
-	s, _ = tui.StripTerminalSequences(s)
-	s = strings.ReplaceAll(s, "\r", "")
-	lines := strings.Split(s, "\n")
-	for i, line := range lines {
-		lines[i] = strings.TrimRight(line, " ")
-	}
-	return strings.Join(lines, "\n")
-}
-
 func TestPigPartialFailureAndCancel112(t *testing.T) {
 	for _, mode := range []string{"failure", "cancel", "length"} {
 		t.Run(mode, func(t *testing.T) {
@@ -197,7 +185,7 @@ func TestPigPartialFailureAndCancel112(t *testing.T) {
 			}))
 			defer server.Close()
 			tty := terminaltest.Open(t)
-			pty.Setsize(tty.Slave, &pty.Winsize{Rows: 14, Cols: 22})
+			tty.SetSize(14, 22)
 			ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 			defer cancel()
 			root := t.TempDir()
@@ -228,7 +216,7 @@ func TestPigPartialFailureAndCancel112(t *testing.T) {
 			deadline := time.Now().Add(8 * time.Second)
 			frame := ""
 			for time.Now().Before(deadline) {
-				frame = latestFrame112(tty.Output())
+				frame = tty.ScreenText()
 				if strings.Contains(frame, expected) {
 					break
 				}
@@ -241,7 +229,7 @@ func TestPigPartialFailureAndCancel112(t *testing.T) {
 			if err := <-done; err != nil {
 				t.Fatal(err)
 			}
-			finalFrame := latestFrame112(tty.Output())
+			finalFrame := tty.ScreenText()
 			if !strings.Contains(finalFrame, "PARTIAL_112") || !strings.Contains(finalFrame, expected) {
 				t.Fatalf("settled partial content disappeared: %s", finalFrame)
 			}

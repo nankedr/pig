@@ -33,6 +33,8 @@ type TextUI struct {
 	mouse                  scrollMouse
 	scrollbar              ScrollViewScrollbar
 	exitTranscript         bool
+	mainState              TUIMainScreenRenderState
+	altState               TUIMainScreenRenderState
 }
 
 type TextInput struct {
@@ -162,6 +164,9 @@ func (u *TextUI) Stop() error {
 				}
 			}
 		}
+		if u.mode == TUIModeRegular {
+			screenErr = u.terminal.Write(mainScreenStop(u.mainState))
+		}
 		return errors.Join(screenErr, u.terminal.DrainInput(context.Background(), time.Second, 50*time.Millisecond), u.terminal.Stop())
 	}
 	return nil
@@ -280,42 +285,48 @@ func (u *TextUI) render() error {
 		extra, _ := WrapTextWithANSI(u.transcript, columns-1)
 		lines = append(lines, extra...)
 	}
-	available := max(0, rows-len(editorLines))
-	content := renderedLines(lines)
-	u.scroll.child = &content
+	for i, line := range editorLines {
+		prefix := "  "
+		if i == 0 {
+			prefix = "> "
+		}
+		editorLines[i] = prefix[:prefixWidth] + line
+	}
+	visible := lines
 	if u.mode == TUIModeFullscreen {
+		available := max(0, rows-len(editorLines))
+		content := renderedLines(lines)
+		u.scroll.child = &content
 		_ = u.scroll.UpdateLayout(len(lines), available, func() {
 			select {
 			case u.renderWake <- struct{}{}:
 			default:
 			}
 		})
-	} else {
-		_ = u.scroll.UpdateLayout(len(lines), available, nil)
-	}
-	top := u.scroll.ScrollTop()
-	visible := append([]string(nil), lines[top:min(len(lines), top+available)]...)
-	if u.mode == TUIModeFullscreen {
+		top := u.scroll.ScrollTop()
+		visible = append([]string(nil), lines[top:min(len(lines), top+available)]...)
 		visible = append(visible, make([]string, max(0, available-len(visible)))...)
-	}
-	clip := LayoutRect{Width: columns, Height: len(visible)}
-	box := &LayoutBox{Rect: clip, Clip: clip, ScrollView: u.scroll, ScrollContentLines: lines}
-	u.frame = LayoutFrame{Root: box, Width: columns, Height: rows, PrimaryScrollView: u.scroll}
-	if u.mode == TUIModeFullscreen {
+		clip := LayoutRect{Width: columns, Height: len(visible)}
+		box := &LayoutBox{Rect: clip, Clip: clip, ScrollView: u.scroll, ScrollContentLines: lines}
+		u.frame = LayoutFrame{Root: box, Width: columns, Height: rows, PrimaryScrollView: u.scroll}
 		paintLayout(box, visible, columns)
 	}
-	for i, line := range editorLines {
-		prefix := "  "
-		if i == 0 {
-			prefix = "> "
-		}
-		visible = append(visible, prefix[:prefixWidth]+line)
+	visible = append(visible, editorLines...)
+	var output string
+	var state TUIMainScreenRenderState
+	if u.mode == TUIModeRegular {
+		output, state, _ = mainScreenFrame(u.mainState, visible, columns, rows, true, false)
+	} else {
+		output, state, _ = screenFrame(u.altState, visible, columns, rows, true)
 	}
-	err = u.terminal.Write(screenFrame(visible, columns, rows, true))
-
-	if err != nil {
+	if err = u.terminal.Write(output); err != nil {
 		u.finish(err)
+	} else if u.mode == TUIModeRegular {
+		u.mainState = state
+	} else {
+		u.altState = state
 	}
+
 	return err
 }
 func (u *TextUI) input(data string) {
@@ -330,7 +341,7 @@ func (u *TextUI) input(data string) {
 	active, _ := u.terminal.KittyProtocolActive()
 	match := func(action Keybinding) bool { return u.keybindings.matches(data, action, active) }
 	if !strings.HasPrefix(data, "\x1b[200~") {
-		scrollInput := u.mode == TUIModeFullscreen || match(KeybindingAltScreenPageUp) || match(KeybindingAltScreenPageDown)
+		scrollInput := u.mode == TUIModeFullscreen
 		if scrollInput {
 			if handled, err := u.mouse.handle(data, u.frame, u.scroll, 1, u.keybindings, active); handled || err != nil {
 				if err != nil {
@@ -437,6 +448,8 @@ func (u *TextUI) Suspend() error {
 	u.watchTerminal()
 	u.mu.Lock()
 	defer u.mu.Unlock()
+	u.mainState = TUIMainScreenRenderState{PreviousWidth: -1, PreviousHeight: -1}
+	u.altState = TUIMainScreenRenderState{}
 	return u.render()
 }
 
@@ -468,6 +481,7 @@ func (u *TextUI) SetMode(mode TUIMode) error {
 		}
 	}
 	u.mode = mode
+	u.altState = TUIMainScreenRenderState{}
 	u.mouse = scrollMouse{}
 	if u.started {
 		return u.render()
@@ -477,6 +491,9 @@ func (u *TextUI) SetMode(mode TUIMode) error {
 func (u *TextUI) ScrollToTop() error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
+	if u.mode == TUIModeRegular {
+		return errors.New("scroll commands require fullscreen mode; use terminal scrollback in regular mode")
+	}
 	if err := u.scroll.ScrollToStart(); err != nil {
 		return err
 	}
@@ -485,6 +502,9 @@ func (u *TextUI) ScrollToTop() error {
 func (u *TextUI) ScrollToBottom() error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
+	if u.mode == TUIModeRegular {
+		return errors.New("scroll commands require fullscreen mode; use terminal scrollback in regular mode")
+	}
 	if err := u.scroll.ScrollToEnd(); err != nil {
 		return err
 	}

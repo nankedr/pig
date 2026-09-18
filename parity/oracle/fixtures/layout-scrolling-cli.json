@@ -30,6 +30,8 @@
       "regular": {
         "tail_visible": true,
         "alternate_screen": false,
+        "native_scrollback": true,
+        "incremental_editor": true,
         "resize_keeps_editor": true,
         "exit_code": 0,
         "terminal_restored": true
@@ -48,7 +50,7 @@
     "side_effects": []
   },
   "input_hash": "sha256:07af3fe8a1c3dfe6d768d074224a18a05eee03283270c92c73bfa7dfc75caf55",
-  "observation_hash": "sha256:a7b62f1ecd6df7608b87365690b15e3b84c5170d1590ddd250299a45a1f834b3",
+  "observation_hash": "sha256:d3b4bc80ae674832347b42d307d1e7ea98b83d1e00090e903a8876d2a2515060",
   "execution_method": "node parity/oracle/layout-scrolling-cli.mjs <locked-pi-checkout>",
   "platform": "posix",
   "environment": {

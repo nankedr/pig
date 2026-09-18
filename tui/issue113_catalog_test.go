@@ -16,7 +16,7 @@ import (
 var updateIssue113 = flag.Bool("update-issue113", false, "refresh layout scrolling contract and API snapshot")
 
 func partial113() *catalog.Partial {
-	return &catalog.Partial{Supported: []string{"Issue #113: public stack allocation, clipped layout frames, nested scroll hit testing, keyboard/wheel/scrollbar drag, tail following and bounded history anchors", "CLI regular/fullscreen via legacy AgentSession and v3 Session; fixed Pi SDK and real CLI PTY fixtures; resize/editor preservation; no CGO"}, Unsupported: []string{"Pi native main-screen scrollback and incremental redraw remain partial; regular mode uses an application-owned viewport", "Selection/copy, URL opening, prompt jumps, overlays, flashes, color queries and resume hints remain Stub or unverified; images M12, extensions M7 and six-platform acceptance M13 are deferred"}}
+	return &catalog.Partial{Supported: []string{"Issue #113: public stack allocation, clipped layout frames, nested scroll hit testing, keyboard/wheel/scrollbar drag, tail following and bounded history anchors", "Pi native main-screen scrollback, differential main/alternate screen redraw, cursor-only updates, state restore and forced redraw", "CLI regular/fullscreen via legacy AgentSession and v3 Session; fixed Pi SDK and real CLI PTY fixtures; resize/editor preservation; no CGO"}, Unsupported: []string{"Selection/copy, URL opening, prompt jumps, overlays, flashes, color queries and resume hints remain Stub or unverified; images M12, extensions M7 and six-platform acceptance M13 are deferred"}}
 }
 func issue113Promote(e *catalog.Entry) bool {
 	name := strings.TrimPrefix(e.Mapping.Target, issue31GoPackage+".")
@@ -48,6 +48,8 @@ func TestLayoutScrollingCatalog113(t *testing.T) {
 	root := issue31RepoRoot(t)
 	entry := catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: "contract:tui/layout-scrolling", Upstream: catalog.Upstream{Module: "tui", Repository: "https://github.com/badlogic/pi-mono", Commit: issue31BaselineCommit, Reference: "packages/tui/src/layout.ts"}, Mapping: catalog.Mapping{Module: "tui", Target: issue31GoPackage + ".RenderLayoutFrame", Kind: "contract"}, Status: catalog.StatusPartial, Milestone: "M6", Classification: "public-api", Partial: partial113(), Notes: "Issue #113; docs/learning/m6-layout-scrolling.md; no parent issue mutation."}
 	for _, item := range []struct{ kind, path, run string }{
+		{"oracle", "parity/oracle/fixtures/main-screen.json", "node parity/oracle/main-screen.mjs <locked-pi-checkout> --check"},
+		{"go-test", "tui/issue113_main_screen_test.go", "go test -race ./tui -run '113' -count=1"},
 		{"oracle", "parity/oracle/fixtures/layout-scrolling.json", "node parity/oracle/layout-scrolling.mjs <locked-pi-checkout> --check"},
 		{"oracle", "parity/oracle/fixtures/layout-scrolling-cli.json", "node parity/oracle/layout-scrolling-cli.mjs <locked-pi-checkout> --check"},
 		{"go-test", "tui/issue113_layout_test.go", "go test ./tui -run 'TestLayout.*113' -count=1"},
