@@ -160,8 +160,7 @@
         {
           "name": "normalized-width",
           "lines": [
-            "a\tb",
-            "> \u001b_pi:c\u0007"
+            "a\t\u001b_pi:c\u0007b"
           ]
         },
         {
@@ -473,23 +472,22 @@
           "fullRedraws": 5
         },
         {
-          "output": "\u001b[?2026h\u001b[1A\r\u001b[2Ka   b\u001b[0m\u001b]8;;\u0007\u001b[?2026l\u001b[1B\u001b[3G\u001b[?25h",
+          "output": "\u001b[?2026h\u001b[1A\r\u001b[2Ka   b\u001b[0m\u001b]8;;\u0007\r\n\u001b[2K\u001b[1A\u001b[?2026l\u001b[5G\u001b[?25h",
           "state": {
             "previousLines": [
-              "a   b\u001b[0m\u001b]8;;\u0007",
-              "> \u001b[0m\u001b]8;;\u0007"
+              "a   b\u001b[0m\u001b]8;;\u0007"
             ],
             "previousWidth": 14,
             "previousHeight": 7,
-            "cursorRow": 1,
-            "hardwareCursorRow": 1,
+            "cursorRow": 0,
+            "hardwareCursorRow": 0,
             "maxLinesRendered": 2,
             "previousViewportTop": 0
           },
           "fullRedraws": 5
         },
         {
-          "output": "\u001b[?2026h\u001b[1A\r\r\u001b[2K\u001b[1B\r\u001b[2K\u001b[1A\u001b[?2026l\u001b[?25l",
+          "output": "\u001b[?2026h\r\r\u001b[2K\u001b[?2026l\u001b[?25l",
           "state": {
             "previousLines": [],
             "previousWidth": 14,
@@ -575,8 +573,8 @@
     },
     "side_effects": []
   },
-  "input_hash": "sha256:62acfee379441358fd11397fe1f84b3dd04ce5c7343a93e89bf857ddd55de958",
-  "observation_hash": "sha256:919fae5537fc54f91d664509518484ff76be06361830a574bcba5fea65f5743f",
+  "input_hash": "sha256:58958e0be6bd89fd0b55783523785ad9575d6da480c6aa8712b7bc9d21a17ebc",
+  "observation_hash": "sha256:4a825a1644ba8357043bf024104ad1d6b1691a796a381a375668c25936d39d61",
   "execution_method": "node parity/oracle/main-screen.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {

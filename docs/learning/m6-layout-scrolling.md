@@ -41,4 +41,4 @@ CGO_ENABLED=0 go test ./...
 
 原生 scrollback 与主屏／全屏增量重绘已验收；CLI PTY 额外检查早期历史进入 scrollback、编辑草稿不清屏／重放对话。`contract:tui/layout-scrolling` 仍保留以下明确边界：选择、复制、URL 打开、提示词跳转、overlay、flash、颜色查询和恢复提示不在已验收分支内，原有相关 Stub 保留。图片属于 M12、扩展运行时属于 M7、六平台验收属于 M13，#99 不参与本票。
 
-本机证据：darwin-arm64 上已用独立交互 PTY 运行无 CGO 示例，输入 Home、`/mode` 两次、End、`/quit`，观察到历史首尾切换、alternate screen 进入／退出序列与正常退出。Terminal.app 的 GUI 访问被电脑控制工具安全限制拒绝，因此真实 GUI 终端的目视演示未验收；以上 PTY 结果不替代这一项。
+本机证据：darwin-arm64 上已用独立交互 PTY 运行无 CGO 示例。补齐增量重绘后再次输入 `/mode`、`/top`、`/end`、`/mode`、`/quit`，观察到普通屏幕输出完整 80 行历史、打字仅重绘编辑行、返回普通屏幕只恢复光标而不重放历史，以及正常退出（exit 0）。Terminal.app 的 GUI 访问被电脑控制工具安全限制拒绝，因此真实 GUI 终端的目视演示未验收；以上 PTY 结果不替代这一项。

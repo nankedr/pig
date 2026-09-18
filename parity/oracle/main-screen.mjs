@@ -21,7 +21,7 @@ const steps=[
  {name:'resize-width',width:14,lines:['中文 👩‍💻','changed',...initial,`> ${marker}`]},
  {name:'resize-height',height:7},
  {name:'shrink',lines:['short',`> ${marker}`]},
- {name:'normalized-width',lines:['a\tb',`> ${marker}`]},
+ {name:'normalized-width',lines:[`a\t${marker}b`]},
  {name:'delete-all',lines:[]},
  {name:'restart',lines:['after',`> ${marker}`]},
  {name:'force',force:true},

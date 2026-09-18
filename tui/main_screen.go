@@ -24,11 +24,12 @@ func mainScreenFrame(previous TUIMainScreenRenderState, lines []string, width, h
 	row, col := -1, 0
 	next := make([]string, len(lines))
 	for i, line := range lines {
+		line = normalizeRenderLine(line)
 		if at := strings.Index(line, CursorMarker); at >= 0 && i >= len(lines)-height {
 			row = i
 			col, _ = VisibleWidth(line[:at])
 		}
-		next[i] = normalizeRenderLine(strings.ReplaceAll(line, CursorMarker, "")) + lineReset
+		next[i] = strings.ReplaceAll(line, CursorMarker, "") + lineReset
 	}
 	widthChanged := previous.PreviousWidth != 0 && previous.PreviousWidth != width
 	heightChanged := previous.PreviousHeight != 0 && previous.PreviousHeight != height
