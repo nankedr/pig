@@ -57,20 +57,15 @@ func TestImageAndTextHelpersAreExplicitCapabilityStubs(t *testing.T) {
 		{name: "imageFallback", call: func() error { _, err := tui.ImageFallback("image/png", &dimensions, "/image.png"); return err }},
 		{name: "getGraphemeSegmenter", call: func() error { _, err := tui.GetGraphemeSegmenter(); return err }},
 		{name: "getWordSegmenter", call: func() error { _, err := tui.GetWordSegmenter(); return err }},
-		{name: "visibleWidth", call: func() error { _, err := tui.VisibleWidth("text"); return err }},
-		{name: "stripTerminalSequences", call: func() error { _, err := tui.StripTerminalSequences("text"); return err }},
 		{name: "getGraphemeCellRange", call: func() error { _, _, err := tui.GetGraphemeCellRange("text", 0); return err }},
 		{name: "getOsc8LinkAtColumn", call: func() error { _, _, err := tui.GetOSC8LinkAtColumn("text", 0); return err }},
 		{name: "normalizeTerminalOutput", call: func() error { _, err := tui.NormalizeTerminalOutput("text"); return err }},
-		{name: "extractAnsiCode", call: func() error { _, _, err := tui.ExtractANSICode("text", 0); return err }},
-		{name: "wrapTextWithAnsi", call: func() error { _, err := tui.WrapTextWithANSI("text", 10); return err }},
 		{name: "isWhitespaceChar", call: func() error { _, err := tui.IsWhitespaceChar(" "); return err }},
 		{name: "isPunctuationChar", call: func() error { _, err := tui.IsPunctuationChar("!"); return err }},
 		{name: "applyBackgroundToLine", call: func() error {
 			_, err := tui.ApplyBackgroundToLine("text", 10, func(value string) string { backgroundCalls++; return value })
 			return err
 		}},
-		{name: "truncateToWidth", call: func() error { _, err := tui.TruncateToWidth("text", 2); return err }},
 		{name: "sliceByColumn", call: func() error { _, err := tui.SliceByColumn("text", 0, 2); return err }},
 		{name: "sliceWithWidth", call: func() error { _, err := tui.SliceWithWidth("text", 0, 2); return err }},
 		{name: "extractSegments", call: func() error { _, err := tui.ExtractSegments("text", 1, 2, 2); return err }},

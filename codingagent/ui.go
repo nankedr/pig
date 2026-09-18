@@ -26,28 +26,6 @@ type ArminComponent struct{ inertComponent }
 
 func (*ArminComponent) Dispose() error { return notImplemented("ArminComponent.Dispose") }
 
-type AssistantMessageComponent struct{ tui.Container }
-
-func (*AssistantMessageComponent) Invalidate() error {
-	return notImplemented("AssistantMessageComponent.Invalidate")
-}
-func (*AssistantMessageComponent) Render(int) ([]string, error) {
-	return nil, notImplemented("AssistantMessageComponent.Render")
-}
-
-func (*AssistantMessageComponent) SetHiddenThinkingLabel(string) error {
-	return notImplemented("AssistantMessageComponent.SetHiddenThinkingLabel")
-}
-func (*AssistantMessageComponent) SetHideThinkingBlock(bool) error {
-	return notImplemented("AssistantMessageComponent.SetHideThinkingBlock")
-}
-func (*AssistantMessageComponent) SetOutputPad(bool) error {
-	return notImplemented("AssistantMessageComponent.SetOutputPad")
-}
-func (*AssistantMessageComponent) UpdateContent(ai.AssistantMessage, ...bool) error {
-	return notImplemented("AssistantMessageComponent.UpdateContent")
-}
-
 type BashExecutionComponent struct{ tui.Container }
 
 func (*BashExecutionComponent) Invalidate() error {
@@ -141,10 +119,6 @@ func (*CustomMessageComponent) SetOutputPad(bool) error {
 }
 
 type RenderDiffOptions struct{ FilePath string }
-
-func RenderDiff(string, ...RenderDiffOptions) (string, error) {
-	return "", notImplemented("RenderDiff")
-}
 
 type DynamicBorder struct{ inertComponent }
 
@@ -394,37 +368,6 @@ type ToolExecutionResult struct {
 	IsError bool
 }
 
-type ToolExecutionComponent struct{ tui.Container }
-
-func (*ToolExecutionComponent) Invalidate() error {
-	return notImplemented("ToolExecutionComponent.Invalidate")
-}
-func (*ToolExecutionComponent) Render(int) ([]string, error) {
-	return nil, notImplemented("ToolExecutionComponent.Render")
-}
-
-func (*ToolExecutionComponent) MarkExecutionStarted() error {
-	return notImplemented("ToolExecutionComponent.MarkExecutionStarted")
-}
-func (*ToolExecutionComponent) SetArgsComplete(bool) error {
-	return notImplemented("ToolExecutionComponent.SetArgsComplete")
-}
-func (*ToolExecutionComponent) SetExpanded(bool) error {
-	return notImplemented("ToolExecutionComponent.SetExpanded")
-}
-func (*ToolExecutionComponent) SetImageWidthCells(int) error {
-	return notImplemented("ToolExecutionComponent.SetImageWidthCells")
-}
-func (*ToolExecutionComponent) SetShowImages(bool) error {
-	return notImplemented("ToolExecutionComponent.SetShowImages")
-}
-func (*ToolExecutionComponent) UpdateArgs(any) error {
-	return notImplemented("ToolExecutionComponent.UpdateArgs")
-}
-func (*ToolExecutionComponent) UpdateResult(ToolExecutionResult, ...bool) error {
-	return notImplemented("ToolExecutionComponent.UpdateResult")
-}
-
 type TreeSelectorComponent struct {
 	tui.Container
 	Focused bool
@@ -444,16 +387,6 @@ type UserMessageSelectorComponent struct{ tui.Container }
 
 func (*UserMessageSelectorComponent) GetMessageList() (*tui.SelectList, error) {
 	return nil, notImplemented("UserMessageSelectorComponent.GetMessageList")
-}
-
-type UserMessageComponent struct{ tui.Container }
-
-func (*UserMessageComponent) Render(int) ([]string, error) {
-	return nil, notImplemented("UserMessageComponent.Render")
-}
-
-func (*UserMessageComponent) SetOutputPad(bool) error {
-	return notImplemented("UserMessageComponent.SetOutputPad")
 }
 
 type VisualTruncateResult struct {
@@ -654,7 +587,10 @@ func GetLanguageFromPath(path string) string {
 	}
 }
 func GetMarkdownTheme() (tui.MarkdownTheme, error) {
-	return tui.MarkdownTheme{}, notImplemented("GetMarkdownTheme")
+	style := func(code string) tui.TextStyleFunc {
+		return func(s string) string { return "\x1b[" + code + "m" + s + "\x1b[0m" }
+	}
+	return tui.MarkdownTheme{Heading: style("36"), Link: style("36"), LinkURL: style("2"), Code: style("33"), CodeBlock: style("37"), CodeBlockBorder: style("2"), Quote: style("3"), QuoteBorder: style("2"), HR: style("2"), ListBullet: style("36"), Bold: style("1"), Italic: style("3"), Strikethrough: style("9"), Underline: style("4")}, nil
 }
 func GetSelectListTheme() (tui.SelectListTheme, error) {
 	return tui.SelectListTheme{}, notImplemented("GetSelectListTheme")

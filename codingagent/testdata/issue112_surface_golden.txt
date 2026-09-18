@@ -1,0 +1,50 @@
+*codingagent.Transcript
+Invalidate func(*codingagent.Transcript) error
+Render func(*codingagent.Transcript, int) ([]string, error)
+SetExpanded func(*codingagent.Transcript, bool) error
+SetHideThinkingBlock func(*codingagent.Transcript, bool) error
+SetMessages func(*codingagent.Transcript, []agent.AgentMessage) error
+Update func(*codingagent.Transcript, codingagent.AgentSessionEvent) error
+*codingagent.AssistantMessageComponent
+AddChild func(*codingagent.AssistantMessageComponent, tui.Component)
+Children func(*codingagent.AssistantMessageComponent) []tui.Component
+Clear func(*codingagent.AssistantMessageComponent)
+Invalidate func(*codingagent.AssistantMessageComponent) error
+RemoveChild func(*codingagent.AssistantMessageComponent, tui.Component)
+Render func(*codingagent.AssistantMessageComponent, int) ([]string, error)
+SetHiddenThinkingLabel func(*codingagent.AssistantMessageComponent, string) error
+SetHideThinkingBlock func(*codingagent.AssistantMessageComponent, bool) error
+SetOutputPad func(*codingagent.AssistantMessageComponent, bool) error
+UpdateContent func(*codingagent.AssistantMessageComponent, ai.AssistantMessage, ...bool) error
+*codingagent.UserMessageComponent
+AddChild func(*codingagent.UserMessageComponent, tui.Component)
+Children func(*codingagent.UserMessageComponent) []tui.Component
+Clear func(*codingagent.UserMessageComponent)
+Invalidate func(*codingagent.UserMessageComponent) error
+RemoveChild func(*codingagent.UserMessageComponent, tui.Component)
+Render func(*codingagent.UserMessageComponent, int) ([]string, error)
+SetOutputPad func(*codingagent.UserMessageComponent, bool) error
+*codingagent.ToolExecutionComponent
+AddChild func(*codingagent.ToolExecutionComponent, tui.Component)
+Children func(*codingagent.ToolExecutionComponent) []tui.Component
+Clear func(*codingagent.ToolExecutionComponent)
+Invalidate func(*codingagent.ToolExecutionComponent) error
+MarkExecutionStarted func(*codingagent.ToolExecutionComponent) error
+RemoveChild func(*codingagent.ToolExecutionComponent, tui.Component)
+Render func(*codingagent.ToolExecutionComponent, int) ([]string, error)
+SetArgsComplete func(*codingagent.ToolExecutionComponent, bool) error
+SetExpanded func(*codingagent.ToolExecutionComponent, bool) error
+SetImageWidthCells func(*codingagent.ToolExecutionComponent, int) error
+SetShowImages func(*codingagent.ToolExecutionComponent, bool) error
+UpdateArgs func(*codingagent.ToolExecutionComponent, interface {}) error
+UpdateResult func(*codingagent.ToolExecutionComponent, codingagent.ToolExecutionResult, ...bool) error
+*tui.Markdown
+Invalidate func(*tui.Markdown) error
+Render func(*tui.Markdown, int) ([]string, error)
+SetText func(*tui.Markdown, string)
+func() *codingagent.Transcript
+func(...ai.AssistantMessage) *codingagent.AssistantMessageComponent
+func(string) *codingagent.UserMessageComponent
+func(string, string, interface {}, ...codingagent.ToolExecutionOptions) *codingagent.ToolExecutionComponent
+func(string) string
+func(string, ...codingagent.RenderDiffOptions) (string, error)

@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/interactive-mode.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/interactive/text-rendering",
+    "catalog_id": "contract:codingagent/text-rendering",
+    "surface": "cli",
+    "input": {
+      "terminal": {
+        "rows": 40,
+        "columns": 44
+      },
+      "scenario": "gated thinking, partial bash arguments, execution progress, final output and expansion"
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "thinking_before_tool": true,
+      "arguments_before_execution": true,
+      "progress_before_final": true,
+      "expanded_output": true,
+      "answer_visible": true,
+      "model_context_clean": true,
+      "exit_code": 0,
+      "terminal_restored": true
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:04e07b1bed34da57c77dd82bf8067ee19b9a3df2a72bf72d311d247bfc3a8298",
+  "observation_hash": "sha256:67565b0b6eda2830ece25d9ce6f079f6aa1cac2d066be660e5ceae9266afe191",
+  "execution_method": "node parity/oracle/text-rendering-cli.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "terminal": "xterm-256color",
+    "transport": "real child process + PTY + gated loopback SSE"
+  }
+}

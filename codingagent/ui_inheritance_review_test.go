@@ -198,6 +198,15 @@ func TestInheritedUIOverrideBehavior(t *testing.T) {
 
 	for _, testCase := range containerCases {
 		t.Run(testCase.name, func(t *testing.T) {
+			if testCase.name == "AssistantMessageComponent" || testCase.name == "ToolExecutionComponent" || testCase.name == "UserMessageComponent" {
+				if err := testCase.component.Invalidate(); err != nil {
+					t.Fatal(err)
+				}
+				if _, err := testCase.component.Render(80); err != nil {
+					t.Fatal(err)
+				}
+				return
+			}
 			err := testCase.component.Invalidate()
 			if testCase.invalidateOverride {
 				assertInheritanceStub(t, err, "codingagent", testCase.name+".Invalidate")

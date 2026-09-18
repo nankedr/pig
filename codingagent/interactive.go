@@ -9,7 +9,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/nankedr/pig/ai"
 	"github.com/nankedr/pig/tui"
 )
 
@@ -27,10 +26,11 @@ type InteractiveMode struct {
 	turnMu                        sync.Mutex
 	turnCancel                    context.CancelFunc
 	setupErr                      error
+	transcript                    *Transcript
 }
 
 func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveModeOptions) *InteractiveMode {
-	mode := &InteractiveMode{runtime: runtime}
+	mode := &InteractiveMode{runtime: runtime, transcript: NewTranscript()}
 	if len(options) > 0 {
 		mode.options = options[0]
 	}
@@ -51,7 +51,15 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 	if bindings != nil {
 		manager = &bindings.KeybindingsManager
 	}
-	mode.ui = tui.NewTextUI(terminal, tui.TextUIOptions{Keybindings: manager, OnInterrupt: func() {
+	hide := false
+	if runtime != nil && runtime.Session() != nil {
+		hide, _ = runtime.Session().SettingsManager().GetHideThinkingBlock()
+	}
+	mode.ui = tui.NewTextUI(terminal, tui.TextUIOptions{Keybindings: manager, HideThinking: hide, RenderTranscript: func(width int, expanded, hide bool) ([]string, error) {
+		mode.transcript.SetExpanded(expanded)
+		mode.transcript.SetHideThinkingBlock(hide)
+		return mode.transcript.Render(width)
+	}, OnInterrupt: func() {
 		mode.turnMu.Lock()
 		defer mode.turnMu.Unlock()
 		if mode.turnCancel != nil {
@@ -121,7 +129,8 @@ func (m *InteractiveMode) GetUserInput(ctx context.Context) (string, error) {
 			if err != nil {
 				_ = m.ShowError(err.Error())
 			} else {
-				_ = m.ui.Append("\nNew session\n")
+				_ = m.transcript.SetMessages(nil)
+				_ = m.ui.Refresh()
 			}
 		case "app.suspend":
 			if err = m.ui.Suspend(); err != nil {
@@ -148,37 +157,20 @@ func (m *InteractiveMode) RenderInitialMessages() error {
 	if m.runtime == nil || m.runtime.Session() == nil {
 		return errors.New("Interactive mode requires an AgentSession runtime")
 	}
-	for _, message := range m.runtime.Session().Messages() {
-		var text string
-		switch message := message.(type) {
-		case ai.UserMessage:
-			text, _ = message.Content.Text()
-			blocks, _ := message.Content.Blocks()
-			for _, content := range blocks {
-				if part, ok := content.(ai.TextContent); ok {
-					text += part.Text
-				}
-			}
-		case ai.AssistantMessage:
-			for _, content := range message.Content {
-				if part, ok := content.(ai.TextContent); ok {
-					text += part.Text
-				}
-			}
-		}
-		if text != "" {
-			if message.MessageRole() == "user" {
-				if err := m.ui.AddToHistory(text); err != nil {
-					return err
-				}
-			}
-			if err := m.ui.Append(fmt.Sprintf("%s: %s\n", message.MessageRole(), text)); err != nil {
+	messages := m.runtime.Session().Messages()
+	for _, message := range messages {
+		if message.MessageRole() == "user" {
+			if err := m.ui.AddToHistory(sessionUserText(message)); err != nil {
 				return err
 			}
 		}
 	}
-	return nil
+	if err := m.transcript.SetMessages(messages); err != nil {
+		return err
+	}
+	return m.ui.Refresh()
 }
+
 func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 	if ctx == nil {
 		return errors.Join(errors.New("Interactive context must not be nil"), m.Stop())
@@ -234,18 +226,17 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		if strings.TrimSpace(prompt) == "/quit" {
 			break
 		}
-		if err = m.ui.Append("\nuser: " + prompt + "\nassistant: "); err != nil {
-			break
-		}
 		turnCtx, turnCancel := context.WithCancel(runCtx)
 		m.turnMu.Lock()
 		m.turnCancel = turnCancel
 		m.turnMu.Unlock()
-		outcome, promptErr := RunHeadless(turnCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, OnEvent: func(event AgentSessionEvent) {
-			if update, ok := event.(AgentSessionMessageUpdateEvent); ok {
-				if delta, ok := update.AssistantMessageEvent.(ai.AssistantMessageTextDeltaEvent); ok {
-					_ = m.ui.Append(delta.Delta)
-				}
+		_, promptErr := RunHeadless(turnCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, OnEvent: func(event AgentSessionEvent) {
+			if updateErr := m.transcript.Update(event); updateErr != nil {
+				turnCancel()
+				return
+			}
+			if renderErr := m.ui.Refresh(); renderErr != nil {
+				turnCancel()
 			}
 		}})
 		m.turnMu.Lock()
@@ -258,10 +249,8 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		}
 		if promptErr != nil {
 			err = m.ShowError(promptErr.Error())
-		} else if outcome.FinalMessage != nil && (outcome.FinalMessage.StopReason == ai.StopReasonError || outcome.Canceled) {
-			err = m.ShowError((&HeadlessOutcomeError{Outcome: outcome}).Error())
 		} else {
-			err = m.ui.Append("\n")
+			err = m.ui.Refresh()
 		}
 		if err != nil {
 			break

@@ -278,9 +278,8 @@ func NewMarkdown(text string, paddingX, paddingY int, theme MarkdownTheme, defau
 	return m
 }
 
-func (m *Markdown) SetText(text string)        { m.text = text }
-func (*Markdown) Invalidate() error            { return nil }
-func (*Markdown) Render(int) ([]string, error) { return nil, newNotImplemented("Markdown.render") }
+func (m *Markdown) SetText(text string) { m.text = text }
+func (*Markdown) Invalidate() error     { return nil }
 
 type ScrollViewScrollbar string
 

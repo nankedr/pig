@@ -291,7 +291,7 @@ type Markdown struct {
 	options          MarkdownOptions
 }
 func (*Markdown) Invalidate() error
-func (*Markdown) Render(int) ([]string, error)
+func (m *Markdown) Render(width int) ([]string, error)
 func (m *Markdown) SetText(text string)
 
 ## symbol:tui/src/components/markdown.ts#MarkdownOptions
@@ -1650,7 +1650,7 @@ const CJKBreakRegex RegexPattern = `[\p{Script_Extensions=Han}\p{Script_Extensio
 ## symbol:tui/src/utils.ts#extractAnsiCode
 reference: packages/tui/src/utils.ts#extractAnsiCode
 target: github.com/nankedr/pig/tui.ExtractANSICode
-func ExtractANSICode(string, int) (ANSICode, bool, error)
+func ExtractANSICode(s string, pos int) (ANSICode, bool, error)
 
 ## symbol:tui/src/utils.ts#extractSegments
 reference: packages/tui/src/utils.ts#extractSegments
@@ -1705,22 +1705,22 @@ func SliceWithWidth(string, int, int, ...bool) (TextSlice, error)
 ## symbol:tui/src/utils.ts#stripTerminalSequences
 reference: packages/tui/src/utils.ts#stripTerminalSequences
 target: github.com/nankedr/pig/tui.StripTerminalSequences
-func StripTerminalSequences(string) (string, error)
+func StripTerminalSequences(s string) (string, error)
 
 ## symbol:tui/src/utils.ts#truncateToWidth
 reference: packages/tui/src/utils.ts#truncateToWidth
 target: github.com/nankedr/pig/tui.TruncateToWidth
-func TruncateToWidth(string, int, ...TruncateOptions) (string, error)
+func TruncateToWidth(s string, width int, options ...TruncateOptions) (string, error)
 
 ## symbol:tui/src/utils.ts#visibleWidth
 reference: packages/tui/src/utils.ts#visibleWidth
 target: github.com/nankedr/pig/tui.VisibleWidth
-func VisibleWidth(string) (int, error)
+func VisibleWidth(s string) (int, error)
 
 ## symbol:tui/src/utils.ts#wrapTextWithAnsi
 reference: packages/tui/src/utils.ts#wrapTextWithAnsi
 target: github.com/nankedr/pig/tui.WrapTextWithANSI
-func WrapTextWithANSI(string, int) ([]string, error)
+func WrapTextWithANSI(s string, width int) ([]string, error)
 
 ## symbol:tui/src/word-navigation.ts#WordNavigationOptions
 reference: packages/tui/src/word-navigation.ts#WordNavigationOptions

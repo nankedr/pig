@@ -16,3 +16,5 @@ require (
 require github.com/rivo/uniseg v0.4.3
 
 require github.com/ebitengine/purego v0.8.4
+
+require github.com/yuin/goldmark v1.7.8

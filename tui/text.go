@@ -8,26 +8,27 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unicode"
 
 	"github.com/rivo/uniseg"
 )
 
 // TextUI is the minimal text conversation renderer. Advanced layouts remain separate capabilities.
 type TextUI struct {
-	terminal         Terminal
-	mu               sync.Mutex
-	transcript       string
-	editor           *Editor
-	inputs           []TextInput
-	ready            chan struct{}
-	done             chan struct{}
-	err              error
-	started, stopped bool
-	lastInterrupt    time.Time
-	keybindings      *KeybindingsManager
-	onInterrupt      func()
-	generation       uint64
+	terminal               Terminal
+	mu                     sync.Mutex
+	transcript             string
+	editor                 *Editor
+	inputs                 []TextInput
+	ready                  chan struct{}
+	done                   chan struct{}
+	err                    error
+	started, stopped       bool
+	lastInterrupt          time.Time
+	keybindings            *KeybindingsManager
+	onInterrupt            func()
+	generation             uint64
+	renderTranscript       func(int, bool, bool) ([]string, error)
+	expanded, hideThinking bool
 }
 
 type TextInput struct {
@@ -35,8 +36,10 @@ type TextInput struct {
 	Action Keybinding
 }
 type TextUIOptions struct {
-	Keybindings *KeybindingsManager
-	OnInterrupt func()
+	Keybindings      *KeybindingsManager
+	OnInterrupt      func()
+	RenderTranscript func(width int, toolsExpanded, hideThinking bool) ([]string, error)
+	HideThinking     bool
 }
 
 func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
@@ -44,10 +47,12 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 	if len(options) > 0 {
 		u.keybindings = options[0].Keybindings
 		u.onInterrupt = options[0].OnInterrupt
+		u.renderTranscript = options[0].RenderTranscript
+		u.hideThinking = options[0].HideThinking
 	}
 	if u.keybindings == nil {
 		defs := NewTUIKeybindings()
-		for action, key := range map[Keybinding]KeyID{"app.clear": "ctrl+c", "app.exit": "ctrl+d", "app.interrupt": "escape", "app.suspend": "ctrl+z", "app.session.new": ""} {
+		for action, key := range map[Keybinding]KeyID{"app.clear": "ctrl+c", "app.exit": "ctrl+d", "app.interrupt": "escape", "app.suspend": "ctrl+z", "app.session.new": "", "app.tools.expand": "ctrl+o", "app.thinking.toggle": "ctrl+t"} {
 			keys := []KeyID{}
 			if key != "" {
 				keys = append(keys, key)
@@ -175,14 +180,8 @@ func (u *TextUI) Append(text string) error {
 	u.transcript += terminalText(text)
 	return u.render()
 }
-func terminalText(text string) string {
-	return strings.Map(func(r rune) rune {
-		if r == '\n' || r == '\t' || !unicode.IsControl(r) {
-			return r
-		}
-		return -1
-	}, text)
-}
+func terminalText(text string) string { return SafeTerminalText(text) }
+func (u *TextUI) Refresh() error      { u.mu.Lock(); defer u.mu.Unlock(); return u.render() }
 func (u *TextUI) render() error {
 	if !u.started {
 		return errors.New("text UI is not initialized")
@@ -222,11 +221,16 @@ func (u *TextUI) render() error {
 		cursorRow -= start
 	}
 	var lines []string
-	for _, line := range strings.Split(u.transcript, "\n") {
-		chunks, _ := WordWrapLine(line, columns-1)
-		for _, chunk := range chunks {
-			lines = append(lines, chunk.Text)
+	if u.renderTranscript != nil {
+		lines, err = u.renderTranscript(columns-1, u.expanded, u.hideThinking)
+		if err != nil {
+			u.finish(err)
+			return err
 		}
+	}
+	if u.transcript != "" {
+		extra, _ := WrapTextWithANSI(u.transcript, columns-1)
+		lines = append(lines, extra...)
 	}
 	available := max(0, rows-len(editorLines))
 	if len(lines) > available {
@@ -273,6 +277,10 @@ func (u *TextUI) input(data string) {
 	case match("app.exit") && u.editor.GetText() == "":
 		u.finish(nil)
 		return
+	case match("app.tools.expand"):
+		u.expanded = !u.expanded
+	case match("app.thinking.toggle"):
+		u.hideThinking = !u.hideThinking
 	case match("app.interrupt"):
 		if u.onInterrupt != nil {
 			u.onInterrupt()

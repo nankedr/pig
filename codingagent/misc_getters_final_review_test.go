@@ -59,7 +59,7 @@ func TestDeferredThemeHelpersReturnStructuredErrors(t *testing.T) {
 	assertDeferredGetter(t, "Theme.GetThinkingBorderColor", func() (tui.TextStyleFunc, error) {
 		return new(Theme).GetThinkingBorderColor(agent.ThinkingLevel("high"))
 	})
-	assertDeferredGetter(t, "GetMarkdownTheme", GetMarkdownTheme)
+
 	assertDeferredGetter(t, "GetSelectListTheme", GetSelectListTheme)
 	assertDeferredGetter(t, "GetSettingsListTheme", GetSettingsListTheme)
 	assertDeferredGetter(t, "HighlightCode", func() ([]string, error) {

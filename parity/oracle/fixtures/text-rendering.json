@@ -1,0 +1,231 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/components/assistant-message.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "codingagent/text-rendering",
+    "catalog_id": "contract:codingagent/text-rendering",
+    "surface": "go-sdk",
+    "input": {
+      "markdown": [
+        {
+          "text": "# Title\n\nHello **bold** and *italic* with `code`.\n\n[site](https://example.com)\n\n- one\n- two",
+          "width": 70
+        },
+        {
+          "text": "```go\nfunc main() {\n\tprintln(\"你好\")\n}\n```",
+          "width": 26
+        },
+        {
+          "text": "3. alpha beta gamma delta\n4. 中文👨‍👩‍👧‍👦 emoji\n   - nested\n   - second",
+          "width": 17
+        },
+        {
+          "text": "> quote **bold**\n> next\n\n---\n\n~~deleted~~",
+          "width": 20
+        },
+        {
+          "text": "partial\n\n```go\nhello",
+          "width": 16
+        },
+        {
+          "text": "中👨‍👩‍👧‍👦é supercalifragilistic",
+          "width": 7
+        },
+        {
+          "text": "7) literal\n9) marker\n\n\\*literal\\*",
+          "width": 30,
+          "options": {
+            "preserveOrderedListMarkers": true,
+            "preserveBackslashEscapes": true
+          }
+        }
+      ],
+      "assistant": [
+        {
+          "content": [
+            {
+              "type": "thinking",
+              "thinking": "reason one"
+            },
+            {
+              "type": "thinking",
+              "thinking": "reason two"
+            },
+            {
+              "type": "text",
+              "text": "**answer**"
+            }
+          ],
+          "stopReason": "stop"
+        },
+        {
+          "content": [
+            {
+              "type": "text",
+              "text": "partial answer"
+            }
+          ],
+          "stopReason": "aborted"
+        },
+        {
+          "content": [
+            {
+              "type": "text",
+              "text": "partial answer"
+            }
+          ],
+          "stopReason": "error",
+          "errorMessage": "broken"
+        },
+        {
+          "content": [
+            {
+              "type": "text",
+              "text": "partial answer"
+            }
+          ],
+          "stopReason": "length"
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "markdown": [
+        [
+          "Title",
+          "",
+          "Hello bold and italic with code.",
+          "",
+          "site (https://example.com)",
+          "",
+          "- one",
+          "- two"
+        ],
+        [
+          "```go",
+          "  func main() {",
+          "     println(\"你好\")",
+          "  }",
+          "```"
+        ],
+        [
+          "3. alpha beta",
+          "   gamma delta",
+          "4. 中文👨‍👩‍👧‍👦 emoji",
+          "    - nested",
+          "    - second"
+        ],
+        [
+          "│ quote bold",
+          "│ next",
+          "",
+          "────────────────────",
+          "",
+          "deleted"
+        ],
+        [
+          "partial",
+          "",
+          "```go",
+          "  hello",
+          "```"
+        ],
+        [
+          "中👨‍👩‍👧‍👦é",
+          "superca",
+          "lifragi",
+          "listic"
+        ],
+        [
+          "7) literal",
+          "9) marker",
+          "",
+          "\\*literal\\*"
+        ]
+      ],
+      "assistant": [
+        [
+          [
+            "",
+            "reason one",
+            "",
+            "reason two",
+            "",
+            "answer"
+          ],
+          [
+            "",
+            "Thinking...",
+            "",
+            "answer"
+          ]
+        ],
+        [
+          [
+            "",
+            "partial answer",
+            "",
+            "Operation aborted"
+          ],
+          [
+            "",
+            "partial answer",
+            "",
+            "Operation aborted"
+          ]
+        ],
+        [
+          [
+            "",
+            "partial answer",
+            "",
+            "Error: broken"
+          ],
+          [
+            "",
+            "partial answer",
+            "",
+            "Error: broken"
+          ]
+        ],
+        [
+          [
+            "",
+            "partial answer",
+            "",
+            "Response was truncated before completion."
+          ],
+          [
+            "",
+            "partial answer",
+            "",
+            "Response was truncated before completion."
+          ]
+        ]
+      ],
+      "diff": "-1 old   value\n+1 new   value\n 2 context"
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:79551320881fbe4f5da1c926a5bf4a9fb9cf9f65fd5f8ba38fc82d36db140348",
+  "observation_hash": "sha256:1a91c36e5f46927f4e00c8318b0ee150d6a98368d77aebc2fa35f39e9115567f",
+  "execution_method": "node parity/oracle/text-rendering.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "colors": "stripped",
+    "hyperlinks": false
+  }
+}

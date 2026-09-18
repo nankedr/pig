@@ -91,14 +91,6 @@ func GetWordSegmenter() (TextSegmenter, error) {
 	return nil, newNotImplemented("getWordSegmenter")
 }
 
-func VisibleWidth(string) (int, error) {
-	return 0, newNotImplemented("visibleWidth")
-}
-
-func StripTerminalSequences(string) (string, error) {
-	return "", newNotImplemented("stripTerminalSequences")
-}
-
 func GetGraphemeCellRange(string, int) (GraphemeCellRange, bool, error) {
 	return GraphemeCellRange{}, false, newNotImplemented("getGraphemeCellRange")
 }
@@ -111,14 +103,6 @@ func NormalizeTerminalOutput(string) (string, error) {
 	return "", newNotImplemented("normalizeTerminalOutput")
 }
 
-func ExtractANSICode(string, int) (ANSICode, bool, error) {
-	return ANSICode{}, false, newNotImplemented("extractAnsiCode")
-}
-
-func WrapTextWithANSI(string, int) ([]string, error) {
-	return nil, newNotImplemented("wrapTextWithAnsi")
-}
-
 func IsWhitespaceChar(string) (bool, error) {
 	return false, newNotImplemented("isWhitespaceChar")
 }
@@ -129,10 +113,6 @@ func IsPunctuationChar(string) (bool, error) {
 
 func ApplyBackgroundToLine(string, int, BackgroundFunc) (string, error) {
 	return "", newNotImplemented("applyBackgroundToLine")
-}
-
-func TruncateToWidth(string, int, ...TruncateOptions) (string, error) {
-	return "", newNotImplemented("truncateToWidth")
 }
 
 func SliceByColumn(string, int, int, ...bool) (string, error) {

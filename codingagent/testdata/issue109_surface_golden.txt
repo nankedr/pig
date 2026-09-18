@@ -12,6 +12,8 @@ Verbose bool
 type tui.TextUIOptions
 Keybindings *tui.KeybindingsManager
 OnInterrupt func()
+RenderTranscript func(int, bool, bool) ([]string, error)
+HideThinking bool
 type tui.TextInput
 Text string
 Action tui.Keybinding
@@ -53,6 +55,7 @@ Done func(*tui.TextUI) <-chan struct {}
 Err func(*tui.TextUI) error
 ReadInput func(*tui.TextUI, context.Context) (tui.TextInput, error)
 ReadLine func(*tui.TextUI, context.Context) (string, error)
+Refresh func(*tui.TextUI) error
 Start func(*tui.TextUI) error
 Stop func(*tui.TextUI) error
 Suspend func(*tui.TextUI) error

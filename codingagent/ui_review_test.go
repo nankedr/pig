@@ -175,7 +175,9 @@ func TestPinnedCoreUIContractsUseConcreteCarriers(t *testing.T) {
 }
 
 func TestPinnedCoreUIOperationsRemainStructuredStubs(t *testing.T) {
-	assertCodingAgentUIStub(t, "AssistantMessageComponent.UpdateContent", new(codingagent.AssistantMessageComponent).UpdateContent(ai.AssistantMessage{}))
+	if err := new(codingagent.AssistantMessageComponent).UpdateContent(ai.AssistantMessage{}); err != nil {
+		t.Fatal(err)
+	}
 	assertCodingAgentUIStub(t, "BashExecutionComponent.SetComplete", new(codingagent.BashExecutionComponent).SetComplete(nil, false, nil, nil))
 
 	toolResult := codingagent.ToolExecutionResult{
@@ -189,8 +191,12 @@ func TestPinnedCoreUIOperationsRemainStructuredStubs(t *testing.T) {
 		IsError: true,
 	}
 	toolExecution := new(codingagent.ToolExecutionComponent)
-	assertCodingAgentUIStub(t, "ToolExecutionComponent.UpdateResult", toolExecution.UpdateResult(toolResult))
-	assertCodingAgentUIStub(t, "ToolExecutionComponent.UpdateResult", toolExecution.UpdateResult(toolResult, true))
+	if err := toolExecution.UpdateResult(toolResult); err != nil {
+		t.Fatal(err)
+	}
+	if err := toolExecution.UpdateResult(toolResult, true); err != nil {
+		t.Fatal(err)
+	}
 	if !reflect.DeepEqual(toolResult, wantToolResult) {
 		t.Errorf("UpdateResult() mutated input to %#v, want %#v", toolResult, wantToolResult)
 	}
@@ -386,13 +392,13 @@ func TestLoginDialogComponentSignal(t *testing.T) {
 }
 
 func TestTruncateToVisualLines(t *testing.T) {
-	t.Run("surfaces deferred text wrapping", func(t *testing.T) {
+	t.Run("wraps text to visual lines", func(t *testing.T) {
 		result, err := codingagent.TruncateToVisualLines("alpha beta", 2, 8)
-		if !errors.Is(err, tui.ErrNotImplemented) {
-			t.Fatalf("error = %v, want tui.ErrNotImplemented", err)
+		if err != nil {
+			t.Fatal(err)
 		}
-		if result.SkippedCount != 0 || result.VisualLines != nil {
-			t.Fatalf("result = %#v, want zero result alongside error", result)
+		if result.SkippedCount != 0 || !reflect.DeepEqual(result.VisualLines, []string{"alpha   ", "beta    "}) {
+			t.Fatalf("wrapped: %#v", result)
 		}
 	})
 
@@ -408,8 +414,8 @@ func TestTruncateToVisualLines(t *testing.T) {
 
 	t.Run("valid padding keeps one content column", func(t *testing.T) {
 		_, err := codingagent.TruncateToVisualLines("x", 1, 5, 2)
-		if !errors.Is(err, tui.ErrNotImplemented) {
-			t.Fatalf("error = %v, want tui.ErrNotImplemented", err)
+		if err != nil {
+			t.Fatal(err)
 		}
 	})
 
