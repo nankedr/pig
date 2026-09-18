@@ -127,52 +127,58 @@ func (m *Markdown) blocks(parent ast.Node, data []byte, width, depth int) []stri
 		if len(out) > 0 && n.HasBlankPreviousLines() {
 			out = append(out, "")
 		}
-		switch n := n.(type) {
-		case *ast.Heading:
-			s := m.inline(n, data)
-			if n.Level >= 3 {
-				s = strings.Repeat("#", n.Level) + " " + s
+		out = append(out, m.block(n, data, width, depth)...)
+	}
+	return out
+}
+func (m *Markdown) block(n ast.Node, data []byte, width, depth int) []string {
+	var out []string
+	switch n := n.(type) {
+	case *ast.Heading:
+		s := m.inline(n, data)
+		if n.Level >= 3 {
+			s = strings.Repeat("#", n.Level) + " " + s
+		}
+		s = styled(m.theme.Bold, s)
+		if n.Level == 1 {
+			s = styled(m.theme.Underline, s)
+		}
+		out = append(out, styled(m.theme.Heading, s))
+		if next := n.NextSibling(); next != nil && !next.HasBlankPreviousLines() {
+			out = append(out, "")
+		}
+	case *ast.Paragraph, *ast.TextBlock:
+		out = append(out, m.inline(n, data))
+	case *ast.FencedCodeBlock:
+		lang := string(n.Language(data))
+		out = append(out, m.code(n, data, lang)...)
+	case *ast.CodeBlock:
+		out = append(out, m.code(n, data, "")...)
+	case *ast.List:
+		out = append(out, m.list(n, data, width, depth)...)
+	case *ast.Blockquote:
+		lines := m.blocks(n, data, max(1, width-2), 0)
+		for _, line := range lines {
+			wrapped, _ := WrapTextWithANSI(line, max(1, width-2))
+			for _, part := range wrapped {
+				out = append(out, styled(m.theme.QuoteBorder, "│ ")+styled(m.theme.Quote, part))
 			}
-			s = styled(m.theme.Bold, s)
-			if n.Level == 1 {
-				s = styled(m.theme.Underline, s)
-			}
-			out = append(out, styled(m.theme.Heading, s))
-			if next := n.NextSibling(); next != nil && !next.HasBlankPreviousLines() {
-				out = append(out, "")
-			}
-		case *ast.Paragraph, *ast.TextBlock:
-			out = append(out, m.inline(n, data))
-		case *ast.FencedCodeBlock:
-			lang := string(n.Language(data))
-			out = append(out, m.code(n, data, lang)...)
-		case *ast.CodeBlock:
-			out = append(out, m.code(n, data, "")...)
-		case *ast.List:
-			out = append(out, m.list(n, data, width, depth)...)
-		case *ast.Blockquote:
-			lines := m.blocks(n, data, max(1, width-2), 0)
-			for _, line := range lines {
-				wrapped, _ := WrapTextWithANSI(line, max(1, width-2))
-				for _, part := range wrapped {
-					out = append(out, styled(m.theme.QuoteBorder, "│ ")+styled(m.theme.Quote, part))
-				}
-			}
-		case *ast.ThematicBreak:
-			out = append(out, styled(m.theme.HR, strings.Repeat("─", max(1, width))))
-		default:
-			if n.HasChildren() {
-				out = append(out, m.blocks(n, data, width, depth)...)
-			} else {
-				for i := 0; i < n.Lines().Len(); i++ {
-					seg := n.Lines().At(i)
-					out = append(out, strings.TrimSuffix(string(seg.Value(data)), "\n"))
-				}
+		}
+	case *ast.ThematicBreak:
+		out = append(out, styled(m.theme.HR, strings.Repeat("─", max(1, width))))
+	default:
+		if n.HasChildren() {
+			out = append(out, m.blocks(n, data, width, depth)...)
+		} else {
+			for i := 0; i < n.Lines().Len(); i++ {
+				seg := n.Lines().At(i)
+				out = append(out, strings.TrimSuffix(string(seg.Value(data)), "\n"))
 			}
 		}
 	}
 	return out
 }
+
 func (m *Markdown) code(n ast.Node, data []byte, language string) []string {
 	var code strings.Builder
 	for i := 0; i < n.Lines().Len(); i++ {
@@ -223,11 +229,14 @@ func (m *Markdown) list(n *ast.List, data []byte, width, depth int) []string {
 		continuation := strings.Repeat(" ", len(prefix))
 		first := true
 		for block := item.FirstChild(); block != nil; block = block.NextSibling() {
+			if !first && block.HasBlankPreviousLines() {
+				out = append(out, "")
+			}
 			if list, ok := block.(*ast.List); ok {
 				out = append(out, m.list(list, data, width, depth+1)...)
 				continue
 			}
-			lines, _ := WrapTextWithANSI(m.inline(block, data), max(1, width-len(prefix)))
+			lines, _ := WrapTextWithANSI(strings.Join(m.block(block, data, max(1, width-len(prefix)), 0), "\n"), max(1, width-len(prefix)))
 			for _, line := range lines {
 				p := continuation
 				if first {

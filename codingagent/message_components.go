@@ -186,11 +186,19 @@ type ToolExecutionComponent struct {
 	args                                   any
 	result                                 *ToolExecutionResult
 	expanded, started, argsComplete, final bool
+	initErr                                error
 }
 
 func NewToolExecutionComponent(name, id string, args any, options ...ToolExecutionOptions) *ToolExecutionComponent {
 	c := &ToolExecutionComponent{name: name, id: id}
-	_ = c.UpdateArgs(args)
+	c.initErr = c.UpdateArgs(args)
+	if len(options) > 0 {
+		if options[0].ShowImages {
+			c.initErr = notImplemented("ToolExecutionComponent.SetShowImages")
+		} else if options[0].ImageWidthCells != 0 {
+			c.initErr = notImplemented("ToolExecutionComponent.SetImageWidthCells")
+		}
+	}
 	return c
 }
 func (*ToolExecutionComponent) Invalidate() error              { return nil }
@@ -235,6 +243,9 @@ func (c *ToolExecutionComponent) UpdateResult(result ToolExecutionResult, partia
 	return nil
 }
 func (c *ToolExecutionComponent) Render(width int) ([]string, error) {
+	if c.initErr != nil {
+		return nil, c.initErr
+	}
 	status := "preparing"
 	if c.started {
 		status = "running"

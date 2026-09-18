@@ -2,6 +2,7 @@ package codingagent_test
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
 	"github.com/nankedr/pig/codingagent"
@@ -130,5 +131,31 @@ func TestTranscriptStreamingEqualsHistory112(t *testing.T) {
 		if strings.Contains(s, "LATE") || strings.Index(s, "RESULT_A") > strings.Index(s, "RESULT_B") {
 			t.Fatal(s)
 		}
+	}
+}
+
+func TestFailedToolHistoryAndConstructor112(t *testing.T) {
+	for _, reason := range []ai.StopReason{ai.StopReasonAborted, ai.StopReasonError} {
+		m := ai.AssistantMessage{Role: ai.MessageRoleAssistant, StopReason: reason, Content: []ai.AssistantContent{ai.ToolCall{Type: ai.ContentTypeToolCall, ID: "a", Name: "probe", Arguments: map[string]any{}}}}
+		live := codingagent.NewTranscript()
+		live.Update(codingagent.AgentSessionMessageStartEvent{MessageStartEvent: agent.MessageStartEvent{Message: m}})
+		live.Update(codingagent.AgentSessionMessageEndEvent{MessageEndEvent: agent.MessageEndEvent{Message: m}})
+		history := codingagent.NewTranscript()
+		history.SetMessages([]agent.AgentMessage{m})
+		a, _ := live.Render(30)
+		b, _ := history.Render(30)
+		if !reflect.DeepEqual(a, b) {
+			t.Errorf("failed tool history: %#v / %#v", a, b)
+		}
+	}
+	for _, options := range []codingagent.ToolExecutionOptions{{ShowImages: true}, {ImageWidthCells: 80}} {
+		c := codingagent.NewToolExecutionComponent("probe", "a", nil, options)
+		if _, err := c.Render(30); !errors.Is(err, codingagent.ErrNotImplemented) {
+			t.Errorf("images silently accepted: %v", err)
+		}
+	}
+	c := codingagent.NewToolExecutionComponent("probe", "a", make(chan int))
+	if _, err := c.Render(30); err == nil {
+		t.Error("invalid arguments silently accepted")
 	}
 }

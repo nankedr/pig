@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9681
+- Total entries: 9682
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5159 |
-| scaffolded | 3779 |
-| partial | 450 |
+| inventoried | 5156 |
+| scaffolded | 3749 |
+| partial | 484 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -5419,7 +5419,6 @@
 | constructor:codingagent/src/core/extensions/runner.ts#ExtensionRunner | inventoried | M7 | contract | github.com/nankedr/pig/codingagent.ExtensionRunner | coding-agent |
 | constructor:codingagent/src/core/model-runtime.ts#CredentialSynchronizationError | inventoried | M3 | contract | github.com/nankedr/pig/codingagent.CredentialSynchronizationError | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/armin.ts#ArminComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent | coding-agent |
-| constructor:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.BorderedLoader | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/branch-summary-message.ts#BranchSummaryMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.BranchSummaryMessageComponent | coding-agent |
@@ -5440,10 +5439,8 @@
 | constructor:codingagent/src/modes/interactive/components/skill-invocation-message.ts#SkillInvocationMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.SkillInvocationMessageComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/theme-selector.ts#ThemeSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ThemeSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/thinking-selector.ts#ThinkingSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ThinkingSelectorComponent | coding-agent |
-| constructor:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/tree-selector.ts#TreeSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.TreeSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/user-message-selector.ts#UserMessageSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageSelectorComponent | coding-agent |
-| constructor:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/theme/theme.ts#Theme | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.Theme | coding-agent |
 | contract:config/models-json | inventoried | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:migration/auth-and-layout | inventoried | M5 | contract | github.com/nankedr/pig/codingagent | coding-agent |
@@ -7256,12 +7253,6 @@
 | member:codingagent/src/modes/interactive/components/armin.ts#ArminComponent.dispose | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent.Dispose | coding-agent |
 | member:codingagent/src/modes/interactive/components/armin.ts#ArminComponent.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent.Invalidate | coding-agent |
 | member:codingagent/src/modes/interactive/components/armin.ts#ArminComponent.render | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent.Render | coding-agent |
-| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.Invalidate | coding-agent |
-| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.render | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.Render | coding-agent |
-| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.setHiddenThinkingLabel | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.SetHiddenThinkingLabel | coding-agent |
-| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.setHideThinkingBlock | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.SetHideThinkingBlock | coding-agent |
-| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.setOutputPad | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.SetOutputPad | coding-agent |
-| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.updateContent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.UpdateContent | coding-agent |
 | member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.appendOutput | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.AppendOutput | coding-agent |
 | member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.getCommand | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.GetCommand | coding-agent |
 | member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.getOutput | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.GetOutput | coding-agent |
@@ -7394,15 +7385,8 @@
 | member:codingagent/src/modes/interactive/components/skill-invocation-message.ts#SkillInvocationMessageComponent.setExpanded | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.SkillInvocationMessageComponent.SetExpanded | coding-agent |
 | member:codingagent/src/modes/interactive/components/theme-selector.ts#ThemeSelectorComponent.getSelectList | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ThemeSelectorComponent.GetSelectList | coding-agent |
 | member:codingagent/src/modes/interactive/components/thinking-selector.ts#ThinkingSelectorComponent.getSelectList | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ThinkingSelectorComponent.GetSelectList | coding-agent |
-| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.Invalidate | coding-agent |
-| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.markExecutionStarted | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.MarkExecutionStarted | coding-agent |
-| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.render | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.Render | coding-agent |
-| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.setArgsComplete | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.SetArgsComplete | coding-agent |
-| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.setExpanded | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.SetExpanded | coding-agent |
 | member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.setImageWidthCells | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.SetImageWidthCells | coding-agent |
 | member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.setShowImages | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.SetShowImages | coding-agent |
-| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.updateArgs | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.UpdateArgs | coding-agent |
-| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.updateResult | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.UpdateResult | coding-agent |
 | member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionOptions.imageWidthCells | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionOptions.ImageWidthCells | coding-agent |
 | member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionOptions.showImages | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionOptions.ShowImages | coding-agent |
 | member:codingagent/src/modes/interactive/components/tree-selector.ts#TreeSelectorComponent.focused | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.TreeSelectorComponent.Focused | coding-agent |
@@ -7410,8 +7394,6 @@
 | member:codingagent/src/modes/interactive/components/tree-selector.ts#TreeSelectorComponent.handleInput | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.TreeSelectorComponent.HandleInput | coding-agent |
 | member:codingagent/src/modes/interactive/components/tree-selector.ts#TreeSelectorComponent.onCopy | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.TreeSelectorComponent.OnCopy | coding-agent |
 | member:codingagent/src/modes/interactive/components/user-message-selector.ts#UserMessageSelectorComponent.getMessageList | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageSelectorComponent.GetMessageList | coding-agent |
-| member:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent.render | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageComponent.Render | coding-agent |
-| member:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent.setOutputPad | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageComponent.SetOutputPad | coding-agent |
 | member:codingagent/src/modes/interactive/components/visual-truncate.ts#VisualTruncateResult.skippedCount | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.VisualTruncateResult.SkippedCount | coding-agent |
 | member:codingagent/src/modes/interactive/components/visual-truncate.ts#VisualTruncateResult.visualLines | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.VisualTruncateResult.VisualLines | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.showNewVersionNotification | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ShowNewVersionNotification | coding-agent |
@@ -7770,7 +7752,6 @@
 | symbol:codingagent/src/core/trust-manager.ts#hasTrustRequiringProjectResources | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.HasTrustRequiringProjectResources | coding-agent |
 | symbol:codingagent/src/main.ts#MainOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.MainOptions | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/armin.ts#ArminComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ArminComponent | coding-agent |
-| symbol:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.AssistantMessageComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.BashExecutionComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.BorderedLoader | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/branch-summary-message.ts#BranchSummaryMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.BranchSummaryMessageComponent | coding-agent |
@@ -7778,7 +7759,6 @@
 | symbol:codingagent/src/modes/interactive/components/custom-editor.ts#CustomEditor | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.CustomEditor | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/custom-message.ts#CustomMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.CustomMessageComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/diff.ts#RenderDiffOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.RenderDiffOptions | coding-agent |
-| symbol:codingagent/src/modes/interactive/components/diff.ts#renderDiff | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.RenderDiff | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/dynamic-border.ts#DynamicBorder | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.DynamicBorder | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/extension-editor.ts#ExtensionEditorComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ExtensionEditorComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/extension-input.ts#ExtensionInputComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ExtensionInputComponent | coding-agent |
@@ -7798,17 +7778,13 @@
 | symbol:codingagent/src/modes/interactive/components/skill-invocation-message.ts#SkillInvocationMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.SkillInvocationMessageComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/theme-selector.ts#ThemeSelectorComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ThemeSelectorComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/thinking-selector.ts#ThinkingSelectorComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ThinkingSelectorComponent | coding-agent |
-| symbol:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ToolExecutionComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ToolExecutionOptions | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/tree-selector.ts#TreeSelectorComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.TreeSelectorComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/user-message-selector.ts#UserMessageSelectorComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.UserMessageSelectorComponent | coding-agent |
-| symbol:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.UserMessageComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/visual-truncate.ts#VisualTruncateResult | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.VisualTruncateResult | coding-agent |
-| symbol:codingagent/src/modes/interactive/components/visual-truncate.ts#truncateToVisualLines | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.TruncateToVisualLines | coding-agent |
 | symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveModeOptions | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#ThemeColor | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ThemeColor | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#getLanguageFromPath | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetLanguageFromPath | coding-agent |
-| symbol:codingagent/src/modes/interactive/theme/theme.ts#getMarkdownTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetMarkdownTheme | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#getSelectListTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetSelectListTheme | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#getSettingsListTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetSettingsListTheme | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#highlightCode | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.HighlightCode | coding-agent |
@@ -7831,6 +7807,9 @@
 | cmd-pig | partial | M1 | command | github.com/nankedr/pig/cmd/pig | coding-agent |
 | constructor:codingagent/src/core/keybindings.ts#KeybindingsManager | partial | M6 | contract | github.com/nankedr/pig/codingagent.KeybindingsManager | coding-agent |
 | constructor:codingagent/src/core/resource-loader.ts#DefaultResourceLoader | partial | M5 | contract | github.com/nankedr/pig/codingagent.NewDefaultResourceLoader | coding-agent |
+| constructor:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | partial | M6 | contract | github.com/nankedr/pig/codingagent.NewAssistantMessageComponent | coding-agent |
+| constructor:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent | partial | M6 | contract | github.com/nankedr/pig/codingagent.NewToolExecutionComponent | coding-agent |
+| constructor:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | partial | M6 | contract | github.com/nankedr/pig/codingagent.NewUserMessageComponent | coding-agent |
 | contract:cli/pig/args | partial | M3 | contract | github.com/nankedr/pig/codingagent.RunCLI | coding-agent |
 | contract:cli/pig/exit-codes | partial | M3 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | contract:cli/pig/experimental | partial | M0 | contract | github.com/nankedr/pig/codingagent.runExperimentalCLI | coding-agent |
@@ -7857,6 +7836,7 @@
 | contract:codingagent/session-tree-navigation | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
 | contract:codingagent/skills | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSkills | coding-agent |
 | contract:codingagent/system-prompts | partial | M5 | contract | github.com/nankedr/pig/codingagent.NewDefaultResourceLoader | coding-agent |
+| contract:codingagent/text-rendering | partial | M6 | contract | github.com/nankedr/pig/codingagent.Transcript | coding-agent |
 | contract:codingagent/themes | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetThemes | coding-agent |
 | contract:codingagent/turn-retry | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.Prompt | coding-agent |
 | contract:codingagent/write-tool | partial | M3 | contract | github.com/nankedr/pig/codingagent.CreateWriteTool | coding-agent |
@@ -7937,6 +7917,21 @@
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.description | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.Description | coding-agent |
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.disable-model-invocation | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.DisableModelInvocation | coding-agent |
 | member:codingagent/src/core/skills.ts#SkillFrontmatter.name | partial | M5 | contract | github.com/nankedr/pig/codingagent.SkillFrontmatter.Name | coding-agent |
+| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.invalidate | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.Invalidate | coding-agent |
+| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.render | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.Render | coding-agent |
+| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.setHiddenThinkingLabel | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.SetHiddenThinkingLabel | coding-agent |
+| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.setHideThinkingBlock | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.SetHideThinkingBlock | coding-agent |
+| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.setOutputPad | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.SetOutputPad | coding-agent |
+| member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.updateContent | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.UpdateContent | coding-agent |
+| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.invalidate | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.Invalidate | coding-agent |
+| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.markExecutionStarted | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.MarkExecutionStarted | coding-agent |
+| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.render | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.Render | coding-agent |
+| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.setArgsComplete | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.SetArgsComplete | coding-agent |
+| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.setExpanded | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.SetExpanded | coding-agent |
+| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.updateArgs | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.UpdateArgs | coding-agent |
+| member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.updateResult | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.UpdateResult | coding-agent |
+| member:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent.render | partial | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageComponent.Render | coding-agent |
+| member:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent.setOutputPad | partial | M6 | contract | github.com/nankedr/pig/codingagent.UserMessageComponent.SetOutputPad | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.clearEditor | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.ClearEditor | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.getUserInput | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.GetUserInput | coding-agent |
 | member:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode.init | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode.Init | coding-agent |
@@ -7981,8 +7976,14 @@
 | symbol:codingagent/src/core/skills.ts#loadSkills | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadSkills | coding-agent |
 | symbol:codingagent/src/core/skills.ts#loadSkillsFromDir | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadSkillsFromDir | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
+| symbol:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | partial | M6 | symbol | github.com/nankedr/pig/codingagent.AssistantMessageComponent | coding-agent |
+| symbol:codingagent/src/modes/interactive/components/diff.ts#renderDiff | partial | M6 | symbol | github.com/nankedr/pig/codingagent.RenderDiff | coding-agent |
+| symbol:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent | partial | M6 | symbol | github.com/nankedr/pig/codingagent.ToolExecutionComponent | coding-agent |
+| symbol:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | partial | M6 | symbol | github.com/nankedr/pig/codingagent.UserMessageComponent | coding-agent |
+| symbol:codingagent/src/modes/interactive/components/visual-truncate.ts#truncateToVisualLines | partial | M6 | symbol | github.com/nankedr/pig/codingagent.TruncateToVisualLines | coding-agent |
 | symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode | partial | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#Theme | partial | M6 | symbol | github.com/nankedr/pig/codingagent.Theme | coding-agent |
+| symbol:codingagent/src/modes/interactive/theme/theme.ts#getMarkdownTheme | partial | M6 | symbol | github.com/nankedr/pig/codingagent.GetMarkdownTheme | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#RpcClient | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-mode.ts#runRpcMode | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RunRPCMode | coding-agent |
@@ -8992,9 +8993,6 @@
 | member:tui/src/components/markdown.ts#DefaultTextStyle.italic | scaffolded | M6 | contract | github.com/nankedr/pig/tui.DefaultTextStyle.Italic | tui |
 | member:tui/src/components/markdown.ts#DefaultTextStyle.strikethrough | scaffolded | M6 | contract | github.com/nankedr/pig/tui.DefaultTextStyle.Strikethrough | tui |
 | member:tui/src/components/markdown.ts#DefaultTextStyle.underline | scaffolded | M6 | contract | github.com/nankedr/pig/tui.DefaultTextStyle.Underline | tui |
-| member:tui/src/components/markdown.ts#Markdown.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Markdown.Invalidate | tui |
-| member:tui/src/components/markdown.ts#Markdown.render | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Markdown.Render | tui |
-| member:tui/src/components/markdown.ts#Markdown.setText | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Markdown.SetText | tui |
 | member:tui/src/components/markdown.ts#MarkdownOptions.preserveBackslashEscapes | scaffolded | M6 | contract | github.com/nankedr/pig/tui.MarkdownOptions.PreserveBackslashEscapes | tui |
 | member:tui/src/components/markdown.ts#MarkdownOptions.preserveOrderedListMarkers | scaffolded | M6 | contract | github.com/nankedr/pig/tui.MarkdownOptions.PreserveOrderedListMarkers | tui |
 | member:tui/src/components/markdown.ts#MarkdownOptions.renderLatex | scaffolded | M6 | contract | github.com/nankedr/pig/tui.MarkdownOptions.RenderLatex | tui |
@@ -9519,7 +9517,6 @@
 | symbol:tui/src/components/loader.ts#Loader | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Loader | tui |
 | symbol:tui/src/components/loader.ts#LoaderIndicatorOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.LoaderIndicatorOptions | tui |
 | symbol:tui/src/components/markdown.ts#DefaultTextStyle | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.DefaultTextStyle | tui |
-| symbol:tui/src/components/markdown.ts#Markdown | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Markdown | tui |
 | symbol:tui/src/components/markdown.ts#MarkdownOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.MarkdownOptions | tui |
 | symbol:tui/src/components/markdown.ts#MarkdownTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.MarkdownTheme | tui |
 | symbol:tui/src/components/scroll-view.ts#ScrollView | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ScrollView | tui |
@@ -9653,7 +9650,6 @@
 | symbol:tui/src/utils.ts#PUNCTUATION_REGEX | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.PunctuationRegex | tui |
 | symbol:tui/src/utils.ts#applyBackgroundToLine | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ApplyBackgroundToLine | tui |
 | symbol:tui/src/utils.ts#cjkBreakRegex | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.CJKBreakRegex | tui |
-| symbol:tui/src/utils.ts#extractAnsiCode | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ExtractANSICode | tui |
 | symbol:tui/src/utils.ts#extractSegments | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ExtractSegments | tui |
 | symbol:tui/src/utils.ts#getGraphemeCellRange | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.GetGraphemeCellRange | tui |
 | symbol:tui/src/utils.ts#getGraphemeSegmenter | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.GetGraphemeSegmenter | tui |
@@ -9664,10 +9660,6 @@
 | symbol:tui/src/utils.ts#normalizeTerminalOutput | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.NormalizeTerminalOutput | tui |
 | symbol:tui/src/utils.ts#sliceByColumn | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SliceByColumn | tui |
 | symbol:tui/src/utils.ts#sliceWithWidth | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SliceWithWidth | tui |
-| symbol:tui/src/utils.ts#stripTerminalSequences | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.StripTerminalSequences | tui |
-| symbol:tui/src/utils.ts#truncateToWidth | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.TruncateToWidth | tui |
-| symbol:tui/src/utils.ts#visibleWidth | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.VisibleWidth | tui |
-| symbol:tui/src/utils.ts#wrapTextWithAnsi | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.WrapTextWithANSI | tui |
 | symbol:tui/src/word-navigation.ts#WordNavigationOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.WordNavigationOptions | tui |
 | symbol:tui/src/word-navigation.ts#findWordBackward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordBackward | tui |
 | symbol:tui/src/word-navigation.ts#findWordForward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordForward | tui |
@@ -9688,6 +9680,9 @@
 | member:tui/src/components/editor.ts#Editor.render | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.Render | tui |
 | member:tui/src/components/editor.ts#Editor.setPaddingX | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetPaddingX | tui |
 | member:tui/src/components/editor.ts#Editor.setText | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetText | tui |
+| member:tui/src/components/markdown.ts#Markdown.invalidate | partial | M6 | contract | github.com/nankedr/pig/tui.Markdown.Invalidate | tui |
+| member:tui/src/components/markdown.ts#Markdown.render | partial | M6 | contract | github.com/nankedr/pig/tui.Markdown.Render | tui |
+| member:tui/src/components/markdown.ts#Markdown.setText | partial | M6 | contract | github.com/nankedr/pig/tui.Markdown.SetText | tui |
 | member:tui/src/keybindings.ts#KeybindingsManager.getConflicts | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetConflicts | tui |
 | member:tui/src/keybindings.ts#KeybindingsManager.getDefinition | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetDefinition | tui |
 | member:tui/src/keybindings.ts#KeybindingsManager.getKeys | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager.GetKeys | tui |
@@ -9717,6 +9712,7 @@
 | module-tui | partial | M6 | package | github.com/nankedr/pig/tui | tui |
 | symbol:tui/src/components/editor.ts#Editor | partial | M6 | symbol | github.com/nankedr/pig/tui.Editor | tui |
 | symbol:tui/src/components/editor.ts#wordWrapLine | partial | M6 | symbol | github.com/nankedr/pig/tui.WordWrapLine | tui |
+| symbol:tui/src/components/markdown.ts#Markdown | partial | M6 | symbol | github.com/nankedr/pig/tui.Markdown | tui |
 | symbol:tui/src/keybindings.ts#KeybindingsManager | partial | M6 | symbol | github.com/nankedr/pig/tui.KeybindingsManager | tui |
 | symbol:tui/src/keybindings.ts#getKeybindings | partial | M6 | symbol | github.com/nankedr/pig/tui.GetKeybindings | tui |
 | symbol:tui/src/keybindings.ts#setKeybindings | partial | M6 | symbol | github.com/nankedr/pig/tui.SetKeybindings | tui |
@@ -9735,6 +9731,11 @@
 | symbol:tui/src/terminal.ts#normalizeAppleTerminalInput | partial | M6 | symbol | github.com/nankedr/pig/tui.NormalizeAppleTerminalInput | tui |
 | symbol:tui/src/terminal.ts#normalizeNativeShiftEnterInput | partial | M6 | symbol | github.com/nankedr/pig/tui.NormalizeNativeShiftEnterInput | tui |
 | symbol:tui/src/terminal.ts#parseKeyboardProtocolNegotiationSequence | partial | M6 | symbol | github.com/nankedr/pig/tui.ParseKeyboardProtocolNegotiationSequence | tui |
+| symbol:tui/src/utils.ts#extractAnsiCode | partial | M6 | symbol | github.com/nankedr/pig/tui.ExtractANSICode | tui |
+| symbol:tui/src/utils.ts#stripTerminalSequences | partial | M6 | symbol | github.com/nankedr/pig/tui.StripTerminalSequences | tui |
+| symbol:tui/src/utils.ts#truncateToWidth | partial | M6 | symbol | github.com/nankedr/pig/tui.TruncateToWidth | tui |
+| symbol:tui/src/utils.ts#visibleWidth | partial | M6 | symbol | github.com/nankedr/pig/tui.VisibleWidth | tui |
+| symbol:tui/src/utils.ts#wrapTextWithAnsi | partial | M6 | symbol | github.com/nankedr/pig/tui.WrapTextWithANSI | tui |
 
 ## OpenAI Chat Completions capability matrix
 

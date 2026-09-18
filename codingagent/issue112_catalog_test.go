@@ -19,6 +19,9 @@ func issue112Partial() *catalog.Partial {
 }
 func issue112PromoteRuntimeEntry(e *catalog.Entry) bool {
 	name := strings.TrimPrefix(e.Mapping.Target, issue32GoPackage+".")
+	if strings.HasPrefix(e.ID, "constructor:") {
+		name = strings.TrimPrefix(name, "New")
+	}
 	supported := false
 	for _, n := range []string{"AssistantMessageComponent", "UserMessageComponent", "ToolExecutionComponent", "RenderDiff", "GetMarkdownTheme", "TruncateToVisualLines"} {
 		supported = supported || name == n || strings.HasPrefix(name, n+".")
@@ -75,4 +78,4 @@ func TestTextRenderingCatalog112(t *testing.T) {
 	}
 }
 
-const issue112FixtureHash = "sha256:2732320dba39013b77be4e1476d6186faf524fbf053aa31bed89736091cdd9c9"
+const issue112FixtureHash = "sha256:ccd00d83f5c2387cf8a9ac10d714364653fdf34314b8754e8b064092aefaae42"

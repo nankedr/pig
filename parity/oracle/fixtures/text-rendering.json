@@ -16,6 +16,10 @@
     "input": {
       "markdown": [
         {
+          "text": "- item\n\n  ```go\n  println(1)\n  ```",
+          "width": 40
+        },
+        {
           "text": "# Title\n\nHello **bold** and *italic* with `code`.\n\n[site](https://example.com)\n\n- one\n- two",
           "width": 70
         },
@@ -104,6 +108,13 @@
   "observation": {
     "outcome": {
       "markdown": [
+        [
+          "- item",
+          "",
+          "  ```go",
+          "    println(1)",
+          "  ```"
+        ],
         [
           "Title",
           "",
@@ -220,8 +231,8 @@
     },
     "side_effects": []
   },
-  "input_hash": "sha256:79551320881fbe4f5da1c926a5bf4a9fb9cf9f65fd5f8ba38fc82d36db140348",
-  "observation_hash": "sha256:1a91c36e5f46927f4e00c8318b0ee150d6a98368d77aebc2fa35f39e9115567f",
+  "input_hash": "sha256:d8de61db20ad092c962666a946bf0f2b4150830452936778c7219111fbeedc16",
+  "observation_hash": "sha256:130a54fb3690e17d235f40ef96ef8cf13fdbce62fba8180be9b3f9717db7d702",
   "execution_method": "node parity/oracle/text-rendering.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {

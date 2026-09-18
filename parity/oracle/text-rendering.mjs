@@ -16,6 +16,7 @@ initTheme("dark",false);
 const identity=s=>s;
 const theme=Object.fromEntries(['heading','link','linkUrl','code','codeBlock','codeBlockBorder','quote','quoteBorder','hr','listBullet','bold','italic','strikethrough','underline'].map(k=>[k,identity]));
 const markdown=[
+ {text:"- item\n\n  ```go\n  println(1)\n  ```",width:40},
  {text:'# Title\n\nHello **bold** and *italic* with `code`.\n\n[site](https://example.com)\n\n- one\n- two',width:70},
  {text:'```go\nfunc main() {\n\tprintln("你好")\n}\n```',width:26},
  {text:'3. alpha beta gamma delta\n4. 中文👨‍👩‍👧‍👦 emoji\n   - nested\n   - second',width:17},

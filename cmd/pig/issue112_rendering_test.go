@@ -241,6 +241,10 @@ func TestPigPartialFailureAndCancel112(t *testing.T) {
 			if err := <-done; err != nil {
 				t.Fatal(err)
 			}
+			finalFrame := latestFrame112(tty.Output())
+			if !strings.Contains(finalFrame, "PARTIAL_112") || !strings.Contains(finalFrame, expected) {
+				t.Fatalf("settled partial content disappeared: %s", finalFrame)
+			}
 			if !tty.Restored(t) {
 				t.Fatal("raw mode not restored")
 			}

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/tui"
 )
 
@@ -157,7 +158,7 @@ func (m *InteractiveMode) RenderInitialMessages() error {
 	if m.runtime == nil || m.runtime.Session() == nil {
 		return errors.New("Interactive mode requires an AgentSession runtime")
 	}
-	messages := m.runtime.Session().Messages()
+	messages := m.transcriptMessages()
 	for _, message := range messages {
 		if message.MessageRole() == "user" {
 			if err := m.ui.AddToHistory(sessionUserText(message)); err != nil {
@@ -232,6 +233,7 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		m.turnMu.Unlock()
 		_, promptErr := RunHeadless(turnCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, OnEvent: func(event AgentSessionEvent) {
 			if updateErr := m.transcript.Update(event); updateErr != nil {
+				_ = m.ShowError(updateErr.Error())
 				turnCancel()
 				return
 			}
@@ -245,6 +247,9 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		turnCancel()
 		if runCtx.Err() != nil {
 			err = runCtx.Err()
+			break
+		}
+		if err = m.transcript.SetMessages(m.transcriptMessages()); err != nil {
 			break
 		}
 		if promptErr != nil {
@@ -282,4 +287,12 @@ func (m *InteractiveMode) Stop(_ ...bool) error {
 		}
 	})
 	return m.stopErr
+}
+
+func (m *InteractiveMode) transcriptMessages() []agent.AgentMessage {
+	session := m.runtime.Session()
+	if manager := session.SessionManager(); manager != nil {
+		return manager.BuildSessionContext().Messages
+	}
+	return session.Messages()
 }

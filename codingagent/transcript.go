@@ -44,6 +44,7 @@ func (t *Transcript) SetMessages(messages []agent.AgentMessage) error {
 		m = cloneSessionAgentMessage(m)
 		t.messages = append(t.messages, m)
 		t.track(m)
+		t.finishMessage(m)
 	}
 	return nil
 }
@@ -92,17 +93,7 @@ func (t *Transcript) Update(event AgentSessionEvent) error {
 		}
 		t.current = -1
 		t.track(m)
-		if assistant, ok := m.(ai.AssistantMessage); ok && (assistant.StopReason == ai.StopReasonError || assistant.StopReason == ai.StopReasonAborted) {
-			text, _ := assistant.ErrorMessage.Value()
-			if text == "" {
-				text = "Operation aborted"
-			}
-			for _, part := range assistant.Content {
-				if call, ok := part.(ai.ToolCall); ok {
-					_ = t.tool(call.ID, call.Name, call.Arguments).UpdateResult(ToolExecutionResult{Content: []ai.ToolResultContent{ai.TextContent{Type: ai.ContentTypeText, Text: text}}, IsError: true})
-				}
-			}
-		}
+		t.finishMessage(m)
 	case AgentSessionToolExecutionStartEvent:
 		c := t.tool(e.ToolCallID, e.ToolName, e.Arguments)
 		_ = c.UpdateArgs(e.Arguments)
@@ -195,4 +186,18 @@ func (t *Transcript) Render(width int) ([]string, error) {
 		lines[i] = strings.TrimRight(s, " ")
 	}
 	return lines, nil
+}
+
+func (t *Transcript) finishMessage(m agent.AgentMessage) {
+	if assistant, ok := m.(ai.AssistantMessage); ok && (assistant.StopReason == ai.StopReasonError || assistant.StopReason == ai.StopReasonAborted) {
+		text, _ := assistant.ErrorMessage.Value()
+		if text == "" {
+			text = "Operation aborted"
+		}
+		for _, part := range assistant.Content {
+			if call, ok := part.(ai.ToolCall); ok {
+				_ = t.tool(call.ID, call.Name, call.Arguments).UpdateResult(ToolExecutionResult{Content: []ai.ToolResultContent{ai.TextContent{Type: ai.ContentTypeText, Text: text}}, IsError: true})
+			}
+		}
+	}
 }

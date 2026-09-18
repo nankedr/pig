@@ -41,7 +41,7 @@ var issue32ConstructorMappings = map[string]issue32ConstructorMapping{
 	"ProjectTrustStore":              {target: "NewProjectTrustStore", status: catalog.StatusScaffolded},
 
 	"ArminComponent":                    {target: "ArminComponent", status: catalog.StatusInventoried},
-	"AssistantMessageComponent":         {target: "AssistantMessageComponent", status: catalog.StatusInventoried},
+	"AssistantMessageComponent":         {target: "NewAssistantMessageComponent", status: catalog.StatusScaffolded},
 	"BashExecutionComponent":            {target: "BashExecutionComponent", status: catalog.StatusInventoried},
 	"BorderedLoader":                    {target: "BorderedLoader", status: catalog.StatusInventoried},
 	"BranchSummaryMessageComponent":     {target: "BranchSummaryMessageComponent", status: catalog.StatusInventoried},
@@ -62,10 +62,10 @@ var issue32ConstructorMappings = map[string]issue32ConstructorMapping{
 	"SkillInvocationMessageComponent":   {target: "SkillInvocationMessageComponent", status: catalog.StatusInventoried},
 	"ThemeSelectorComponent":            {target: "ThemeSelectorComponent", status: catalog.StatusInventoried},
 	"ThinkingSelectorComponent":         {target: "ThinkingSelectorComponent", status: catalog.StatusInventoried},
-	"ToolExecutionComponent":            {target: "ToolExecutionComponent", status: catalog.StatusInventoried},
+	"ToolExecutionComponent":            {target: "NewToolExecutionComponent", status: catalog.StatusScaffolded},
 	"TreeSelectorComponent":             {target: "TreeSelectorComponent", status: catalog.StatusInventoried},
 	"UserMessageSelectorComponent":      {target: "UserMessageSelectorComponent", status: catalog.StatusInventoried},
-	"UserMessageComponent":              {target: "UserMessageComponent", status: catalog.StatusInventoried},
+	"UserMessageComponent":              {target: "NewUserMessageComponent", status: catalog.StatusScaffolded},
 
 	"InteractiveMode": {target: "NewInteractiveMode", status: catalog.StatusScaffolded},
 	"Theme":           {target: "Theme", status: catalog.StatusInventoried},
@@ -153,8 +153,8 @@ func TestIssue32ConstructorTargetsResolve(t *testing.T) {
 		}
 	}
 	sort.Strings(names)
-	if scaffolded != 8 || inventoried != 30 {
-		t.Fatalf("constructor status counts = scaffolded %d, inventoried %d; want 8, 30; names=%v", scaffolded, inventoried, names)
+	if scaffolded != 11 || inventoried != 27 {
+		t.Fatalf("constructor status counts = scaffolded %d, inventoried %d; want 11, 27; names=%v", scaffolded, inventoried, names)
 	}
 	if constructor, static := issue32ConstructorMappings["KeybindingsManager"].target, issue32StaticMemberTargetExceptions["KeybindingsManager.create"]; constructor == static {
 		t.Fatalf("KeybindingsManager constructor target %q conflates the distinct static create target", constructor)
