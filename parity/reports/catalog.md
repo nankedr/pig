@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9683
+- Total entries: 9684
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5156 |
-| scaffolded | 3657 |
-| partial | 577 |
+| scaffolded | 3635 |
+| partial | 600 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -9017,15 +9017,6 @@
 | member:tui/src/components/select-list.ts#SelectItem.description | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectItem.Description | tui |
 | member:tui/src/components/select-list.ts#SelectItem.label | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectItem.Label | tui |
 | member:tui/src/components/select-list.ts#SelectItem.value | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectItem.Value | tui |
-| member:tui/src/components/select-list.ts#SelectList.getSelectedItem | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.GetSelectedItem | tui |
-| member:tui/src/components/select-list.ts#SelectList.handleInput | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.HandleInput | tui |
-| member:tui/src/components/select-list.ts#SelectList.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.Invalidate | tui |
-| member:tui/src/components/select-list.ts#SelectList.onCancel | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.OnCancel | tui |
-| member:tui/src/components/select-list.ts#SelectList.onSelect | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.OnSelect | tui |
-| member:tui/src/components/select-list.ts#SelectList.onSelectionChange | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.OnSelectionChange | tui |
-| member:tui/src/components/select-list.ts#SelectList.render | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.Render | tui |
-| member:tui/src/components/select-list.ts#SelectList.setFilter | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.SetFilter | tui |
-| member:tui/src/components/select-list.ts#SelectList.setSelectedIndex | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectList.SetSelectedIndex | tui |
 | member:tui/src/components/select-list.ts#SelectListLayoutOptions.maxPrimaryColumnWidth | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectListLayoutOptions.MaxPrimaryColumnWidth | tui |
 | member:tui/src/components/select-list.ts#SelectListLayoutOptions.minPrimaryColumnWidth | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectListLayoutOptions.MinPrimaryColumnWidth | tui |
 | member:tui/src/components/select-list.ts#SelectListLayoutOptions.truncatePrimary | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SelectListLayoutOptions.TruncatePrimary | tui |
@@ -9255,9 +9246,6 @@
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.getClearOnShrink | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.GetClearOnShrink | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.getFocusedComponent | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.GetFocusedComponent | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.getShowHardwareCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.GetShowHardwareCursor | tui |
-| member:tui/src/tui-alt-screen.ts#TuiAltScreen.hasOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.HasOverlay | tui |
-| member:tui/src/tui-alt-screen.ts#TuiAltScreen.hasOverlayEntries | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.HasOverlayEntries | tui |
-| member:tui/src/tui-alt-screen.ts#TuiAltScreen.hideOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.HideOverlay | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.Invalidate | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.mode | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.Mode | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.onDebug | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.SetOnDebug | tui |
@@ -9266,7 +9254,6 @@
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.queryTerminalColorScheme | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.QueryTerminalColorScheme | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.removeChild | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.RemoveChild | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.setTerminalColorSchemeNotifications | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.SetTerminalColorSchemeNotifications | tui |
-| member:tui/src/tui-alt-screen.ts#TuiAltScreen.showOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.ShowOverlay | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.terminal | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.Terminal | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreenOptions.mouse | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreenOptions.Mouse | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreenOptions.onRightClickPaste | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreenOptions.OnRightClickPaste | tui |
@@ -9279,9 +9266,6 @@
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.getClearOnShrink | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.GetClearOnShrink | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.getFocusedComponent | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.GetFocusedComponent | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.getShowHardwareCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.GetShowHardwareCursor | tui |
-| member:tui/src/tui-main-screen.ts#TuiMainScreen.hasOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.HasOverlay | tui |
-| member:tui/src/tui-main-screen.ts#TuiMainScreen.hasOverlayEntries | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.HasOverlayEntries | tui |
-| member:tui/src/tui-main-screen.ts#TuiMainScreen.hideOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.HideOverlay | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.Invalidate | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.mode | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.Mode | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.onDebug | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.SetOnDebug | tui |
@@ -9290,7 +9274,6 @@
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.queryTerminalColorScheme | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.QueryTerminalColorScheme | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.removeChild | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.RemoveChild | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.setTerminalColorSchemeNotifications | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.SetTerminalColorSchemeNotifications | tui |
-| member:tui/src/tui-main-screen.ts#TuiMainScreen.showOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.ShowOverlay | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.terminal | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.Terminal | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreenRenderState.cursorRow | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreenRenderState.CursorRow | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreenRenderState.hardwareCursorRow | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreenRenderState.HardwareCursorRow | tui |
@@ -9369,9 +9352,6 @@
 | member:tui/src/tui.ts#TuiBase.getClearOnShrink | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.GetClearOnShrink | tui |
 | member:tui/src/tui.ts#TuiBase.getFocusedComponent | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.GetFocusedComponent | tui |
 | member:tui/src/tui.ts#TuiBase.getShowHardwareCursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.GetShowHardwareCursor | tui |
-| member:tui/src/tui.ts#TuiBase.hasOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.HasOverlay | tui |
-| member:tui/src/tui.ts#TuiBase.hasOverlayEntries | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.HasOverlayEntries | tui |
-| member:tui/src/tui.ts#TuiBase.hideOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.HideOverlay | tui |
 | member:tui/src/tui.ts#TuiBase.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.Invalidate | tui |
 | member:tui/src/tui.ts#TuiBase.mode | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.Mode | tui |
 | member:tui/src/tui.ts#TuiBase.onDebug | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.SetOnDebug | tui |
@@ -9380,7 +9360,6 @@
 | member:tui/src/tui.ts#TuiBase.queryTerminalColorScheme | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.QueryTerminalColorScheme | tui |
 | member:tui/src/tui.ts#TuiBase.removeChild | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.RemoveChild | tui |
 | member:tui/src/tui.ts#TuiBase.setTerminalColorSchemeNotifications | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.SetTerminalColorSchemeNotifications | tui |
-| member:tui/src/tui.ts#TuiBase.showOverlay | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.ShowOverlay | tui |
 | member:tui/src/tui.ts#TuiBase.terminal | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIBase.Terminal | tui |
 | member:tui/src/tui.ts#TuiStopOptions.preserveScreen | scaffolded | M6 | contract | github.com/nankedr/pig/tui.TUIStopOptions.PreserveScreen | tui |
 | member:tui/src/tui.ts#ViewportTUI.addChild | scaffolded | M6 | contract | github.com/nankedr/pig/tui.ViewportTUI.AddChild | tui |
@@ -9443,7 +9422,6 @@
 | symbol:tui/src/components/scroll-view.ts#ScrollViewOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ScrollViewOptions | tui |
 | symbol:tui/src/components/scroll-view.ts#ScrollViewScrollbar | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.ScrollViewScrollbar | tui |
 | symbol:tui/src/components/select-list.ts#SelectItem | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SelectItem | tui |
-| symbol:tui/src/components/select-list.ts#SelectList | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SelectList | tui |
 | symbol:tui/src/components/select-list.ts#SelectListLayoutOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SelectListLayoutOptions | tui |
 | symbol:tui/src/components/select-list.ts#SelectListTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SelectListTheme | tui |
 | symbol:tui/src/components/select-list.ts#SelectListTruncatePrimaryContext | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SelectListTruncatePrimaryContext | tui |
@@ -9571,6 +9549,7 @@
 | symbol:tui/src/word-navigation.ts#WordNavigationOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.WordNavigationOptions | tui |
 | symbol:tui/src/word-navigation.ts#findWordBackward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordBackward | tui |
 | symbol:tui/src/word-navigation.ts#findWordForward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordForward | tui |
+| contract:tui/dialogs-trust | partial | M6 | contract | github.com/nankedr/pig/tui.ShowSelectDialog | tui |
 | contract:tui/layout-scrolling | partial | M6 | contract | github.com/nankedr/pig/tui.RenderLayoutFrame | tui |
 | contract:tui/multiline-editor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor | tui |
 | contract:tui/terminal-keys | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager | tui |
@@ -9620,6 +9599,15 @@
 | member:tui/src/components/scroll-view.ts#ScrollView.setScrollbarActive | partial | M6 | contract | github.com/nankedr/pig/tui.ScrollView.SetScrollbarActive | tui |
 | member:tui/src/components/scroll-view.ts#ScrollView.updateLayout | partial | M6 | contract | github.com/nankedr/pig/tui.ScrollView.UpdateLayout | tui |
 | member:tui/src/components/scroll-view.ts#ScrollView.viewportHeight | partial | M6 | contract | github.com/nankedr/pig/tui.ScrollView.ViewportHeight | tui |
+| member:tui/src/components/select-list.ts#SelectList.getSelectedItem | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.GetSelectedItem | tui |
+| member:tui/src/components/select-list.ts#SelectList.handleInput | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.HandleInput | tui |
+| member:tui/src/components/select-list.ts#SelectList.invalidate | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.Invalidate | tui |
+| member:tui/src/components/select-list.ts#SelectList.onCancel | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.OnCancel | tui |
+| member:tui/src/components/select-list.ts#SelectList.onSelect | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.OnSelect | tui |
+| member:tui/src/components/select-list.ts#SelectList.onSelectionChange | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.OnSelectionChange | tui |
+| member:tui/src/components/select-list.ts#SelectList.render | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.Render | tui |
+| member:tui/src/components/select-list.ts#SelectList.setFilter | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.SetFilter | tui |
+| member:tui/src/components/select-list.ts#SelectList.setSelectedIndex | partial | M6 | contract | github.com/nankedr/pig/tui.SelectList.SetSelectedIndex | tui |
 | member:tui/src/components/stack.ts#Stack.addChild | partial | M6 | contract | github.com/nankedr/pig/tui.Stack.AddChild | tui |
 | member:tui/src/components/stack.ts#Stack.children | partial | M6 | contract | github.com/nankedr/pig/tui.Stack.Children | tui |
 | member:tui/src/components/stack.ts#Stack.clear | partial | M6 | contract | github.com/nankedr/pig/tui.Stack.Clear | tui |
@@ -9659,6 +9647,9 @@
 | member:tui/src/terminal.ts#ProcessTerminal.stop | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Stop | tui |
 | member:tui/src/terminal.ts#ProcessTerminal.write | partial | M6 | contract | github.com/nankedr/pig/tui.ProcessTerminal.Write | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.addInputListener | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.AddInputListener | tui |
+| member:tui/src/tui-alt-screen.ts#TuiAltScreen.hasOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.HasOverlay | tui |
+| member:tui/src/tui-alt-screen.ts#TuiAltScreen.hasOverlayEntries | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.HasOverlayEntries | tui |
+| member:tui/src/tui-alt-screen.ts#TuiAltScreen.hideOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.HideOverlay | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.isFollowingOutput | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.IsFollowingOutput | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.removeInputListener | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.RemoveInputListener | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.render | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.Render | tui |
@@ -9671,11 +9662,15 @@
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.setFocus | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.SetFocus | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.setLayoutRoot | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.SetLayoutRoot | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.setShowHardwareCursor | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.SetShowHardwareCursor | tui |
+| member:tui/src/tui-alt-screen.ts#TuiAltScreen.showOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.ShowOverlay | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.start | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.Start | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.stop | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.Stop | tui |
 | member:tui/src/tui-alt-screen.ts#TuiAltScreen.viewportTop | partial | M6 | contract | github.com/nankedr/pig/tui.TUIAltScreen.ViewportTop | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.addInputListener | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.AddInputListener | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.captureRenderState | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.CaptureRenderState | tui |
+| member:tui/src/tui-main-screen.ts#TuiMainScreen.hasOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.HasOverlay | tui |
+| member:tui/src/tui-main-screen.ts#TuiMainScreen.hasOverlayEntries | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.HasOverlayEntries | tui |
+| member:tui/src/tui-main-screen.ts#TuiMainScreen.hideOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.HideOverlay | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.removeInputListener | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.RemoveInputListener | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.render | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.Render | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.renderNow | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.RenderNow | tui |
@@ -9684,9 +9679,13 @@
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.setClearOnShrink | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.SetClearOnShrink | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.setFocus | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.SetFocus | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.setShowHardwareCursor | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.SetShowHardwareCursor | tui |
+| member:tui/src/tui-main-screen.ts#TuiMainScreen.showOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.ShowOverlay | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.start | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.Start | tui |
 | member:tui/src/tui-main-screen.ts#TuiMainScreen.stop | partial | M6 | contract | github.com/nankedr/pig/tui.TUIMainScreen.Stop | tui |
 | member:tui/src/tui.ts#TuiBase.addInputListener | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.AddInputListener | tui |
+| member:tui/src/tui.ts#TuiBase.hasOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.HasOverlay | tui |
+| member:tui/src/tui.ts#TuiBase.hasOverlayEntries | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.HasOverlayEntries | tui |
+| member:tui/src/tui.ts#TuiBase.hideOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.HideOverlay | tui |
 | member:tui/src/tui.ts#TuiBase.removeInputListener | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.RemoveInputListener | tui |
 | member:tui/src/tui.ts#TuiBase.render | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.Render | tui |
 | member:tui/src/tui.ts#TuiBase.renderNow | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.RenderNow | tui |
@@ -9694,6 +9693,7 @@
 | member:tui/src/tui.ts#TuiBase.setClearOnShrink | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.SetClearOnShrink | tui |
 | member:tui/src/tui.ts#TuiBase.setFocus | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.SetFocus | tui |
 | member:tui/src/tui.ts#TuiBase.setShowHardwareCursor | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.SetShowHardwareCursor | tui |
+| member:tui/src/tui.ts#TuiBase.showOverlay | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.ShowOverlay | tui |
 | member:tui/src/tui.ts#TuiBase.start | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.Start | tui |
 | member:tui/src/tui.ts#TuiBase.stop | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.Stop | tui |
 | module-tui | partial | M6 | package | github.com/nankedr/pig/tui | tui |
@@ -9702,6 +9702,7 @@
 | symbol:tui/src/components/h-stack.ts#HStack | partial | M6 | symbol | github.com/nankedr/pig/tui.HStack | tui |
 | symbol:tui/src/components/markdown.ts#Markdown | partial | M6 | symbol | github.com/nankedr/pig/tui.Markdown | tui |
 | symbol:tui/src/components/scroll-view.ts#ScrollView | partial | M6 | symbol | github.com/nankedr/pig/tui.ScrollView | tui |
+| symbol:tui/src/components/select-list.ts#SelectList | partial | M6 | symbol | github.com/nankedr/pig/tui.SelectList | tui |
 | symbol:tui/src/components/stack.ts#Stack | partial | M6 | symbol | github.com/nankedr/pig/tui.Stack | tui |
 | symbol:tui/src/components/stack.ts#allocateStackSizes | partial | M6 | symbol | github.com/nankedr/pig/tui.AllocateStackSizes | tui |
 | symbol:tui/src/components/stack.ts#visibleStackEntries | partial | M6 | symbol | github.com/nankedr/pig/tui.VisibleStackEntries | tui |

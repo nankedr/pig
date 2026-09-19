@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/tui/src/tui.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "tui/overlays",
+    "catalog_id": "contract:tui/dialogs-trust",
+    "surface": "go-sdk",
+    "input": {
+      "width": 20,
+      "height": 6,
+      "cases": [
+        {
+          "name": "center",
+          "options": {
+            "width": 8
+          },
+          "lines": [
+            "hello",
+            "world"
+          ]
+        },
+        {
+          "name": "top-right",
+          "options": {
+            "width": 8,
+            "anchor": "top-right"
+          },
+          "lines": [
+            "hello"
+          ]
+        },
+        {
+          "name": "percent-margin",
+          "options": {
+            "width": "50%",
+            "row": "100%",
+            "col": "100%",
+            "margin": 1,
+            "maxHeight": 2
+          },
+          "lines": [
+            "one",
+            "two",
+            "three"
+          ]
+        },
+        {
+          "name": "wide-cell",
+          "options": {
+            "width": 5,
+            "row": 0,
+            "col": 1
+          },
+          "lines": [
+            "中界hello"
+          ]
+        },
+        {
+          "name": "clipped-offset",
+          "options": {
+            "width": 40,
+            "minWidth": 30,
+            "anchor": "bottom-left",
+            "offsetX": 50,
+            "offsetY": 10
+          },
+          "lines": [
+            "hello"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "frames": [
+        [
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefhello   opqrst",
+          "abcdefworld   opqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst"
+        ],
+        [
+          "abcdefghijklhello",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst"
+        ],
+        [
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghione       t",
+          "abcdefghitwo       t",
+          "abcdefghijklmnopqrst"
+        ],
+        [
+          "a中界hghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst"
+        ],
+        [
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "abcdefghijklmnopqrst",
+          "hello"
+        ]
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:c9634b3555530d191eb78009fe050a6a308be4e816e0891bfcc63dbd1ed8f731",
+  "observation_hash": "sha256:30a4bb4b6369e66d7dbf5de5f768ee11b8c4cbd697228e8a70d16138a6396c84",
+  "execution_method": "node parity/oracle/overlays.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "transport": "public TuiMainScreen renderNow/captureRenderState"
+  }
+}

@@ -1,0 +1,25 @@
+*tui.SelectList
+GetSelectedItem func(*tui.SelectList) (*tui.SelectItem, error)
+HandleInput func(*tui.SelectList, string) error
+Invalidate func(*tui.SelectList) error
+Render func(*tui.SelectList, int) ([]string, error)
+SetFilter func(*tui.SelectList, string) error
+SetSelectedIndex func(*tui.SelectList, int) error
+*tui.SelectDialog
+HandleInput func(*tui.SelectDialog, string) error
+Invalidate func(*tui.SelectDialog) error
+Render func(*tui.SelectDialog, int) ([]string, error)
+codingagent.PrepareProjectSettingsOptions
+CWD string
+AgentDir string
+SettingsManager *codingagent.SettingsManager
+Override *bool
+Terminal tui.Terminal
+codingagent.ProjectTrustOption
+Label string
+Trusted bool
+Updates []codingagent.ProjectTrustUpdate
+func(context.Context, tui.Terminal, string, []tui.SelectItem) (*tui.SelectItem, error)
+func(string, []tui.SelectItem, func(tui.SelectItem), func()) *tui.SelectDialog
+func(context.Context, codingagent.PrepareProjectSettingsOptions) error
+func(string, bool) ([]codingagent.ProjectTrustOption, error)

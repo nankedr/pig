@@ -1,0 +1,21 @@
+import { execFileSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { caseDigest, observationDigest } from './fixture-hash.mjs';
+const pi=resolve(process.argv[2]), lock=JSON.parse(readFileSync('parity/baseline/upstream.lock.json'));
+if(execFileSync('git',['-C',pi,'rev-parse','HEAD'],{encoding:'utf8'}).trim()!==lock.upstream.commit)throw Error('baseline mismatch');
+if(execFileSync('git',['-C',pi,'status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim())throw Error('dirty baseline');
+const {SelectList}=await import(pathToFileURL(`${pi}/packages/tui/src/components/select-list.ts`));
+const theme=Object.fromEntries(['selectedPrefix','selectedText','description','scrollInfo','noMatch'].map(x=>[x,x=>x]));
+const items=[{value:'alpha',label:'Alpha',description:'first\nchoice'},{value:'beta',label:'Beta'},{value:'bravo',label:'Bravo'}];
+const list=new SelectList(items,2,theme), events=[];
+list.onSelect=x=>events.push(`select:${x.value}`);list.onCancel=()=>events.push('cancel');list.onSelectionChange=x=>events.push(`change:${x.value}`);
+const steps=[{key:'\u001b[A'},{key:'\r'},{filter:'B'},{key:'\u001b[B'},{filter:'missing'},{key:'\r'},{key:'\u001b'},{filter:''},{index:100}];
+const frames=[];
+for(const step of steps){if('key'in step)list.handleInput(step.key);if('filter'in step)list.setFilter(step.filter);if('index'in step)list.setSelectedIndex(step.index);frames.push({selected:list.getSelectedItem()?.value??null,lines:list.render(48)});}
+const c={schema_version:'1.0.0',id:'sdk/tui/dialogs',catalog_id:'contract:tui/dialogs-trust',surface:'go-sdk',input:{items,steps,width:48,maxVisible:2},observe:['outcome','side_effects']};
+const observation={outcome:{frames,events},side_effects:[]};
+const fixture={schema_version:'1.0.0',deterministic:true,baseline_id:lock.baseline_id,baseline_commit:lock.upstream.commit,upstream:{repository:lock.upstream.repository,commit:lock.upstream.commit,reference:'packages/tui/src/components/select-list.ts'},case:c,observation,input_hash:caseDigest(c),observation_hash:observationDigest(observation),execution_method:'node --experimental-strip-types parity/oracle/dialogs.mjs <locked-pi-checkout>',platform:'any',environment:{transport:'public SelectList'}};
+const path='parity/oracle/fixtures/dialogs.json';
+if(process.argv.includes('--check')){if(JSON.stringify(fixture)!==JSON.stringify(JSON.parse(readFileSync(path))))throw Error('fixture drift');}else writeFileSync(path,JSON.stringify(fixture,null,2)+'\n');

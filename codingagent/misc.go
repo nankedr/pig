@@ -407,7 +407,10 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 	if err != nil {
 		return err
 	}
-	if err = prepareHeadlessProjectSettings(ctx, cwd, "", settings, parsed.ProjectTrustOverride); err != nil {
+	if err = prepareCLIProjectSettings(ctx, cwd, settings, parsed.ProjectTrustOverride, interactive); err != nil {
+		if interactive && errors.Is(err, context.Canceled) && ctx.Err() != nil {
+			return nil
+		}
 		return err
 	}
 	diagnostics, err := settings.DrainErrors()
@@ -449,7 +452,10 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 		if err != nil {
 			return err
 		}
-		if err = prepareHeadlessProjectSettings(ctx, cwd, "", settings, parsed.ProjectTrustOverride); err != nil {
+		if err = prepareCLIProjectSettings(ctx, cwd, settings, parsed.ProjectTrustOverride, interactive); err != nil {
+			if interactive && errors.Is(err, context.Canceled) && ctx.Err() != nil {
+				return nil
+			}
 			return err
 		}
 	}
@@ -666,4 +672,19 @@ func optionalHeadlessString(value *string) string {
 		return ""
 	}
 	return *value
+}
+
+func prepareCLIProjectSettings(ctx context.Context, cwd string, settings *SettingsManager, override ProjectTrustDecision, interactive bool) error {
+	options := PrepareProjectSettingsOptions{CWD: cwd, SettingsManager: settings, Override: override}
+	if interactive {
+		bindings, err := NewKeybindingsManager()
+		if err != nil {
+			return err
+		}
+		if err = tui.SetKeybindings(&bindings.KeybindingsManager); err != nil {
+			return err
+		}
+		options.Terminal = tui.NewProcessTerminal(os.Stdin, os.Stdout)
+	}
+	return PrepareProjectSettings(ctx, options)
 }

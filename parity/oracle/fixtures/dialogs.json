@@ -1,0 +1,153 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/tui/src/components/select-list.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/tui/dialogs",
+    "catalog_id": "contract:tui/dialogs-trust",
+    "surface": "go-sdk",
+    "input": {
+      "items": [
+        {
+          "value": "alpha",
+          "label": "Alpha",
+          "description": "first\nchoice"
+        },
+        {
+          "value": "beta",
+          "label": "Beta"
+        },
+        {
+          "value": "bravo",
+          "label": "Bravo"
+        }
+      ],
+      "steps": [
+        {
+          "key": "\u001b[A"
+        },
+        {
+          "key": "\r"
+        },
+        {
+          "filter": "B"
+        },
+        {
+          "key": "\u001b[B"
+        },
+        {
+          "filter": "missing"
+        },
+        {
+          "key": "\r"
+        },
+        {
+          "key": "\u001b"
+        },
+        {
+          "filter": ""
+        },
+        {
+          "index": 100
+        }
+      ],
+      "width": 48,
+      "maxVisible": 2
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "frames": [
+        {
+          "selected": "bravo",
+          "lines": [
+            "  Beta",
+            "→ Bravo",
+            "  (3/3)"
+          ]
+        },
+        {
+          "selected": "bravo",
+          "lines": [
+            "  Beta",
+            "→ Bravo",
+            "  (3/3)"
+          ]
+        },
+        {
+          "selected": "beta",
+          "lines": [
+            "→ Beta",
+            "  Bravo"
+          ]
+        },
+        {
+          "selected": "bravo",
+          "lines": [
+            "  Beta",
+            "→ Bravo"
+          ]
+        },
+        {
+          "selected": null,
+          "lines": [
+            "  No matching commands"
+          ]
+        },
+        {
+          "selected": null,
+          "lines": [
+            "  No matching commands"
+          ]
+        },
+        {
+          "selected": null,
+          "lines": [
+            "  No matching commands"
+          ]
+        },
+        {
+          "selected": "alpha",
+          "lines": [
+            "→ Alpha                           first choice",
+            "  Beta",
+            "  (1/3)"
+          ]
+        },
+        {
+          "selected": "bravo",
+          "lines": [
+            "  Beta",
+            "→ Bravo",
+            "  (3/3)"
+          ]
+        }
+      ],
+      "events": [
+        "change:bravo",
+        "select:bravo",
+        "change:bravo",
+        "cancel"
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:89d611b32c390a3710a65c61cd61254a04aab4e2a0b8a46bb4b617aaffb6c562",
+  "observation_hash": "sha256:04d0f48c7d8033818b900f5f93f753ae9a9a596d657230a1b4689936aafdaa34",
+  "execution_method": "node --experimental-strip-types parity/oracle/dialogs.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "transport": "public SelectList"
+  }
+}

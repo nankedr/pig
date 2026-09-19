@@ -1,0 +1,174 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/core/project-trust.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/project-trust/dialog",
+    "catalog_id": "contract:tui/dialogs-trust",
+    "surface": "cli",
+    "input": {
+      "choices": [
+        "trust",
+        "parent",
+        "session",
+        "deny",
+        "deny-session",
+        "cancel"
+      ],
+      "runs": 2,
+      "resources": [
+        "SYSTEM.md",
+        "AGENTS.md"
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "name": "trust",
+        "runs": [
+          {
+            "prompt": true,
+            "project": true,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          },
+          {
+            "prompt": false,
+            "project": true,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          }
+        ],
+        "saved": true,
+        "parent": false
+      },
+      {
+        "name": "parent",
+        "runs": [
+          {
+            "prompt": true,
+            "project": true,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          },
+          {
+            "prompt": false,
+            "project": true,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          }
+        ],
+        "saved": true,
+        "parent": true
+      },
+      {
+        "name": "session",
+        "runs": [
+          {
+            "prompt": true,
+            "project": true,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          },
+          {
+            "prompt": true,
+            "project": false,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          }
+        ],
+        "saved": null,
+        "parent": false
+      },
+      {
+        "name": "deny",
+        "runs": [
+          {
+            "prompt": true,
+            "project": false,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          },
+          {
+            "prompt": false,
+            "project": false,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          }
+        ],
+        "saved": false,
+        "parent": false
+      },
+      {
+        "name": "deny-session",
+        "runs": [
+          {
+            "prompt": true,
+            "project": false,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          },
+          {
+            "prompt": true,
+            "project": false,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          }
+        ],
+        "saved": null,
+        "parent": false
+      },
+      {
+        "name": "cancel",
+        "runs": [
+          {
+            "prompt": true,
+            "project": false,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          },
+          {
+            "prompt": true,
+            "project": false,
+            "context": true,
+            "exit": 0,
+            "restored": true
+          }
+        ],
+        "saved": null,
+        "parent": false
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:813fd6fd80e58af671007354538416270a0d0c175cacd78e64ba8f126ae4a216",
+  "observation_hash": "sha256:9bd7f69f46560f9f8236450fe3932f1c629238191e4f54a7b0146699a8ba39b0",
+  "execution_method": "node parity/oracle/trust-dialog.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "transport": "real Pi CLI + PTY + controlled SSE"
+  }
+}

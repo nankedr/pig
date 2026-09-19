@@ -403,16 +403,18 @@ type SelectList struct {
 	OnCancel          func()
 	OnSelectionChange func(SelectItem)
 	items             []SelectItem
+	filtered          []SelectItem
+	selected          int
 	maxVisible        int
 	theme             SelectListTheme
 	layout            SelectListLayoutOptions
 }
-func (*SelectList) GetSelectedItem() (*SelectItem, error)
-func (*SelectList) HandleInput(string) error
 func (*SelectList) Invalidate() error
-func (*SelectList) Render(int) ([]string, error)
-func (*SelectList) SetFilter(string) error
-func (*SelectList) SetSelectedIndex(int) error
+func (s *SelectList) GetSelectedItem() (*SelectItem, error)
+func (s *SelectList) HandleInput(data string) error
+func (s *SelectList) Render(width int) ([]string, error)
+func (s *SelectList) SetFilter(filter string) error
+func (s *SelectList) SetSelectedIndex(index int) error
 
 ## symbol:tui/src/components/select-list.ts#SelectListLayoutOptions
 reference: packages/tui/src/components/select-list.ts#SelectListLayoutOptions
@@ -1536,7 +1538,10 @@ type TUIBase struct {
 	logDirectory       string
 	fullRedraws        int
 	focusedComponent   Component
-	overlays           []Component
+	overlays           []*overlayEntry
+	inputMu            sync.Mutex
+	focusOrder         uint64
+	resizeFocus        *overlayEntry
 	renderMu           sync.Mutex
 	started            bool
 	screenMode         TUIMode
@@ -1547,19 +1552,18 @@ type TUIBase struct {
 	wheelLines         int
 	mouseCapture       bool
 	renderWake         chan struct{}
+	renderErrors       chan error
 	renderStop         chan struct{}
 	listeners          map[uint64]TUIInputListener
 	listenerID         uint64
 	mainState          TUIMainScreenRenderState
 	forceRender        atomic.Bool
 }
-func (*TUIBase) HideOverlay() error
 func (*TUIBase) Mode() TUIMode
 func (*TUIBase) OnTerminalColorSchemeChange(TerminalColorSchemeListener) (TUIUnsubscribe, error)
 func (*TUIBase) QueryTerminalBackgroundColor(context.Context, TerminalColorQueryOptions) (RGBColor, bool, error)
 func (*TUIBase) QueryTerminalColorScheme(context.Context, TerminalColorQueryOptions) (TerminalColorScheme, bool, error)
 func (*TUIBase) SetTerminalColorSchemeNotifications(bool) error
-func (*TUIBase) ShowOverlay(Component, ...OverlayOptions) (OverlayHandle, error)
 func (*TUIBase) WantsKeyRelease() bool
 func (t *TUIBase) AddInputListener(listener TUIInputListener) (TUIUnsubscribe, error)
 func (t *TUIBase) FullRedraws() int
@@ -1569,6 +1573,7 @@ func (t *TUIBase) GetShowHardwareCursor() bool
 func (t *TUIBase) HandleInput(data string) error
 func (t *TUIBase) HasOverlay() bool
 func (t *TUIBase) HasOverlayEntries() bool
+func (t *TUIBase) HideOverlay() error
 func (t *TUIBase) OnDebug() func()
 func (t *TUIBase) RemoveInputListener(listener TUIInputListener) error
 func (t *TUIBase) Render(width int) ([]string, error)
@@ -1578,6 +1583,7 @@ func (t *TUIBase) SetClearOnShrink(clear bool) error
 func (t *TUIBase) SetFocus(c Component) error
 func (t *TUIBase) SetOnDebug(callback func())
 func (t *TUIBase) SetShowHardwareCursor(show bool) error
+func (t *TUIBase) ShowOverlay(c Component, options ...OverlayOptions) (OverlayHandle, error)
 func (t *TUIBase) Start() error
 func (t *TUIBase) Stop(options ...TUIStopOptions) error
 func (t *TUIBase) Terminal() Terminal

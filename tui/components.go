@@ -412,29 +412,22 @@ type SelectList struct {
 	OnCancel          func()
 	OnSelectionChange func(SelectItem)
 	items             []SelectItem
+	filtered          []SelectItem
+	selected          int
 	maxVisible        int
 	theme             SelectListTheme
 	layout            SelectListLayoutOptions
 }
 
 func NewSelectList(items []SelectItem, maxVisible int, theme SelectListTheme, layout ...SelectListLayoutOptions) *SelectList {
-	s := &SelectList{items: append([]SelectItem(nil), items...), maxVisible: maxVisible, theme: theme}
+	s := &SelectList{items: append([]SelectItem(nil), items...), filtered: append([]SelectItem(nil), items...), maxVisible: max(1, maxVisible), theme: theme}
 	if len(layout) != 0 {
 		s.layout = layout[0]
 	}
 	return s
 }
 
-func (*SelectList) GetSelectedItem() (*SelectItem, error) {
-	return nil, newNotImplemented("SelectList.getSelectedItem")
-}
-func (*SelectList) HandleInput(string) error     { return newNotImplemented("SelectList.handleInput") }
-func (*SelectList) Invalidate() error            { return nil }
-func (*SelectList) Render(int) ([]string, error) { return nil, newNotImplemented("SelectList.render") }
-func (*SelectList) SetFilter(string) error       { return newNotImplemented("SelectList.setFilter") }
-func (*SelectList) SetSelectedIndex(int) error {
-	return newNotImplemented("SelectList.setSelectedIndex")
-}
+func (*SelectList) Invalidate() error { return nil }
 
 type SettingItem struct {
 	ID           string

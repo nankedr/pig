@@ -106,13 +106,8 @@ func (t *TUIAltScreen) ScrollToBottom() error {
 func (t *TUIBase) SetFocus(c Component) error {
 	t.renderMu.Lock()
 	defer t.renderMu.Unlock()
-	if f, ok := IsFocusable(t.focusedComponent); ok {
-		f.SetFocusState(false)
-	}
-	t.focusedComponent = c
-	if f, ok := IsFocusable(c); ok {
-		f.SetFocusState(true)
-	}
+	t.resizeFocus = nil
+	t.setFocus(c)
 	return t.RequestRender()
 }
 func (t *TUIBase) SetShowHardwareCursor(show bool) error {
@@ -165,7 +160,12 @@ func (t *TUIBase) Start() error {
 			case <-stop:
 				return
 			case <-t.renderWake:
-				_ = t.RenderNow()
+				if err := t.RenderNow(); err != nil {
+					select {
+					case t.renderErrors <- err:
+					default:
+					}
+				}
 			}
 		}
 	}()
@@ -219,6 +219,8 @@ func (t *TUIBase) RequestRender(force ...bool) error {
 	return nil
 }
 func (t *TUIBase) RenderNow(force ...bool) error {
+	t.inputMu.Lock()
+	defer t.inputMu.Unlock()
 	t.renderMu.Lock()
 	defer t.renderMu.Unlock()
 	if !t.started {
@@ -241,6 +243,10 @@ func (t *TUIBase) RenderNow(force ...bool) error {
 		if err != nil {
 			return err
 		}
+		lines, err = t.compositeOverlays(lines, width, height)
+		if err != nil {
+			return err
+		}
 		output, state, full := mainScreenFrame(t.mainState, lines, width, height, t.showHardwareCursor, t.clearOnShrink)
 		if err = t.terminal.Write(output); err != nil {
 			return err
@@ -252,6 +258,10 @@ func (t *TUIBase) RenderNow(force ...bool) error {
 		return nil
 	}
 	frame, err := t.layoutFrame(width, height)
+	if err != nil {
+		return err
+	}
+	frame.Lines, err = t.compositeOverlays(frame.Lines, width, height)
 	if err != nil {
 		return err
 	}
@@ -308,6 +318,8 @@ func screenFrame(previous TUIMainScreenRenderState, lines []string, width, heigh
 	return output.String(), state, full
 }
 func (t *TUIBase) HandleInput(data string) error {
+	t.inputMu.Lock()
+	defer t.inputMu.Unlock()
 	t.renderMu.Lock()
 	ids := make([]uint64, 0, len(t.listeners))
 	for id := range t.listeners {
@@ -329,20 +341,23 @@ func (t *TUIBase) HandleInput(data string) error {
 		}
 	}
 	t.renderMu.Lock()
-	defer t.renderMu.Unlock()
 	if release, _ := IsKeyRelease(data); release {
+		t.renderMu.Unlock()
 		return nil
 	}
 	keys, _ := GetKeybindings()
 	kitty, _ := t.terminal.KittyProtocolActive()
-	if t.screenMode == TUIModeFullscreen {
+	if t.screenMode == TUIModeFullscreen && !t.hasCapturingOverlay() {
 		handled, err := t.mouse.handle(data, t.frame, t.frame.PrimaryScrollView, t.wheelLines, keys, kitty)
 		if handled || err != nil {
 			_ = t.RequestRender()
+			t.renderMu.Unlock()
 			return err
 		}
 	}
-	if h, ok := t.focusedComponent.(ComponentInputHandler); ok {
+	focused := t.focusedComponent
+	t.renderMu.Unlock()
+	if h, ok := focused.(ComponentInputHandler); ok {
 		if err := h.HandleInput(data); err != nil {
 			return err
 		}

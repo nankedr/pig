@@ -256,7 +256,10 @@ type TUIBase struct {
 	logDirectory       string
 	fullRedraws        int
 	focusedComponent   Component
-	overlays           []Component
+	overlays           []*overlayEntry
+	inputMu            sync.Mutex
+	focusOrder         uint64
+	resizeFocus        *overlayEntry
 	renderMu           sync.Mutex
 	started            bool
 	screenMode         TUIMode
@@ -267,6 +270,7 @@ type TUIBase struct {
 	wheelLines         int
 	mouseCapture       bool
 	renderWake         chan struct{}
+	renderErrors       chan error
 	renderStop         chan struct{}
 	listeners          map[uint64]TUIInputListener
 	listenerID         uint64
@@ -284,6 +288,7 @@ func NewTUIBase(terminal Terminal, options ...TUIBaseOptions) *TUIBase {
 	}
 	base.wheelLines = 1
 	base.renderWake = make(chan struct{}, 1)
+	base.renderErrors = make(chan error, 1)
 	return base
 }
 
@@ -296,16 +301,19 @@ func (t *TUIBase) FullRedraws() int {
 	defer t.renderMu.Unlock()
 	return t.fullRedraws
 }
-func (t *TUIBase) HasOverlayEntries() bool        { return len(t.overlays) != 0 }
-func (t *TUIBase) GetShowHardwareCursor() bool    { return t.showHardwareCursor }
-func (t *TUIBase) GetClearOnShrink() bool         { return t.clearOnShrink }
-func (t *TUIBase) GetFocusedComponent() Component { return t.focusedComponent }
-func (t *TUIBase) HasOverlay() bool               { return len(t.overlays) != 0 }
-func (*TUIBase) WantsKeyRelease() bool            { return false }
-func (*TUIBase) HideOverlay() error               { return newNotImplemented("TUIBase.hideOverlay") }
-func (*TUIBase) ShowOverlay(Component, ...OverlayOptions) (OverlayHandle, error) {
-	return nil, newNotImplemented("TUIBase.showOverlay")
+func (t *TUIBase) HasOverlayEntries() bool {
+	t.renderMu.Lock()
+	defer t.renderMu.Unlock()
+	return len(t.overlays) != 0
 }
+func (t *TUIBase) GetShowHardwareCursor() bool { return t.showHardwareCursor }
+func (t *TUIBase) GetClearOnShrink() bool      { return t.clearOnShrink }
+func (t *TUIBase) GetFocusedComponent() Component {
+	t.renderMu.Lock()
+	defer t.renderMu.Unlock()
+	return t.focusedComponent
+}
+func (*TUIBase) WantsKeyRelease() bool { return false }
 func (*TUIBase) OnTerminalColorSchemeChange(TerminalColorSchemeListener) (TUIUnsubscribe, error) {
 	return nil, newNotImplemented("TUIBase.onTerminalColorSchemeChange")
 }
