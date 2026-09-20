@@ -106,6 +106,23 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 		return notImplemented("InteractiveMode.images")
 	}
 
+	fd, _ := findBinary(ctx)
+	var fdPath *string
+	if fd != "" {
+		fdPath = &fd
+	}
+	provider, err := NewSessionAutocompleteProvider(m.runtime.Session(), fdPath)
+	if err != nil {
+		return err
+	}
+	if err = m.ui.SetAutocompleteProvider(provider); err != nil {
+		return err
+	}
+	visible, err := m.runtime.Session().SettingsManager().GetAutocompleteMaxVisible()
+	if err != nil {
+		return err
+	}
+	_ = m.ui.SetAutocompleteMaxVisible(visible)
 	if err := m.ui.Start(); err != nil {
 		return err
 	}
@@ -229,6 +246,12 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		}
 		if strings.TrimSpace(prompt) == "/quit" {
 			break
+		}
+		if handled, commandErr := m.handleCommand(runCtx, prompt); handled {
+			if commandErr != nil {
+				_ = m.ShowError(commandErr.Error())
+			}
+			continue
 		}
 		turnCtx, turnCancel := context.WithCancel(runCtx)
 		m.turnMu.Lock()

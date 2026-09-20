@@ -82,6 +82,7 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 	follow := ScrollViewFollowEnd
 	u.scroll = NewScrollView(nil, ScrollViewOptions{Follow: &follow, Scrollbar: &u.scrollbar})
 	u.renderWake = make(chan struct{}, 1)
+	u.editor.ui = u
 	u.editor.keybindings = u.keybindings
 	u.editor.kitty = func() bool { active, _ := u.terminal.KittyProtocolActive(); return active }
 	u.editor.Focused = true
@@ -96,6 +97,24 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 		}
 	}
 	return u
+}
+func (u *TextUI) Terminal() Terminal { return u.terminal }
+func (u *TextUI) RequestRender(...bool) error {
+	select {
+	case u.renderWake <- struct{}{}:
+	default:
+	}
+	return nil
+}
+func (u *TextUI) SetAutocompleteProvider(provider AutocompleteProvider) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	return u.editor.SetAutocompleteProvider(provider)
+}
+func (u *TextUI) SetAutocompleteMaxVisible(value int) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	return u.editor.SetAutocompleteMaxVisible(value)
 }
 func (u *TextUI) Done() <-chan struct{} { return u.done }
 func (u *TextUI) Err() error            { u.mu.Lock(); defer u.mu.Unlock(); return u.err }
@@ -179,6 +198,7 @@ func (u *TextUI) finish(err error) {
 	if !errors.Is(err, io.EOF) {
 		u.err = err
 	}
+	u.editor.cancelAutocomplete()
 	close(u.done)
 }
 func (u *TextUI) ReadLine(ctx context.Context) (string, error) {
@@ -262,7 +282,12 @@ func (u *TextUI) render() error {
 	if err != nil {
 		return err
 	}
-	editorLines = editorLines[1 : len(editorLines)-1]
+	bottom := len(editorLines) - 1
+	if u.editor.completion.list != nil {
+		suggestions, _ := u.editor.completion.list.Render(columns - prefixWidth)
+		bottom -= len(suggestions)
+	}
+	editorLines = append(editorLines[1:bottom], editorLines[bottom+1:]...)
 	cursorRow := 0
 	for i, line := range editorLines {
 		if strings.Contains(line, CursorMarker) {
@@ -372,6 +397,8 @@ func (u *TextUI) input(data string) {
 		u.expanded = !u.expanded
 	case match("app.thinking.toggle"):
 		u.hideThinking = !u.hideThinking
+	case (u.editor.completion.list != nil || u.editor.completion.pending != nil) && match(KeybindingSelectCancel):
+		u.editor.cancelAutocomplete()
 	case match("app.interrupt"):
 		if u.onInterrupt != nil {
 			u.onInterrupt()

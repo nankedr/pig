@@ -1,0 +1,122 @@
+{
+  "files": {
+    ".pi/agent/prompts/review.md": "---\ndescription: Review template\nargument-hint: <topic>\n---\nREVIEW $1",
+    ".pi/agent/skills/guide/SKILL.md": "---\nname: guide\ndescription: Guide instructions\n---\nGUIDE BODY",
+    "alpha.txt": "NOT AUTOMATICALLY ATTACHED",
+    "a space.txt": "NOT AUTOMATICALLY ATTACHED",
+    ".pi/agent/bin/fd": "#!/bin/sh\nif [ \"$1\" = --version ]; then printf \"fd 10.2.0\\n\"; else printf \"alpha.txt\\na space.txt\\n\"; fi\n",
+    "space dir/inner.txt": "not attached",
+    "中文.txt": "not attached"
+  },
+  "args": [
+    "--skill",
+    "$ROOT/.pi/agent/skills/guide"
+  ],
+  "delayMS": 150,
+  "turns": [
+    {
+      "chunks": [
+        "/rev",
+        "\t",
+        "主题\r"
+      ],
+      "waits": [
+        "review",
+        "",
+        ""
+      ]
+    },
+    {
+      "chunks": [
+        "/skill:g",
+        "\t",
+        "question\r"
+      ],
+      "waits": [
+        "skill:guide",
+        "",
+        ""
+      ]
+    },
+    {
+      "chunks": [
+        "read ./alp",
+        "\t",
+        "\r"
+      ]
+    },
+    {
+      "chunks": [
+        "read \"./a sp",
+        "\t",
+        "\r"
+      ]
+    },
+    {
+      "chunks": [
+        "/rev",
+        "\u001b",
+        "\r"
+      ]
+    },
+    {
+      "chunks": [
+        "\u001b[200~/rev suffix\u001b[201~",
+        "\u0001\u001b[C\u001b[C\u001b[C\u001b[C",
+        "\t",
+        "\t",
+        "\r"
+      ]
+    },
+    {
+      "chunks": [
+        "read @alpha",
+        "\t",
+        "\r"
+      ],
+      "waits": [
+        "alpha.txt",
+        "",
+        ""
+      ]
+    },
+    {
+      "chunks": [
+        "read @\"a sp",
+        "\t",
+        "\r"
+      ],
+      "waits": [
+        "a space.txt",
+        "",
+        ""
+      ]
+    },
+    {
+      "chunks": [
+        "read \"./space d",
+        "\t",
+        "inn",
+        "\t",
+        "\r"
+      ]
+    },
+    {
+      "chunks": [
+        "read ./中",
+        "\t",
+        "\r"
+      ]
+    },
+    {
+      "chunks": [
+        "read $ROOT/alp",
+        "\t",
+        "\r"
+      ]
+    }
+  ],
+  "executables": [
+    ".pi/agent/bin/fd"
+  ]
+}

@@ -1,0 +1,506 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/tui/src/components/editor.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "tui/autocomplete/editor",
+    "catalog_id": "contract:tui/autocomplete",
+    "surface": "go-sdk",
+    "input": [
+      {
+        "id": "second-line-no-command-menu",
+        "text": "draft\n",
+        "steps": [
+          "/rev",
+          "\t",
+          "\r"
+        ]
+      },
+      {
+        "id": "select-tab",
+        "steps": [
+          "/",
+          "\u001b[B",
+          "\t"
+        ]
+      },
+      {
+        "id": "cancel-draft",
+        "steps": [
+          "/r",
+          "\u001b[B",
+          "\u001b"
+        ]
+      },
+      {
+        "id": "enter-command-submits",
+        "steps": [
+          "/rev",
+          "\r"
+        ]
+      },
+      {
+        "id": "accept-undo",
+        "steps": [
+          "/rev",
+          "\t",
+          "\u001f"
+        ]
+      },
+      {
+        "id": "empty-result-retrigger",
+        "steps": [
+          "/",
+          "zzzz",
+          "",
+          "",
+          "",
+          ""
+        ]
+      },
+      {
+        "id": "middle-replace",
+        "text": "/re suffix",
+        "steps": [
+          "\u0001",
+          "\u001b[C",
+          "\u001b[C",
+          "\u001b[C",
+          "\t",
+          "\t"
+        ]
+      },
+      {
+        "id": "unicode-command",
+        "steps": [
+          "/中文",
+          "\t"
+        ]
+      },
+      {
+        "id": "typing-closes-menu",
+        "steps": [
+          "/rev",
+          " ",
+          "arg",
+          "\r"
+        ]
+      },
+      {
+        "id": "paste-no-trigger",
+        "steps": [
+          "\u001b[200~/rev\u001b[201~",
+          "\r"
+        ]
+      }
+    ],
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "second-line-no-command-menu",
+        "states": [
+          {
+            "text": "draft\n/rev",
+            "showing": false,
+            "cursor": {
+              "Line": 1,
+              "Col": 4
+            }
+          },
+          {
+            "text": "draft\n/rev",
+            "showing": false,
+            "cursor": {
+              "Line": 1,
+              "Col": 4
+            }
+          },
+          {
+            "text": "",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "submits": [
+          "draft\n/rev"
+        ],
+        "changes": [
+          "draft\n/rev",
+          ""
+        ]
+      },
+      {
+        "id": "select-tab",
+        "states": [
+          {
+            "text": "/",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "/",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "/reload ",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 8
+            }
+          }
+        ],
+        "submits": [],
+        "changes": [
+          "/",
+          "/reload "
+        ]
+      },
+      {
+        "id": "cancel-draft",
+        "states": [
+          {
+            "text": "/r",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "/r",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "/r",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          }
+        ],
+        "submits": [],
+        "changes": [
+          "/r"
+        ]
+      },
+      {
+        "id": "enter-command-submits",
+        "states": [
+          {
+            "text": "/rev",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "submits": [
+          "/review"
+        ],
+        "changes": [
+          "/rev",
+          ""
+        ]
+      },
+      {
+        "id": "accept-undo",
+        "states": [
+          {
+            "text": "/rev",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "/review ",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 8
+            }
+          },
+          {
+            "text": "/rev",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          }
+        ],
+        "submits": [],
+        "changes": [
+          "/rev",
+          "/review ",
+          "/rev"
+        ]
+      },
+      {
+        "id": "empty-result-retrigger",
+        "states": [
+          {
+            "text": "/",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "/zzzz",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "/zzz",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "/zz",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 3
+            }
+          },
+          {
+            "text": "/z",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "/",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          }
+        ],
+        "submits": [],
+        "changes": [
+          "/",
+          "/zzzz",
+          "/zzz",
+          "/zz",
+          "/z",
+          "/"
+        ]
+      },
+      {
+        "id": "middle-replace",
+        "states": [
+          {
+            "text": "/re suffix",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          },
+          {
+            "text": "/re suffix",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 1
+            }
+          },
+          {
+            "text": "/re suffix",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 2
+            }
+          },
+          {
+            "text": "/re suffix",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 3
+            }
+          },
+          {
+            "text": "/re suffix",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 3
+            }
+          },
+          {
+            "text": "/review  suffix",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 8
+            }
+          }
+        ],
+        "submits": [],
+        "changes": [
+          "/review  suffix"
+        ]
+      },
+      {
+        "id": "unicode-command",
+        "states": [
+          {
+            "text": "/中文",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          },
+          {
+            "text": "/中文",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 7
+            }
+          }
+        ],
+        "submits": [],
+        "changes": [
+          "/中文"
+        ]
+      },
+      {
+        "id": "typing-closes-menu",
+        "states": [
+          {
+            "text": "/rev",
+            "showing": true,
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "/rev ",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 5
+            }
+          },
+          {
+            "text": "/rev arg",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 8
+            }
+          },
+          {
+            "text": "",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "submits": [
+          "/rev arg"
+        ],
+        "changes": [
+          "/rev",
+          "/rev ",
+          "/rev arg",
+          ""
+        ]
+      },
+      {
+        "id": "paste-no-trigger",
+        "states": [
+          {
+            "text": "/rev",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 4
+            }
+          },
+          {
+            "text": "",
+            "showing": false,
+            "cursor": {
+              "Line": 0,
+              "Col": 0
+            }
+          }
+        ],
+        "submits": [
+          "/rev"
+        ],
+        "changes": [
+          "/rev",
+          ""
+        ]
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:73e837be938b22108033b918544a94a3c96f9a289c5bdd173b504c8aecb2a20c",
+  "observation_hash": "sha256:330b69d03de24947568ff28122d7361a8f61e67c0bd979326666d2139fbe9295",
+  "execution_method": "node parity/oracle/autocomplete-editor.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "cursor": "UTF-8 byte offsets",
+    "filesystem": "absent"
+  }
+}

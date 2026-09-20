@@ -1,0 +1,47 @@
+*tui.CombinedAutocompleteProvider
+ApplyCompletion func(*tui.CombinedAutocompleteProvider, []string, int, int, tui.AutocompleteItem, string) (tui.AutocompleteResult, error)
+GetSuggestions func(*tui.CombinedAutocompleteProvider, context.Context, []string, int, int, tui.AutocompleteOptions) (tui.AutocompleteSuggestions, bool, error)
+ShouldTriggerFileCompletion func(*tui.CombinedAutocompleteProvider, []string, int, int) (bool, error)
+TriggerCharacters func(*tui.CombinedAutocompleteProvider) []string
+*tui.Editor
+AddToHistory func(*tui.Editor, string) error
+GetAutocompleteMaxVisible func(*tui.Editor) int
+GetCursor func(*tui.Editor) tui.EditorCursor
+GetExpandedText func(*tui.Editor) (string, error)
+GetLines func(*tui.Editor) []string
+GetPaddingX func(*tui.Editor) int
+GetText func(*tui.Editor) string
+HandleInput func(*tui.Editor, string) error
+InsertTextAtCursor func(*tui.Editor, string) error
+Invalidate func(*tui.Editor) error
+IsShowingAutocomplete func(*tui.Editor) bool
+Render func(*tui.Editor, int) ([]string, error)
+SetAutocompleteMaxVisible func(*tui.Editor, int) error
+SetAutocompleteProvider func(*tui.Editor, tui.AutocompleteProvider) error
+SetBorderColor func(*tui.Editor, tui.TextStyleFunc)
+SetFocusState func(*tui.Editor, bool)
+SetOnChange func(*tui.Editor, func(string))
+SetOnSubmit func(*tui.Editor, func(string))
+SetPaddingX func(*tui.Editor, int) error
+SetText func(*tui.Editor, string) error
+*tui.TextUI
+AddToHistory func(*tui.TextUI, string) error
+Append func(*tui.TextUI, string) error
+ClearEditor func(*tui.TextUI) error
+Done func(*tui.TextUI) <-chan struct {}
+Err func(*tui.TextUI) error
+Mode func(*tui.TextUI) tui.TUIMode
+ReadInput func(*tui.TextUI, context.Context) (tui.TextInput, error)
+ReadLine func(*tui.TextUI, context.Context) (string, error)
+Refresh func(*tui.TextUI) error
+RequestRender func(*tui.TextUI, ...bool) error
+ScrollToBottom func(*tui.TextUI) error
+ScrollToTop func(*tui.TextUI) error
+SetAutocompleteMaxVisible func(*tui.TextUI, int) error
+SetAutocompleteProvider func(*tui.TextUI, tui.AutocompleteProvider) error
+SetMode func(*tui.TextUI, tui.TUIMode) error
+Start func(*tui.TextUI) error
+Stop func(*tui.TextUI) error
+Suspend func(*tui.TextUI) error
+Terminal func(*tui.TextUI) tui.Terminal
+func(*codingagent.AgentSession, *string) (*tui.CombinedAutocompleteProvider, error)

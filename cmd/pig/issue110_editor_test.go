@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -34,12 +35,17 @@ func runEditorCLI(t *testing.T, fixtureName string) {
 		t.Fatal(err)
 	}
 	var input struct {
+		Files       map[string]string
+		Args        []string
+		Executables []string
+		DelayMS     int
 		Config      json.RawMessage
 		Negotiation []string
 		Exit        string
 		Clear       string
 		Turns       []struct {
 			Chunks  []string
+			Waits   []string
 			Columns uint16
 		}
 	}
@@ -97,6 +103,20 @@ func runEditorCLI(t *testing.T, fixtureName string) {
 	defer server.Close()
 	tty := terminaltest.Open(t)
 	root := t.TempDir()
+	for name, content := range input.Files {
+		path := filepath.Join(root, strings.ReplaceAll(name, ".pi/", ".pig/"))
+		if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for _, name := range input.Executables {
+		if err := os.Chmod(filepath.Join(root, strings.ReplaceAll(name, ".pi/", ".pig/")), 0755); err != nil {
+			t.Fatal(err)
+		}
+	}
 	if len(input.Config) > 0 {
 		dir := filepath.Join(root, ".pig", "agent")
 		if err := os.MkdirAll(dir, 0700); err != nil {
@@ -109,6 +129,9 @@ func runEditorCLI(t *testing.T, fixtureName string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, buildPigBinary(t), "--provider", "deepseek", "--model", "deepseek-v4-flash", "--api-key", "synthetic", "--no-session", "--no-tools", "--no-extensions", "--no-skills")
+	for _, arg := range input.Args {
+		cmd.Args = append(cmd.Args, strings.ReplaceAll(strings.ReplaceAll(arg, "$ROOT", root), "/.pi/", "/.pig/"))
+	}
 	cmd.Dir = root
 	cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + root, "TERM=xterm-256color", "PIG_DEEPSEEK_BASE_URL=" + server.URL}
 	cmd.Stdin = tty.Slave
@@ -134,8 +157,18 @@ func runEditorCLI(t *testing.T, fixtureName string) {
 	}
 	for index, turn := range input.Turns {
 		for j, chunk := range turn.Chunks {
-			tty.Send(t, chunk)
-			time.Sleep(10 * time.Millisecond)
+			offset := len(tty.Output())
+			tty.Send(t, strings.ReplaceAll(chunk, "$ROOT", root))
+			if j < len(turn.Waits) && turn.Waits[j] != "" {
+				deadline := time.Now().Add(10 * time.Second)
+				for !strings.Contains(tty.Output()[offset:], turn.Waits[j]) {
+					if time.Now().After(deadline) {
+						t.Fatalf("completion never displayed %q: %q", turn.Waits[j], tty.Output()[offset:])
+					}
+					time.Sleep(5 * time.Millisecond)
+				}
+			}
+			time.Sleep(time.Duration(max(10, input.DelayMS)) * time.Millisecond)
 			if j == 0 && turn.Columns > 0 {
 				if err := pty.Setsize(tty.Slave, &pty.Winsize{Rows: 32, Cols: turn.Columns}); err != nil {
 					t.Fatal(err)
@@ -158,6 +191,9 @@ func runEditorCLI(t *testing.T, fixtureName string) {
 	}
 	mu.Lock()
 	defer mu.Unlock()
+	for i := range prompts {
+		prompts[i] = strings.ReplaceAll(strings.ReplaceAll(prompts[i], root, "$ROOT"), "/.pig/", "/.pi/")
+	}
 	if !reflect.DeepEqual(prompts, want.Prompts) {
 		t.Fatalf("Provider prompts got %#v want %#v", prompts, want.Prompts)
 	}

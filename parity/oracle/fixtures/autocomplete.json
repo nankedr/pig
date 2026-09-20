@@ -1,0 +1,589 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/tui/src/autocomplete.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "tui/autocomplete/provider",
+    "catalog_id": "contract:tui/autocomplete",
+    "surface": "go-sdk",
+    "input": {
+      "files": [
+        "alpha.txt",
+        "a space.txt",
+        "中文.txt",
+        "src/main.go",
+        "space dir/inner.txt"
+      ],
+      "cases": [
+        {
+          "id": "fd-file",
+          "text": "@alpha",
+          "fd": true
+        },
+        {
+          "id": "fd-spaces",
+          "text": "@space",
+          "fd": true
+        },
+        {
+          "id": "fd-scope",
+          "text": "@src/ma",
+          "fd": true
+        },
+        {
+          "id": "fd-directory",
+          "text": "@src",
+          "fd": true
+        },
+        {
+          "id": "fd-quoted-middle",
+          "text": "read @\"a sp\" tail",
+          "col": 11,
+          "fd": true
+        },
+        {
+          "id": "fd-missing",
+          "text": "@alpha",
+          "fd": "missing"
+        },
+        {
+          "id": "commands",
+          "text": "/"
+        },
+        {
+          "id": "fuzzy",
+          "text": "/rv"
+        },
+        {
+          "id": "unicode",
+          "text": "/中文"
+        },
+        {
+          "id": "empty",
+          "text": "/zzzz"
+        },
+        {
+          "id": "middle-command",
+          "text": "/rev suffix",
+          "col": 4
+        },
+        {
+          "id": "argument",
+          "text": "/model d"
+        },
+        {
+          "id": "plain-no-trigger",
+          "text": "alp"
+        },
+        {
+          "id": "forced-file",
+          "text": "alp",
+          "force": true
+        },
+        {
+          "id": "directory",
+          "text": "./s"
+        },
+        {
+          "id": "quoted",
+          "text": "read \"a sp\" untouched",
+          "col": 10,
+          "force": true
+        },
+        {
+          "id": "unicode-path",
+          "text": "看 ./中"
+        },
+        {
+          "id": "directory-space",
+          "text": "\"space d",
+          "force": true
+        },
+        {
+          "id": "no-fd",
+          "text": "@alpha"
+        },
+        {
+          "id": "no-fd-forced",
+          "text": "@alpha",
+          "force": true
+        },
+        {
+          "id": "absolute",
+          "text": "${ROOT}/alp",
+          "force": true
+        },
+        {
+          "id": "relative-parent",
+          "text": "src/../alp"
+        },
+        {
+          "id": "missing-directory",
+          "text": "./missing/"
+        },
+        {
+          "id": "ordinary-slash-argument",
+          "text": "/review x"
+        }
+      ],
+      "fdScript": "#!/bin/sh\n[ \"$1\" = --base-directory ] || exit 1\ncase \"$2\" in */src/) printf 'main.go\\n';; */src) printf 'main.go\\n';; *) printf 'src/\\nsrc/main.go\\nalpha.txt\\na space.txt\\nspace dir/\\n.git/config\\n' ;; esac\n"
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "fd-file",
+        "suggestions": {
+          "items": [
+            {
+              "value": "@alpha.txt",
+              "label": "alpha.txt",
+              "description": "alpha.txt"
+            }
+          ],
+          "prefix": "@alpha"
+        },
+        "application": {
+          "lines": [
+            "@alpha.txt "
+          ],
+          "cursorLine": 0,
+          "cursorCol": 11
+        },
+        "trigger": true
+      },
+      {
+        "id": "fd-spaces",
+        "suggestions": {
+          "items": [
+            {
+              "value": "@\"space dir/\"",
+              "label": "space dir/",
+              "description": "space dir"
+            },
+            {
+              "value": "@\"a space.txt\"",
+              "label": "a space.txt",
+              "description": "a space.txt"
+            }
+          ],
+          "prefix": "@space"
+        },
+        "application": {
+          "lines": [
+            "@\"space dir/\""
+          ],
+          "cursorLine": 0,
+          "cursorCol": 12
+        },
+        "trigger": true
+      },
+      {
+        "id": "fd-scope",
+        "suggestions": {
+          "items": [
+            {
+              "value": "@src/main.go",
+              "label": "main.go",
+              "description": "src/main.go"
+            }
+          ],
+          "prefix": "@src/ma"
+        },
+        "application": {
+          "lines": [
+            "@src/main.go "
+          ],
+          "cursorLine": 0,
+          "cursorCol": 13
+        },
+        "trigger": true
+      },
+      {
+        "id": "fd-directory",
+        "suggestions": {
+          "items": [
+            {
+              "value": "@src/",
+              "label": "src/",
+              "description": "src"
+            },
+            {
+              "value": "@src/main.go",
+              "label": "main.go",
+              "description": "src/main.go"
+            }
+          ],
+          "prefix": "@src"
+        },
+        "application": {
+          "lines": [
+            "@src/"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 5
+        },
+        "trigger": true
+      },
+      {
+        "id": "fd-quoted-middle",
+        "suggestions": {
+          "items": [
+            {
+              "value": "@\"a space.txt\"",
+              "label": "a space.txt",
+              "description": "a space.txt"
+            }
+          ],
+          "prefix": "@\"a sp"
+        },
+        "application": {
+          "lines": [
+            "read @\"a space.txt\"  tail"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 20
+        },
+        "trigger": true
+      },
+      {
+        "id": "fd-missing",
+        "suggestions": null,
+        "application": null,
+        "trigger": true
+      },
+      {
+        "id": "commands",
+        "suggestions": {
+          "items": [
+            {
+              "value": "review",
+              "label": "review",
+              "description": "<file> — Review changes"
+            },
+            {
+              "value": "reload",
+              "label": "reload"
+            },
+            {
+              "value": "resume",
+              "label": "resume"
+            },
+            {
+              "value": "skill:中文",
+              "label": "skill:中文"
+            },
+            {
+              "value": "skill:review",
+              "label": "skill:review"
+            },
+            {
+              "value": "model",
+              "label": "model"
+            }
+          ],
+          "prefix": "/"
+        },
+        "application": {
+          "lines": [
+            "/review "
+          ],
+          "cursorLine": 0,
+          "cursorCol": 8
+        },
+        "trigger": false
+      },
+      {
+        "id": "fuzzy",
+        "suggestions": {
+          "items": [
+            {
+              "value": "review",
+              "label": "review",
+              "description": "<file> — Review changes"
+            },
+            {
+              "value": "skill:review",
+              "label": "skill:review"
+            }
+          ],
+          "prefix": "/rv"
+        },
+        "application": {
+          "lines": [
+            "/review "
+          ],
+          "cursorLine": 0,
+          "cursorCol": 8
+        },
+        "trigger": false
+      },
+      {
+        "id": "unicode",
+        "suggestions": {
+          "items": [
+            {
+              "value": "skill:中文",
+              "label": "skill:中文"
+            }
+          ],
+          "prefix": "/中文"
+        },
+        "application": {
+          "lines": [
+            "/skill:中文 "
+          ],
+          "cursorLine": 0,
+          "cursorCol": 14
+        },
+        "trigger": false
+      },
+      {
+        "id": "empty",
+        "suggestions": null,
+        "application": null,
+        "trigger": false
+      },
+      {
+        "id": "middle-command",
+        "suggestions": {
+          "items": [
+            {
+              "value": "review",
+              "label": "review",
+              "description": "<file> — Review changes"
+            },
+            {
+              "value": "skill:review",
+              "label": "skill:review"
+            }
+          ],
+          "prefix": "/rev"
+        },
+        "application": {
+          "lines": [
+            "/review  suffix"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 8
+        },
+        "trigger": false
+      },
+      {
+        "id": "argument",
+        "suggestions": {
+          "items": [
+            {
+              "value": "deepseek/model",
+              "label": "model"
+            }
+          ],
+          "prefix": "d"
+        },
+        "application": {
+          "lines": [
+            "/model deepseek/model"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 21
+        },
+        "trigger": true
+      },
+      {
+        "id": "plain-no-trigger",
+        "suggestions": null,
+        "application": null,
+        "trigger": true
+      },
+      {
+        "id": "forced-file",
+        "suggestions": {
+          "items": [
+            {
+              "value": "alpha.txt",
+              "label": "alpha.txt"
+            }
+          ],
+          "prefix": "alp"
+        },
+        "application": {
+          "lines": [
+            "alpha.txt"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 9
+        },
+        "trigger": true
+      },
+      {
+        "id": "directory",
+        "suggestions": {
+          "items": [
+            {
+              "value": "./src/",
+              "label": "src/"
+            },
+            {
+              "value": "\"./space dir/\"",
+              "label": "space dir/"
+            }
+          ],
+          "prefix": "./s"
+        },
+        "application": {
+          "lines": [
+            "./src/"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 6
+        },
+        "trigger": true
+      },
+      {
+        "id": "quoted",
+        "suggestions": {
+          "items": [
+            {
+              "value": "\"a space.txt\"",
+              "label": "a space.txt"
+            }
+          ],
+          "prefix": "\"a sp"
+        },
+        "application": {
+          "lines": [
+            "read \"a space.txt\" untouched"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 18
+        },
+        "trigger": true
+      },
+      {
+        "id": "unicode-path",
+        "suggestions": {
+          "items": [
+            {
+              "value": "./中文.txt",
+              "label": "中文.txt"
+            }
+          ],
+          "prefix": "./中"
+        },
+        "application": {
+          "lines": [
+            "看 ./中文.txt"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 16
+        },
+        "trigger": true
+      },
+      {
+        "id": "directory-space",
+        "suggestions": {
+          "items": [
+            {
+              "value": "\"space dir/\"",
+              "label": "space dir/"
+            }
+          ],
+          "prefix": "\"space d"
+        },
+        "application": {
+          "lines": [
+            "\"space dir/\""
+          ],
+          "cursorLine": 0,
+          "cursorCol": 11
+        },
+        "trigger": true
+      },
+      {
+        "id": "no-fd",
+        "suggestions": null,
+        "application": null,
+        "trigger": true
+      },
+      {
+        "id": "no-fd-forced",
+        "suggestions": null,
+        "application": null,
+        "trigger": true
+      },
+      {
+        "id": "absolute",
+        "suggestions": {
+          "items": [
+            {
+              "value": "${ROOT}/alpha.txt",
+              "label": "alpha.txt"
+            }
+          ],
+          "prefix": "${ROOT}/alp"
+        },
+        "application": {
+          "lines": [
+            "${ROOT}/alpha.txt"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 17
+        },
+        "trigger": false
+      },
+      {
+        "id": "relative-parent",
+        "suggestions": {
+          "items": [
+            {
+              "value": "alpha.txt",
+              "label": "alpha.txt"
+            }
+          ],
+          "prefix": "src/../alp"
+        },
+        "application": {
+          "lines": [
+            "alpha.txt"
+          ],
+          "cursorLine": 0,
+          "cursorCol": 9
+        },
+        "trigger": true
+      },
+      {
+        "id": "missing-directory",
+        "suggestions": null,
+        "application": null,
+        "trigger": true
+      },
+      {
+        "id": "ordinary-slash-argument",
+        "suggestions": null,
+        "application": null,
+        "trigger": true
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:36e9209925a9dcec0ac3f0c7a09ab42dcc87de5af04e91d83293cfc638d8df39",
+  "observation_hash": "sha256:48aac02b84a6270125d11fc8c5ff6a46d25678741f96ea319f2322d90a9b5ded",
+  "execution_method": "node parity/oracle/autocomplete.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "cursor": "UTF-8 byte offsets",
+    "root": "${ROOT}",
+    "fd": "controlled executable or unavailable"
+  }
+}

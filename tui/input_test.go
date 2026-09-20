@@ -9,20 +9,11 @@ import (
 )
 
 func TestInputAndPlatformCapabilityStubsAreExplicit(t *testing.T) {
-	provider := tui.NewCombinedAutocompleteProvider(nil, ".", nil)
 
 	operations := []struct {
 		name string
 		call func() error
 	}{
-		{name: "autocomplete suggestions", call: func() error {
-			_, _, err := provider.GetSuggestions(context.Background(), nil, 0, 0, tui.AutocompleteOptions{})
-			return err
-		}},
-		{name: "autocomplete application", call: func() error {
-			_, err := provider.ApplyCompletion(nil, 0, 0, tui.AutocompleteItem{}, "")
-			return err
-		}},
 		{name: "word navigation", call: func() error {
 			_, err := tui.FindWordForward("word", 0)
 			return err

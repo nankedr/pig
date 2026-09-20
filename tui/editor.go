@@ -114,6 +114,7 @@ type Editor struct {
 	jump                   int
 	paddingX               int
 	autocompleteMaxVisible int
+	completion             editorAutocomplete
 }
 
 // EditorRuntime is the narrow TUI seam used by Editor.
@@ -136,7 +137,7 @@ func NewEditor(ui EditorRuntime, theme EditorTheme, options ...EditorOptions) *E
 			e.paddingX = *options[0].PaddingX
 		}
 		if options[0].AutocompleteMaxVisible != nil {
-			e.autocompleteMaxVisible = *options[0].AutocompleteMaxVisible
+			e.autocompleteMaxVisible = max(3, min(20, *options[0].AutocompleteMaxVisible))
 		}
 	}
 	return e
@@ -188,7 +189,11 @@ func (e *Editor) GetLines() []string {
 func (e *Editor) GetPaddingX() int { return e.paddingX }
 func (e *Editor) GetText() string  { return e.text }
 func (e *Editor) HandleInput(data string) error {
+	if err := e.pollAutocomplete(); err != nil {
+		return err
+	}
 	if e.inPaste || strings.Contains(data, "\x1b[200~") {
+		e.cancelAutocomplete()
 		return e.handlePasteInput(data)
 	}
 	if release, _ := IsKeyRelease(data); release {
@@ -203,6 +208,55 @@ func (e *Editor) HandleInput(data string) error {
 		active = e.kitty()
 	}
 	match := func(action Keybinding) bool { return kb.matches(data, action, active) }
+	if match(KeybindingEditorUndo) {
+		e.cancelAutocomplete()
+		e.restoreUndo()
+		return nil
+	}
+	if match(KeybindingSelectCancel) && (e.completion.list != nil || e.completion.pending != nil) {
+		e.cancelAutocomplete()
+		return nil
+	}
+	if e.completion.list != nil {
+		switch {
+		case match(KeybindingSelectUp), match(KeybindingSelectDown):
+			list := e.completion.list
+			delta := 1
+			if match(KeybindingSelectUp) {
+				delta = -1
+			}
+			list.selected = (list.selected + delta + len(list.filtered)) % len(list.filtered)
+			return nil
+		case match(KeybindingInputTab), match(KeybindingSelectConfirm):
+			submit := match(KeybindingSelectConfirm) && strings.HasPrefix(e.completion.prefix, "/")
+			if err := e.acceptAutocomplete(!submit); err != nil {
+				return err
+			}
+			if !submit {
+				return nil
+			}
+		}
+	}
+	if match(KeybindingInputTab) {
+		cursor := e.GetCursor()
+		before := e.GetLines()[cursor.Line][:cursor.Col]
+		return e.requestAutocomplete(!(cursor.Line == 0 && strings.HasPrefix(strings.TrimLeft(before, " \t"), "/") && !strings.Contains(strings.TrimLeft(before, " \t"), " ")), true)
+	}
+	oldText, oldCursor, wasShowing, force := e.text, e.cursor, e.completion.list != nil, e.completion.force
+	defer func() {
+		if e.completion.provider == nil || oldText == e.text && oldCursor == e.cursor {
+			return
+		}
+		e.cancelAutocomplete()
+		if e.text != "" && !match(KeybindingInputSubmit) && !match(KeybindingInputNewLine) {
+			if wasShowing {
+				_ = e.requestAutocomplete(force, false)
+			} else if oldText != e.text && e.naturalAutocomplete(data, match(KeybindingEditorDeleteCharBackward) || match(KeybindingEditorDeleteCharForward)) {
+				_ = e.requestAutocomplete(false, false)
+			}
+		}
+	}()
+
 	if e.jump != 0 {
 		if printable, ok, _ := DecodePrintableKey(data); ok {
 			data = printable
@@ -328,6 +382,7 @@ func normalizeEditorText(text string) string {
 	return strings.NewReplacer("\r\n", "\n", "\r", "\n", "\t", "    ").Replace(text)
 }
 func (e *Editor) changed() {
+	e.cancelAutocomplete()
 	e.snappedCol = nil
 	if e.OnChange != nil {
 		e.OnChange(e.text)
@@ -359,15 +414,7 @@ func (e *Editor) lineEnd() int {
 	}
 	return len(e.text)
 }
-func (*Editor) Invalidate() error           { return nil }
-func (*Editor) IsShowingAutocomplete() bool { return false }
-
-func (*Editor) SetAutocompleteMaxVisible(int) error {
-	return newNotImplemented("Editor.setAutocompleteMaxVisible")
-}
-func (*Editor) SetAutocompleteProvider(AutocompleteProvider) error {
-	return newNotImplemented("Editor.setAutocompleteProvider")
-}
+func (*Editor) Invalidate() error             { return nil }
 func (e *Editor) SetPaddingX(value int) error { e.paddingX = max(0, value); return nil }
 func (e *Editor) SetText(text string) error {
 	if e.text != normalizeEditorText(text) {

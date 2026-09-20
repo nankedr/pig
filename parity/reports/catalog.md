@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9684
+- Total entries: 9685
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5156 |
-| scaffolded | 3635 |
-| partial | 600 |
+| scaffolded | 3628 |
+| partial | 608 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -8911,9 +8911,6 @@
 | member:tui/src/autocomplete.ts#AutocompleteProvider.triggerCharacters | scaffolded | M6 | contract | github.com/nankedr/pig/tui.AutocompleteProvider.TriggerCharacters | tui |
 | member:tui/src/autocomplete.ts#AutocompleteSuggestions.items | scaffolded | M6 | contract | github.com/nankedr/pig/tui.AutocompleteSuggestions.Items | tui |
 | member:tui/src/autocomplete.ts#AutocompleteSuggestions.prefix | scaffolded | M6 | contract | github.com/nankedr/pig/tui.AutocompleteSuggestions.Prefix | tui |
-| member:tui/src/autocomplete.ts#CombinedAutocompleteProvider.applyCompletion | scaffolded | M6 | contract | github.com/nankedr/pig/tui.CombinedAutocompleteProvider.ApplyCompletion | tui |
-| member:tui/src/autocomplete.ts#CombinedAutocompleteProvider.getSuggestions | scaffolded | M6 | contract | github.com/nankedr/pig/tui.CombinedAutocompleteProvider.GetSuggestions | tui |
-| member:tui/src/autocomplete.ts#CombinedAutocompleteProvider.shouldTriggerFileCompletion | scaffolded | M6 | contract | github.com/nankedr/pig/tui.CombinedAutocompleteProvider.ShouldTriggerFileCompletion | tui |
 | member:tui/src/autocomplete.ts#SlashCommand.argumentHint | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SlashCommand.ArgumentHint | tui |
 | member:tui/src/autocomplete.ts#SlashCommand.description | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SlashCommand.Description | tui |
 | member:tui/src/autocomplete.ts#SlashCommand.getArgumentCompletions | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SlashCommand.GetArgumentCompletions | tui |
@@ -8945,9 +8942,6 @@
 | member:tui/src/components/editor.ts#Editor.getAutocompleteMaxVisible | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.GetAutocompleteMaxVisible | tui |
 | member:tui/src/components/editor.ts#Editor.getPaddingX | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.GetPaddingX | tui |
 | member:tui/src/components/editor.ts#Editor.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.Invalidate | tui |
-| member:tui/src/components/editor.ts#Editor.isShowingAutocomplete | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.IsShowingAutocomplete | tui |
-| member:tui/src/components/editor.ts#Editor.setAutocompleteMaxVisible | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.SetAutocompleteMaxVisible | tui |
-| member:tui/src/components/editor.ts#Editor.setAutocompleteProvider | scaffolded | M6 | contract | github.com/nankedr/pig/tui.Editor.SetAutocompleteProvider | tui |
 | member:tui/src/components/editor.ts#EditorOptions.autocompleteMaxVisible | scaffolded | M6 | contract | github.com/nankedr/pig/tui.EditorOptions.AutocompleteMaxVisible | tui |
 | member:tui/src/components/editor.ts#EditorOptions.paddingX | scaffolded | M6 | contract | github.com/nankedr/pig/tui.EditorOptions.PaddingX | tui |
 | member:tui/src/components/editor.ts#EditorTheme.borderColor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.EditorTheme.BorderColor | tui |
@@ -9402,7 +9396,6 @@
 | symbol:tui/src/autocomplete.ts#AutocompleteItem | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.AutocompleteItem | tui |
 | symbol:tui/src/autocomplete.ts#AutocompleteProvider | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.AutocompleteProvider | tui |
 | symbol:tui/src/autocomplete.ts#AutocompleteSuggestions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.AutocompleteSuggestions | tui |
-| symbol:tui/src/autocomplete.ts#CombinedAutocompleteProvider | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.CombinedAutocompleteProvider | tui |
 | symbol:tui/src/autocomplete.ts#SlashCommand | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SlashCommand | tui |
 | symbol:tui/src/components/alt-screen-flash.ts#AltScreenFlashContainer | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.AltScreenFlashContainer | tui |
 | symbol:tui/src/components/box.ts#Box | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Box | tui |
@@ -9549,10 +9542,14 @@
 | symbol:tui/src/word-navigation.ts#WordNavigationOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.WordNavigationOptions | tui |
 | symbol:tui/src/word-navigation.ts#findWordBackward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordBackward | tui |
 | symbol:tui/src/word-navigation.ts#findWordForward | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.FindWordForward | tui |
+| contract:tui/autocomplete | partial | M6 | contract | github.com/nankedr/pig/tui.CombinedAutocompleteProvider | tui |
 | contract:tui/dialogs-trust | partial | M6 | contract | github.com/nankedr/pig/tui.ShowSelectDialog | tui |
 | contract:tui/layout-scrolling | partial | M6 | contract | github.com/nankedr/pig/tui.RenderLayoutFrame | tui |
 | contract:tui/multiline-editor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor | tui |
 | contract:tui/terminal-keys | partial | M6 | contract | github.com/nankedr/pig/tui.KeybindingsManager | tui |
+| member:tui/src/autocomplete.ts#CombinedAutocompleteProvider.applyCompletion | partial | M6 | contract | github.com/nankedr/pig/tui.CombinedAutocompleteProvider.ApplyCompletion | tui |
+| member:tui/src/autocomplete.ts#CombinedAutocompleteProvider.getSuggestions | partial | M6 | contract | github.com/nankedr/pig/tui.CombinedAutocompleteProvider.GetSuggestions | tui |
+| member:tui/src/autocomplete.ts#CombinedAutocompleteProvider.shouldTriggerFileCompletion | partial | M6 | contract | github.com/nankedr/pig/tui.CombinedAutocompleteProvider.ShouldTriggerFileCompletion | tui |
 | member:tui/src/components/editor.ts#Editor.addToHistory | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.AddToHistory | tui |
 | member:tui/src/components/editor.ts#Editor.borderColor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.BorderColor | tui |
 | member:tui/src/components/editor.ts#Editor.disableSubmit | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.DisableSubmit | tui |
@@ -9563,9 +9560,12 @@
 | member:tui/src/components/editor.ts#Editor.getText | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.GetText | tui |
 | member:tui/src/components/editor.ts#Editor.handleInput | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.HandleInput | tui |
 | member:tui/src/components/editor.ts#Editor.insertTextAtCursor | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.InsertTextAtCursor | tui |
+| member:tui/src/components/editor.ts#Editor.isShowingAutocomplete | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.IsShowingAutocomplete | tui |
 | member:tui/src/components/editor.ts#Editor.onChange | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.OnChange | tui |
 | member:tui/src/components/editor.ts#Editor.onSubmit | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.OnSubmit | tui |
 | member:tui/src/components/editor.ts#Editor.render | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.Render | tui |
+| member:tui/src/components/editor.ts#Editor.setAutocompleteMaxVisible | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetAutocompleteMaxVisible | tui |
+| member:tui/src/components/editor.ts#Editor.setAutocompleteProvider | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetAutocompleteProvider | tui |
 | member:tui/src/components/editor.ts#Editor.setPaddingX | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetPaddingX | tui |
 | member:tui/src/components/editor.ts#Editor.setText | partial | M6 | contract | github.com/nankedr/pig/tui.Editor.SetText | tui |
 | member:tui/src/components/h-stack.ts#HStack.addChild | partial | M6 | contract | github.com/nankedr/pig/tui.HStack.AddChild | tui |
@@ -9697,6 +9697,7 @@
 | member:tui/src/tui.ts#TuiBase.start | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.Start | tui |
 | member:tui/src/tui.ts#TuiBase.stop | partial | M6 | contract | github.com/nankedr/pig/tui.TUIBase.Stop | tui |
 | module-tui | partial | M6 | package | github.com/nankedr/pig/tui | tui |
+| symbol:tui/src/autocomplete.ts#CombinedAutocompleteProvider | partial | M6 | symbol | github.com/nankedr/pig/tui.CombinedAutocompleteProvider | tui |
 | symbol:tui/src/components/editor.ts#Editor | partial | M6 | symbol | github.com/nankedr/pig/tui.Editor | tui |
 | symbol:tui/src/components/editor.ts#wordWrapLine | partial | M6 | symbol | github.com/nankedr/pig/tui.WordWrapLine | tui |
 | symbol:tui/src/components/h-stack.ts#HStack | partial | M6 | symbol | github.com/nankedr/pig/tui.HStack | tui |

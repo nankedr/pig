@@ -33,10 +33,10 @@ type CombinedAutocompleteProvider struct {
 	basePath string
 	fdPath   *string
 }
-func (*CombinedAutocompleteProvider) ApplyCompletion([]string, int, int, AutocompleteItem, string) (AutocompleteResult, error)
-func (*CombinedAutocompleteProvider) GetSuggestions(context.Context, []string, int, int, AutocompleteOptions) (AutocompleteSuggestions, bool, error)
-func (*CombinedAutocompleteProvider) ShouldTriggerFileCompletion([]string, int, int) (bool, error)
+func (*CombinedAutocompleteProvider) ShouldTriggerFileCompletion(lines []string, line, col int) (bool, error)
 func (*CombinedAutocompleteProvider) TriggerCharacters() []string
+func (p *CombinedAutocompleteProvider) ApplyCompletion(lines []string, line, col int, item AutocompleteItem, prefix string) (AutocompleteResult, error)
+func (p *CombinedAutocompleteProvider) GetSuggestions(ctx context.Context, lines []string, line, col int, options AutocompleteOptions) (AutocompleteSuggestions, bool, error)
 
 ## symbol:tui/src/autocomplete.ts#SlashCommand
 reference: packages/tui/src/autocomplete.ts#SlashCommand
@@ -129,11 +129,9 @@ type Editor struct {
 	jump                   int
 	paddingX               int
 	autocompleteMaxVisible int
+	completion             editorAutocomplete
 }
 func (*Editor) Invalidate() error
-func (*Editor) IsShowingAutocomplete() bool
-func (*Editor) SetAutocompleteMaxVisible(int) error
-func (*Editor) SetAutocompleteProvider(AutocompleteProvider) error
 func (e *Editor) AddToHistory(text string) error
 func (e *Editor) GetAutocompleteMaxVisible() int
 func (e *Editor) GetCursor() EditorCursor
@@ -143,7 +141,10 @@ func (e *Editor) GetPaddingX() int
 func (e *Editor) GetText() string
 func (e *Editor) HandleInput(data string) error
 func (e *Editor) InsertTextAtCursor(text string) error
+func (e *Editor) IsShowingAutocomplete() bool
 func (e *Editor) Render(width int) ([]string, error)
+func (e *Editor) SetAutocompleteMaxVisible(value int) error
+func (e *Editor) SetAutocompleteProvider(provider AutocompleteProvider) error
 func (e *Editor) SetBorderColor(style TextStyleFunc)
 func (e *Editor) SetFocusState(focused bool)
 func (e *Editor) SetOnChange(callback func(string))

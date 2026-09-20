@@ -122,3 +122,5 @@ M5.5 支持本地 Theme、SDK 样式与安全 HTML 导出，见[学习材料](le
 M5.6 支持本地资源优先级、筛选去重与双方来源诊断，见[学习材料](learning/m5-local-resources.md)、[TypeScript → Go](mappings/typescript-to-go/m5-local-resources.md)及[离线示例](../examples/local-resources/main.go)。
 
 M5.7 支持通过公开 SDK 重载本地资源并继续当前会话，见[学习材料](learning/m5-session-reload.md)与 [TypeScript → Go](mappings/typescript-to-go/m5-session-reload.md)。
+
+- [M6.7 命令、本地资源与文件补全](learning/m6-autocomplete.md)

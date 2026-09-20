@@ -60,9 +60,13 @@ Mode func(*tui.TextUI) tui.TUIMode
 ReadInput func(*tui.TextUI, context.Context) (tui.TextInput, error)
 ReadLine func(*tui.TextUI, context.Context) (string, error)
 Refresh func(*tui.TextUI) error
+RequestRender func(*tui.TextUI, ...bool) error
 ScrollToBottom func(*tui.TextUI) error
 ScrollToTop func(*tui.TextUI) error
+SetAutocompleteMaxVisible func(*tui.TextUI, int) error
+SetAutocompleteProvider func(*tui.TextUI, tui.AutocompleteProvider) error
 SetMode func(*tui.TextUI, tui.TUIMode) error
 Start func(*tui.TextUI) error
 Stop func(*tui.TextUI) error
 Suspend func(*tui.TextUI) error
+Terminal func(*tui.TextUI) tui.Terminal

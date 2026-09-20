@@ -102,6 +102,9 @@ func (e *Editor) visibleRows() int {
 	return max(5, rows*3/10)
 }
 func (e *Editor) Render(width int) ([]string, error) {
+	if err := e.pollAutocomplete(); err != nil {
+		return nil, err
+	}
 	width = max(1, width)
 	padding := min(max(0, e.paddingX), max(0, (width-1)/2))
 	contentWidth := width - 2*padding
@@ -159,7 +162,17 @@ func (e *Editor) Render(width int) ([]string, error) {
 		}
 		result = append(result, strings.Repeat(" ", padding)+text+strings.Repeat(" ", max(0, contentWidth-used))+strings.Repeat(" ", max(0, padding-max(0, used-contentWidth))))
 	}
-	return append(result, border("↓", max(0, len(rows)-e.scroll-visible))), nil
+	result = append(result, border("↓", max(0, len(rows)-e.scroll-visible)))
+	if e.completion.list != nil {
+		lines, err := e.completion.list.Render(contentWidth)
+		if err != nil {
+			return nil, err
+		}
+		for _, line := range lines {
+			result = append(result, strings.Repeat(" ", padding)+line)
+		}
+	}
+	return result, nil
 }
 func (e *Editor) vertical(direction int) {
 	rows, current := e.layout(e.width)

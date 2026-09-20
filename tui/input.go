@@ -61,8 +61,7 @@ type AutocompleteProvider interface {
 }
 
 // CombinedAutocompleteProvider records the slash-command and file-completion
-// configuration. It does not inspect the filesystem or start a process until
-// the interactive TUI capability is implemented.
+// configuration. Construction does not inspect the filesystem or start a process.
 type CombinedAutocompleteProvider struct {
 	commands []AutocompleteEntry
 	basePath string
@@ -79,18 +78,6 @@ func NewCombinedAutocompleteProvider(commands []AutocompleteEntry, basePath stri
 }
 
 func (*CombinedAutocompleteProvider) TriggerCharacters() []string { return nil }
-
-func (*CombinedAutocompleteProvider) GetSuggestions(context.Context, []string, int, int, AutocompleteOptions) (AutocompleteSuggestions, bool, error) {
-	return AutocompleteSuggestions{}, false, newNotImplemented("CombinedAutocompleteProvider.getSuggestions")
-}
-
-func (*CombinedAutocompleteProvider) ApplyCompletion([]string, int, int, AutocompleteItem, string) (AutocompleteResult, error) {
-	return AutocompleteResult{}, newNotImplemented("CombinedAutocompleteProvider.applyCompletion")
-}
-
-func (*CombinedAutocompleteProvider) ShouldTriggerFileCompletion([]string, int, int) (bool, error) {
-	return false, newNotImplemented("CombinedAutocompleteProvider.shouldTriggerFileCompletion")
-}
 
 // KeyID is a terminal key name, optionally prefixed by one or more modifiers
 // such as "ctrl+" or "alt+". Validation belongs to the key parser.
