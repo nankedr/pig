@@ -127,14 +127,6 @@ func ExtractSegments(string, int, int, int, ...bool) (ExtractedSegments, error) 
 	return ExtractedSegments{}, newNotImplemented("extractSegments")
 }
 
-func FuzzyMatch(string, string) (FuzzyMatchResult, error) {
-	return FuzzyMatchResult{}, newNotImplemented("fuzzyMatch")
-}
-
-func FuzzyFilter[T any]([]T, string, func(T) string) ([]T, error) {
-	return nil, newNotImplemented("fuzzyFilter")
-}
-
 func RenderLaTeX(string, ...RenderLaTeXOptions) (string, bool, error) {
 	return "", false, newNotImplemented("renderLatex")
 }

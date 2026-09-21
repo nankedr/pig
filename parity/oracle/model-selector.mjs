@@ -1,0 +1,27 @@
+import {execFileSync} from 'node:child_process';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {caseDigest,observationDigest} from './fixture-hash.mjs';
+const pi=resolve(process.argv[2]),lock=JSON.parse(readFileSync('parity/baseline/upstream.lock.json'));
+if(execFileSync('git',['-C',pi,'rev-parse','HEAD'],{encoding:'utf8'}).trim()!==lock.upstream.commit)throw Error('baseline mismatch');
+if(execFileSync('git',['-C',pi,'status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim())throw Error('dirty baseline');
+const {ModelSelectorComponent}=await import(pathToFileURL(`${pi}/packages/coding-agent/dist/modes/interactive/components/model-selector.js`));
+const {initTheme}=await import(pathToFileURL(`${pi}/packages/coding-agent/dist/modes/interactive/theme/theme.js`));
+initTheme("dark",false);
+const models=[{provider:'openrouter',id:'openai/gpt-5',name:'Proxy Five'},{provider:'openai',id:'gpt-5',name:'Native Five'},{provider:'deepseek',id:'deepseek-v4-flash',name:'Flash'},{provider:'deepseek',id:'deepseek-v4-pro',name:'Pro'}];
+const cases=[{id:'current',keys:['\r']},{id:'rank',keys:['openai/gpt-5','\r']},{id:'name',keys:['Native Five','\r']},{id:'reset',keys:['\x1b[B','\x1b[B','flash','\r']},{id:'wrap',keys:['\x1b[A','\r']},{id:'cancel',keys:['flash','\x1b']},{id:'none',keys:['missing','\r','\x1b']},{id:'scoped',scope:[3,2],keys:['\r']},{id:'all',scope:[3],keys:['\t','openai/gpt-5','\r']},{id:'empty',empty:true,keys:['\r','\x1b']}];
+cases.push({id:'scope-current',scope:[3,1],keys:['\t','\t','\r']});
+const outcome=[];
+for(const c of cases){let selected='',cancelled=false;const available=c.empty?[]:models;
+const runtime={getAvailableSnapshot:()=>available,getModel:(p,id)=>models.find(m=>m.provider===p&&m.id===id),refresh:async()=>({errors:new Map()}),getError:()=>undefined};
+const selector=new ModelSelectorComponent({requestRender(){}},models[1],{setDefaultModelAndProvider(){}},runtime,(c.scope??[]).map(i=>({model:models[i]})),m=>selected=m.provider+'/'+m.id,()=>cancelled=true);
+await new Promise(r=>setTimeout(r,0));
+for(const key of c.keys)selector.handleInput(key);
+selector.dispose();outcome.push({id:c.id,selected,cancelled});}
+const c={schema_version:'1.0.0',id:'sdk/interactive/model-selector',catalog_id:'contract:codingagent/model-selection',surface:'go-sdk',input:{models,cases},observe:['outcome','side_effects']};
+const observation={outcome,side_effects:[]};
+const fixture={schema_version:'1.0.0',deterministic:true,baseline_id:lock.baseline_id,baseline_commit:lock.upstream.commit,upstream:{repository:lock.upstream.repository,commit:lock.upstream.commit,reference:'packages/coding-agent/src/modes/interactive/components/model-selector.ts'},case:c,observation,input_hash:caseDigest(c),observation_hash:observationDigest(observation),execution_method:'node parity/oracle/model-selector.mjs <locked-pi-checkout>',platform:'any',environment:{catalog:'fixed snapshot; refresh networking excluded'}};
+const path='parity/oracle/fixtures/model-selector.json';
+if(process.argv.includes('--check')){if(JSON.stringify(fixture)!==JSON.stringify(JSON.parse(readFileSync(path))))throw Error('fixture drift');}else writeFileSync(path,JSON.stringify(fixture,null,2)+'\n');
+console.log(outcome);

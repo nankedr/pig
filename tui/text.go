@@ -16,6 +16,7 @@ type TextUI struct {
 	mu                     sync.Mutex
 	transcript             string
 	editor                 *Editor
+	dialog                 Component
 	inputs                 []TextInput
 	turn                   uint64
 	ready                  chan struct{}
@@ -99,6 +100,15 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 		}
 	}
 	return u
+}
+
+// SetDialog replaces the editor until cleared; component callbacks must not call TextUI methods.
+func (u *TextUI) SetDialog(dialog Component) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.editor.cancelAutocomplete()
+	u.dialog = dialog
+	return u.render()
 }
 func (u *TextUI) Terminal() Terminal { return u.terminal }
 func (u *TextUI) RequestRender(...bool) error {
@@ -343,6 +353,15 @@ func (u *TextUI) render() error {
 		}
 		editorLines[i] = prefix[:prefixWidth] + line
 	}
+	if u.dialog != nil {
+		editorLines, err = u.dialog.Render(columns)
+		if err != nil {
+			return err
+		}
+		if len(editorLines) > rows {
+			editorLines = editorLines[:rows]
+		}
+	}
 	visible := lines
 	if u.mode == TUIModeFullscreen {
 		available := max(0, rows-len(editorLines))
@@ -387,6 +406,15 @@ func (u *TextUI) input(data string) {
 		return
 	}
 	if release, _ := IsKeyRelease(data); release {
+		return
+	}
+	if u.dialog != nil {
+		if handler, ok := u.dialog.(interface{ HandleInput(string) error }); ok {
+			if err := handler.HandleInput(data); err != nil {
+				u.transcript += "\nError: " + SafeTerminalText(err.Error()) + "\n"
+			}
+		}
+		_ = u.render()
 		return
 	}
 	active, _ := u.terminal.KittyProtocolActive()
@@ -438,6 +466,13 @@ func (u *TextUI) input(data string) {
 			_ = u.editor.AddToHistory(text)
 			_ = u.editor.SetText("")
 			u.enqueueAction("app.message.followUp", text)
+		}
+	case match("app.model.select"), match("app.model.cycleForward"), match("app.model.cycleBackward"), match("app.thinking.cycle"):
+		for _, action := range []Keybinding{"app.model.select", "app.model.cycleForward", "app.model.cycleBackward", "app.thinking.cycle"} {
+			if match(action) {
+				u.enqueueAction(action, "")
+				break
+			}
 		}
 	case match("app.message.dequeue"):
 		u.enqueueAction("app.message.dequeue", "")

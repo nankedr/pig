@@ -1,0 +1,26 @@
+import {execFileSync} from 'node:child_process';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {caseDigest,observationDigest} from './fixture-hash.mjs';
+const pi=resolve(process.argv[2]),lock=JSON.parse(readFileSync('parity/baseline/upstream.lock.json'));
+if(execFileSync('git',['-C',pi,'rev-parse','HEAD'],{encoding:'utf8'}).trim()!==lock.upstream.commit)throw Error('baseline mismatch');
+if(execFileSync('git',['-C',pi,'status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim())throw Error('dirty baseline');
+const {ScopedModelsSelectorComponent}=await import(pathToFileURL(`${pi}/packages/coding-agent/dist/modes/interactive/components/scoped-models-selector.js`));
+const {KeybindingsManager}=await import(pathToFileURL(`${pi}/packages/coding-agent/dist/core/keybindings.js`));
+const {setKeybindings}=await import(pathToFileURL(`${pi}/packages/tui/dist/index.js`));
+setKeybindings(new KeybindingsManager({}));
+const {initTheme}=await import(pathToFileURL(`${pi}/packages/coding-agent/dist/modes/interactive/theme/theme.js`));initTheme('dark',false);
+const models=[{provider:'deepseek',id:'flash',name:'Flash'},{provider:'deepseek',id:'pro',name:'Pro'},{provider:'openai',id:'gpt-5',name:'Five'}];
+const cases=[{id:'toggle',enabled:null,keys:['\r','\x13','\x1b']},{id:'ordered',enabled:[],keys:['\r','\x1b[B','\r','\x1b[1;3A','\x13','\x1b']},{id:'filtered',enabled:null,keys:['deepseek','\x18','\x01','\x13']},{id:'provider',enabled:null,keys:['\x10','\x10','\x13']},{id:'unavailable',enabled:['gone/model','deepseek/pro'],keys:['\x1b[B','\r','\x13']},{id:'empty',enabled:[],keys:['missing','\r','\x13','\x03','\x03']}];
+const outcome=[];
+for(const c of cases){const changes=[],saved=[];let cancelled=false;
+const selector=new ScopedModelsSelectorComponent({allModels:models,enabledModelIds:c.enabled},{onChange:ids=>changes.push(ids),onPersist:ids=>saved.push(ids),onCancel:()=>cancelled=true});
+for(const key of c.keys)selector.handleInput(key);
+outcome.push({id:c.id,changes,saved,cancelled});}
+const c={schema_version:'1.0.0',id:'sdk/interactive/model-scope',catalog_id:'contract:codingagent/model-selection',surface:'go-sdk',input:{models,cases},observe:['outcome','side_effects']};
+const observation={outcome,side_effects:[]};
+const fixture={schema_version:'1.0.0',deterministic:true,baseline_id:lock.baseline_id,baseline_commit:lock.upstream.commit,upstream:{repository:lock.upstream.repository,commit:lock.upstream.commit,reference:'packages/coding-agent/src/modes/interactive/components/scoped-models-selector.ts'},case:c,observation,input_hash:caseDigest(c),observation_hash:observationDigest(observation),execution_method:'node parity/oracle/model-scope.mjs <locked-pi-checkout>',platform:'any',environment:{catalog:'fixed snapshot; refresh networking excluded'}};
+const path='parity/oracle/fixtures/model-scope.json';
+if(process.argv.includes('--check')){if(JSON.stringify(fixture)!==JSON.stringify(JSON.parse(readFileSync(path))))throw Error('fixture drift');}else writeFileSync(path,JSON.stringify(fixture,null,2)+'\n');
+console.log(outcome);

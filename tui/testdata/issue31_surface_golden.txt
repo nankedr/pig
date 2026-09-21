@@ -230,11 +230,12 @@ type Input struct {
 	OnSubmit func(string)
 	OnEscape func()
 	value    string
+	editor   *Editor
 }
-func (*Input) HandleInput(string) error
 func (*Input) Invalidate() error
-func (*Input) Render(int) ([]string, error)
 func (i *Input) GetValue() string
+func (i *Input) HandleInput(data string) error
+func (i *Input) Render(width int) ([]string, error)
 func (i *Input) SetFocusState(focused bool)
 func (i *Input) SetValue(value string)
 
@@ -616,12 +617,12 @@ type FuzzyMatchResult struct {
 ## symbol:tui/src/fuzzy.ts#fuzzyFilter
 reference: packages/tui/src/fuzzy.ts#fuzzyFilter
 target: github.com/nankedr/pig/tui.FuzzyFilter
-func FuzzyFilter[T any]([]T, string, func(T) string) ([]T, error)
+func FuzzyFilter[T any](items []T, query string, getText func(T) string) ([]T, error)
 
 ## symbol:tui/src/fuzzy.ts#fuzzyMatch
 reference: packages/tui/src/fuzzy.ts#fuzzyMatch
 target: github.com/nankedr/pig/tui.FuzzyMatch
-func FuzzyMatch(string, string) (FuzzyMatchResult, error)
+func FuzzyMatch(query, text string) (FuzzyMatchResult, error)
 
 ## symbol:tui/src/keybindings.ts#Keybinding
 reference: packages/tui/src/keybindings.ts#Keybinding

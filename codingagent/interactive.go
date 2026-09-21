@@ -162,6 +162,12 @@ func (m *InteractiveMode) GetUserInput(ctx context.Context) (string, error) {
 		if err != nil {
 			return "", err
 		}
+		if handled, actionErr := m.modelAction(ctx, input.Action); handled {
+			if actionErr != nil {
+				_ = m.ShowError(actionErr.Error())
+			}
+			continue
+		}
 		switch input.Action {
 		case "app.session.new":
 			_, err = m.runtime.NewSession(ctx)
@@ -371,6 +377,12 @@ loop:
 			break
 		}
 		session := m.runtime.Session()
+		if handled, actionErr := m.modelAction(runCtx, input.Action); handled {
+			if actionErr != nil {
+				_ = m.ShowError(actionErr.Error())
+			}
+			continue
+		}
 		switch input.Action {
 		case "app.suspend":
 			if err = m.ui.Suspend(); err != nil {

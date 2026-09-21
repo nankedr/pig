@@ -11,3 +11,5 @@ AgentSession 的配置方法与 Prompt 入口共享锁。整个 Prompt（含工�
 模型切换验证已知模型身份和结构、实时认证，以及运行时路径已有的 DeepSeek/OpenAI Chat Completions 适配器边界。注入 stream 的 SDK 可用于能力模型实验和确定性 Oracle，不新增任何真实适配器。合法模型描述可携带调用者的 endpoint、headers 和 thinking 能力覆盖，保持既有 SDK 模型参数语义；未知身份或非法 thinking 不接受。
 
 Session 配置先准备完整 v3 文件，再写 settings，最后替换 Session 文件并发布内存状态。普通写入错误会返回错误；Session 替换失败会回滚本次触及的 settings 字段。此处比普通 SettingsManager 的记录错误模式更严格，以实现 Issue 要求的失败不半切换。两个文件不是跨进程或断电事务；进程在两次文件写入之间崩溃，以及底层存储在报错前部分写入，仍受文件系统/SettingsStorage 的既有可靠性限制。回滚失败会与原始错误一起返回，不报告成功。
+
+Issue #117 的交互选择器复用上述事务：模型选择组件只回传模型，不预写 settings；busy、认证或持久化失败时保留旧配置。模型范围采用基线的 Session 即时生效、Ctrl+S 显式保存语义，Esc 关闭不回滚已经成功的范围修改。SetEnabledModels 的保存使用 SettingsStorage 锁，成功后才发布 settings 与 Session 范围；不可用 ID 保存在偏好中，范围不写 v3 Session。选择器只消费本地快照，M10 动态目录与 M11 完整认证继续保持既定边界。

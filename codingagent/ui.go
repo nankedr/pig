@@ -202,21 +202,6 @@ func (*LoginDialogComponent) Signal() (context.Context, error) {
 	return nil, notImplemented("LoginDialogComponent.Signal")
 }
 
-type ModelSelectorComponent struct {
-	tui.Container
-	Focused bool
-}
-
-func (*ModelSelectorComponent) Dispose() error {
-	return notImplemented("ModelSelectorComponent.Dispose")
-}
-func (*ModelSelectorComponent) GetSearchInput() (*tui.Input, error) {
-	return nil, notImplemented("ModelSelectorComponent.GetSearchInput")
-}
-func (*ModelSelectorComponent) HandleInput(string) error {
-	return notImplemented("ModelSelectorComponent.HandleInput")
-}
-
 type OAuthSelectorComponent struct {
 	tui.Container
 	Focused bool
@@ -349,12 +334,6 @@ type ThemeSelectorComponent struct{ tui.Container }
 
 func (*ThemeSelectorComponent) GetSelectList() (*tui.SelectList, error) {
 	return nil, notImplemented("ThemeSelectorComponent.GetSelectList")
-}
-
-type ThinkingSelectorComponent struct{ tui.Container }
-
-func (*ThinkingSelectorComponent) GetSelectList() (*tui.SelectList, error) {
-	return nil, notImplemented("ThinkingSelectorComponent.GetSelectList")
 }
 
 type ToolExecutionOptions struct {

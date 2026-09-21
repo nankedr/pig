@@ -210,22 +210,21 @@ func (i *Image) GetImageID() *uint32        { return i.imageID }
 func (*Image) Invalidate() error            { return nil }
 func (*Image) Render(int) ([]string, error) { return nil, newNotImplemented("Image.render") }
 
-// Input is the single-line input component. Value access is state-only; input
-// processing and rendering are deferred.
+// Input is a single-line search editor.
 type Input struct {
 	Focused  bool
 	OnSubmit func(string)
 	OnEscape func()
 	value    string
+	editor   *Editor
 }
 
 func NewInput() *Input                      { return &Input{} }
 func (i *Input) GetValue() string           { return i.value }
 func (i *Input) SetValue(value string)      { i.value = value }
 func (i *Input) SetFocusState(focused bool) { i.Focused = focused }
-func (*Input) HandleInput(string) error     { return newNotImplemented("Input.handleInput") }
-func (*Input) Invalidate() error            { return nil }
-func (*Input) Render(int) ([]string, error) { return nil, newNotImplemented("Input.render") }
+
+func (*Input) Invalidate() error { return nil }
 
 // DefaultTextStyle is the base style applied to unannotated Markdown text.
 type DefaultTextStyle struct {

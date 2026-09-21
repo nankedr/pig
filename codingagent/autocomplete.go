@@ -77,7 +77,7 @@ func autocompleteDescription(description string, source SourceInfo) string {
 	return strings.TrimSpace("[" + tag + "] " + description)
 }
 func (m *InteractiveMode) handleCommand(ctx context.Context, prompt string) (bool, error) {
-	name, _, _ := strings.Cut(strings.TrimSpace(prompt), " ")
+	name, argument, _ := strings.Cut(strings.TrimSpace(prompt), " ")
 	if !strings.HasPrefix(name, "/") {
 		return false, nil
 	}
@@ -85,6 +85,14 @@ func (m *InteractiveMode) handleCommand(ctx context.Context, prompt string) (boo
 	for _, command := range interactiveCommands {
 		if command.name != name {
 			continue
+		}
+		switch name {
+		case "model":
+			return true, m.selectModel(ctx, strings.TrimSpace(argument))
+		case "scoped-models":
+			return true, m.selectModelScope(ctx)
+		case "settings":
+			return true, m.selectThinking(ctx)
 		}
 		if name == "new" {
 			_, err := m.runtime.NewSession(ctx)

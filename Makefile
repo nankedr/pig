@@ -12,6 +12,7 @@ m0-offline:
 	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./... -count=1
 	go vet ./...
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build ./...
+	go run ./examples/model-selection
 	go run ./examples/autocomplete
 	go run ./examples/text-rendering
 	go run ./examples/terminal-keys
@@ -74,6 +75,9 @@ m0-oracle: m0-node-preflight
 	@test -f "$(PIG_PI_ORACLE_CHECKOUT)/node_modules/partial-json/package.json" || (echo "Pi Oracle dependencies are incomplete" >&2; exit 2)
 	@test -f "$(PIG_PI_ORACLE_CHECKOUT)/node_modules/chalk/package.json" || (echo "Pi Oracle dependencies are incomplete" >&2; exit 2)
 	@test -f "$(PIG_PI_ORACLE_CHECKOUT)/packages/coding-agent/dist/cli.js" || (echo "Pi Oracle dist is absent; run npm run build:offline --prefix $(PIG_PI_ORACLE_CHECKOUT)" >&2; exit 2)
+	node parity/oracle/model-selector.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/model-scope.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/model-selection-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/autocomplete.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/autocomplete-editor.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/autocomplete-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

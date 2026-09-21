@@ -69,11 +69,6 @@ func TestImageAndTextHelpersAreExplicitCapabilityStubs(t *testing.T) {
 		{name: "sliceByColumn", call: func() error { _, err := tui.SliceByColumn("text", 0, 2); return err }},
 		{name: "sliceWithWidth", call: func() error { _, err := tui.SliceWithWidth("text", 0, 2); return err }},
 		{name: "extractSegments", call: func() error { _, err := tui.ExtractSegments("text", 1, 2, 2); return err }},
-		{name: "fuzzyMatch", call: func() error { _, err := tui.FuzzyMatch("tx", "text"); return err }},
-		{name: "fuzzyFilter", call: func() error {
-			_, err := tui.FuzzyFilter([]string{"text"}, "tx", func(value string) string { textCalls++; return value })
-			return err
-		}},
 		{name: "renderLatex", call: func() error { _, _, err := tui.RenderLaTeX(`\alpha`); return err }},
 	}
 

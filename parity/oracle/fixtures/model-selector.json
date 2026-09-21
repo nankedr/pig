@@ -1,0 +1,206 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/components/model-selector.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/interactive/model-selector",
+    "catalog_id": "contract:codingagent/model-selection",
+    "surface": "go-sdk",
+    "input": {
+      "models": [
+        {
+          "provider": "openrouter",
+          "id": "openai/gpt-5",
+          "name": "Proxy Five"
+        },
+        {
+          "provider": "openai",
+          "id": "gpt-5",
+          "name": "Native Five"
+        },
+        {
+          "provider": "deepseek",
+          "id": "deepseek-v4-flash",
+          "name": "Flash"
+        },
+        {
+          "provider": "deepseek",
+          "id": "deepseek-v4-pro",
+          "name": "Pro"
+        }
+      ],
+      "cases": [
+        {
+          "id": "current",
+          "keys": [
+            "\r"
+          ]
+        },
+        {
+          "id": "rank",
+          "keys": [
+            "openai/gpt-5",
+            "\r"
+          ]
+        },
+        {
+          "id": "name",
+          "keys": [
+            "Native Five",
+            "\r"
+          ]
+        },
+        {
+          "id": "reset",
+          "keys": [
+            "\u001b[B",
+            "\u001b[B",
+            "flash",
+            "\r"
+          ]
+        },
+        {
+          "id": "wrap",
+          "keys": [
+            "\u001b[A",
+            "\r"
+          ]
+        },
+        {
+          "id": "cancel",
+          "keys": [
+            "flash",
+            "\u001b"
+          ]
+        },
+        {
+          "id": "none",
+          "keys": [
+            "missing",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "id": "scoped",
+          "scope": [
+            3,
+            2
+          ],
+          "keys": [
+            "\r"
+          ]
+        },
+        {
+          "id": "all",
+          "scope": [
+            3
+          ],
+          "keys": [
+            "\t",
+            "openai/gpt-5",
+            "\r"
+          ]
+        },
+        {
+          "id": "empty",
+          "empty": true,
+          "keys": [
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "id": "scope-current",
+          "scope": [
+            3,
+            1
+          ],
+          "keys": [
+            "\t",
+            "\t",
+            "\r"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "current",
+        "selected": "openai/gpt-5",
+        "cancelled": false
+      },
+      {
+        "id": "rank",
+        "selected": "openai/gpt-5",
+        "cancelled": false
+      },
+      {
+        "id": "name",
+        "selected": "openai/gpt-5",
+        "cancelled": false
+      },
+      {
+        "id": "reset",
+        "selected": "deepseek/deepseek-v4-flash",
+        "cancelled": false
+      },
+      {
+        "id": "wrap",
+        "selected": "openrouter/openai/gpt-5",
+        "cancelled": false
+      },
+      {
+        "id": "cancel",
+        "selected": "",
+        "cancelled": true
+      },
+      {
+        "id": "none",
+        "selected": "",
+        "cancelled": true
+      },
+      {
+        "id": "scoped",
+        "selected": "deepseek/deepseek-v4-pro",
+        "cancelled": false
+      },
+      {
+        "id": "all",
+        "selected": "openai/gpt-5",
+        "cancelled": false
+      },
+      {
+        "id": "empty",
+        "selected": "",
+        "cancelled": true
+      },
+      {
+        "id": "scope-current",
+        "selected": "openai/gpt-5",
+        "cancelled": false
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:f41316f7f40f3dc86fa80583cd0309707d0b06b4309b4cf6cb74bdabb3ae4cbd",
+  "observation_hash": "sha256:92b94bae5179ee6f9d390c29bfcb182cddae9f762a556d8cce029ba2278cd19a",
+  "execution_method": "node parity/oracle/model-selector.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "catalog": "fixed snapshot; refresh networking excluded"
+  }
+}

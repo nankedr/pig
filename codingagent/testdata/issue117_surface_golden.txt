@@ -1,0 +1,39 @@
+func([]ai.Model, *ai.Model, []codingagent.ScopedModel, func(ai.Model), func(), ...string) *codingagent.ModelSelectorComponent
+func(ai.ModelThinkingLevel, []ai.ModelThinkingLevel, func(ai.ModelThinkingLevel), func()) *codingagent.ThinkingSelectorComponent
+func(codingagent.ModelsConfig, codingagent.ModelsCallbacks) *codingagent.ScopedModelsSelectorComponent
+AddChild func(*codingagent.ModelSelectorComponent, tui.Component)
+Children func(*codingagent.ModelSelectorComponent) []tui.Component
+Clear func(*codingagent.ModelSelectorComponent)
+Dispose func(*codingagent.ModelSelectorComponent) error
+GetSearchInput func(*codingagent.ModelSelectorComponent) (*tui.Input, error)
+HandleInput func(*codingagent.ModelSelectorComponent, string) error
+Invalidate func(*codingagent.ModelSelectorComponent) error
+RemoveChild func(*codingagent.ModelSelectorComponent, tui.Component)
+Render func(*codingagent.ModelSelectorComponent, int) ([]string, error)
+AddChild func(*codingagent.ThinkingSelectorComponent, tui.Component)
+Children func(*codingagent.ThinkingSelectorComponent) []tui.Component
+Clear func(*codingagent.ThinkingSelectorComponent)
+GetSelectList func(*codingagent.ThinkingSelectorComponent) (*tui.SelectList, error)
+HandleInput func(*codingagent.ThinkingSelectorComponent, string) error
+Invalidate func(*codingagent.ThinkingSelectorComponent) error
+RemoveChild func(*codingagent.ThinkingSelectorComponent, tui.Component)
+Render func(*codingagent.ThinkingSelectorComponent, int) ([]string, error)
+AddChild func(*codingagent.ScopedModelsSelectorComponent, tui.Component)
+Children func(*codingagent.ScopedModelsSelectorComponent) []tui.Component
+Clear func(*codingagent.ScopedModelsSelectorComponent)
+GetSearchInput func(*codingagent.ScopedModelsSelectorComponent) (*tui.Input, error)
+HandleInput func(*codingagent.ScopedModelsSelectorComponent, string) error
+Invalidate func(*codingagent.ScopedModelsSelectorComponent) error
+RemoveChild func(*codingagent.ScopedModelsSelectorComponent, tui.Component)
+Render func(*codingagent.ScopedModelsSelectorComponent, int) ([]string, error)
+type codingagent.ModelsConfig struct
+fields:
+- AllModels []ai.Model tag=""
+- EnabledModelIDs []string tag=""
+type codingagent.ModelsCallbacks struct
+fields:
+- OnChange func([]string) error tag=""
+- OnPersist func([]string) error tag=""
+- OnCancel func() tag=""
+func(*codingagent.AgentSession, []string, bool) error
+func(*tui.TextUI, tui.Component) error

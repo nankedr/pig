@@ -38,9 +38,11 @@ func TestComponentInteractiveStubsAreExplicitAndInert(t *testing.T) {
 	inputCalls := 0
 	input.OnSubmit = func(string) { inputCalls++ }
 	input.OnEscape = func() { inputCalls++ }
-	assertTUIStub(t, input.HandleInput("\n"), "Input.handleInput")
-	if inputCalls != 0 {
-		t.Fatalf("Input.HandleInput invoked %d callbacks, want 0", inputCalls)
+	if err := input.HandleInput("\r"); err != nil {
+		t.Fatal(err)
+	}
+	if inputCalls != 1 {
+		t.Fatalf("Input.HandleInput invoked %d callbacks, want 1", inputCalls)
 	}
 }
 
