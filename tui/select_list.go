@@ -27,7 +27,10 @@ func (s *SelectList) SetSelectedIndex(index int) error {
 	return nil
 }
 func (s *SelectList) HandleInput(data string) error {
-	kb, _ := GetKeybindings()
+	kb := s.keybindings
+	if kb == nil {
+		kb, _ = GetKeybindings()
+	}
 	matches := func(action Keybinding) bool { v, _ := kb.Matches(data, action); return v }
 	switch {
 	case matches("tui.select.up"), matches("tui.select.down"):
@@ -132,3 +135,5 @@ func (s *SelectList) Render(width int) ([]string, error) {
 	}
 	return lines, nil
 }
+
+func (s *SelectList) SetKeybindings(kb *KeybindingsManager) { s.keybindings = kb }

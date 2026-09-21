@@ -226,17 +226,19 @@ type ImageTheme struct {
 reference: packages/tui/src/components/input.ts#Input
 target: github.com/nankedr/pig/tui.Input
 type Input struct {
-	Focused  bool
-	OnSubmit func(string)
-	OnEscape func()
-	value    string
-	editor   *Editor
+	Focused     bool
+	OnSubmit    func(string)
+	OnEscape    func()
+	value       string
+	editor      *Editor
+	keybindings *KeybindingsManager
 }
 func (*Input) Invalidate() error
 func (i *Input) GetValue() string
 func (i *Input) HandleInput(data string) error
 func (i *Input) Render(width int) ([]string, error)
 func (i *Input) SetFocusState(focused bool)
+func (i *Input) SetKeybindings(kb *KeybindingsManager)
 func (i *Input) SetValue(value string)
 
 ## symbol:tui/src/components/loader.ts#Loader
@@ -401,6 +403,7 @@ type SelectItem struct {
 reference: packages/tui/src/components/select-list.ts#SelectList
 target: github.com/nankedr/pig/tui.SelectList
 type SelectList struct {
+	keybindings       *KeybindingsManager
 	OnSelect          func(SelectItem)
 	OnCancel          func()
 	OnSelectionChange func(SelectItem)
@@ -416,6 +419,7 @@ func (s *SelectList) GetSelectedItem() (*SelectItem, error)
 func (s *SelectList) HandleInput(data string) error
 func (s *SelectList) Render(width int) ([]string, error)
 func (s *SelectList) SetFilter(filter string) error
+func (s *SelectList) SetKeybindings(kb *KeybindingsManager)
 func (s *SelectList) SetSelectedIndex(index int) error
 
 ## symbol:tui/src/components/select-list.ts#SelectListLayoutOptions
@@ -622,7 +626,7 @@ func FuzzyFilter[T any](items []T, query string, getText func(T) string) ([]T, e
 ## symbol:tui/src/fuzzy.ts#fuzzyMatch
 reference: packages/tui/src/fuzzy.ts#fuzzyMatch
 target: github.com/nankedr/pig/tui.FuzzyMatch
-func FuzzyMatch(query, text string) (FuzzyMatchResult, error)
+func FuzzyMatch(string, string) (FuzzyMatchResult, error)
 
 ## symbol:tui/src/keybindings.ts#Keybinding
 reference: packages/tui/src/keybindings.ts#Keybinding

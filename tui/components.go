@@ -212,11 +212,12 @@ func (*Image) Render(int) ([]string, error) { return nil, newNotImplemented("Ima
 
 // Input is a single-line search editor.
 type Input struct {
-	Focused  bool
-	OnSubmit func(string)
-	OnEscape func()
-	value    string
-	editor   *Editor
+	Focused     bool
+	OnSubmit    func(string)
+	OnEscape    func()
+	value       string
+	editor      *Editor
+	keybindings *KeybindingsManager
 }
 
 func NewInput() *Input                      { return &Input{} }
@@ -407,6 +408,7 @@ type SelectListLayoutOptions struct {
 }
 
 type SelectList struct {
+	keybindings       *KeybindingsManager
 	OnSelect          func(SelectItem)
 	OnCancel          func()
 	OnSelectionChange func(SelectItem)

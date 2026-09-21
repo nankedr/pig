@@ -32,7 +32,10 @@ func (d *SelectDialog) Render(width int) ([]string, error) {
 	return append(append(lines, ""), hint...), err
 }
 func (d *SelectDialog) HandleInput(data string) error {
-	kb, _ := GetKeybindings()
+	kb := d.List.keybindings
+	if kb == nil {
+		kb, _ = GetKeybindings()
+	}
 	up, _ := kb.Matches(data, "tui.select.up")
 	down, _ := kb.Matches(data, "tui.select.down")
 	switch {

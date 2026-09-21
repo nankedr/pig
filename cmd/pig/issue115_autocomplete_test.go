@@ -31,10 +31,10 @@ func TestPigUndeliveredCommand115(t *testing.T) {
 	done := make(chan error, 1)
 	go func() { done <- cmd.Wait() }()
 	tty.Wait(t, "> ")
-	tty.Send(t, "/sett")
-	tty.Wait(t, "Open settings menu")
+	tty.Send(t, "/shar")
+	tty.Wait(t, "Share session as a secret GitHub gist")
 	tty.Send(t, "\r")
-	tty.Wait(t, "InteractiveMode.command.settings: not implemented")
+	tty.Wait(t, "InteractiveMode.command.share: not implemented")
 	tty.Send(t, "/quit\r")
 	select {
 	case err := <-done:

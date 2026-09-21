@@ -7,10 +7,6 @@ import (
 	"unicode"
 )
 
-func FuzzyMatch(query, text string) (FuzzyMatchResult, error) {
-	score, ok := completionScore(query, text)
-	return FuzzyMatchResult{Matches: ok, Score: score}, nil
-}
 func FuzzyFilter[T any](items []T, query string, getText func(T) string) ([]T, error) {
 	tokens := strings.FieldsFunc(query, func(r rune) bool { return r == '/' || unicode.IsSpace(r) })
 	if len(tokens) == 0 {

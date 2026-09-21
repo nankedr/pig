@@ -4,7 +4,7 @@ import "strings"
 
 func (i *Input) prepare() {
 	if i.editor == nil {
-		i.editor = NewEditor(nil, EditorTheme{})
+		i.editor = NewEditor(nil, EditorTheme{}, EditorOptions{Keybindings: i.keybindings})
 	}
 	if i.editor.GetText() != i.value {
 		_ = i.editor.SetText(i.value)
@@ -13,7 +13,10 @@ func (i *Input) prepare() {
 }
 func (i *Input) HandleInput(data string) error {
 	i.prepare()
-	kb, _ := GetKeybindings()
+	kb := i.keybindings
+	if kb == nil {
+		kb, _ = GetKeybindings()
+	}
 	confirm, _ := kb.Matches(data, "tui.select.confirm")
 	cancel, _ := kb.Matches(data, "tui.select.cancel")
 	if confirm {
@@ -42,4 +45,11 @@ func (i *Input) Render(width int) ([]string, error) {
 		return lines[1 : len(lines)-1], err
 	}
 	return lines, err
+}
+
+func (i *Input) SetKeybindings(kb *KeybindingsManager) {
+	i.keybindings = kb
+	if i.editor != nil {
+		i.editor.keybindings = kb
+	}
 }

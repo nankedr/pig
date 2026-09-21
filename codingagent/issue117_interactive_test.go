@@ -4,6 +4,7 @@ package codingagent_test
 
 import (
 	"context"
+	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
 	"github.com/nankedr/pig/codingagent"
 	"github.com/nankedr/pig/internal/terminaltest"
@@ -110,5 +111,51 @@ func TestModelSelectionFailurePreservesConfiguration117(t *testing.T) {
 		if model, _ := settings.GetDefaultModel(); model != models[0].ID {
 			t.Fatal("settings changed", model)
 		}
+	}
+}
+
+func TestInteractiveModelBindings117(t *testing.T) {
+	catalog, models, _ := config87Runtime(t)
+	core, _ := ai.CreateFauxCore(ai.RegisterFauxProviderOptions{})
+	created, err := codingagent.CreateAgentSession(context.Background(), codingagent.CreateAgentSessionOptions{CWD: t.TempDir(), AgentDir: t.TempDir(), Model: &models[0], ModelRuntime: catalog, NoTools: codingagent.NoToolsAll, StreamFunction: agent.StreamFunction(core.StreamSimple)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	runtime := codingagent.NewAgentSessionRuntime(created.Session, codingagent.AgentSessionServices{}, nil, nil, nil)
+	bindings, err := codingagent.NewKeybindingsManager(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = bindings.SetUserBindings(tui.KeybindingsConfig{"tui.select.confirm": {"ctrl+y"}, "tui.select.cancel": {"ctrl+g"}, "tui.editor.deleteCharBackward": {"ctrl+q"}}); err != nil {
+		t.Fatal(err)
+	}
+	tty := terminaltest.Open(t)
+	mode := codingagent.NewInteractiveMode(runtime, codingagent.InteractiveModeOptions{Terminal: tui.NewProcessTerminal(tty.Slave, tty.Slave), Keybindings: bindings})
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- mode.Run(ctx) }()
+	tty.Wait(t, "> ")
+	tty.Send(t, "/settings\r")
+	tty.Wait(t, "Thinking level")
+	tty.Send(t, "\x19")
+	tty.Wait(t, "Thinking Level")
+	tty.Send(t, "\x07")
+	time.Sleep(50 * time.Millisecond)
+	tty.Send(t, "\x0c")
+	tty.Wait(t, "Select Model")
+	tty.Send(t, "queryz\x11")
+	deadline := time.Now().Add(time.Second)
+	for !strings.Contains(tty.ScreenText(), "query ") && time.Now().Before(deadline) {
+		time.Sleep(5 * time.Millisecond)
+	}
+	if strings.Contains(tty.ScreenText(), "queryz") || !strings.Contains(tty.ScreenText(), "query") {
+		t.Fatal("search ignored instance edit key", tty.ScreenText())
+	}
+	tty.Send(t, "\x07")
+	time.Sleep(50 * time.Millisecond)
+	tty.Send(t, "\x04")
+	if err = awaitInteractive(t, done); err != nil {
+		t.Fatal(err)
 	}
 }

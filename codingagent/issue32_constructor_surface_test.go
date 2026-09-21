@@ -54,14 +54,14 @@ var issue32ConstructorMappings = map[string]issue32ConstructorMapping{
 	"ExtensionSelectorComponent":        {target: "ExtensionSelectorComponent", status: catalog.StatusInventoried},
 	"FooterComponent":                   {target: "FooterComponent", status: catalog.StatusInventoried},
 	"LoginDialogComponent":              {target: "LoginDialogComponent", status: catalog.StatusInventoried},
-	"ModelSelectorComponent":            {target: "ModelSelectorComponent", status: catalog.StatusInventoried},
+	"ModelSelectorComponent":            {target: "NewModelSelectorComponent", status: catalog.StatusScaffolded},
 	"OAuthSelectorComponent":            {target: "OAuthSelectorComponent", status: catalog.StatusInventoried},
 	"SessionSelectorComponent":          {target: "SessionSelectorComponent", status: catalog.StatusInventoried},
 	"SettingsSelectorComponent":         {target: "SettingsSelectorComponent", status: catalog.StatusInventoried},
 	"ShowImagesSelectorComponent":       {target: "ShowImagesSelectorComponent", status: catalog.StatusInventoried},
 	"SkillInvocationMessageComponent":   {target: "SkillInvocationMessageComponent", status: catalog.StatusInventoried},
 	"ThemeSelectorComponent":            {target: "ThemeSelectorComponent", status: catalog.StatusInventoried},
-	"ThinkingSelectorComponent":         {target: "ThinkingSelectorComponent", status: catalog.StatusInventoried},
+	"ThinkingSelectorComponent":         {target: "NewThinkingSelectorComponent", status: catalog.StatusScaffolded},
 	"ToolExecutionComponent":            {target: "NewToolExecutionComponent", status: catalog.StatusScaffolded},
 	"TreeSelectorComponent":             {target: "TreeSelectorComponent", status: catalog.StatusInventoried},
 	"UserMessageSelectorComponent":      {target: "UserMessageSelectorComponent", status: catalog.StatusInventoried},
@@ -153,8 +153,8 @@ func TestIssue32ConstructorTargetsResolve(t *testing.T) {
 		}
 	}
 	sort.Strings(names)
-	if scaffolded != 11 || inventoried != 27 {
-		t.Fatalf("constructor status counts = scaffolded %d, inventoried %d; want 11, 27; names=%v", scaffolded, inventoried, names)
+	if scaffolded != 13 || inventoried != 25 {
+		t.Fatalf("constructor status counts = scaffolded %d, inventoried %d; want 13, 25; names=%v", scaffolded, inventoried, names)
 	}
 	if constructor, static := issue32ConstructorMappings["KeybindingsManager"].target, issue32StaticMemberTargetExceptions["KeybindingsManager.create"]; constructor == static {
 		t.Fatalf("KeybindingsManager constructor target %q conflates the distinct static create target", constructor)

@@ -4,6 +4,7 @@ HandleInput func(*tui.SelectList, string) error
 Invalidate func(*tui.SelectList) error
 Render func(*tui.SelectList, int) ([]string, error)
 SetFilter func(*tui.SelectList, string) error
+SetKeybindings func(*tui.SelectList, *tui.KeybindingsManager)
 SetSelectedIndex func(*tui.SelectList, int) error
 *tui.SelectDialog
 HandleInput func(*tui.SelectDialog, string) error

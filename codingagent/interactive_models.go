@@ -8,6 +8,7 @@ import (
 	"github.com/nankedr/pig/tui"
 	"io"
 	"strings"
+	"sync"
 )
 
 func (m *InteractiveMode) configurationReady() error {
@@ -46,6 +47,11 @@ func (m *InteractiveMode) modelAction(ctx context.Context, action tui.Keybinding
 		return true, m.modelStatus()
 	}
 	return false, nil
+}
+func selectorSignal() (<-chan struct{}, func()) {
+	done := make(chan struct{})
+	var once sync.Once
+	return done, func() { once.Do(func() { close(done) }) }
 }
 func (m *InteractiveMode) waitSelector(ctx context.Context, component tui.Component, done <-chan struct{}) error {
 	if err := m.ui.SetDialog(component); err != nil {
@@ -95,17 +101,12 @@ func (m *InteractiveMode) selectModel(ctx context.Context, query string) error {
 			return m.modelStatus()
 		}
 	}
-	done := make(chan struct{}, 1)
-	finish := func() {
-		select {
-		case done <- struct{}{}:
-		default:
-		}
-	}
+	done, finish := selectorSignal()
 	var selected *ai.Model
 	current := s.Model()
 	selector := NewModelSelectorComponent(models, &current, scope, func(model ai.Model) { selected = &model; finish() }, finish, query)
 	selector.keybindings = &m.options.Keybindings.KeybindingsManager
+	selector.search.SetKeybindings(selector.keybindings)
 	defer selector.Dispose()
 	if err = m.waitSelector(ctx, selector, done); err != nil {
 		return err
@@ -122,15 +123,10 @@ func (m *InteractiveMode) selectThinking(ctx context.Context) error {
 	if err := m.configurationReady(); err != nil {
 		return err
 	}
-	done := make(chan struct{}, 1)
-	finish := func() {
-		select {
-		case done <- struct{}{}:
-		default:
-		}
-	}
+	done, finish := selectorSignal()
 	open := false
 	menu := tui.NewSelectDialog("Settings", []tui.SelectItem{{Value: "thinking", Label: "Thinking level"}}, func(tui.SelectItem) { open = true; finish() }, finish)
+	menu.List.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
 	if err := m.waitSelector(ctx, menu, done); err != nil {
 		return err
 	}
@@ -142,8 +138,10 @@ func (m *InteractiveMode) selectThinking(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	done, finish = selectorSignal()
 	var level agent.ThinkingLevel
 	selector := NewThinkingSelectorComponent(s.ThinkingLevel(), levels, func(value agent.ThinkingLevel) { level = value; finish() }, finish)
+	selector.list.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
 	if err = m.waitSelector(ctx, selector, done); err != nil {
 		return err
 	}
@@ -191,13 +189,9 @@ func (m *InteractiveMode) selectModelScope(ctx context.Context) error {
 			}
 		}
 	}
-	done := make(chan struct{}, 1)
-	selector := NewScopedModelsSelectorComponent(ModelsConfig{AllModels: models, EnabledModelIDs: ids}, ModelsCallbacks{OnChange: func(ids []string) error { return s.SetEnabledModels(ids, false) }, OnPersist: func(ids []string) error { return s.SetEnabledModels(ids, true) }, OnCancel: func() {
-		select {
-		case done <- struct{}{}:
-		default:
-		}
-	}})
+	done, finish := selectorSignal()
+	selector := NewScopedModelsSelectorComponent(ModelsConfig{AllModels: models, EnabledModelIDs: ids}, ModelsCallbacks{OnChange: func(ids []string) error { return s.SetEnabledModels(ids, false) }, OnPersist: func(ids []string) error { return s.SetEnabledModels(ids, true) }, OnCancel: finish})
 	selector.keybindings = &m.options.Keybindings.KeybindingsManager
+	selector.search.SetKeybindings(selector.keybindings)
 	return m.waitSelector(ctx, selector, done)
 }

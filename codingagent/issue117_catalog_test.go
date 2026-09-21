@@ -53,8 +53,26 @@ func TestModelSelectionCatalog117(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	constructors := map[string]catalog.Entry{}
+	for _, symbol := range issue32Symbols(t) {
+		if symbol.Name == "ModelSelectorComponent" || symbol.Name == "ThinkingSelectorComponent" {
+			expected, e := issue32ConstructorEntry(symbol, "M6")
+			if e != nil {
+				t.Fatal(e)
+			}
+			constructors[expected.ID] = expected
+		}
+	}
 	found := false
 	for i, e := range entries {
+		if expected, ok := constructors[e.ID]; ok {
+			if *updateIssue117 {
+				entries[i] = expected
+			} else if !reflect.DeepEqual(e, expected) {
+				t.Fatal("model selector constructor mapping drift")
+			}
+			delete(constructors, e.ID)
+		}
 		if e.ID == entry.ID {
 			found = true
 			if *updateIssue117 {
@@ -63,6 +81,9 @@ func TestModelSelectionCatalog117(t *testing.T) {
 				t.Fatal("model selection evidence drift")
 			}
 		}
+	}
+	if len(constructors) > 0 {
+		t.Fatal("missing model selector constructor mapping")
 	}
 	if *updateIssue117 {
 		if !found {
