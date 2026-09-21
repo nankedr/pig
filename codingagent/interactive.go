@@ -285,7 +285,7 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 	var turnDone chan error
 	var turnCancel context.CancelFunc
 	var turnContext context.Context
-	var settling []string
+	var settling, pendingPrompts []string
 	var turnID uint64
 	defer func() {
 		cancel()
@@ -300,14 +300,15 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	finishTurn := func(promptErr error) error {
-		if len(settling) > 0 {
-			if turnContext.Err() != nil {
-				_ = m.ui.PrependEditor(strings.Join(settling, "\n\n"))
-			} else {
-				prompts = append(settling, prompts...)
+		if turnContext.Err() != nil {
+			if messages := append(pendingPrompts, settling...); len(messages) > 0 {
+				_ = m.ui.PrependEditor(strings.Join(messages, "\n\n"))
 			}
-			settling = nil
+			pendingPrompts = nil
+		} else {
+			pendingPrompts = append(pendingPrompts, settling...)
 		}
+		settling = nil
 		turnDone = nil
 		turnCancel()
 		turnCancel = nil
@@ -323,7 +324,11 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 loop:
 	for {
 		var input tui.TextInput
-		if turnDone == nil && len(prompts) > 0 {
+		literalPrompt := false
+		if turnDone == nil && len(pendingPrompts) > 0 {
+			input.Text, pendingPrompts = pendingPrompts[0], pendingPrompts[1:]
+			literalPrompt = true
+		} else if turnDone == nil && len(prompts) > 0 {
 			input.Text, prompts = prompts[0], prompts[1:]
 		} else {
 			select {
@@ -361,8 +366,8 @@ loop:
 			}
 			continue
 		}
-		activeFollowUp := turnDone != nil && input.Action == "app.message.followUp"
-		if !activeFollowUp && strings.TrimSpace(input.Text) == "/quit" {
+		literalPrompt = literalPrompt || turnDone != nil && input.Action == "app.message.followUp"
+		if !literalPrompt && strings.TrimSpace(input.Text) == "/quit" {
 			break
 		}
 		session := m.runtime.Session()
@@ -393,7 +398,7 @@ loop:
 			input.Text = "/new"
 		}
 
-		if !activeFollowUp {
+		if !literalPrompt {
 			if handled, commandErr := m.handleCommand(runCtx, input.Text); handled {
 				if commandErr != nil {
 					_ = m.ShowError(commandErr.Error())

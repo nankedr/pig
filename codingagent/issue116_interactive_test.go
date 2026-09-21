@@ -117,9 +117,13 @@ func TestInteractiveSDKLateDequeue116(t *testing.T) {
 			model, _ := core.GetModel()
 			secondRequest := make(chan struct{})
 			requests := 0
+			var session *codingagent.AgentSession
 			created, err := codingagent.CreateAgentSession(context.Background(), codingagent.CreateAgentSessionOptions{CWD: t.TempDir(), AgentDir: t.TempDir(), Model: &model, NoTools: codingagent.NoToolsAll, StreamFunction: func(ctx context.Context, m ai.Model, input ai.Context, options ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
 				requests++
 				if requests == 2 {
+					if err := session.Steer("new-turn"); err != nil {
+						t.Error(err)
+					}
 					close(secondRequest)
 					<-ctx.Done()
 				}
@@ -128,6 +132,7 @@ func TestInteractiveSDKLateDequeue116(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			session = created.Session
 			runtime := codingagent.NewAgentSessionRuntime(created.Session, codingagent.AgentSessionServices{}, nil, nil, nil)
 			firstStarted, releaseFirst, barrier := make(chan struct{}), make(chan struct{}), make(chan struct{}, 1)
 			var release sync.Once
@@ -139,10 +144,6 @@ func TestInteractiveSDKLateDequeue116(t *testing.T) {
 					if starts == 1 {
 						close(firstStarted)
 						<-releaseFirst
-					} else if starts == 2 {
-						if err := runtime.Session().Steer("new-turn"); err != nil {
-							t.Error(err)
-						}
 					}
 				case codingagent.AgentSessionQueueUpdateEvent:
 					if len(e.FollowUp) > 0 && e.FollowUp[0] == "barrier" {
@@ -191,5 +192,62 @@ func TestInteractiveSDKLateDequeue116(t *testing.T) {
 				t.Fatal(err)
 			}
 		})
+	}
+}
+
+func TestInteractiveSDKSettlingFollowUp116(t *testing.T) {
+	runtime := interactiveRuntime(t)
+	reached, release := make(chan struct{}), make(chan struct{})
+	var first, unblock sync.Once
+	_, err := runtime.Session().Subscribe(func(event codingagent.AgentSessionEvent) {
+		if event.AgentSessionEventType() == codingagent.AgentSessionEventTypeAgentSettled {
+			first.Do(func() { close(reached); <-release })
+		}
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	tty := terminaltest.Open(t)
+	terminal := tui.NewProcessTerminal(tty.Slave, tty.Slave)
+	mode := codingagent.NewInteractiveMode(runtime, codingagent.InteractiveModeOptions{Terminal: terminal})
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	defer unblock.Do(func() { close(release) })
+	done := make(chan error, 1)
+	go func() { done <- mode.Run(ctx) }()
+	tty.Wait(t, "> ")
+	tty.Send(t, "first question\r")
+	select {
+	case <-reached:
+	case <-ctx.Done():
+		t.Fatal("settlement not reached")
+	}
+	tty.Send(t, "/quit\x1b\r")
+	tty.Wait(t, "Waiting for current turn to settle")
+	unblock.Do(func() { close(release) })
+	tty.Wait(t, "SECOND_DONE")
+	if err := runtime.Session().WaitForIdle(ctx); err != nil {
+		t.Fatal(err)
+	}
+	tty.Send(t, "\x04")
+	if err := awaitInteractive(t, done); err != nil {
+		t.Fatal(err)
+	}
+	var users []string
+	for _, message := range runtime.Session().SessionManager().BuildSessionContext().Messages {
+		if message.MessageRole() == ai.MessageRoleUser {
+			users = append(users, message85Text(message))
+		}
+	}
+	if strings.Join(users, "|") != "first question|/quit" {
+		t.Fatalf("duplicate or lost submission: %v", users)
+	}
+	select {
+	case <-terminal.Done():
+	default:
+		t.Fatal("terminal reader survived exit")
+	}
+	if !tty.Restored(t) || !runtime.Session().IsIdle() {
+		t.Fatal("runtime not cleaned up")
 	}
 }
