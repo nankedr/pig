@@ -5,7 +5,7 @@ InteractiveMode 在一个输入循环中处理终端动作，当前 RunHeadless 
 | 入口 | 行为 |
 | --- | --- |
 | 生成时 Enter | 投递 steering，在工具轮次边界优先消费 |
-| 生成时 Alt+Enter | 投递 follow-up，等待 Agent 没有工具和 steering 后消费 |
+| 生成时 Alt+Enter | `/quit`、`/new` 等文本也直接投递 follow-up，等待 Agent 没有工具和 steering 后消费 |
 | 空闲时 Alt+Enter | 与 Enter 相同，启动新一轮 |
 | Alt+↑ | 原子取出尚未消费的两类队列，按 steering、follow-up、当前草稿回填；段落之间空一行 |
 | Escape | 生成中回填队列并取消当前轮；重试等待中取消整轮重试等待；补全菜单打开时先关闭菜单 |
@@ -26,7 +26,7 @@ AgentSession 的 agent_end 仍然属于 busy；完整 settled 收尾后才能发
 
 ## 证据与范围
 
-固定 Pi `936aff00918de1187f085f123c2812d8f2d67745` 的真实 CLI 在 PTY 和本地 SSE 服务上提取五个 fixture：两类队列优先级、回取清除、取消回填编辑、重试取消、重试成功。普通验收不需要 Pi、Node、Python或在线 Provider。
+固定 Pi `936aff00918de1187f085f123c2812d8f2d67745` 的真实 CLI 在 PTY 和本地 SSE 服务上提取六个 fixture：两类队列优先级、回取清除、取消回填编辑、重试取消、重试成功、命令外观文本的 follow-up。普通验收不需要 Pi、Node、Python或在线 Provider。
 
 ```sh
 go test ./cmd/pig -run 116 -count=1

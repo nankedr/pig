@@ -20,7 +20,7 @@ var updateIssue116 = flag.Bool("update-issue116", false, "refresh interactive qu
 
 func partial116() *catalog.Partial {
 	return &catalog.Partial{Supported: []string{
-		"Issue #116: pinned Pi real CLI PTY fixtures for steering/follow-up priority, dequeue/edit/clear, abort preserving Assistant output, next submission, retry success and cancelled waiting",
+		"Issue #116: pinned Pi real CLI PTY fixtures for steering/follow-up priority, dequeue/edit/clear, abort preserving Assistant output, next submission, retry success and cancelled waiting; active Alt+Enter preserves builtin-looking text",
 		"Public AgentSession atomic TakeQueuedMessages, queue callback reentrancy and one/all consumption races; TextInput turn identity isolates delayed interrupts and submissions",
 		"Real CLI Bash partial output and v3 Session error persistence, active exit paths and race-instrumented child process cleanup",
 	}, Unsupported: []string{
@@ -32,6 +32,7 @@ func TestInteractiveQueuesCatalog116(t *testing.T) {
 	root := issue32RepoRoot(t)
 	entry := catalog.Entry{SchemaVersion: catalog.SchemaVersion, ID: "contract:codingagent/interactive-queues", Upstream: catalog.Upstream{Module: "coding-agent", Repository: "https://github.com/badlogic/pi-mono", Commit: issue32BaselineCommit, Reference: "packages/coding-agent/src/modes/interactive/interactive-mode.ts"}, Mapping: catalog.Mapping{Module: "codingagent", Target: issue32GoPackage + ".InteractiveMode", Kind: "contract"}, Status: catalog.StatusPartial, Milestone: "M6", Classification: "public-api", Partial: partial116(), Deviation: &catalog.Deviation{ADR: "docs/adr/0018-legacy-agent-queue-admission.md", Reason: "Pig keeps explicit idle/settling/retry admission; unaccepted settling inputs wait for worker completion or return to editor on cancellation."}, Notes: "Issue #116; docs/learning/m6-interactive-queues.md. Reuses legacy AgentSession and v3 Session, with no transport retry changes."}
 	for _, item := range []struct{ kind, path, run string }{
+		{"oracle", "parity/oracle/fixtures/queues-commands.json", "node parity/oracle/queues.mjs <locked-pi-checkout> --check"},
 		{"oracle", "parity/oracle/fixtures/queues.json", "node parity/oracle/queues.mjs <locked-pi-checkout> --check"},
 		{"oracle", "parity/oracle/fixtures/queues-restore.json", "node parity/oracle/queues.mjs <locked-pi-checkout> --check"},
 		{"oracle", "parity/oracle/fixtures/queues-abort.json", "node parity/oracle/queues.mjs <locked-pi-checkout> --check"},

@@ -55,10 +55,12 @@ with tempfile.TemporaryDirectory(prefix='pi-queues-') as root:
             wait_for(lambda: ('DONE_'+('2' if scenario=='retry' else '3')).encode() in output)
         else:
             wait_for(lambda: b'PARTIAL_1' in output)
-            os.write(master,b'follow question\x1b\r')
-            wait_for(lambda: b'Follow-up: follow question' in output)
-            os.write(master,b'steer question\r')
-            wait_for(lambda: b'Steering: steer question' in output)
+            follow = '/quit' if scenario=='commands' else 'follow question'
+            steer = '/new' if scenario=='commands' else 'steer question'
+            os.write(master,follow.encode()+b'\x1b\r')
+            wait_for(lambda: ('Follow-up: '+follow).encode() in output)
+            os.write(master,steer.encode()+(b'\x1b\r' if scenario=='commands' else b'\r'))
+            wait_for(lambda: (('Follow-up: ' if scenario=='commands' else 'Steering: ')+steer).encode() in output)
             if scenario in ['restore','abort']:
                 os.write(master,b'draft')
                 time.sleep(.1)

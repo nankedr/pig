@@ -421,3 +421,59 @@ func TestPigInteractiveToolAbort116(t *testing.T) {
 		t.Fatalf("tool result=%q requests=%d", output, calls.Load())
 	}
 }
+
+func TestPigInteractiveFollowUpCommands116(t *testing.T) {
+	var mu sync.Mutex
+	var requests [][]string
+	release := make(chan struct{})
+	var once sync.Once
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		users := requestUsers116(t, r)
+		mu.Lock()
+		requests = append(requests, users)
+		turn := len(requests)
+		mu.Unlock()
+		w.Header().Set("Content-Type", "text/event-stream")
+		fmt.Fprintf(w, "data: {\"choices\":[{\"delta\":{\"content\":\"PARTIAL_%d\"},\"finish_reason\":null}]}\n\n", turn)
+		w.(http.Flusher).Flush()
+		if turn == 1 {
+			select {
+			case <-release:
+			case <-r.Context().Done():
+				return
+			}
+		}
+		fmt.Fprintf(w, "data: {\"choices\":[{\"delta\":{\"content\":\" DONE_%d\"},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n", turn)
+	}))
+	defer server.Close()
+	defer once.Do(func() { close(release) })
+	tty, _, done := startQueues116(t, server.URL, `{"compaction":{"enabled":false},"retry":{"enabled":false}}`)
+	tty.Send(t, "first question\r")
+	tty.Wait(t, "PARTIAL_1")
+	tty.Send(t, "/quit\x1b\r")
+	tty.Wait(t, "Follow-up: /quit")
+	tty.Send(t, "/new\x1b\r")
+	tty.Wait(t, "Follow-up: /new")
+	once.Do(func() { close(release) })
+	tty.Wait(t, "DONE_3")
+	tty.Send(t, "after question\r")
+	tty.Wait(t, "DONE_4")
+	exitQueues116(t, tty, done)
+	lock, _, err := baseline.Load("../../parity/baseline")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fixture, err := parity.LoadFixture("../../parity/oracle/fixtures/queues-commands.json", parity.Baseline{ID: lock.BaselineID, Commit: lock.Upstream.Commit, Repository: lock.Upstream.Repository})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var want struct{ Prompts [][]string }
+	if err := json.Unmarshal(fixture.Observation.Outcome, &want); err != nil {
+		t.Fatal(err)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if !reflect.DeepEqual(requests, want.Prompts) {
+		t.Fatalf("requests=%v want=%v", requests, want.Prompts)
+	}
+}

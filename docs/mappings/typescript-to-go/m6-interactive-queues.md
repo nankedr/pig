@@ -10,4 +10,4 @@
 
 延续 ADR-0018/0024 的 Go admission 和取消时序偏离。收尾期尚未入队的新输入等待完整 settled；取消时回填，避免重复提交。重试等待期新投递仍按现有契约拒绝并回填。底层 transport retry 不属于此次 UI 实现。
 
-学习路径见 [中文说明](../../learning/m6-interactive-queues.md)。Catalog 保留 explicit partial，五个 Oracle fixture 均来自固定源码离线构建后的真实子进程；不把私有 helper 测试当对等证明。
+学习路径见 [中文说明](../../learning/m6-interactive-queues.md)。Catalog 保留 explicit partial，六个 Oracle fixture 均来自固定源码离线构建后的真实子进程；不把私有 helper 测试当对等证明。

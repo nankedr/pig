@@ -354,7 +354,15 @@ loop:
 			}
 		}
 
-		if strings.TrimSpace(input.Text) == "/quit" {
+		if input.Turn != 0 && input.Turn != turnID {
+			if input.Text != "" {
+				_ = m.ui.PrependEditor(input.Text)
+				_ = m.ShowWarning("Turn already settled; message restored to editor")
+			}
+			continue
+		}
+		activeFollowUp := turnDone != nil && input.Action == "app.message.followUp"
+		if !activeFollowUp && strings.TrimSpace(input.Text) == "/quit" {
 			break
 		}
 		session := m.runtime.Session()
@@ -384,18 +392,14 @@ loop:
 		case "app.session.new":
 			input.Text = "/new"
 		}
-		if input.Turn != 0 && input.Turn != turnID {
-			if input.Text != "" {
-				_ = m.ui.PrependEditor(input.Text)
-				_ = m.ShowWarning("Turn already settled; message restored to editor")
+
+		if !activeFollowUp {
+			if handled, commandErr := m.handleCommand(runCtx, input.Text); handled {
+				if commandErr != nil {
+					_ = m.ShowError(commandErr.Error())
+				}
+				continue
 			}
-			continue
-		}
-		if handled, commandErr := m.handleCommand(runCtx, input.Text); handled {
-			if commandErr != nil {
-				_ = m.ShowError(commandErr.Error())
-			}
-			continue
 		}
 		if turnDone != nil {
 			var queueErr error
