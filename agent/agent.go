@@ -520,6 +520,11 @@ func (a *Agent) Subscribe(listener AgentEventListener) Unsubscribe {
 	}
 }
 
+var (
+	ErrAgentIdle     = errors.New("Agent is idle")
+	ErrAgentSettling = errors.New("Agent is settling")
+)
+
 func (a *Agent) Steer(message AgentMessage) error {
 	cloned, err := cloneAgentMessageForOwnership(message)
 	if err != nil {
@@ -528,10 +533,10 @@ func (a *Agent) Steer(message AgentMessage) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	if a.activeContext == nil {
-		return fmt.Errorf("cannot Steer: Agent is idle")
+		return fmt.Errorf("cannot Steer: %w", ErrAgentIdle)
 	}
 	if !a.acceptingMessages || context.Cause(a.activeContext) != nil {
-		return fmt.Errorf("cannot Steer: Agent is settling")
+		return fmt.Errorf("cannot Steer: %w", ErrAgentSettling)
 	}
 	a.steeringQueue = append(a.steeringQueue, cloned)
 	return nil
@@ -545,10 +550,10 @@ func (a *Agent) FollowUp(message AgentMessage) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	if a.activeContext == nil {
-		return fmt.Errorf("cannot FollowUp: Agent is idle")
+		return fmt.Errorf("cannot FollowUp: %w", ErrAgentIdle)
 	}
 	if !a.acceptingMessages || context.Cause(a.activeContext) != nil {
-		return fmt.Errorf("cannot FollowUp: Agent is settling")
+		return fmt.Errorf("cannot FollowUp: %w", ErrAgentSettling)
 	}
 	a.followUpQueue = append(a.followUpQueue, cloned)
 	return nil
@@ -585,6 +590,15 @@ func (a *Agent) ClearAllQueues() {
 	a.steeringQueue = nil
 	a.followUpQueue = nil
 	a.mu.Unlock()
+}
+
+// TakeQueuedMessages atomically removes messages still waiting for consumption.
+func (a *Agent) TakeQueuedMessages() (steering, followUp []AgentMessage) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	steering, followUp = a.steeringQueue, a.followUpQueue
+	a.steeringQueue, a.followUpQueue = nil, nil
+	return
 }
 
 func (a *Agent) HasQueuedMessages() bool {

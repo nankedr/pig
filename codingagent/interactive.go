@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/tui"
@@ -24,8 +25,9 @@ type InteractiveMode struct {
 	cancel                        context.CancelFunc
 	stopOnce                      sync.Once
 	stopErr                       error
-	turnMu                        sync.Mutex
-	turnCancel                    context.CancelFunc
+	progressMu                    sync.Mutex
+	retry                         *AgentSessionAutoRetryStartEvent
+	retryUntil                    time.Time
 	setupErr                      error
 	transcript                    *Transcript
 }
@@ -64,13 +66,29 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 	mode.ui = tui.NewTextUI(terminal, tui.TextUIOptions{Mode: mode.options.TUIMode, Scrollbar: scrollbar, PreserveScreen: preserve, Keybindings: manager, HideThinking: hide, RenderTranscript: func(width int, expanded, hide bool) ([]string, error) {
 		mode.transcript.SetExpanded(expanded)
 		mode.transcript.SetHideThinkingBlock(hide)
-		return mode.transcript.Render(width)
-	}, OnInterrupt: func() {
-		mode.turnMu.Lock()
-		defer mode.turnMu.Unlock()
-		if mode.turnCancel != nil {
-			mode.turnCancel()
+		lines, err := mode.transcript.Render(width)
+		if err != nil {
+			return nil, err
 		}
+		if runtime != nil && runtime.Session() != nil {
+			steering, _ := runtime.Session().GetSteeringMessages()
+			followUp, _ := runtime.Session().GetFollowUpMessages()
+			for _, text := range steering {
+				wrapped, _ := tui.WrapTextWithANSI(tui.SafeTerminalText("Steering: "+text), width)
+				lines = append(lines, wrapped...)
+			}
+			for _, text := range followUp {
+				wrapped, _ := tui.WrapTextWithANSI(tui.SafeTerminalText("Follow-up: "+text), width)
+				lines = append(lines, wrapped...)
+			}
+		}
+		mode.progressMu.Lock()
+		if retry := mode.retry; retry != nil {
+			seconds := max(0, int(time.Until(mode.retryUntil).Seconds()+0.999))
+			lines = append(lines, fmt.Sprintf("Retrying (%d/%d) in %ds... (%s to cancel)", retry.Attempt, retry.MaxAttempts, seconds, mode.interruptHint()))
+		}
+		mode.progressMu.Unlock()
+		return lines, nil
 	}})
 	return mode
 }
@@ -153,6 +171,21 @@ func (m *InteractiveMode) GetUserInput(ctx context.Context) (string, error) {
 				_ = m.transcript.SetMessages(nil)
 				_ = m.ui.Refresh()
 			}
+		case "app.message.dequeue":
+			if err = m.restoreQueued(); err != nil {
+				return "", err
+			}
+		case "app.interrupt":
+			if retrying, _ := m.runtime.Session().IsRetrying(); retrying {
+				_ = m.runtime.Session().AbortRetry()
+			} else if m.runtime.Session().IsStreaming() {
+				if err = m.restoreQueued(); err != nil {
+					return "", err
+				}
+				if err = m.runtime.Session().Abort(); err != nil {
+					return "", err
+				}
+			}
 		case "app.suspend":
 			if err = m.ui.Suspend(); err != nil {
 				return "", err
@@ -233,60 +266,214 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 			return err
 		}
 	}
+	inputs := make(chan tui.TextInput)
+	inputDone := make(chan struct{})
+	go func() {
+		defer close(inputDone)
+		for {
+			input, readErr := m.ui.ReadInput(runCtx)
+			if readErr != nil {
+				return
+			}
+			select {
+			case inputs <- input:
+			case <-runCtx.Done():
+				return
+			}
+		}
+	}()
+	var turnDone chan error
+	var turnCancel context.CancelFunc
+	var turnContext context.Context
+	var settling []string
+	var turnID uint64
+	defer func() {
+		cancel()
+		if turnCancel != nil {
+			turnCancel()
+		}
+		if turnDone != nil {
+			<-turnDone
+		}
+		<-inputDone
+	}()
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+	finishTurn := func(promptErr error) error {
+		if len(settling) > 0 {
+			if turnContext.Err() != nil {
+				_ = m.ui.PrependEditor(strings.Join(settling, "\n\n"))
+			} else {
+				prompts = append(settling, prompts...)
+			}
+			settling = nil
+		}
+		turnDone = nil
+		turnCancel()
+		turnCancel = nil
+		m.ui.SetTurn(0)
+		if err := m.transcript.SetMessages(m.transcriptMessages()); err != nil {
+			return err
+		}
+		if promptErr != nil {
+			return m.ShowError(promptErr.Error())
+		}
+		return m.ui.Refresh()
+	}
+loop:
 	for {
-		var prompt string
-		if len(prompts) > 0 {
-			prompt = prompts[0]
-			prompts = prompts[1:]
+		var input tui.TextInput
+		if turnDone == nil && len(prompts) > 0 {
+			input.Text, prompts = prompts[0], prompts[1:]
 		} else {
-			prompt, err = m.GetUserInput(runCtx)
+			select {
+			case <-runCtx.Done():
+				err = runCtx.Err()
+				break loop
+			case promptErr := <-turnDone:
+				if err = finishTurn(promptErr); err != nil {
+					break loop
+				}
+				continue
+			case <-ticker.C:
+				if err = m.ui.Refresh(); err != nil {
+					break loop
+				}
+				continue
+			case input = <-inputs:
+			}
 		}
-		if err != nil {
+		// Settle a completed worker before deciding whether idle input starts a new turn.
+		if turnDone != nil {
+			select {
+			case promptErr := <-turnDone:
+				if err = finishTurn(promptErr); err != nil {
+					break loop
+				}
+			default:
+			}
+		}
+
+		if strings.TrimSpace(input.Text) == "/quit" {
 			break
 		}
-		if strings.TrimSpace(prompt) == "/quit" {
-			break
+		session := m.runtime.Session()
+		switch input.Action {
+		case "app.suspend":
+			if err = m.ui.Suspend(); err != nil {
+				break loop
+			}
+			continue
+		case "app.message.dequeue":
+			if err = m.restoreQueued(); err != nil {
+				_ = m.ShowError(err.Error())
+			}
+			continue
+		case "app.interrupt":
+			if input.Turn != 0 && input.Turn == turnID && turnDone != nil {
+				if retrying, _ := session.IsRetrying(); retrying {
+					session.AbortRetry()
+				} else {
+					turnCancel()
+					if err = m.restoreQueued(); err != nil {
+						_ = m.ShowError(err.Error())
+					}
+				}
+			}
+			continue
+		case "app.session.new":
+			input.Text = "/new"
 		}
-		if handled, commandErr := m.handleCommand(runCtx, prompt); handled {
+		if input.Turn != 0 && input.Turn != turnID {
+			if input.Text != "" {
+				_ = m.ui.PrependEditor(input.Text)
+				_ = m.ShowWarning("Turn already settled; message restored to editor")
+			}
+			continue
+		}
+		if handled, commandErr := m.handleCommand(runCtx, input.Text); handled {
 			if commandErr != nil {
 				_ = m.ShowError(commandErr.Error())
 			}
 			continue
 		}
-		turnCtx, turnCancel := context.WithCancel(runCtx)
-		m.turnMu.Lock()
-		m.turnCancel = turnCancel
-		m.turnMu.Unlock()
-		_, promptErr := RunHeadless(turnCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, OnEvent: func(event AgentSessionEvent) {
-			if updateErr := m.transcript.Update(event); updateErr != nil {
-				_ = m.ShowError(updateErr.Error())
-				turnCancel()
-				return
+		if turnDone != nil {
+			var queueErr error
+			if input.Action == "app.message.followUp" {
+				queueErr = session.FollowUp(input.Text)
+			} else {
+				queueErr = session.Steer(input.Text)
 			}
-			if renderErr := m.ui.Refresh(); renderErr != nil {
-				turnCancel()
+			if queueErr != nil && turnContext.Err() == nil && (errors.Is(queueErr, agent.ErrAgentIdle) || errors.Is(queueErr, agent.ErrAgentSettling)) {
+				if retrying, _ := session.IsRetrying(); !retrying {
+					settling = append(settling, input.Text)
+					_ = m.ShowWarning("Waiting for current turn to settle")
+					continue
+				}
 			}
-		}})
-		m.turnMu.Lock()
-		m.turnCancel = nil
-		m.turnMu.Unlock()
-		turnCancel()
-		if runCtx.Err() != nil {
+			if queueErr != nil {
+				_ = m.ui.PrependEditor(input.Text)
+				_ = m.ShowError(queueErr.Error())
+			}
+			continue
+		}
+		turnID++
+		m.ui.SetTurn(turnID)
+		turnCtx, stop := context.WithCancel(runCtx)
+		turnContext = turnCtx
+		turnCancel = stop
+		turnDone = make(chan error, 1)
+		started := make(chan struct{}, 1)
+		go func(prompt string, done chan<- error) {
+			_, promptErr := RunHeadless(turnCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, OnEvent: func(event AgentSessionEvent) {
+				if event.AgentSessionEventType() == AgentSessionEventTypeAgentStart {
+					select {
+					case started <- struct{}{}:
+					default:
+					}
+				}
+				if event.AgentSessionEventType() == AgentSessionEventTypeAgentSettled {
+					m.ui.SetTurn(0)
+				}
+				m.progressMu.Lock()
+				switch e := event.(type) {
+				case AgentSessionAutoRetryStartEvent:
+					m.retry = &e
+					m.retryUntil = time.Now().Add(time.Duration(e.DelayMS) * time.Millisecond)
+				case AgentSessionAutoRetryEndEvent:
+					m.retry = nil
+				}
+				m.progressMu.Unlock()
+				if updateErr := m.transcript.Update(event); updateErr != nil {
+					_ = m.ShowError(updateErr.Error())
+					stop()
+					return
+				}
+				if e, ok := event.(AgentSessionAutoRetryEndEvent); ok && !e.Success {
+					message := "Unknown error"
+					if e.FinalError != nil {
+						message = *e.FinalError
+					}
+					_ = m.ShowError(fmt.Sprintf("Retry failed after %d attempts: %s", e.Attempt, message))
+				}
+				if renderErr := m.ui.Refresh(); renderErr != nil {
+					stop()
+				}
+			}})
+			done <- promptErr
+		}(input.Text, turnDone)
+		select {
+		case <-started:
+		case promptErr := <-turnDone:
+			if err = finishTurn(promptErr); err != nil {
+				break loop
+			}
+		case <-runCtx.Done():
 			err = runCtx.Err()
-			break
-		}
-		if err = m.transcript.SetMessages(m.transcriptMessages()); err != nil {
-			break
-		}
-		if promptErr != nil {
-			err = m.ShowError(promptErr.Error())
-		} else {
-			err = m.ui.Refresh()
-		}
-		if err != nil {
-			break
+			break loop
 		}
 	}
+
 	if failure := m.ui.Err(); failure != nil {
 		return failure
 	}
@@ -321,4 +508,26 @@ func (m *InteractiveMode) transcriptMessages() []agent.AgentMessage {
 		return manager.BuildSessionContext().Messages
 	}
 	return session.Messages()
+}
+
+func (m *InteractiveMode) restoreQueued() error {
+	steering, followUp, err := m.runtime.Session().TakeQueuedMessages()
+	if err != nil {
+		return err
+	}
+	messages := append(steering, followUp...)
+	if len(messages) == 0 {
+		return m.ui.Refresh()
+	}
+	return m.ui.PrependEditor(strings.Join(messages, "\n\n"))
+}
+
+func (m *InteractiveMode) interruptHint() string {
+	if m.options.Keybindings != nil {
+		keys, _ := m.options.Keybindings.GetKeys("app.interrupt")
+		if len(keys) > 0 {
+			return string(keys[0])
+		}
+	}
+	return "interrupt"
 }

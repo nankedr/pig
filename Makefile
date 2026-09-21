@@ -244,3 +244,12 @@ m6-keys-oracle: m0-node-preflight
 m6-text-oracle: m0-node-preflight
 	node parity/oracle/text-rendering.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/text-rendering-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+.PHONY: m6-queues-oracle m6-queues-repeat
+m6-queues-oracle: m0-node-preflight
+	node parity/oracle/queues.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+m6-queues-repeat:
+	go test -race ./codingagent -run '116|^TestInteractiveSDK' -count=3 -shuffle=on
+	PIG_TEST_RACE=1 go test -race ./cmd/pig -run 116 -count=3 -shuffle=on
+	go run ./examples/interactive-queues

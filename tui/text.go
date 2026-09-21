@@ -17,6 +17,7 @@ type TextUI struct {
 	transcript             string
 	editor                 *Editor
 	inputs                 []TextInput
+	turn                   uint64
 	ready                  chan struct{}
 	done                   chan struct{}
 	err                    error
@@ -38,6 +39,7 @@ type TextUI struct {
 }
 
 type TextInput struct {
+	Turn   uint64
 	Text   string
 	Action Keybinding
 }
@@ -64,7 +66,7 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 	}
 	if u.keybindings == nil {
 		defs := NewTUIKeybindings()
-		for action, key := range map[Keybinding]KeyID{"app.clear": "ctrl+c", "app.exit": "ctrl+d", "app.interrupt": "escape", "app.suspend": "ctrl+z", "app.session.new": "", "app.tools.expand": "ctrl+o", "app.thinking.toggle": "ctrl+t"} {
+		for action, key := range map[Keybinding]KeyID{"app.clear": "ctrl+c", "app.exit": "ctrl+d", "app.interrupt": "escape", "app.suspend": "ctrl+z", "app.session.new": "", "app.tools.expand": "ctrl+o", "app.thinking.toggle": "ctrl+t", "app.message.followUp": "alt+enter", "app.message.dequeue": "alt+up"} {
 			keys := []KeyID{}
 			if key != "" {
 				keys = append(keys, key)
@@ -89,7 +91,7 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 	u.editor.OnSubmit = func(text string) {
 		if text != "" {
 			u.editor.AddToHistory(text)
-			u.inputs = append(u.inputs, TextInput{Text: text})
+			u.inputs = append(u.inputs, TextInput{Text: text, Turn: u.turn})
 			select {
 			case u.ready <- struct{}{}:
 			default:
@@ -244,6 +246,30 @@ func (u *TextUI) ClearEditor() error {
 	_ = u.editor.SetText("")
 	return u.render()
 }
+
+// SetTurn tags subsequent inputs so delayed delivery cannot submit into another turn.
+func (u *TextUI) SetTurn(turn uint64) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.turn = turn
+}
+
+func (u *TextUI) PrependEditor(text string) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	current, err := u.editor.GetExpandedText()
+	if err != nil {
+		return err
+	}
+	if strings.TrimSpace(current) != "" {
+		text += "\n\n" + current
+	}
+	if err = u.editor.SetText(text); err != nil {
+		return err
+	}
+	return u.render()
+}
+
 func (u *TextUI) AddToHistory(text string) error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
@@ -402,7 +428,19 @@ func (u *TextUI) input(data string) {
 	case match("app.interrupt"):
 		if u.onInterrupt != nil {
 			u.onInterrupt()
+		} else {
+			u.enqueueAction("app.interrupt", "")
 		}
+	case match("app.message.followUp"):
+		text, _ := u.editor.GetExpandedText()
+		text = strings.TrimSpace(text)
+		if text != "" {
+			_ = u.editor.AddToHistory(text)
+			_ = u.editor.SetText("")
+			u.enqueueAction("app.message.followUp", text)
+		}
+	case match("app.message.dequeue"):
+		u.enqueueAction("app.message.dequeue", "")
 	case match("app.session.new"), match("app.suspend"):
 		action := Keybinding("app.session.new")
 		if match("app.suspend") {
@@ -410,7 +448,7 @@ func (u *TextUI) input(data string) {
 		} else {
 			_ = u.editor.SetText("")
 		}
-		u.inputs = append(u.inputs, TextInput{Action: action})
+		u.inputs = append(u.inputs, TextInput{Action: action, Turn: u.turn})
 		select {
 		case u.ready <- struct{}{}:
 		default:
@@ -536,4 +574,12 @@ func (u *TextUI) ScrollToBottom() error {
 		return err
 	}
 	return u.render()
+}
+
+func (u *TextUI) enqueueAction(action Keybinding, text string) {
+	u.inputs = append(u.inputs, TextInput{Action: action, Text: text, Turn: u.turn})
+	select {
+	case u.ready <- struct{}{}:
+	default:
+	}
 }

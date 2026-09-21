@@ -31,6 +31,7 @@ ClearEditor func(*tui.TextUI) error
 Done func(*tui.TextUI) <-chan struct {}
 Err func(*tui.TextUI) error
 Mode func(*tui.TextUI) tui.TUIMode
+PrependEditor func(*tui.TextUI, string) error
 ReadInput func(*tui.TextUI, context.Context) (tui.TextInput, error)
 ReadLine func(*tui.TextUI, context.Context) (string, error)
 Refresh func(*tui.TextUI) error
@@ -40,6 +41,7 @@ ScrollToTop func(*tui.TextUI) error
 SetAutocompleteMaxVisible func(*tui.TextUI, int) error
 SetAutocompleteProvider func(*tui.TextUI, tui.AutocompleteProvider) error
 SetMode func(*tui.TextUI, tui.TUIMode) error
+SetTurn func(*tui.TextUI, uint64)
 Start func(*tui.TextUI) error
 Stop func(*tui.TextUI) error
 Suspend func(*tui.TextUI) error

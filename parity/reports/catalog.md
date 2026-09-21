@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9685
+- Total entries: 9686
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5156 |
 | scaffolded | 3628 |
-| partial | 608 |
+| partial | 609 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -7824,6 +7824,7 @@
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
+| contract:codingagent/interactive-queues | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-text | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/local-extensions | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetExtensionDiscovery | coding-agent |
 | contract:codingagent/local-resources | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |

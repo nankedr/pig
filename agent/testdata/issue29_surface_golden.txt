@@ -82,6 +82,7 @@ methods:
 - SteeringMode func(*agent.Agent) agent.QueueMode
 - StreamFunction func(*agent.Agent) agent.StreamFunction
 - Subscribe func(*agent.Agent, agent.AgentEventSink) agent.Unsubscribe
+- TakeQueuedMessages func(*agent.Agent) ([]agent.AgentMessage, []agent.AgentMessage)
 - ThinkingBudgets func(*agent.Agent) *ai.ThinkingBudgets
 - ToolExecution func(*agent.Agent) agent.ToolExecutionMode
 - TransformContext func(*agent.Agent) agent.TransformContextFunc

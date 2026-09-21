@@ -1,0 +1,16 @@
+func(*agent.Agent) ([]agent.AgentMessage, []agent.AgentMessage)
+func(*codingagent.AgentSession) ([]string, []string, error)
+func(*codingagent.AgentSession, string) error
+func(*codingagent.AgentSession, string) error
+func(*codingagent.AgentSession) error
+func(*codingagent.AgentSession) error
+func(*codingagent.AgentSession, context.Context) error
+func(*tui.TextUI, string) error
+func(*tui.TextUI, uint64)
+func(*tui.TextUI, context.Context) (tui.TextInput, error)
+type codingagent.TextInput struct
+fields:
+- Turn uint64 tag=""
+- Text string tag=""
+- Action tui.Keybinding tag=""
+Agent is idle Agent is settling

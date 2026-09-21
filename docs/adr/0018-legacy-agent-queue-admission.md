@@ -13,3 +13,7 @@ Issue #85 将同一 admission 决策接到 AgentSession；独立 `session-messag
 Session 用本次用户消息的单调毫秒时间戳与文本识别消费，避免固定 Pi 按非空文本查找时的空文本残留，以及相同文本在新 Prompt 和保留队列之间误删展示项。时间戳是生成的身份，不要求与 Pi 的 Date.now 字节一致；内容、消费顺序与已消费历史仍须相同。该调整服务于 #85 的并发与历史一致性要求，不改变 Legacy Agent 调度。
 
 Pi 的 sendUserMessage 返回 Promise，Go 保留已发布的同步 error 签名。为避免 idle queue_update 回调启动新运行时自等待，或多 listener 通知倒序，队列通知在途时 Prompt/SendUserMessage 启动新运行明确拒绝。已有活动运行的 steer/follow-up 不受此限制；新运行应在通知调用（如 ClearQueue）返回后开始。这是同步 Go API 的回调重入边界，由公开 SDK 回归测试固定。
+
+Issue #116 增加 Agent / AgentSession.TakeQueuedMessages，回取时以 Agent 的实际未消费队列为准，与取队列的动作共享锁。Session 展示快照可能暂时包含已经进入消费而尚未发布 message_start 的消息，不能用 getter + ClearQueue 来实现交互回填。原 ClearQueue 签名不变。
+
+Interactive 输入记录活动轮次，取消和迟到输入不能误投下一轮。生成收尾窗口内被 AgentIdle / AgentSettling 明确拒绝的新文本由交互层暂存，完整 worker 返回后作为新 Prompt 提交；取消则回填编辑器。它没有产生成功 queue_update，也不重新投递已接受的队列项。重试等待中的投递仍按既有 admission 拒绝并回填。

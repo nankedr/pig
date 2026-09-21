@@ -177,6 +177,28 @@ func (s *AgentSession) ClearQueue() error {
 	return nil
 }
 
+// TakeQueuedMessages returns and clears only messages the Agent has not consumed.
+func (s *AgentSession) TakeQueuedMessages() (steering, followUp []string, err error) {
+	s.mu.Lock()
+	if s.disposed || s.replacing || s.reloading || s.agent == nil {
+		s.mu.Unlock()
+		return nil, nil, fmt.Errorf("AgentSession is busy or disposed")
+	}
+	pendingSteering, pendingFollowUp := s.agent.TakeQueuedMessages()
+	for _, message := range append(pendingSteering, s.compactionSteering...) {
+		steering = append(steering, sessionUserText(message))
+	}
+	for _, message := range append(pendingFollowUp, s.compactionFollowUp...) {
+		followUp = append(followUp, sessionUserText(message))
+	}
+	s.compactionSteering, s.compactionFollowUp = nil, nil
+	s.steeringMessages, s.followUpMessages = nil, nil
+	s.queueUpdateLocked()
+	s.mu.Unlock()
+	s.dispatchQueueEvents()
+	return
+}
+
 func (s *AgentSession) SetSteeringMode(mode agent.QueueMode) error { return s.setQueueMode(mode, true) }
 func (s *AgentSession) SetFollowUpMode(mode agent.QueueMode) error {
 	return s.setQueueMode(mode, false)

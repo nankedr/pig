@@ -60,6 +60,9 @@ func TestInteractiveSDKConversationAndStop(t *testing.T) {
 	go func() { done <- mode.Run(context.Background()) }()
 	tty.Send(t, "first questiox\x7fn\r")
 	tty.Wait(t, "FIRST_DONE")
+	if err := runtime.Session().WaitForIdle(context.Background()); err != nil {
+		t.Fatal(err)
+	}
 	tty.Send(t, "second question\r")
 	tty.Wait(t, "SECOND_DONE")
 	if err := mode.Stop(); err != nil {
