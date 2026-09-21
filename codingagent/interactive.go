@@ -498,12 +498,17 @@ func (m *InteractiveMode) Stop(_ ...bool) error {
 	m.stopOnce.Do(func() {
 		m.mu.Lock()
 		m.stopped = true
-		cancel := m.cancel
+		cancel, initialized := m.cancel, m.initialized
 		m.mu.Unlock()
 		if cancel != nil {
 			cancel()
 		}
 		m.stopErr = m.ui.Stop()
+		if initialized {
+			if terminal, ok := m.ui.Terminal().(interface{ Done() <-chan struct{} }); ok {
+				<-terminal.Done()
+			}
+		}
 		if m.runtime != nil {
 			m.stopErr = errors.Join(m.stopErr, m.runtime.Dispose(context.Background()))
 		}
