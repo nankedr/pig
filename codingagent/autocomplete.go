@@ -87,6 +87,10 @@ func (m *InteractiveMode) handleCommand(ctx context.Context, prompt string) (boo
 			continue
 		}
 		switch name {
+		case "resume":
+			return true, m.selectSession(ctx)
+		case "name":
+			return true, m.runtime.Session().SetSessionName(strings.TrimSpace(argument))
 		case "model":
 			return true, m.selectModel(ctx, strings.TrimSpace(argument))
 		case "scoped-models":
@@ -95,12 +99,7 @@ func (m *InteractiveMode) handleCommand(ctx context.Context, prompt string) (boo
 			return true, m.selectThinking(ctx)
 		}
 		if name == "new" {
-			_, err := m.runtime.NewSession(ctx)
-			if err == nil {
-				_ = m.transcript.SetMessages(nil)
-				err = m.ui.Refresh()
-			}
-			return true, err
+			return true, m.newSession(ctx)
 		}
 		return true, notImplemented("InteractiveMode.command." + name)
 	}

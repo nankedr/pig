@@ -20,6 +20,7 @@ type InteractiveModeOptions struct {
 	Terminal             tui.Terminal
 	Keybindings          *KeybindingsManager
 	AutoTrustOnReloadCWD *string
+	ProjectTrustOverride ProjectTrustDecision
 	InitialImages        []ai.ImageContent
 	InitialMessage       *string
 	InitialMessages      []string

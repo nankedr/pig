@@ -1,0 +1,19 @@
+func(context.Context, codingagent.SessionsLoader, codingagent.SessionsLoader, func(string), func(), ...codingagent.SessionSelectorOptions) (*codingagent.SessionSelectorComponent, error)
+AddChild func(*codingagent.SessionSelectorComponent, tui.Component)
+Children func(*codingagent.SessionSelectorComponent) []tui.Component
+Clear func(*codingagent.SessionSelectorComponent)
+GetSessionList func(*codingagent.SessionSelectorComponent) (*tui.SelectList, error)
+HandleInput func(*codingagent.SessionSelectorComponent, string) error
+Invalidate func(*codingagent.SessionSelectorComponent) error
+RemoveChild func(*codingagent.SessionSelectorComponent, tui.Component)
+Render func(*codingagent.SessionSelectorComponent, int) ([]string, error)
+type codingagent.SessionSelectorOptions struct
+fields:
+- Keybindings *codingagent.KeybindingsManager tag=""
+- CurrentSessionFilePath string tag=""
+- RenameSession func(string, string) error tag=""
+func(context.Context, string, ...codingagent.SessionListOptions) ([]codingagent.SessionInfo, error)
+func(context.Context, ...codingagent.SessionListOptions) ([]codingagent.SessionInfo, error)
+func(*codingagent.AgentSessionRuntime, context.Context, string, ...codingagent.SwitchSessionOptions) (codingagent.SessionReplacementResult, error)
+func(*codingagent.AgentSessionRuntime, context.Context, ...codingagent.NewRuntimeSessionOptions) (codingagent.SessionReplacementResult, error)
+func(*tui.TextUI, []string) error

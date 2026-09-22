@@ -375,6 +375,9 @@ func Main(ctx context.Context, arguments []string, _ ...MainOptions) error {
 func runSessionMain(ctx context.Context, arguments []string) error {
 	parsed := ParseArgs(arguments)
 	interactive := !parsed.Print && parsed.Mode != ModeJSON && parsed.Mode != ModeRPC && isTerminalFile(os.Stdin) && isTerminalFile(os.Stdout)
+	if parsed.Resume && !interactive {
+		return &CLIArgumentError{Message: "--resume requires an interactive terminal"}
+	}
 	if operation := unsupportedHeadlessOperation(parsed); operation != "" {
 		return notImplemented(operation)
 	}
@@ -557,7 +560,7 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 				return errors.Join(err, runtime.Dispose(context.WithoutCancel(ctx)))
 			}
 		}
-		mode := NewInteractiveMode(runtime, InteractiveModeOptions{InitialMessages: messages, TUIMode: parsed.TUIMode})
+		mode := NewInteractiveMode(runtime, InteractiveModeOptions{InitialMessages: messages, TUIMode: parsed.TUIMode, ProjectTrustOverride: parsed.ProjectTrustOverride})
 		err := mode.Run(ctx)
 		if err == context.Canceled && ctx.Err() != nil {
 			return nil
@@ -576,8 +579,6 @@ func unsupportedHeadlessOperation(parsed Args) string {
 	switch {
 	case len(parsed.FileArgs) != 0:
 		return "headless.file-arguments"
-	case parsed.Resume:
-		return "headless.session-persistence"
 	case len(parsed.Extensions) != 0:
 		return "headless.resources"
 	default:

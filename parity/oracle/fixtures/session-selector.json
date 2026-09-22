@@ -1,0 +1,268 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/components/session-selector.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/interactive/session-selector",
+    "catalog_id": "contract:codingagent/session-selection",
+    "surface": "go-sdk",
+    "input": {
+      "sessions": [
+        {
+          "path": "/sessions/child.jsonl",
+          "id": "child",
+          "cwd": "/project",
+          "parentSessionPath": "/sessions/root.jsonl",
+          "name": "Child task",
+          "firstMessage": "fix node cve",
+          "allMessagesText": "fix node cve regression",
+          "messageCount": 2,
+          "created": "2026-01-01T00:00:00.000Z",
+          "modified": "2026-01-05T00:00:00.000Z"
+        },
+        {
+          "path": "/sessions/other.jsonl",
+          "id": "other",
+          "cwd": "/other",
+          "name": "Other project",
+          "firstMessage": "work elsewhere",
+          "allMessagesText": "work elsewhere",
+          "messageCount": 2,
+          "created": "2026-01-01T00:00:00.000Z",
+          "modified": "2026-01-04T00:00:00.000Z"
+        },
+        {
+          "path": "/sessions/plain.jsonl",
+          "id": "plain",
+          "cwd": "/project",
+          "firstMessage": "node stuff cve",
+          "allMessagesText": "node stuff cve",
+          "messageCount": 2,
+          "created": "2026-01-01T00:00:00.000Z",
+          "modified": "2026-01-03T00:00:00.000Z"
+        },
+        {
+          "path": "/sessions/root.jsonl",
+          "id": "root",
+          "cwd": "/project",
+          "name": "Root task",
+          "firstMessage": "fix bug",
+          "allMessagesText": "fix bug original",
+          "messageCount": 2,
+          "created": "2026-01-01T00:00:00.000Z",
+          "modified": "2026-01-02T00:00:00.000Z"
+        }
+      ],
+      "cases": [
+        {
+          "id": "threaded",
+          "keys": [
+            "\r"
+          ]
+        },
+        {
+          "id": "recent",
+          "keys": [
+            "\u0013",
+            "\r"
+          ]
+        },
+        {
+          "id": "all",
+          "keys": [
+            "\t",
+            "other",
+            "\r"
+          ]
+        },
+        {
+          "id": "phrase",
+          "keys": [
+            "\"node cve\"",
+            "\r"
+          ]
+        },
+        {
+          "id": "tokens",
+          "keys": [
+            "node cve",
+            "\r"
+          ]
+        },
+        {
+          "id": "regex",
+          "keys": [
+            "re:node.*cve",
+            "\r"
+          ]
+        },
+        {
+          "id": "invalid",
+          "keys": [
+            "re:[",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "id": "named",
+          "keys": [
+            "\u000e",
+            "\u001b[B",
+            "\r"
+          ]
+        },
+        {
+          "id": "clamp",
+          "keys": [
+            "\u001b[A",
+            "\r"
+          ]
+        },
+        {
+          "id": "cancel",
+          "keys": [
+            "\u001b"
+          ]
+        },
+        {
+          "id": "sort-cycle",
+          "keys": [
+            "\u0013",
+            "\u0013",
+            "\u0013",
+            "\r"
+          ]
+        },
+        {
+          "id": "page",
+          "keys": [
+            "\u001b[6~",
+            "\r"
+          ]
+        },
+        {
+          "id": "scope-back",
+          "keys": [
+            "\t",
+            "\t",
+            "\r"
+          ]
+        },
+        {
+          "id": "path",
+          "keys": [
+            "\u0010",
+            "\r"
+          ]
+        },
+        {
+          "id": "unclosed",
+          "keys": [
+            "\"node",
+            "\r",
+            "\u001b"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "threaded",
+        "selected": "/sessions/root.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "recent",
+        "selected": "/sessions/child.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "all",
+        "selected": "/sessions/other.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "phrase",
+        "selected": "/sessions/child.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "tokens",
+        "selected": "/sessions/plain.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "regex",
+        "selected": "/sessions/plain.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "invalid",
+        "selected": "",
+        "cancelled": true
+      },
+      {
+        "id": "named",
+        "selected": "/sessions/child.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "clamp",
+        "selected": "/sessions/root.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "cancel",
+        "selected": "",
+        "cancelled": true
+      },
+      {
+        "id": "sort-cycle",
+        "selected": "/sessions/root.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "page",
+        "selected": "/sessions/plain.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "scope-back",
+        "selected": "/sessions/root.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "path",
+        "selected": "/sessions/root.jsonl",
+        "cancelled": false
+      },
+      {
+        "id": "unclosed",
+        "selected": "",
+        "cancelled": true
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:30a8ff510d4b3bccce2e485e91926b0862a6192c5d00372fa642b59fe8835c2a",
+  "observation_hash": "sha256:5cec1d1f73a94552dbea6362648d202f3d05b1907d9ae5521c2c6982d5fcd22d",
+  "execution_method": "node parity/oracle/session-selector.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "sessions": "fixed discovery snapshot; no network"
+  }
+}

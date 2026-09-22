@@ -123,6 +123,9 @@ func (r *AgentSessionRuntime) beginReplacement(ctx context.Context) (func(), err
 	return done, nil
 }
 func (r *AgentSessionRuntime) SwitchSession(ctx context.Context, path string, options ...SwitchSessionOptions) (SessionReplacementResult, error) {
+	if err := validateResumeSession(path); err != nil {
+		return SessionReplacementResult{}, err
+	}
 	done, err := r.beginReplacement(ctx)
 	if err != nil {
 		return SessionReplacementResult{}, err

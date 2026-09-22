@@ -626,7 +626,7 @@ func FuzzyFilter[T any](items []T, query string, getText func(T) string) ([]T, e
 ## symbol:tui/src/fuzzy.ts#fuzzyMatch
 reference: packages/tui/src/fuzzy.ts#fuzzyMatch
 target: github.com/nankedr/pig/tui.FuzzyMatch
-func FuzzyMatch(string, string) (FuzzyMatchResult, error)
+func FuzzyMatch(query, text string) (FuzzyMatchResult, error)
 
 ## symbol:tui/src/keybindings.ts#Keybinding
 reference: packages/tui/src/keybindings.ts#Keybinding

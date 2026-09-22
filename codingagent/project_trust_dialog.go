@@ -43,6 +43,15 @@ type PrepareProjectSettingsOptions struct {
 
 // PrepareProjectSettings resolves and persists trust before reading project settings.
 func PrepareProjectSettings(ctx context.Context, o PrepareProjectSettingsOptions) error {
+	var selectDialog func(context.Context, string, []tui.SelectItem) (*tui.SelectItem, error)
+	if o.Terminal != nil {
+		selectDialog = func(ctx context.Context, title string, items []tui.SelectItem) (*tui.SelectItem, error) {
+			return tui.ShowSelectDialog(ctx, o.Terminal, title, items)
+		}
+	}
+	return prepareProjectSettings(ctx, o, selectDialog)
+}
+func prepareProjectSettings(ctx context.Context, o PrepareProjectSettingsOptions, selectDialog func(context.Context, string, []tui.SelectItem) (*tui.SelectItem, error)) error {
 	if ctx == nil {
 		return fmt.Errorf("trust context must not be nil")
 	}
@@ -84,7 +93,7 @@ func PrepareProjectSettings(ctx context.Context, o PrepareProjectSettingsOptions
 	if global.DefaultProjectTrust != nil {
 		policy = *global.DefaultProjectTrust
 	}
-	if policy == DefaultProjectTrustAlways || policy == DefaultProjectTrustNever || o.Terminal == nil {
+	if policy == DefaultProjectTrustAlways || policy == DefaultProjectTrustNever || selectDialog == nil {
 		return o.SettingsManager.SetProjectTrusted(policy == DefaultProjectTrustAlways)
 	}
 	options, err := GetProjectTrustOptions(o.CWD, true)
@@ -96,7 +105,7 @@ func PrepareProjectSettings(ctx context.Context, o PrepareProjectSettingsOptions
 		items[i] = tui.SelectItem{Value: option.Label, Label: option.Label}
 	}
 	title := "Trust project folder?\n" + tui.SafeTerminalText(o.CWD) + "\n\nTrust allows Pig to load .pig settings and project resources. Trusted content and Tools use your host user permissions. This is not Tool approval or a sandbox. Context Files load even without trust. Package installation and extension execution remain unavailable."
-	selected, err := tui.ShowSelectDialog(ctx, o.Terminal, title, items)
+	selected, err := selectDialog(ctx, title, items)
 	if err != nil {
 		return err
 	}

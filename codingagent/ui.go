@@ -211,18 +211,6 @@ func (*OAuthSelectorComponent) HandleInput(string) error {
 	return notImplemented("OAuthSelectorComponent.HandleInput")
 }
 
-type SessionSelectorComponent struct {
-	tui.Container
-	Focused bool
-}
-
-func (*SessionSelectorComponent) GetSessionList() (*tui.SelectList, error) {
-	return nil, notImplemented("SessionSelectorComponent.GetSessionList")
-}
-func (*SessionSelectorComponent) HandleInput(string) error {
-	return notImplemented("SessionSelectorComponent.HandleInput")
-}
-
 type MermaidRenderingMode string
 
 const (

@@ -467,8 +467,8 @@ func (u *TextUI) input(data string) {
 			_ = u.editor.SetText("")
 			u.enqueueAction("app.message.followUp", text)
 		}
-	case match("app.model.select"), match("app.model.cycleForward"), match("app.model.cycleBackward"), match("app.thinking.cycle"):
-		for _, action := range []Keybinding{"app.model.select", "app.model.cycleForward", "app.model.cycleBackward", "app.thinking.cycle"} {
+	case match("app.session.resume"), match("app.model.select"), match("app.model.cycleForward"), match("app.model.cycleBackward"), match("app.thinking.cycle"):
+		for _, action := range []Keybinding{"app.session.resume", "app.model.select", "app.model.cycleForward", "app.model.cycleBackward", "app.thinking.cycle"} {
 			if match(action) {
 				u.enqueueAction(action, "")
 				break
@@ -617,4 +617,19 @@ func (u *TextUI) enqueueAction(action Keybinding, text string) {
 	case u.ready <- struct{}{}:
 	default:
 	}
+}
+
+// ResetSession replaces conversation-local editor history and output after a successful Session change.
+func (u *TextUI) ResetSession(history []string) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.transcript = ""
+	u.inputs = nil
+	u.editor.history = nil
+	u.editor.exitHistory()
+	for _, text := range history {
+		_ = u.editor.AddToHistory(text)
+	}
+	_ = u.editor.SetText("")
+	return u.render()
 }

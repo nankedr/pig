@@ -127,8 +127,9 @@ func ExtractSegments(string, int, int, int, ...bool) (ExtractedSegments, error) 
 	return ExtractedSegments{}, newNotImplemented("extractSegments")
 }
 
-func FuzzyMatch(string, string) (FuzzyMatchResult, error) {
-	return FuzzyMatchResult{}, newNotImplemented("fuzzyMatch")
+func FuzzyMatch(query, text string) (FuzzyMatchResult, error) {
+	score, matches := completionScore(query, text)
+	return FuzzyMatchResult{Matches: matches, Score: score}, nil
 }
 
 func RenderLaTeX(string, ...RenderLaTeXOptions) (string, bool, error) {

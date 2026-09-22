@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/nankedr/pig/agent"
@@ -30,6 +31,8 @@ type InteractiveMode struct {
 	retryUntil                    time.Time
 	setupErr                      error
 	transcript                    *Transcript
+	renderSession                 atomic.Pointer[AgentSession]
+	settleSession                 func() error
 }
 
 func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveModeOptions) *InteractiveMode {
@@ -50,6 +53,9 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 		bindings, mode.setupErr = NewKeybindingsManager(dir)
 	}
 	mode.options.Keybindings = bindings
+	if runtime != nil {
+		mode.renderSession.Store(runtime.Session())
+	}
 	var manager *tui.KeybindingsManager
 	if bindings != nil {
 		manager = &bindings.KeybindingsManager
@@ -70,9 +76,9 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 		if err != nil {
 			return nil, err
 		}
-		if runtime != nil && runtime.Session() != nil {
-			steering, _ := runtime.Session().GetSteeringMessages()
-			followUp, _ := runtime.Session().GetFollowUpMessages()
+		if session := mode.renderSession.Load(); session != nil {
+			steering, _ := session.GetSteeringMessages()
+			followUp, _ := session.GetFollowUpMessages()
 			for _, text := range steering {
 				wrapped, _ := tui.WrapTextWithANSI(tui.SafeTerminalText("Steering: "+text), width)
 				lines = append(lines, wrapped...)
@@ -169,13 +175,14 @@ func (m *InteractiveMode) GetUserInput(ctx context.Context) (string, error) {
 			continue
 		}
 		switch input.Action {
-		case "app.session.new":
-			_, err = m.runtime.NewSession(ctx)
+		case "app.session.new", "app.session.resume":
+			if input.Action == "app.session.new" {
+				err = m.newSession(ctx)
+			} else {
+				err = m.selectSession(ctx)
+			}
 			if err != nil {
 				_ = m.ShowError(err.Error())
-			} else {
-				_ = m.transcript.SetMessages(nil)
-				_ = m.ui.Refresh()
 			}
 		case "app.message.dequeue":
 			if err = m.restoreQueued(); err != nil {
@@ -327,6 +334,20 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		}
 		return m.ui.Refresh()
 	}
+	m.settleSession = func() error {
+		if turnDone == nil {
+			return nil
+		}
+		turnCancel()
+		promptErr := <-turnDone
+		pendingPrompts = nil
+		settling = nil
+		if errors.Is(promptErr, context.Canceled) {
+			promptErr = nil
+		}
+		return finishTurn(promptErr)
+	}
+	defer func() { m.settleSession = nil }()
 loop:
 	for {
 		var input tui.TextInput
@@ -408,10 +429,18 @@ loop:
 			continue
 		case "app.session.new":
 			input.Text = "/new"
+		case "app.session.resume":
+			input.Text = "/resume"
 		}
 
 		if !literalPrompt {
 			if handled, commandErr := m.handleCommand(runCtx, input.Text); handled {
+				if m.runtime.Session() != session {
+					turnID++
+					prompts = nil
+					pendingPrompts = nil
+					settling = nil
+				}
 				if commandErr != nil {
 					_ = m.ShowError(commandErr.Error())
 				}

@@ -96,6 +96,8 @@ func selectHeadlessSession(ctx context.Context, parsed Args, cwd string, dir *st
 			return ForkSessionManager(path, cwd, dir)
 		}
 		return OpenSessionManager(path, dir, nil)
+	case parsed.Resume:
+		return selectStartupSession(ctx, cwd, dir)
 	case parsed.Continue:
 		return ContinueRecentSessionManager(cwd, dir)
 	default:
