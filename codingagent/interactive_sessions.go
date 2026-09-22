@@ -160,11 +160,6 @@ func (m *InteractiveMode) newSession(ctx context.Context) error {
 func (m *InteractiveMode) sessionChanged(status string) error {
 	session := m.runtime.Session()
 	m.renderSession.Store(session)
-	if m.themes != nil {
-		if err := m.reloadThemes(); err != nil {
-			_ = m.ShowWarning(err.Error())
-		}
-	}
 	provider, err := NewSessionAutocompleteProvider(session, nil)
 	if err != nil {
 		return err
@@ -196,6 +191,11 @@ func (m *InteractiveMode) sessionChanged(status string) error {
 	}
 	if err = m.ui.ResetSession(history); err != nil {
 		return err
+	}
+	if m.themes != nil {
+		if err := m.reloadThemes(); err != nil {
+			_ = m.ShowWarning(err.Error())
+		}
 	}
 	if fallback := m.runtime.ModelFallbackMessage(); fallback != nil {
 		_ = m.ShowWarning(*fallback)

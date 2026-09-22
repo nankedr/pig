@@ -131,9 +131,7 @@ func TestInteractiveInvalidThemeSessionReplacement120(t *testing.T) {
 	tty.Send(t, "/new\r")
 	tty.Wait(t, "Started new session")
 	waitSessionScreen118(t, tty, "SOURCE_HISTORY_120", false)
-	if !strings.Contains(tty.Output(), "missing-theme-120") {
-		t.Fatal("missing theme warning")
-	}
+	waitSessionScreen118(t, tty, "missing-theme-120", true)
 	tty.Send(t, "\x04")
 	if err = awaitInteractive(t, done); err != nil {
 		t.Fatal(err)
