@@ -130,9 +130,26 @@ func TestSessionSelectionFailureAndCancel118(t *testing.T) {
 	if err := old.Prompt(ctx, "before failure"); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"missing", "empty", "corrupt", "directory"} {
+	for _, name := range []string{"missing", "empty", "corrupt", "directory", "concatenated", "unreadable"} {
 		path := filepath.Join(dir, name+".jsonl")
 		switch name {
+		case "concatenated", "unreadable":
+			data, err := os.ReadFile(*old.SessionFile())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if name == "concatenated" {
+				parts := strings.SplitN(string(data), "\n", 2)
+				data = []byte(parts[0] + "\n" + strings.ReplaceAll(parts[1], "\n", ""))
+			}
+			if err = os.WriteFile(path, data, 0600); err != nil {
+				t.Fatal(err)
+			}
+			if name == "unreadable" {
+				if err = os.Chmod(path, 0); err != nil {
+					t.Fatal(err)
+				}
+			}
 		case "empty":
 			os.WriteFile(path, nil, 0600)
 		case "corrupt":

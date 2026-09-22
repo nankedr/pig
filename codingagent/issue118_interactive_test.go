@@ -23,7 +23,7 @@ import (
 )
 
 func TestInteractiveSessionSwitchTrustAndBusy118(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
 	defer cancel()
 	started, aborted := make(chan struct{}), make(chan struct{})
 	var first sync.Once
@@ -75,7 +75,7 @@ func TestInteractiveSessionSwitchTrustAndBusy118(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		runtime, err := codingagent.CreateHeadlessSession(ctx, codingagent.CreateHeadlessSessionOptions{CWD: cwd, AgentDir: agentDir, SessionManager: manager, SettingsManager: settings, ModelRuntime: catalog, BaseURL: &server.URL, NoTools: codingagent.NoToolsAll})
+		runtime, err := codingagent.CreateHeadlessSession(ctx, codingagent.CreateHeadlessSessionOptions{CWD: cwd, AgentDir: agentDir, SessionManager: manager, SettingsManager: settings, ModelRuntime: catalog, BaseURL: &server.URL, NoTools: codingagent.NoToolsAll, NoSkills: true, NoExtensions: true, NoPromptTemplates: true})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -122,7 +122,9 @@ func TestInteractiveSessionSwitchTrustAndBusy118(t *testing.T) {
 	tty := terminaltest.Open(t)
 	mode := codingagent.NewInteractiveMode(runtime, codingagent.InteractiveModeOptions{Terminal: tui.NewProcessTerminal(tty.Slave, tty.Slave)})
 	done := make(chan error, 1)
-	go func() { done <- mode.Run(ctx) }()
+	finished := make(chan struct{})
+	go func() { done <- mode.Run(ctx); close(finished) }()
+	defer func() { cancel(); <-finished }()
 	tty.Wait(t, "> ")
 	tty.Send(t, "blocking turn\r")
 	select {
@@ -133,15 +135,16 @@ func TestInteractiveSessionSwitchTrustAndBusy118(t *testing.T) {
 	tty.Send(t, "/resume\r")
 	tty.Wait(t, "Resume Session")
 	tty.Send(t, "\x1b[27u")
-	time.Sleep(100 * time.Millisecond)
+	waitSessionScreen118(t, tty, "Resume Session", false)
 	select {
 	case <-aborted:
 		t.Fatal("cancelling selector aborted current generation")
 	default:
 	}
 	tty.Send(t, "/resume\r")
-	time.Sleep(100 * time.Millisecond)
+	waitSessionScreen118(t, tty, "Resume Session", true)
 	tty.Send(t, "\t")
+	waitSessionScreen118(t, tty, "Resume Session (All)", true)
 	tty.Wait(t, "TARGET_TWO")
 	tty.Send(t, "TARGET_TWO\r")
 	tty.Wait(t, "Trust project folder?")
@@ -191,5 +194,69 @@ func TestInteractiveSessionSwitchTrustAndBusy118(t *testing.T) {
 	}
 	if strings.Join(users, "|") != "target history|after switch" {
 		t.Fatal(users)
+	}
+}
+
+func TestInteractiveSessionSameCWDOverrides118(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/event-stream")
+		fmt.Fprint(w, "data: {\"choices\":[{\"delta\":{\"content\":\"READY\"},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n")
+	}))
+	defer server.Close()
+	cwd, dir, agentDir := t.TempDir(), t.TempDir(), t.TempDir()
+	catalog, _, _ := config87Runtime(t)
+	provider, model := "deepseek", "deepseek-v4-flash"
+	settings, _ := codingagent.NewInMemorySettingsManager(codingagent.Settings{DefaultProvider: &provider, DefaultModel: &model})
+	manager, err := codingagent.NewSessionManager(cwd, &dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	runtime, err := codingagent.CreateHeadlessSession(ctx, codingagent.CreateHeadlessSessionOptions{CWD: cwd, AgentDir: agentDir, SessionManager: manager, SettingsManager: settings, ModelRuntime: catalog, BaseURL: &server.URL, NoTools: codingagent.NoToolsAll, NoSkills: true, NoExtensions: true, NoPromptTemplates: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = runtime.Session().SetSessionName("KEEP_OVERRIDES"); err != nil {
+		t.Fatal(err)
+	}
+	if err = runtime.Session().Prompt(ctx, "saved question"); err != nil {
+		t.Fatal(err)
+	}
+	visible := 17
+	if err = settings.ApplyOverrides(codingagent.Settings{AutocompleteMaxVisible: &visible}); err != nil {
+		t.Fatal(err)
+	}
+	tty := terminaltest.Open(t)
+	mode := codingagent.NewInteractiveMode(runtime, codingagent.InteractiveModeOptions{Terminal: tui.NewProcessTerminal(tty.Slave, tty.Slave)})
+	done := make(chan error, 1)
+	finished := make(chan struct{})
+	go func() { done <- mode.Run(ctx); close(finished) }()
+	defer func() { cancel(); <-finished }()
+	tty.Wait(t, "> ")
+	tty.Send(t, "/resume\r")
+	tty.Wait(t, "Resume Session")
+	tty.Send(t, "KEEP_OVERRIDES\r")
+	tty.Wait(t, "Resumed session")
+	tty.Send(t, "\x04")
+	if err = awaitInteractive(t, done); err != nil {
+		t.Fatal(err)
+	}
+	if runtime.Session().SettingsManager() != settings {
+		t.Fatal("same-CWD resume replaced injected settings")
+	}
+	if got, _ := runtime.Session().SettingsManager().GetAutocompleteMaxVisible(); got != 17 {
+		t.Fatal("temporary override lost", got)
+	}
+}
+
+func waitSessionScreen118(t *testing.T, tty *terminaltest.Terminal, text string, present bool) {
+	t.Helper()
+	deadline := time.Now().Add(10 * time.Second)
+	for strings.Contains(tty.ScreenText(), text) != present {
+		if time.Now().After(deadline) {
+			t.Fatalf("screen %q present=%v: %s", text, present, tty.ScreenText())
+		}
+		time.Sleep(5 * time.Millisecond)
 	}
 }

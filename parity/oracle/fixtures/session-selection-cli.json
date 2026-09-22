@@ -138,17 +138,17 @@
         }
       ],
       "sessions": {
+        "new": {
+          "name": null,
+          "users": [
+            "new question"
+          ]
+        },
         "source": {
           "name": "source saved",
           "users": [
             "source history",
             "switched question"
-          ]
-        },
-        "new": {
-          "name": null,
-          "users": [
-            "new question"
           ]
         },
         "target": {

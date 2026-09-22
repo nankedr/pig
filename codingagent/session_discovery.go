@@ -115,7 +115,10 @@ func sessionFiles(dir string) []string {
 	files := []string{}
 	for _, e := range entries {
 		if strings.HasSuffix(e.Name(), ".jsonl") {
-			files = append(files, filepath.Join(dir, e.Name()))
+			path := filepath.Join(dir, e.Name())
+			if info, err := os.Stat(path); err == nil && info.Mode().IsRegular() {
+				files = append(files, path)
+			}
 		}
 	}
 	return files

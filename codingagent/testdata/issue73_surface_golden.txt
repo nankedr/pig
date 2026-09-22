@@ -33,6 +33,7 @@ fields:
 
 type codingagent.SwitchSessionOptions struct
 fields:
+- prepareSettings func(context.Context, string) (*codingagent.SettingsManager, error) tag=""
 - CWDOverride *string tag=""
 - WithSession codingagent.ExtensionHandler tag=""
 - ProjectTrustContextFactory func(string) codingagent.ProjectTrustContext tag=""

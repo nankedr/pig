@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9687
+- Total entries: 9688
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5154 |
-| scaffolded | 3630 |
-| partial | 610 |
+| inventoried | 5153 |
+| scaffolded | 3631 |
+| partial | 611 |
 | implemented | 123 |
 | verified | 167 |
 | deferred | 3 |
@@ -5432,7 +5432,6 @@
 | constructor:codingagent/src/modes/interactive/components/footer.ts#FooterComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.FooterComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/login-dialog.ts#LoginDialogComponent | inventoried | M11 | contract | github.com/nankedr/pig/codingagent.LoginDialogComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/oauth-selector.ts#OAuthSelectorComponent | inventoried | M11 | contract | github.com/nankedr/pig/codingagent.OAuthSelectorComponent | coding-agent |
-| constructor:codingagent/src/modes/interactive/components/session-selector.ts#SessionSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.SessionSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/settings-selector.ts#SettingsSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.SettingsSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/show-images-selector.ts#ShowImagesSelectorComponent | inventoried | M12 | contract | github.com/nankedr/pig/codingagent.ShowImagesSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/skill-invocation-message.ts#SkillInvocationMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.SkillInvocationMessageComponent | coding-agent |
@@ -6156,6 +6155,7 @@
 | constructor:codingagent/src/core/package-manager.ts#DefaultPackageManager | scaffolded | M5 | contract | github.com/nankedr/pig/codingagent.NewDefaultPackageManager | coding-agent |
 | constructor:codingagent/src/core/trust-manager.ts#ProjectTrustStore | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.NewProjectTrustStore | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/model-selector.ts#ModelSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewModelSelectorComponent | coding-agent |
+| constructor:codingagent/src/modes/interactive/components/session-selector.ts#SessionSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewSessionSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/thinking-selector.ts#ThinkingSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewThinkingSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewInteractiveMode | coding-agent |
 | constructor:codingagent/src/modes/rpc/rpc-client.ts#RpcClient | scaffolded | M4 | contract | github.com/nankedr/pig/codingagent.NewRPCClient | coding-agent |
@@ -7835,6 +7835,7 @@
 | contract:codingagent/session-configuration | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.SetModel | coding-agent |
 | contract:codingagent/session-messages | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession | coding-agent |
 | contract:codingagent/session-reload | partial | M5 | contract | github.com/nankedr/pig/codingagent.AgentSession.Reload | coding-agent |
+| contract:codingagent/session-selection | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/session-tree-navigation | partial | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.NavigateTree | coding-agent |
 | contract:codingagent/skills | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetSkills | coding-agent |
 | contract:codingagent/system-prompts | partial | M5 | contract | github.com/nankedr/pig/codingagent.NewDefaultResourceLoader | coding-agent |

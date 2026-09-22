@@ -88,5 +88,5 @@ with tempfile.TemporaryDirectory(prefix='pi-model-selection-') as tmp:
             c=message.get('content',[])
             return c if isinstance(c,str) else ''.join(x.get('text','') for x in c if x.get('type')=='text')
         saved[name]={'name':next((row['name'] for row in reversed(rows) if row['type']=='session_info'),None),'users':[text(row['message']) for row in rows if row['type']=='message' and row['message']['role']=='user']}
-    print(json.dumps({'requests':[{'model':r['model'],'thinking':r.get('reasoning_effort'),'users':[m['content'] for m in r['messages'] if m['role']=='user']} for r in requests],'sessions':saved,'terminal_restored':restored}))
+    print(json.dumps({'requests':[{'model':r['model'],'thinking':r.get('reasoning_effort'),'users':[m['content'] for m in r['messages'] if m['role']=='user']} for r in requests],'sessions':dict(sorted(saved.items())),'terminal_restored':restored}))
 server.shutdown();server.server_close()

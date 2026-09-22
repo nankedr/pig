@@ -624,12 +624,10 @@ func (u *TextUI) ResetSession(history []string) error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	u.transcript = ""
-	u.inputs = nil
 	u.editor.history = nil
 	u.editor.exitHistory()
 	for _, text := range history {
 		_ = u.editor.AddToHistory(text)
 	}
-	_ = u.editor.SetText("")
 	return u.render()
 }

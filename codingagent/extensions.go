@@ -6,7 +6,6 @@ package codingagent
 // stubs until the extension-runtime milestone.
 
 import (
-	"context"
 	"encoding/json"
 	"time"
 
@@ -456,11 +455,10 @@ type ProjectTrustEventResult struct {
 	Trusted  ProjectTrustEventDecision
 }
 type ProjectTrustContext struct {
-	prepareSettings func(context.Context, *SettingsManager) error
-	CWD             string
-	HasUI           bool
-	Mode            ExtensionMode
-	UI              ExtensionUIContext
+	CWD   string
+	HasUI bool
+	Mode  ExtensionMode
+	UI    ExtensionUIContext
 }
 
 type SessionStartEvent struct{ Type, Reason, PreviousSessionFile string }

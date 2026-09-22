@@ -10,6 +10,7 @@ import (
 )
 
 type CreateAgentSessionRuntimeOptions struct {
+	prepareSettings     func(context.Context, string) (*SettingsManager, error)
 	CWD, AgentDir       string
 	SessionManager      *SessionManager
 	SessionStartEvent   *SessionStartEvent
@@ -26,6 +27,7 @@ type SessionReplacementResult struct {
 	SelectedText *string
 }
 type SwitchSessionOptions struct {
+	prepareSettings            func(context.Context, string) (*SettingsManager, error)
 	CWDOverride                *string
 	WithSession                ExtensionHandler
 	ProjectTrustContextFactory func(string) ProjectTrustContext
@@ -150,7 +152,7 @@ func (r *AgentSessionRuntime) SwitchSession(ctx context.Context, path string, op
 		v := option.ProjectTrustContextFactory(manager.GetCWD())
 		trust = &v
 	}
-	return SessionReplacementResult{}, r.replaceSession(ctx, manager, "resume", trust)
+	return SessionReplacementResult{}, r.replaceSession(ctx, manager, "resume", trust, option.prepareSettings)
 }
 func (r *AgentSessionRuntime) NewSession(ctx context.Context, options ...NewRuntimeSessionOptions) (SessionReplacementResult, error) {
 	done, err := r.beginReplacement(ctx)
@@ -169,7 +171,7 @@ func (r *AgentSessionRuntime) NewSession(ctx context.Context, options ...NewRunt
 	if err != nil {
 		return SessionReplacementResult{}, err
 	}
-	return SessionReplacementResult{}, r.replaceSession(ctx, manager, "new", nil)
+	return SessionReplacementResult{}, r.replaceSession(ctx, manager, "new", nil, nil)
 }
 func (r *AgentSessionRuntime) newSessionManager(parent *string) (*SessionManager, error) {
 	option := NewSessionOptions{}
@@ -250,12 +252,12 @@ func (r *AgentSessionRuntime) fork(ctx context.Context, id string, clone bool, o
 	if err != nil {
 		return SessionReplacementResult{}, err
 	}
-	if err = r.replaceSession(ctx, manager, "fork", nil); err != nil {
+	if err = r.replaceSession(ctx, manager, "fork", nil, nil); err != nil {
 		return SessionReplacementResult{}, err
 	}
 	return result, nil
 }
-func (r *AgentSessionRuntime) replaceSession(ctx context.Context, manager *SessionManager, reason string, trust *ProjectTrustContext) error {
+func (r *AgentSessionRuntime) replaceSession(ctx context.Context, manager *SessionManager, reason string, trust *ProjectTrustContext, prepareSettings func(context.Context, string) (*SettingsManager, error)) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
@@ -264,7 +266,7 @@ func (r *AgentSessionRuntime) replaceSession(ctx context.Context, manager *Sessi
 	if file := old.SessionFile(); file != nil {
 		previous = *file
 	}
-	result, err := r.createRuntime(ctx, CreateAgentSessionRuntimeOptions{CWD: manager.GetCWD(), AgentDir: r.services.AgentDir, SessionManager: manager, SessionStartEvent: &SessionStartEvent{Type: "session_start", Reason: reason, PreviousSessionFile: previous}, ProjectTrustContext: trust})
+	result, err := r.createRuntime(ctx, CreateAgentSessionRuntimeOptions{CWD: manager.GetCWD(), AgentDir: r.services.AgentDir, SessionManager: manager, SessionStartEvent: &SessionStartEvent{Type: "session_start", Reason: reason, PreviousSessionFile: previous}, ProjectTrustContext: trust, prepareSettings: prepareSettings})
 	if err != nil {
 		if result.Session != nil {
 			err = errors.Join(err, result.Session.Dispose(), ai.CleanupSessionResources(result.Session.SessionID()))

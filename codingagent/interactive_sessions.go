@@ -1,6 +1,8 @@
 package codingagent
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -23,25 +25,28 @@ func validateResumeSession(path string) error {
 		return err
 	}
 	defer file.Close()
-	decoder := json.NewDecoder(file)
+
+	reader := bufio.NewReader(file)
 	for {
-		var row json.RawMessage
-		err = decoder.Decode(&row)
-		if err == io.EOF {
+		line, readErr := reader.ReadBytes('\n')
+		if len(bytes.TrimSpace(line)) > 0 && !json.Valid(line) {
+			return fmt.Errorf("Corrupt Session %s: each JSONL line must contain one complete JSON value", path)
+		}
+		if readErr == io.EOF {
 			break
 		}
-		if err != nil {
-			return fmt.Errorf("Corrupt Session %s: %w", path, err)
+		if readErr != nil {
+			return readErr
 		}
 	}
 	return nil
 }
 func sessionLoaders(cwd string, dir *string) (SessionsLoader, SessionsLoader) {
 	return func(ctx context.Context) ([]SessionInfo, error) {
-		return ListSessions(ctx, cwd, SessionListOptions{SessionDir: dir})
-	}, func(ctx context.Context) ([]SessionInfo, error) {
-		return ListAllSessions(ctx, SessionListOptions{SessionDir: dir})
-	}
+			return ListSessions(ctx, cwd, SessionListOptions{SessionDir: dir})
+		}, func(ctx context.Context) ([]SessionInfo, error) {
+			return ListAllSessions(ctx, SessionListOptions{SessionDir: dir})
+		}
 }
 func selectStartupSession(ctx context.Context, cwd string, dir *string) (manager *SessionManager, err error) {
 	bindings, err := NewKeybindingsManager()
@@ -135,11 +140,7 @@ func (m *InteractiveMode) selectSession(ctx context.Context) error {
 			return err
 		}
 	}
-	_, err = m.runtime.SwitchSession(ctx, selected, SwitchSessionOptions{ProjectTrustContextFactory: func(cwd string) ProjectTrustContext {
-		return ProjectTrustContext{CWD: cwd, HasUI: true, prepareSettings: func(ctx context.Context, settings *SettingsManager) error {
-			return m.prepareSessionSettings(ctx, cwd, settings)
-		}}
-	}})
+	_, err = m.runtime.SwitchSession(ctx, selected, SwitchSessionOptions{prepareSettings: m.prepareSessionSettings})
 	if err != nil {
 		return err
 	}
@@ -199,16 +200,20 @@ func (m *InteractiveMode) sessionChanged(status string) error {
 	}
 	return m.ui.Append("\n" + status + " · " + optionalHeadlessString(session.SessionManager().GetSessionName()) + "\n")
 }
-func (m *InteractiveMode) prepareSessionSettings(ctx context.Context, cwd string, settings *SettingsManager) error {
-	override := m.options.ProjectTrustOverride
+func (m *InteractiveMode) prepareSessionSettings(ctx context.Context, cwd string) (*SettingsManager, error) {
 	if cwd == m.runtime.CWD() {
-		trusted, err := m.runtime.Session().SettingsManager().IsProjectTrusted()
-		if err != nil {
-			return err
-		}
-		override = &trusted
+		return m.runtime.Session().SettingsManager(), nil
 	}
-	return prepareProjectSettings(ctx, PrepareProjectSettingsOptions{CWD: cwd, AgentDir: m.runtime.Services().AgentDir, SettingsManager: settings, Override: override}, func(ctx context.Context, title string, items []tui.SelectItem) (*tui.SelectItem, error) {
+	agentDir := m.runtime.Services().AgentDir
+	var dir *string
+	if agentDir != "" {
+		dir = &agentDir
+	}
+	settings, err := NewSettingsManager(cwd, dir)
+	if err != nil {
+		return nil, err
+	}
+	err = prepareProjectSettings(ctx, PrepareProjectSettingsOptions{CWD: cwd, AgentDir: agentDir, SettingsManager: settings, Override: m.options.ProjectTrustOverride}, func(ctx context.Context, title string, items []tui.SelectItem) (*tui.SelectItem, error) {
 		done, finish := selectorSignal()
 		var selected *tui.SelectItem
 		dialog := tui.NewSelectDialog(title, items, func(item tui.SelectItem) { selected = &item; finish() }, finish)
@@ -216,4 +221,5 @@ func (m *InteractiveMode) prepareSessionSettings(ctx context.Context, cwd string
 		err := m.waitSelector(ctx, dialog, done)
 		return selected, err
 	})
+	return settings, err
 }

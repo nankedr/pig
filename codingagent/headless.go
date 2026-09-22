@@ -306,16 +306,10 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		if next.CWD != options.CWD {
 			config.SettingsManager = nil
 		}
-		if trust := next.ProjectTrustContext; trust != nil && trust.prepareSettings != nil {
-			var dir *string
-			if config.AgentDir != "" {
-				dir = &config.AgentDir
-			}
-			prepared, err := NewSettingsManager(next.CWD, dir)
+
+		if next.prepareSettings != nil {
+			prepared, err := next.prepareSettings(ctx, next.CWD)
 			if err != nil {
-				return CreateAgentSessionRuntimeResult{}, err
-			}
-			if err = trust.prepareSettings(ctx, prepared); err != nil {
 				return CreateAgentSessionRuntimeResult{}, err
 			}
 			config.SettingsManager = prepared

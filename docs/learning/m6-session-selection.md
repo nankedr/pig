@@ -12,9 +12,9 @@ Issue #118 的固定对等基线是 Pi `936aff00918de1187f085f123c2812d8f2d67745
 
 ## 生命周期
 
-选定目标后，InteractiveMode 取消并等待当前生成返回，RunHeadless 解除该轮监听，随后调用 AgentSessionRuntime.SwitchSession。runtime 先成功构建目标才销毁旧 Session；读取或构建失败后旧 Session 仍可继续工作。目标文件必须存在、非空、为普通文件，且 JSON 完整。缺失 CWD 显示错误，保留当前 Session。
+选定目标后，InteractiveMode 取消并等待当前生成返回，RunHeadless 解除该轮监听，随后调用 AgentSessionRuntime.SwitchSession。runtime 先成功构建目标才销毁旧 Session；读取或构建失败后旧 Session 仍可继续工作。目标文件必须存在、非空、为普通文件，且每行都是一个完整 JSON 值。缺失 CWD 显示错误，保留当前 Session。
 
-切换后，模型、thinking、名称、模型历史、编辑器历史、资源补全和后续持久化指向目标。CLI 显式模型/thinking 参数仍保持现有优先级。跨 CWD 创建目标前，复用 #114 的项目信任判断并在当前 TUI 显示信任对话框；拒绝或 Esc 不读取项目设置，Context File 仍会加载。公开 SDK 自定义 runtime factory 继续负责自己的资源与信任装配。
+切换后，模型、thinking、名称、模型历史、编辑器历史、资源补全和后续持久化指向目标。CLI 显式模型/thinking 参数仍保持现有优先级。同 CWD 恢复保留 SDK 注入的设置实例和临时 ApplyOverrides。跨 CWD 创建目标前，复用 #114 的项目信任判断并在当前 TUI 显示信任对话框；拒绝或 Esc 不读取项目设置，Context File 仍会加载。公开 SDK 自定义 runtime factory 继续负责自己的资源与信任装配。
 
 ```go
 current := func(ctx context.Context) ([]codingagent.SessionInfo, error) {
