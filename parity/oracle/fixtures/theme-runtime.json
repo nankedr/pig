@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/theme/theme-controller.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/interactive/theme-runtime",
+    "catalog_id": "contract:codingagent/interactive-themes",
+    "surface": "go-sdk",
+    "input": {
+      "reports": [
+        "\u001b]11;rgb:ffff/ffff/ffff\u0007",
+        "\u001b]11;#000000\u001b\\",
+        "\u001b]11;rgba:80/40/ff/ff\u0007",
+        "\u001b]11;bad\u0007",
+        "\u001b[?997;1n",
+        "\u001b[?997;2n",
+        "\u001b[?997;1n\u001b[?997;2n",
+        "x"
+      ],
+      "env": [
+        "",
+        "0;15",
+        "15;0",
+        "0;7",
+        "0;invalid;255"
+      ],
+      "keys": [
+        [
+          "\r"
+        ],
+        [
+          "\u001b[B",
+          "\r"
+        ],
+        [
+          "\u001b[A",
+          "\u001b"
+        ],
+        [
+          "\u001b[B",
+          "\u001b[A",
+          "\r"
+        ]
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "reports": [
+        {
+          "rgb": {
+            "r": 255,
+            "g": 255,
+            "b": 255
+          },
+          "scheme": ""
+        },
+        {
+          "rgb": {
+            "r": 0,
+            "g": 0,
+            "b": 0
+          },
+          "scheme": ""
+        },
+        {
+          "rgb": {
+            "r": 128,
+            "g": 64,
+            "b": 255
+          },
+          "scheme": ""
+        },
+        {
+          "rgb": null,
+          "scheme": ""
+        },
+        {
+          "rgb": null,
+          "scheme": "dark"
+        },
+        {
+          "rgb": null,
+          "scheme": "light"
+        },
+        {
+          "rgb": null,
+          "scheme": "light"
+        },
+        {
+          "rgb": null,
+          "scheme": ""
+        }
+      ],
+      "env": [
+        "dark",
+        "light",
+        "dark",
+        "light",
+        "light"
+      ],
+      "selectors": [
+        [
+          "select:dark"
+        ],
+        [
+          "preview:light",
+          "select:light"
+        ],
+        [
+          "preview:light",
+          "cancel"
+        ],
+        [
+          "preview:light",
+          "preview:dark",
+          "select:dark"
+        ]
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:20930557e81f15dba7a52013583987c1a3d7c5dcb3ba32fa2136cf0cbb929d2d",
+  "observation_hash": "sha256:381f3108de2e11f6120c8300c3254a28c299c0ac698462daf7e468c49bd88c45",
+  "execution_method": "node parity/oracle/theme-runtime.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {}
+}

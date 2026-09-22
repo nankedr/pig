@@ -9,6 +9,7 @@ import (
 )
 
 type AssistantMessageComponent struct {
+	theme *Theme
 	tui.Container
 	message                 ai.AssistantMessage
 	hideThinking, outputPad bool
@@ -59,13 +60,24 @@ func (c *AssistantMessageComponent) Render(width int) ([]string, error) {
 		pad = 1
 	}
 	theme, _ := GetMarkdownTheme()
+	if c.theme != nil {
+		theme = c.theme.MarkdownTheme()
+	}
 	appendMarkdown := func(s string, thinking bool) error {
 		var style *tui.DefaultTextStyle
 		if thinking {
 			yes := true
 			style = &tui.DefaultTextStyle{Italic: &yes}
+			if c.theme != nil {
+				style.Color = func(s string) string { return c.theme.FG("thinkingText", s) }
+			}
 		}
 		part, err := tui.NewMarkdown(s, pad, 0, theme, style).Render(width)
+		if c.theme != nil && !thinking {
+			for i, line := range part {
+				part[i] = c.theme.FG("text", line)
+			}
+		}
 		lines = append(lines, part...)
 		return err
 	}
@@ -152,7 +164,11 @@ func (c *AssistantMessageComponent) Render(width int) ([]string, error) {
 	}
 	if failure != "" {
 		lines = append(lines, "")
-		part, _ := tui.WrapTextWithANSI("\x1b[31m"+failure+"\x1b[0m", max(1, width-2*pad))
+		styledFailure := "\x1b[31m" + failure + "\x1b[0m"
+		if c.theme != nil {
+			styledFailure = c.theme.FG("error", failure)
+		}
+		part, _ := tui.WrapTextWithANSI(styledFailure, max(1, width-2*pad))
 		for _, line := range part {
 			lines = append(lines, strings.Repeat(" ", pad)+line)
 		}
@@ -161,6 +177,7 @@ func (c *AssistantMessageComponent) Render(width int) ([]string, error) {
 }
 
 type UserMessageComponent struct {
+	theme *Theme
 	tui.Container
 	text      string
 	outputPad bool
@@ -177,10 +194,20 @@ func (c *UserMessageComponent) Render(width int) ([]string, error) {
 	}
 	yes := true
 	theme, _ := GetMarkdownTheme()
-	return tui.NewMarkdown(c.text, pad, 1, theme, nil, tui.MarkdownOptions{PreserveOrderedListMarkers: &yes, PreserveBackslashEscapes: &yes}).Render(width)
+	if c.theme != nil {
+		theme = c.theme.MarkdownTheme()
+	}
+	lines, err := tui.NewMarkdown(c.text, pad, 1, theme, nil, tui.MarkdownOptions{PreserveOrderedListMarkers: &yes, PreserveBackslashEscapes: &yes}).Render(width)
+	if c.theme != nil {
+		for i, line := range lines {
+			lines[i] = c.theme.BG("userMessageBg", c.theme.FG("userMessageText", line))
+		}
+	}
+	return lines, err
 }
 
 type ToolExecutionComponent struct {
+	theme *Theme
 	tui.Container
 	name, id                               string
 	args                                   any
@@ -285,7 +312,7 @@ func (c *ToolExecutionComponent) Render(width int) ([]string, error) {
 			if details, ok := c.result.Details.Value(); ok {
 				if fields, ok := details.(map[string]any); ok {
 					if diff, ok := fields["diff"].(string); ok {
-						text, _ = RenderDiff(diff)
+						text, _ = renderThemeDiff(diff, c.theme)
 					}
 				}
 			}
@@ -300,9 +327,28 @@ func (c *ToolExecutionComponent) Render(width int) ([]string, error) {
 			lines = append(lines, wrapped...)
 		}
 	}
+	if c.theme != nil {
+		bg := ThemeBGToolPending
+		if c.final {
+			bg = ThemeBGToolSuccess
+			if c.result.IsError {
+				bg = ThemeBGToolError
+			}
+		}
+		for i, line := range lines {
+			fg := ThemeColor("toolOutput")
+			if i <= len(header) {
+				fg = "toolTitle"
+			}
+			lines[i] = c.theme.BG(bg, c.theme.FG(fg, line))
+		}
+	}
 	return lines, nil
 }
 func RenderDiff(text string, _ ...RenderDiffOptions) (string, error) {
+	return renderThemeDiff(text, nil)
+}
+func renderThemeDiff(text string, theme *Theme) (string, error) {
 	lines := strings.Split(tui.SafeTerminalText(text), "\n")
 	for i, line := range lines {
 		color := "2"
@@ -312,6 +358,15 @@ func RenderDiff(text string, _ ...RenderDiffOptions) (string, error) {
 			color = "31"
 		}
 		lines[i] = "\x1b[" + color + "m" + line + "\x1b[0m"
+		if theme != nil {
+			key := ThemeColor("toolDiffContext")
+			if color == "32" {
+				key = "toolDiffAdded"
+			} else if color == "31" {
+				key = "toolDiffRemoved"
+			}
+			lines[i] = theme.FG(key, line)
+		}
 	}
 	return strings.Join(lines, "\n"), nil
 }

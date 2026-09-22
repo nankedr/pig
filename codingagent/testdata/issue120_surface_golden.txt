@@ -1,0 +1,24 @@
+func(*codingagent.SettingsManager, codingagent.ThemeLoadResult) *codingagent.ThemeController
+func(string, codingagent.ThemeLoadResult, func(string), func(), func(string)) *codingagent.ThemeSelectorComponent
+func(string) (tui.TerminalColorScheme, bool)
+func(tui.RGBColor) tui.TerminalColorScheme
+func(*codingagent.Theme) tui.MarkdownTheme
+func(*codingagent.Transcript, *codingagent.Theme)
+func(*tui.TextUI, tui.TextStyleFunc, tui.TextStyleFunc)
+func(*tui.TextUI, func(string))
+ApplySettings func(*codingagent.ThemeController) error
+Current func(*codingagent.ThemeController) *codingagent.Theme
+Preview func(*codingagent.ThemeController, string) error
+Refresh func(*codingagent.ThemeController) (bool, error)
+ReplaceResources func(*codingagent.ThemeController, *codingagent.SettingsManager, codingagent.ThemeLoadResult) error
+SetTerminalTheme func(*codingagent.ThemeController, tui.TerminalColorScheme) error
+SetTheme func(*codingagent.ThemeController, string) error
+Watch func(*codingagent.ThemeController, context.Context, func(error))
+AddChild func(*codingagent.ThemeSelectorComponent, tui.Component)
+Children func(*codingagent.ThemeSelectorComponent) []tui.Component
+Clear func(*codingagent.ThemeSelectorComponent)
+GetSelectList func(*codingagent.ThemeSelectorComponent) (*tui.SelectList, error)
+HandleInput func(*codingagent.ThemeSelectorComponent, string) error
+Invalidate func(*codingagent.ThemeSelectorComponent) error
+RemoveChild func(*codingagent.ThemeSelectorComponent, tui.Component)
+Render func(*codingagent.ThemeSelectorComponent, int) ([]string, error)

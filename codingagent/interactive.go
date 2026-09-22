@@ -18,6 +18,10 @@ import (
 // InteractiveMode composes the production AgentSession with tui-owned input and rendering.
 // Run and Stop dispose the supplied runtime; construction performs no terminal I/O.
 type InteractiveMode struct {
+	themes                        *ThemeController
+	themeCancel                   context.CancelFunc
+	themeDone                     chan struct{}
+	colorReports                  chan string
 	runtime                       *AgentSessionRuntime
 	options                       InteractiveModeOptions
 	ui                            *tui.TextUI
@@ -71,6 +75,9 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 		preserve = exit != FullscreenExitOutputTranscript
 	}
 	mode.ui = tui.NewTextUI(terminal, tui.TextUIOptions{Mode: mode.options.TUIMode, Scrollbar: scrollbar, PreserveScreen: preserve, Keybindings: manager, HideThinking: hide, RenderTranscript: func(width int, expanded, hide bool) ([]string, error) {
+		if mode.themes != nil {
+			mode.transcript.SetTheme(mode.themes.Current())
+		}
 		mode.transcript.SetExpanded(expanded)
 		mode.transcript.SetHideThinkingBlock(hide)
 		lines, err := mode.transcript.Render(width)
@@ -148,6 +155,9 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 		return err
 	}
 	_ = m.ui.SetAutocompleteMaxVisible(visible)
+	if err := m.initThemes(ctx); err != nil {
+		return err
+	}
 	if err := m.ui.Start(); err != nil {
 		return err
 	}
@@ -158,6 +168,9 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 				return err
 			}
 		}
+	}
+	if err := m.detectTheme(ctx); err != nil {
+		return err
 	}
 	m.initialized = true
 	return nil
@@ -557,6 +570,14 @@ func (m *InteractiveMode) Stop(_ ...bool) error {
 		m.mu.Unlock()
 		if cancel != nil {
 			cancel()
+		}
+		if m.themeCancel != nil {
+			m.themeCancel()
+			<-m.themeDone
+		}
+		m.ui.SetTerminalColorHandler(nil)
+		if initialized {
+			_ = m.ui.Terminal().Write("\x1b[?2031l")
 		}
 		m.stopErr = m.ui.Stop()
 		if initialized {

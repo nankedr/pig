@@ -101,6 +101,11 @@ func (m *InteractiveMode) handleCommand(ctx context.Context, prompt string) (boo
 			return true, m.selectModelScope(ctx)
 		case "settings":
 			return true, m.selectThinking(ctx)
+		case "reload":
+			if err := m.runtime.Session().Reload(ctx); err != nil {
+				return true, err
+			}
+			return true, m.reloadThemes()
 		}
 		if name == "new" {
 			return true, m.newSession(ctx)

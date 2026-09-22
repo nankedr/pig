@@ -124,13 +124,16 @@ func (m *InteractiveMode) selectThinking(ctx context.Context) error {
 		return err
 	}
 	done, finish := selectorSignal()
-	open := false
-	menu := tui.NewSelectDialog("Settings", []tui.SelectItem{{Value: "thinking", Label: "Thinking level"}}, func(tui.SelectItem) { open = true; finish() }, finish)
+	choice := ""
+	menu := tui.NewSelectDialog("Settings", []tui.SelectItem{{Value: "thinking", Label: "Thinking level"}, {Value: "theme", Label: "Theme"}}, func(item tui.SelectItem) { choice = item.Value; finish() }, finish)
 	menu.List.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
 	if err := m.waitSelector(ctx, menu, done); err != nil {
 		return err
 	}
-	if !open {
+	if choice == "theme" {
+		return m.selectTheme(ctx)
+	}
+	if choice == "" {
 		return nil
 	}
 	s := m.runtime.Session()

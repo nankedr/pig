@@ -4,6 +4,7 @@ Render func(*codingagent.Transcript, int) ([]string, error)
 SetExpanded func(*codingagent.Transcript, bool) error
 SetHideThinkingBlock func(*codingagent.Transcript, bool) error
 SetMessages func(*codingagent.Transcript, []agent.AgentMessage) error
+SetTheme func(*codingagent.Transcript, *codingagent.Theme)
 Update func(*codingagent.Transcript, codingagent.AgentSessionEvent) error
 *codingagent.AssistantMessageComponent
 AddChild func(*codingagent.AssistantMessageComponent, tui.Component)

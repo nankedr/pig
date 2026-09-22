@@ -8,6 +8,7 @@ import (
 	"math"
 	"os"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -56,10 +57,7 @@ func LoadBuiltinTheme(name string, modes ...ColorMode) (*Theme, error) {
 }
 
 func parseTheme(data []byte, modes []ColorMode) (*Theme, error) {
-	mode := ColorMode256
-	if value := os.Getenv("COLORTERM"); value == "truecolor" || value == "24bit" {
-		mode = ColorModeTrueColor
-	}
+	mode := detectThemeColorMode()
 	if len(modes) > 1 {
 		return nil, fmt.Errorf("expected at most one color mode")
 	}
@@ -272,4 +270,25 @@ func SelectTheme(name string, loaded ThemeLoadResult) (*Theme, error) {
 		}
 	}
 	return LoadBuiltinTheme(name)
+}
+
+func detectThemeColorMode() ColorMode {
+	color, term, program := strings.ToLower(os.Getenv("COLORTERM")), strings.ToLower(os.Getenv("TERM")), strings.ToLower(os.Getenv("TERM_PROGRAM"))
+	hinted := color == "truecolor" || color == "24bit"
+	if os.Getenv("TMUX") != "" || strings.HasPrefix(term, "tmux") || strings.HasPrefix(term, "screen") {
+		if hinted {
+			return ColorModeTrueColor
+		}
+		return ColorMode256
+	}
+	for _, key := range []string{"KITTY_WINDOW_ID", "GHOSTTY_RESOURCES_DIR", "WEZTERM_PANE", "WARP_SESSION_ID", "WARP_TERMINAL_SESSION_UUID", "ITERM_SESSION_ID", "WT_SESSION"} {
+		hinted = hinted || os.Getenv(key) != ""
+	}
+	for _, name := range []string{"kitty", "ghostty", "wezterm", "warpterminal", "iterm.app", "vscode", "alacritty"} {
+		hinted = hinted || program == name
+	}
+	if hinted || strings.Contains(term, "ghostty") || strings.EqualFold(os.Getenv("TERMINAL_EMULATOR"), "jetbrains-jediterm") || runtime.GOOS == "windows" {
+		return ColorModeTrueColor
+	}
+	return ColorMode256
 }

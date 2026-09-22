@@ -318,12 +318,6 @@ func (*ShowImagesSelectorComponent) GetSelectList() (*tui.SelectList, error) {
 	return nil, notImplemented("ShowImagesSelectorComponent.GetSelectList")
 }
 
-type ThemeSelectorComponent struct{ tui.Container }
-
-func (*ThemeSelectorComponent) GetSelectList() (*tui.SelectList, error) {
-	return nil, notImplemented("ThemeSelectorComponent.GetSelectList")
-}
-
 type ToolExecutionOptions struct {
 	ImageWidthCells int
 	ShowImages      bool

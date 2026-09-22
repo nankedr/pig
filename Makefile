@@ -267,3 +267,8 @@ m6-sessions-oracle: m0-node-preflight
 m6-branches-oracle: m0-node-preflight
 	node parity/oracle/branch-selectors.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/interactive-branches-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+.PHONY: m6-themes-oracle
+m6-themes-oracle: m0-node-preflight
+	node parity/oracle/theme-runtime.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/themes-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

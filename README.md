@@ -100,3 +100,5 @@ M5 安装：`go install github.com/nankedr/pig/cmd/pig@v0.5.0`；SDK：`go get g
 M5.7 支持通过公开 SDK 重载本地资源并继续当前会话，见[学习材料](docs/learning/m5-session-reload.md)与 [TypeScript → Go](docs/mappings/typescript-to-go/m5-session-reload.md)。
 
 M5.8 提供本地扩展入口发现，执行仍显式未实现：`go run ./examples/local-extensions`。见[学习材料](docs/learning/m5-local-extensions.md)与 [TypeScript → Go 导航](docs/mappings/typescript-to-go/m5-local-extensions.md)。
+
+M6.12：[会话主题切换与更新](docs/learning/m6-interactive-themes.md)，离线示例 `go run ./examples/interactive-themes`。

@@ -11,32 +11,34 @@ import (
 
 // TextUI renders a scrollable conversation and multiline editor.
 type TextUI struct {
-	renderWake             chan struct{}
-	terminal               Terminal
-	mu                     sync.Mutex
-	transcript             string
-	editor                 *Editor
-	dialog                 Component
-	inputs                 []TextInput
-	turn                   uint64
-	ready                  chan struct{}
-	done                   chan struct{}
-	err                    error
-	started, stopped       bool
-	lastInterrupt          time.Time
-	keybindings            *KeybindingsManager
-	onInterrupt            func()
-	generation             uint64
-	renderTranscript       func(int, bool, bool) ([]string, error)
-	expanded, hideThinking bool
-	mode                   TUIMode
-	scroll                 *ScrollView
-	frame                  LayoutFrame
-	mouse                  scrollMouse
-	scrollbar              ScrollViewScrollbar
-	exitTranscript         bool
-	mainState              TUIMainScreenRenderState
-	altState               TUIMainScreenRenderState
+	editorStyle, dialogStyle TextStyleFunc
+	colorHandler             func(string)
+	renderWake               chan struct{}
+	terminal                 Terminal
+	mu                       sync.Mutex
+	transcript               string
+	editor                   *Editor
+	dialog                   Component
+	inputs                   []TextInput
+	turn                     uint64
+	ready                    chan struct{}
+	done                     chan struct{}
+	err                      error
+	started, stopped         bool
+	lastInterrupt            time.Time
+	keybindings              *KeybindingsManager
+	onInterrupt              func()
+	generation               uint64
+	renderTranscript         func(int, bool, bool) ([]string, error)
+	expanded, hideThinking   bool
+	mode                     TUIMode
+	scroll                   *ScrollView
+	frame                    LayoutFrame
+	mouse                    scrollMouse
+	scrollbar                ScrollViewScrollbar
+	exitTranscript           bool
+	mainState                TUIMainScreenRenderState
+	altState                 TUIMainScreenRenderState
 }
 
 type TextInput struct {
@@ -109,6 +111,21 @@ func (u *TextUI) SetDialog(dialog Component) error {
 	u.editor.cancelAutocomplete()
 	u.dialog = dialog
 	return u.render()
+}
+
+// SetStyles changes rendering without replacing the editor or dialog.
+func (u *TextUI) SetStyles(editor, dialog TextStyleFunc) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.editorStyle, u.dialogStyle = editor, dialog
+}
+
+// SetTerminalColorHandler consumes color reports before focused components see input.
+// The handler must not call TextUI methods.
+func (u *TextUI) SetTerminalColorHandler(handler func(string)) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.colorHandler = handler
 }
 func (u *TextUI) Terminal() Terminal { return u.terminal }
 func (u *TextUI) RequestRender(...bool) error {
@@ -344,6 +361,9 @@ func (u *TextUI) render() error {
 	}
 	if u.transcript != "" {
 		extra, _ := WrapTextWithANSI(u.transcript, columns-1)
+		for i, line := range extra {
+			extra[i] = selectStyle(u.editorStyle, line)
+		}
 		lines = append(lines, extra...)
 	}
 	for i, line := range editorLines {
@@ -351,12 +371,15 @@ func (u *TextUI) render() error {
 		if i == 0 {
 			prefix = "> "
 		}
-		editorLines[i] = prefix[:prefixWidth] + line
+		editorLines[i] = selectStyle(u.editorStyle, prefix[:prefixWidth]+line)
 	}
 	if u.dialog != nil {
 		editorLines, err = u.dialog.Render(columns)
 		if err != nil {
 			return err
+		}
+		for i, line := range editorLines {
+			editorLines[i] = selectStyle(u.dialogStyle, line)
 		}
 		if len(editorLines) > rows {
 			editorLines = editorLines[:rows]
@@ -403,6 +426,18 @@ func (u *TextUI) input(data string) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	if u.stopped {
+		return
+	}
+	if osc, _ := IsOSC11BackgroundColorResponse(data); osc {
+		if u.colorHandler != nil {
+			u.colorHandler(data)
+		}
+		return
+	}
+	if _, ok, _ := ParseTerminalColorSchemeReport(data); ok {
+		if u.colorHandler != nil {
+			u.colorHandler(data)
+		}
 		return
 	}
 	if release, _ := IsKeyRelease(data); release {

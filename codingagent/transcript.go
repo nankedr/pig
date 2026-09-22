@@ -11,6 +11,7 @@ import (
 
 // Transcript projects Session messages and events into text without changing model context.
 type Transcript struct {
+	theme                  *Theme
 	mu                     sync.Mutex
 	messages               []agent.AgentMessage
 	current                int
@@ -18,6 +19,7 @@ type Transcript struct {
 	expanded, hideThinking bool
 }
 
+func (t *Transcript) SetTheme(theme *Theme) { t.mu.Lock(); defer t.mu.Unlock(); t.theme = theme }
 func NewTranscript() *Transcript {
 	return &Transcript{current: -1, tools: make(map[string]*ToolExecutionComponent)}
 }
@@ -112,6 +114,9 @@ func (t *Transcript) Render(width int) ([]string, error) {
 	var lines []string
 	seen := make(map[string]bool)
 	theme, _ := GetMarkdownTheme()
+	if t.theme != nil {
+		theme = t.theme.MarkdownTheme()
+	}
 	toolLines := func(id string) error {
 		if seen[id] {
 			return nil
@@ -121,6 +126,7 @@ func (t *Transcript) Render(width int) ([]string, error) {
 		if c == nil {
 			return nil
 		}
+		c.theme = t.theme
 		c.SetExpanded(t.expanded)
 		part, err := c.Render(width)
 		lines = append(lines, part...)
@@ -130,9 +136,12 @@ func (t *Transcript) Render(width int) ([]string, error) {
 		var component tui.Component
 		switch m := message.(type) {
 		case ai.UserMessage:
-			component = NewUserMessageComponent("user: " + sessionUserText(m))
+			c := NewUserMessageComponent("user: " + sessionUserText(m))
+			c.theme = t.theme
+			component = c
 		case ai.AssistantMessage:
 			c := NewAssistantMessageComponent(m)
+			c.theme = t.theme
 			c.SetHideThinkingBlock(t.hideThinking)
 			component = c
 		case ai.ToolResultMessage:
@@ -158,11 +167,20 @@ func (t *Transcript) Render(width int) ([]string, error) {
 			if err != nil {
 				return nil, err
 			}
+			if t.theme != nil {
+				for i, line := range part {
+					part[i] = t.theme.FG("toolOutput", line)
+				}
+			}
 			lines = append(lines, append([]string{""}, part...)...)
 			continue
 		case agent.CustomMessage:
 			if m.Display {
-				component = tui.NewMarkdown("["+m.CustomType+"]\n\n"+sessionUserText(ai.UserMessage{Content: m.Content}), 0, 1, theme, nil)
+				var style *tui.DefaultTextStyle
+				if t.theme != nil {
+					style = &tui.DefaultTextStyle{Color: func(s string) string { return t.theme.FG("customMessageText", s) }, BGColor: func(s string) string { return t.theme.BG("customMessageBg", s) }}
+				}
+				component = tui.NewMarkdown("["+m.CustomType+"]\n\n"+sessionUserText(ai.UserMessage{Content: m.Content}), 0, 1, theme, style)
 			}
 		}
 		if component != nil {

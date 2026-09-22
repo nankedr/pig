@@ -18,10 +18,6 @@ func TestInputAndPlatformCapabilityStubsAreExplicit(t *testing.T) {
 			_, err := tui.FindWordForward("word", 0)
 			return err
 		}},
-		{name: "terminal color parsing", call: func() error {
-			_, _, err := tui.ParseOSC11BackgroundColor("\x1b]11;#000000\x07")
-			return err
-		}},
 	}
 
 	for _, operation := range operations {

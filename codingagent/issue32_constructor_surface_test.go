@@ -60,7 +60,7 @@ var issue32ConstructorMappings = map[string]issue32ConstructorMapping{
 	"SettingsSelectorComponent":         {target: "SettingsSelectorComponent", status: catalog.StatusInventoried},
 	"ShowImagesSelectorComponent":       {target: "ShowImagesSelectorComponent", status: catalog.StatusInventoried},
 	"SkillInvocationMessageComponent":   {target: "SkillInvocationMessageComponent", status: catalog.StatusInventoried},
-	"ThemeSelectorComponent":            {target: "ThemeSelectorComponent", status: catalog.StatusInventoried},
+	"ThemeSelectorComponent":            {target: "NewThemeSelectorComponent", status: catalog.StatusScaffolded},
 	"ThinkingSelectorComponent":         {target: "NewThinkingSelectorComponent", status: catalog.StatusScaffolded},
 	"ToolExecutionComponent":            {target: "NewToolExecutionComponent", status: catalog.StatusScaffolded},
 	"TreeSelectorComponent":             {target: "NewTreeSelectorComponent", status: catalog.StatusScaffolded},
