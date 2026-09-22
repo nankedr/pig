@@ -335,27 +335,6 @@ type ToolExecutionResult struct {
 	IsError bool
 }
 
-type TreeSelectorComponent struct {
-	tui.Container
-	Focused bool
-}
-
-func (*TreeSelectorComponent) GetTreeList() (*tui.SelectList, error) {
-	return nil, notImplemented("TreeSelectorComponent.GetTreeList")
-}
-func (*TreeSelectorComponent) HandleInput(string) error {
-	return notImplemented("TreeSelectorComponent.HandleInput")
-}
-func (*TreeSelectorComponent) OnCopy(func(string)) error {
-	return notImplemented("TreeSelectorComponent.OnCopy")
-}
-
-type UserMessageSelectorComponent struct{ tui.Container }
-
-func (*UserMessageSelectorComponent) GetMessageList() (*tui.SelectList, error) {
-	return nil, notImplemented("UserMessageSelectorComponent.GetMessageList")
-}
-
 type VisualTruncateResult struct {
 	SkippedCount int
 	VisualLines  []string

@@ -1,5 +1,7 @@
 # Pig 文档导航
 
+M6.11 的历史消息 fork、树导航、标签和离开分支摘要见 [交互分支导航](learning/m6-interactive-branches.md)与 [源码映射](mappings/typescript-to-go/m6-interactive-branches.md)。
+
 M6.3 的终端按键协议、自定义快捷键与生命周期验证见 [终端按键与快捷键](learning/m6-terminal-keys.md)。
 M6.1 的真实终端、公开 SDK 和受控 PTY 验收见 [Interactive 文本对话](learning/m6-interactive-text.md)与 [源码映射](mappings/typescript-to-go/m6-interactive-text.md)。
 

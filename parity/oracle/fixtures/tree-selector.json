@@ -1,0 +1,699 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/components/tree-selector.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/interactive/tree-selector",
+    "catalog_id": "contract:codingagent/interactive-branches",
+    "surface": "go-sdk",
+    "input": {
+      "entries": [
+        {
+          "id": "m",
+          "parentId": null,
+          "type": "model_change",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "provider": "faux",
+          "modelId": "test"
+        },
+        {
+          "id": "u1",
+          "parentId": "m",
+          "type": "message",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "text",
+                "text": "first question"
+              }
+            ],
+            "stopReason": "stop",
+            "api": "faux",
+            "provider": "faux",
+            "model": "test",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "toolCallId": "call",
+            "toolName": "read",
+            "isError": false,
+            "timestamp": 1767225600000
+          }
+        },
+        {
+          "id": "a1",
+          "parentId": "u1",
+          "type": "message",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "first answer"
+              }
+            ],
+            "stopReason": "stop",
+            "api": "faux",
+            "provider": "faux",
+            "model": "test",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "toolCallId": "call",
+            "toolName": "read",
+            "isError": false,
+            "timestamp": 1767225600000
+          }
+        },
+        {
+          "id": "u2",
+          "parentId": "a1",
+          "type": "message",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "text",
+                "text": "old branch question"
+              }
+            ],
+            "stopReason": "stop",
+            "api": "faux",
+            "provider": "faux",
+            "model": "test",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "toolCallId": "call",
+            "toolName": "read",
+            "isError": false,
+            "timestamp": 1767225600000
+          }
+        },
+        {
+          "id": "a2",
+          "parentId": "u2",
+          "type": "message",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "old branch answer"
+              }
+            ],
+            "stopReason": "stop",
+            "api": "faux",
+            "provider": "faux",
+            "model": "test",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "toolCallId": "call",
+            "toolName": "read",
+            "isError": false,
+            "timestamp": 1767225600000
+          }
+        },
+        {
+          "id": "u3",
+          "parentId": "a1",
+          "type": "message",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "message": {
+            "role": "user",
+            "content": [
+              {
+                "type": "text",
+                "text": "active question"
+              }
+            ],
+            "stopReason": "stop",
+            "api": "faux",
+            "provider": "faux",
+            "model": "test",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "toolCallId": "call",
+            "toolName": "read",
+            "isError": false,
+            "timestamp": 1767225600000
+          }
+        },
+        {
+          "id": "tool",
+          "parentId": "u3",
+          "type": "message",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "message": {
+            "role": "toolResult",
+            "content": [
+              {
+                "type": "text",
+                "text": "tool output"
+              }
+            ],
+            "stopReason": "stop",
+            "api": "faux",
+            "provider": "faux",
+            "model": "test",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "toolCallId": "call",
+            "toolName": "read",
+            "isError": false,
+            "timestamp": 1767225600000
+          }
+        },
+        {
+          "id": "a3",
+          "parentId": "tool",
+          "type": "message",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "message": {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "active answer"
+              }
+            ],
+            "stopReason": "stop",
+            "api": "faux",
+            "provider": "faux",
+            "model": "test",
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "toolCallId": "call",
+            "toolName": "read",
+            "isError": false,
+            "timestamp": 1767225600000
+          }
+        },
+        {
+          "id": "label",
+          "parentId": "a3",
+          "type": "label",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "targetId": "a2",
+          "label": "bookmark"
+        },
+        {
+          "id": "info",
+          "parentId": "label",
+          "type": "session_info",
+          "timestamp": "2026-01-01T00:00:00.000Z",
+          "name": "named session"
+        }
+      ],
+      "cases": [
+        {
+          "id": "current",
+          "keys": [
+            "\r"
+          ]
+        },
+        {
+          "id": "all-leaf",
+          "keys": [
+            "\u0001",
+            "\r"
+          ]
+        },
+        {
+          "id": "users",
+          "keys": [
+            "\u0015",
+            "\r"
+          ]
+        },
+        {
+          "id": "label",
+          "keys": [
+            "\f",
+            "\r"
+          ]
+        },
+        {
+          "id": "search",
+          "keys": [
+            "old answer",
+            "\r"
+          ]
+        },
+        {
+          "id": "clear-search",
+          "keys": [
+            "missing",
+            "\u001b",
+            "\r"
+          ]
+        },
+        {
+          "id": "cancel-tree",
+          "keys": [
+            "\u001b"
+          ]
+        },
+        {
+          "id": "page-first",
+          "keys": [
+            "\u001b[5~",
+            "\r"
+          ]
+        },
+        {
+          "id": "page-last",
+          "keys": [
+            "\u001b[6~",
+            "\r"
+          ]
+        },
+        {
+          "id": "wrap-tree",
+          "initial": "u1",
+          "keys": [
+            "\u001b[A",
+            "\r"
+          ]
+        },
+        {
+          "id": "cycle",
+          "keys": [
+            "\u000f",
+            "\u000f",
+            "\r"
+          ]
+        },
+        {
+          "id": "toggle-users",
+          "keys": [
+            "\u0015",
+            "\u0015",
+            "\r"
+          ]
+        },
+        {
+          "id": "label-search",
+          "keys": [
+            "bookmark",
+            "\r"
+          ]
+        },
+        {
+          "id": "nearest-parent",
+          "initial": "m",
+          "keys": [
+            "\r"
+          ]
+        },
+        {
+          "id": "fold-root",
+          "initial": "u1",
+          "keys": [
+            "\u001b[1;5D",
+            "\u001b[B",
+            "\r"
+          ]
+        },
+        {
+          "id": "unfold-root",
+          "initial": "u1",
+          "keys": [
+            "\u001b[1;5D",
+            "\u001b[1;5C",
+            "\u001b[B",
+            "\r"
+          ]
+        },
+        {
+          "id": "segment-up",
+          "keys": [
+            "\u001b[1;5D",
+            "\r"
+          ]
+        },
+        {
+          "id": "segment-down",
+          "initial": "u1",
+          "keys": [
+            "\u001b[1;5C",
+            "\r"
+          ]
+        },
+        {
+          "id": "set-label",
+          "initial": "a1",
+          "keys": [
+            "L",
+            "checkpoint",
+            "\r",
+            "\f",
+            "\r"
+          ]
+        },
+        {
+          "id": "remove-label",
+          "initial": "a2",
+          "keys": [
+            "L",
+            "\u0005",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "\r",
+            "\f",
+            "\r"
+          ]
+        },
+        {
+          "id": "cancel-label",
+          "initial": "a1",
+          "keys": [
+            "L",
+            "draft",
+            "\u001b",
+            "\r"
+          ]
+        },
+        {
+          "id": "copy",
+          "initial": "a1",
+          "keys": [
+            "\u0018",
+            "\r"
+          ]
+        },
+        {
+          "id": "no-tools",
+          "initial": "tool",
+          "keys": [
+            "\u0014",
+            "\r"
+          ]
+        },
+        {
+          "id": "initial-mode",
+          "mode": "user-only",
+          "keys": [
+            "\r"
+          ]
+        }
+      ],
+      "leaf": "info"
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "current",
+        "selected": "a3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "all-leaf",
+        "selected": "a3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "users",
+        "selected": "u3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "label",
+        "selected": "a2",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "search",
+        "selected": "a2",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "clear-search",
+        "selected": "a3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "cancel-tree",
+        "selected": "",
+        "cancelled": true,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "page-first",
+        "selected": "u1",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "page-last",
+        "selected": "a2",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "wrap-tree",
+        "selected": "a2",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "cycle",
+        "selected": "u3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "toggle-users",
+        "selected": "u3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "label-search",
+        "selected": "a2",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "nearest-parent",
+        "selected": "a2",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "fold-root",
+        "selected": "u1",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "unfold-root",
+        "selected": "a1",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "segment-up",
+        "selected": "u3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "segment-down",
+        "selected": "u3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "set-label",
+        "selected": "a1",
+        "cancelled": false,
+        "labels": [
+          {
+            "id": "a1",
+            "label": "checkpoint"
+          }
+        ],
+        "copies": []
+      },
+      {
+        "id": "remove-label",
+        "selected": "",
+        "cancelled": false,
+        "labels": [
+          {
+            "id": "a2",
+            "label": null
+          }
+        ],
+        "copies": []
+      },
+      {
+        "id": "cancel-label",
+        "selected": "a1",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "copy",
+        "selected": "a1",
+        "cancelled": false,
+        "labels": [],
+        "copies": [
+          "first answer"
+        ]
+      },
+      {
+        "id": "no-tools",
+        "selected": "u3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      },
+      {
+        "id": "initial-mode",
+        "selected": "u3",
+        "cancelled": false,
+        "labels": [],
+        "copies": []
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:eb4aa428fe5fb9c54ab84bcb6bc00201fbb992baae883c9f16252515efbcd2af",
+  "observation_hash": "sha256:d43d8d6f09a29e0de1349520c9ac00b4de22207d5dbeb0c0caf1c0053de6fbd2",
+  "execution_method": "node parity/oracle/branch-selectors.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "sessions": "fixed messages; no network"
+  }
+}

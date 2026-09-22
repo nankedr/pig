@@ -1,0 +1,136 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/interactive-mode.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/interactive/interactive-branches",
+    "catalog_id": "contract:codingagent/interactive-branches",
+    "surface": "cli",
+    "input": {
+      "steps": [
+        "cancel fork",
+        "fork latest user + submit draft",
+        "navigate user + submit draft",
+        "label ancestor + cancel summary",
+        "navigate ancestor without summary + generate",
+        "navigate old branch with summary + generate",
+        "reopen fork + generate"
+      ],
+      "terminal": {
+        "rows": 32,
+        "columns": 100
+      }
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "requests": [
+        {
+          "users": [
+            "question 1",
+            "question 2 revised"
+          ],
+          "assistants": [
+            "answer 1"
+          ]
+        },
+        {
+          "users": [
+            "question 1",
+            "question 2 revised from tree"
+          ],
+          "assistants": [
+            "answer 1"
+          ]
+        },
+        {
+          "users": [
+            "question 1",
+            "new branch question"
+          ],
+          "assistants": [
+            "answer 1"
+          ]
+        },
+        {
+          "users": [
+            "<conversation>\n[User]: new branch question\n\n[Assistant]: DONE_3\n</conversation>\n\nCreate a structured summary of this conversation branch for context when returning later.\n\nUse this EXACT format:\n\n## Goal\n[What was the user trying to accomplish in this branch?]\n\n## Constraints & Preferences\n- [Any constraints, preferences, or requirements mentioned]\n- [Or \"(none)\" if none were mentioned]\n\n## Progress\n### Done\n- [x] [Completed tasks/changes]\n\n### In Progress\n- [ ] [Work that was started but not finished]\n\n### Blocked\n- [Issues preventing progress, if any]\n\n## Key Decisions\n- **[Decision]**: [Brief rationale]\n\n## Next Steps\n1. [What should happen next to continue this work]\n\nKeep each section concise. Preserve exact file paths, function names, and error messages."
+          ],
+          "assistants": []
+        },
+        {
+          "users": [
+            "question 1",
+            "question 2 revised",
+            "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nDONE_4</summary>",
+            "after summary"
+          ],
+          "assistants": [
+            "answer 1",
+            "DONE_1"
+          ]
+        },
+        {
+          "users": [
+            "question 1",
+            "question 2 revised",
+            "The following is a summary of a branch that this conversation came back from:\n\n<summary>\nThe user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nDONE_4</summary>",
+            "after summary",
+            "reopened question"
+          ],
+          "assistants": [
+            "answer 1",
+            "DONE_1",
+            "DONE_5"
+          ]
+        }
+      ],
+      "source_unchanged": true,
+      "parent_session": true,
+      "saved_users": [
+        "question 1",
+        "question 2 revised",
+        "question 2 revised from tree",
+        "new branch question",
+        "after summary",
+        "reopened question"
+      ],
+      "branch_users": [
+        "question 1",
+        "question 2 revised",
+        "after summary",
+        "reopened question"
+      ],
+      "labels": [
+        "checkpoint"
+      ],
+      "summaries": [
+        "The user explored a different conversation branch before returning here.\nSummary of that exploration:\n\nDONE_4"
+      ],
+      "terminal_restored": [
+        true,
+        true
+      ]
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:455a512e4b4fd4a156b1a73abdac90186a1a6344fe5a7d4cd7c48965b7705fde",
+  "observation_hash": "sha256:cd851c85ec78af82b6fe7121abd8c46b618e0b648ed9e95368123776b2ebb764",
+  "execution_method": "node parity/oracle/interactive-branches-cli.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "terminal": "xterm-256color",
+    "transport": "real child process + PTY + loopback SSE"
+  }
+}

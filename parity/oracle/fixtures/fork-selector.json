@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/components/user-message-selector.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/interactive/fork-selector",
+    "catalog_id": "contract:codingagent/interactive-branches",
+    "surface": "go-sdk",
+    "input": {
+      "messages": [
+        {
+          "id": "u1",
+          "text": "first question"
+        },
+        {
+          "id": "u2",
+          "text": "second question"
+        },
+        {
+          "id": "u3",
+          "text": "third question"
+        }
+      ],
+      "cases": [
+        {
+          "id": "latest",
+          "keys": [
+            "\r"
+          ]
+        },
+        {
+          "id": "older",
+          "keys": [
+            "\u001b[A",
+            "\r"
+          ]
+        },
+        {
+          "id": "wrap",
+          "keys": [
+            "\u001b[B",
+            "\r"
+          ]
+        },
+        {
+          "id": "initial",
+          "initial": "u2",
+          "keys": [
+            "\r"
+          ]
+        },
+        {
+          "id": "cancel",
+          "keys": [
+            "\u001b"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "id": "latest",
+        "selected": "u3",
+        "cancelled": false
+      },
+      {
+        "id": "older",
+        "selected": "u2",
+        "cancelled": false
+      },
+      {
+        "id": "wrap",
+        "selected": "u1",
+        "cancelled": false
+      },
+      {
+        "id": "initial",
+        "selected": "u2",
+        "cancelled": false
+      },
+      {
+        "id": "cancel",
+        "selected": "",
+        "cancelled": true
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:07d03e718548295d62fe4e5d710f73c6b62e1dda2dfedc10d4440ba7afc4e39a",
+  "observation_hash": "sha256:125a66793c23a4270ab64e385e46b66ad631c88d3fb7d6b4f8269d6f6dc3ce77",
+  "execution_method": "node parity/oracle/branch-selectors.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "sessions": "fixed messages; no network"
+  }
+}

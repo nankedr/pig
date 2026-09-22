@@ -33,6 +33,7 @@ type InteractiveMode struct {
 	transcript                    *Transcript
 	renderSession                 atomic.Pointer[AgentSession]
 	settleSession                 func() error
+	sessionRevision               uint64
 }
 
 func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveModeOptions) *InteractiveMode {
@@ -175,6 +176,14 @@ func (m *InteractiveMode) GetUserInput(ctx context.Context) (string, error) {
 			continue
 		}
 		switch input.Action {
+		case "app.session.fork":
+			if err = m.selectFork(ctx); err != nil {
+				_ = m.ShowError(err.Error())
+			}
+		case "app.session.tree":
+			if err = m.selectTree(ctx); err != nil {
+				_ = m.ShowError(err.Error())
+			}
 		case "app.session.new", "app.session.resume":
 			if input.Action == "app.session.new" {
 				err = m.newSession(ctx)
@@ -427,6 +436,10 @@ loop:
 				}
 			}
 			continue
+		case "app.session.fork":
+			input.Text = "/fork"
+		case "app.session.tree":
+			input.Text = "/tree"
 		case "app.session.new":
 			input.Text = "/new"
 		case "app.session.resume":
@@ -434,8 +447,9 @@ loop:
 		}
 
 		if !literalPrompt {
+			revision := m.sessionRevision
 			if handled, commandErr := m.handleCommand(runCtx, input.Text); handled {
-				if m.runtime.Session() != session {
+				if m.runtime.Session() != session || m.sessionRevision != revision {
 					turnID++
 					prompts = nil
 					pendingPrompts = nil

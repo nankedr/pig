@@ -262,3 +262,8 @@ m6-queues-repeat:
 m6-sessions-oracle: m0-node-preflight
 	node parity/oracle/session-selector.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/session-selection-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+.PHONY: m6-branches-oracle
+m6-branches-oracle: m0-node-preflight
+	node parity/oracle/branch-selectors.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/interactive-branches-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

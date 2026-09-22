@@ -1,0 +1,28 @@
+func([]codingagent.ForkMessage, func(string), func(), ...string) *codingagent.UserMessageSelectorComponent
+func([]codingagent.SessionTreeNode, *string, int, func(string), func(), ...codingagent.TreeSelectorOptions) *codingagent.TreeSelectorComponent
+func(*codingagent.AgentSessionRuntime, context.Context, string, ...codingagent.ForkSessionOptions) (codingagent.SessionReplacementResult, error)
+func(*codingagent.AgentSession, context.Context, string, ...codingagent.NavigateTreeOptions) (codingagent.NavigateTreeResult, error)
+func(*tui.TextUI, string, bool) error
+AddChild func(*codingagent.UserMessageSelectorComponent, tui.Component)
+Children func(*codingagent.UserMessageSelectorComponent) []tui.Component
+Clear func(*codingagent.UserMessageSelectorComponent)
+GetMessageList func(*codingagent.UserMessageSelectorComponent) (*tui.SelectList, error)
+HandleInput func(*codingagent.UserMessageSelectorComponent, string) error
+Invalidate func(*codingagent.UserMessageSelectorComponent) error
+RemoveChild func(*codingagent.UserMessageSelectorComponent, tui.Component)
+Render func(*codingagent.UserMessageSelectorComponent, int) ([]string, error)
+AddChild func(*codingagent.TreeSelectorComponent, tui.Component)
+Children func(*codingagent.TreeSelectorComponent) []tui.Component
+Clear func(*codingagent.TreeSelectorComponent)
+GetTreeList func(*codingagent.TreeSelectorComponent) (*tui.SelectList, error)
+HandleInput func(*codingagent.TreeSelectorComponent, string) error
+Invalidate func(*codingagent.TreeSelectorComponent) error
+OnCopy func(*codingagent.TreeSelectorComponent, func(string)) error
+RemoveChild func(*codingagent.TreeSelectorComponent, tui.Component)
+Render func(*codingagent.TreeSelectorComponent, int) ([]string, error)
+type codingagent.TreeSelectorOptions struct
+fields:
+- InitialSelectedID string tag=""
+- InitialFilterMode string tag=""
+- OnLabelChange func(string, *string) error tag=""
+- Keybindings *codingagent.KeybindingsManager tag=""

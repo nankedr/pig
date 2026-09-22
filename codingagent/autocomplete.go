@@ -87,6 +87,10 @@ func (m *InteractiveMode) handleCommand(ctx context.Context, prompt string) (boo
 			continue
 		}
 		switch name {
+		case "fork":
+			return true, m.selectFork(ctx)
+		case "tree":
+			return true, m.selectTree(ctx)
 		case "resume":
 			return true, m.selectSession(ctx)
 		case "name":

@@ -3,8 +3,10 @@ package codingagent
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 )
 
@@ -150,7 +152,35 @@ func (m *SessionManager) AppendLabelChange(id string, label *string) (string, er
 	entry := m.newEntryLocked("label")
 	entry.TargetID = id
 	entry.Label = cloneStringPointer(label)
-	return entry.ID, m.appendEntryLocked(entry)
+	entries := append(append([]SessionEntry{}, m.entries...), entry)
+	persist := m.flushed
+	for _, e := range entries {
+		if _, ok := sessionAssistantMessage(e.Message); ok {
+			persist = true
+			break
+		}
+	}
+	if persist && m.sessionFile != "" {
+		data, err := encodeSessionFile(m.header, entries)
+		if err != nil {
+			return "", err
+		}
+		file, err := os.CreateTemp(filepath.Dir(m.sessionFile), ".session-label-*")
+		if err != nil {
+			return "", err
+		}
+		defer os.Remove(file.Name())
+		_, writeErr := file.Write(data)
+		if err = errors.Join(writeErr, file.Close()); err != nil {
+			return "", err
+		}
+		if err = os.Rename(file.Name(), m.sessionFile); err != nil {
+			return "", err
+		}
+		m.flushed = true
+	}
+	m.entries, m.leafID = entries, &entry.ID
+	return entry.ID, nil
 }
 
 func (m *SessionManager) BranchWithSummary(id *string, summary string, options ...BranchSummaryOptions) (string, error) {

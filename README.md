@@ -1,5 +1,7 @@
 # Pig
 
+M6.11 的历史消息 fork、树导航、标签和离开分支摘要见 [交互分支导航](docs/learning/m6-interactive-branches.md)与 [源码映射](docs/mappings/typescript-to-go/m6-interactive-branches.md)。
+
 M6.9 的模型搜索、thinking 选择与模型范围配置见 [模型与 thinking](docs/learning/m6-model-selection.md)。
 
 M6.3 的终端按键协议、自定义快捷键与生命周期验证见 [终端按键与快捷键](docs/learning/m6-terminal-keys.md)。

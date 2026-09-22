@@ -631,3 +631,22 @@ func (u *TextUI) ResetSession(history []string) error {
 	}
 	return u.render()
 }
+
+// SetEditorText restores a selected message, optionally preserving an existing draft.
+func (u *TextUI) SetEditorText(text string, preserveDraft bool) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	if preserveDraft {
+		current, err := u.editor.GetExpandedText()
+		if err != nil {
+			return err
+		}
+		if strings.TrimSpace(current) != "" {
+			return nil
+		}
+	}
+	if err := u.editor.SetText(text); err != nil {
+		return err
+	}
+	return u.render()
+}
