@@ -2,7 +2,6 @@ package codingagent
 
 import (
 	"context"
-	"errors"
 	"github.com/nankedr/pig/tui"
 	"os"
 	"strings"
@@ -22,7 +21,13 @@ func (m *InteractiveMode) initThemes(ctx context.Context) error {
 	m.themes = NewThemeController(s.SettingsManager(), loaded)
 	_ = m.themes.ApplySettings()
 	m.colorReports = make(chan string, 32)
+	m.themeQueries = make(chan string, 32)
+	m.themeContext = ctx
 	m.ui.SetTerminalColorHandler(func(data string) {
+		select {
+		case m.themeQueries <- data:
+		default:
+		}
 		select {
 		case m.colorReports <- data:
 		default:
@@ -37,8 +42,10 @@ func (m *InteractiveMode) reloadThemes() error {
 	if err != nil {
 		return err
 	}
-	err = m.themes.ReplaceResources(s.SettingsManager(), loaded)
-	return errors.Join(err, m.themeNotifications(), m.ui.Refresh())
+	if err = m.themes.ReplaceResources(s.SettingsManager(), loaded); err != nil {
+		_ = m.ShowWarning(err.Error())
+	}
+	return m.queryTheme(m.themeContext)
 }
 func (m *InteractiveMode) themeNotifications() error {
 	m.themes.mu.Lock()
@@ -50,7 +57,7 @@ func (m *InteractiveMode) themeNotifications() error {
 	}
 	return m.ui.Terminal().Write(seq)
 }
-func (m *InteractiveMode) detectTheme(ctx context.Context) error {
+func (m *InteractiveMode) queryTheme(ctx context.Context) error {
 	setting, err := m.runtime.Session().SettingsManager().GetThemeSetting()
 	if err != nil {
 		return err
@@ -60,6 +67,9 @@ func (m *InteractiveMode) detectTheme(ctx context.Context) error {
 		query := "\x1b]11;?\x07"
 		if auto {
 			query += "\x1b[?996n"
+		}
+		for len(m.themeQueries) > 0 {
+			<-m.themeQueries
 		}
 		if err = m.ui.Terminal().Write(query); err != nil {
 			return err
@@ -75,7 +85,7 @@ func (m *InteractiveMode) detectTheme(ctx context.Context) error {
 				return ctx.Err()
 			case <-timer.C:
 				break detect
-			case data := <-m.colorReports:
+			case data := <-m.themeQueries:
 				if rgb, ok, _ := tui.ParseOSC11BackgroundColor(data); ok {
 					scheme, high = ThemeForRGB(rgb), true
 				}
@@ -100,6 +110,12 @@ func (m *InteractiveMode) detectTheme(ctx context.Context) error {
 		_ = m.ShowError(err.Error())
 	}
 	if err = m.themeNotifications(); err != nil {
+		return err
+	}
+	return m.ui.Refresh()
+}
+func (m *InteractiveMode) detectTheme(ctx context.Context) error {
+	if err := m.queryTheme(ctx); err != nil {
 		return err
 	}
 	watchCtx, cancel := context.WithCancel(ctx)
@@ -145,7 +161,11 @@ func (m *InteractiveMode) selectTheme(ctx context.Context) error {
 	if automatic {
 		light, dark = strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
 	}
-	defer func() { _ = m.themes.ApplySettings(); _ = m.themeNotifications(); _ = m.ui.RequestRender() }()
+	defer func() {
+		if err := m.queryTheme(ctx); err != nil {
+			_ = m.ShowError(err.Error())
+		}
+	}()
 	for {
 		if automatic {
 			done, finish := selectorSignal()

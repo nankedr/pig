@@ -78,6 +78,7 @@ method GetFgANSI func(*codingagent.Theme, codingagent.ThemeColor) string
 method GetThinkingBorderColor func(*codingagent.Theme, ai.ModelThinkingLevel) (tui.TextStyleFunc, error)
 method Inverse func(*codingagent.Theme, string) string
 method Italic func(*codingagent.Theme, string) string
+method MarkdownTheme func(*codingagent.Theme) tui.MarkdownTheme
 method ResolvedColors func(*codingagent.Theme) map[string]string
 method Strikethrough func(*codingagent.Theme, string) string
 method Underline func(*codingagent.Theme, string) string

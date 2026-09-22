@@ -1036,17 +1036,17 @@ type TerminalColorScheme string
 ## symbol:tui/src/terminal-colors.ts#isOsc11BackgroundColorResponse
 reference: packages/tui/src/terminal-colors.ts#isOsc11BackgroundColorResponse
 target: github.com/nankedr/pig/tui.IsOSC11BackgroundColorResponse
-func IsOSC11BackgroundColorResponse(string) (bool, error)
+func IsOSC11BackgroundColorResponse(data string) (bool, error)
 
 ## symbol:tui/src/terminal-colors.ts#parseOsc11BackgroundColor
 reference: packages/tui/src/terminal-colors.ts#parseOsc11BackgroundColor
 target: github.com/nankedr/pig/tui.ParseOSC11BackgroundColor
-func ParseOSC11BackgroundColor(string) (RGBColor, bool, error)
+func ParseOSC11BackgroundColor(data string) (RGBColor, bool, error)
 
 ## symbol:tui/src/terminal-colors.ts#parseTerminalColorSchemeReport
 reference: packages/tui/src/terminal-colors.ts#parseTerminalColorSchemeReport
 target: github.com/nankedr/pig/tui.ParseTerminalColorSchemeReport
-func ParseTerminalColorSchemeReport(string) (TerminalColorScheme, bool, error)
+func ParseTerminalColorSchemeReport(data string) (TerminalColorScheme, bool, error)
 
 ## symbol:tui/src/terminal-image.ts#CellDimensions
 reference: packages/tui/src/terminal-image.ts#CellDimensions

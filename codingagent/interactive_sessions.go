@@ -162,7 +162,7 @@ func (m *InteractiveMode) sessionChanged(status string) error {
 	m.renderSession.Store(session)
 	if m.themes != nil {
 		if err := m.reloadThemes(); err != nil {
-			return err
+			_ = m.ShowWarning(err.Error())
 		}
 	}
 	provider, err := NewSessionAutocompleteProvider(session, nil)

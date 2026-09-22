@@ -69,13 +69,26 @@ func (c *ThemeController) applySettings() error {
 }
 func (c *ThemeController) load(name string) error {
 	theme, err := SelectTheme(name, c.loaded)
+	fingerprint := ""
+	if err == nil && theme.SourcePath != "" {
+		var data []byte
+		data, err = readThemeFile(theme.SourcePath)
+		if err == nil {
+			var loaded *Theme
+			loaded, err = parseTheme(data, []ColorMode{theme.GetColorMode()})
+			if err == nil {
+				loaded.SourcePath, loaded.SourceInfo = theme.SourcePath, theme.SourceInfo
+				theme = loaded
+				fingerprint = fmt.Sprintf("%x", sha256.Sum256(data))
+			}
+		}
+	}
 	if err != nil {
 		c.current, _ = LoadBuiltinTheme("dark")
 		c.fingerprint = ""
 		return fmt.Errorf("Failed to load theme %q: %w; fell back to dark theme", name, err)
 	}
-	c.current = theme
-	c.fingerprint = themeFingerprint(theme.SourcePath)
+	c.current, c.fingerprint = theme, fingerprint
 	return nil
 }
 func (c *ThemeController) Preview(setting string) error {
@@ -111,23 +124,6 @@ func (c *ThemeController) SetTerminalTheme(scheme tui.TerminalColorScheme) error
 	}
 	return nil
 }
-func themeFingerprint(path string) string {
-	if path == "" {
-		return ""
-	}
-	info, err := os.Stat(path)
-	if err != nil {
-		return err.Error()
-	}
-	if !info.Mode().IsRegular() {
-		return "not a regular file"
-	}
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return err.Error()
-	}
-	return fmt.Sprintf("%x", sha256.Sum256(data))
-}
 func (c *ThemeController) Refresh() (bool, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -135,15 +131,23 @@ func (c *ThemeController) Refresh() (bool, error) {
 	if path == "" {
 		return false, nil
 	}
-	fingerprint := themeFingerprint(path)
+	data, err := readThemeFile(path)
+	fingerprint := fmt.Sprintf("%x", sha256.Sum256(data))
+	if err != nil {
+		fingerprint = err.Error()
+	}
 	if fingerprint == c.fingerprint {
 		return false, nil
 	}
 	c.fingerprint = fingerprint
-	theme, err := LoadThemeFromPath(path, c.current.GetColorMode())
+	var theme *Theme
+	if err == nil {
+		theme, err = parseTheme(data, []ColorMode{c.current.GetColorMode()})
+	}
 	if err != nil {
 		return false, fmt.Errorf("Theme reload failed; keeping last valid theme: %w", err)
 	}
+	theme.SourcePath = path
 	theme.SourceInfo = c.current.SourceInfo
 	for i, t := range c.loaded.Themes {
 		if t != nil && t.SourcePath == path {

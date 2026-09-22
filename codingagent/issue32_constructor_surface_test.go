@@ -153,8 +153,8 @@ func TestIssue32ConstructorTargetsResolve(t *testing.T) {
 		}
 	}
 	sort.Strings(names)
-	if scaffolded != 16 || inventoried != 22 {
-		t.Fatalf("constructor status counts = scaffolded %d, inventoried %d; want 16, 22; names=%v", scaffolded, inventoried, names)
+	if scaffolded != 17 || inventoried != 21 {
+		t.Fatalf("constructor status counts = scaffolded %d, inventoried %d; want 17, 21; names=%v", scaffolded, inventoried, names)
 	}
 	if constructor, static := issue32ConstructorMappings["KeybindingsManager"].target, issue32StaticMemberTargetExceptions["KeybindingsManager.create"]; constructor == static {
 		t.Fatalf("KeybindingsManager constructor target %q conflates the distinct static create target", constructor)

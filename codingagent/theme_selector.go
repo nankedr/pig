@@ -50,9 +50,22 @@ func NewThemeSelectorComponent(current string, loaded ThemeLoadResult, onSelect 
 	}
 	return &ThemeSelectorComponent{list: list}
 }
-func (s *ThemeSelectorComponent) GetSelectList() (*tui.SelectList, error) { return s.list, nil }
-func (s *ThemeSelectorComponent) HandleInput(data string) error           { return s.list.HandleInput(data) }
+func (s *ThemeSelectorComponent) GetSelectList() (*tui.SelectList, error) {
+	if s.list == nil {
+		return nil, notImplemented("ThemeSelectorComponent.GetSelectList")
+	}
+	return s.list, nil
+}
+func (s *ThemeSelectorComponent) HandleInput(data string) error {
+	if s.list == nil {
+		return nil
+	}
+	return s.list.HandleInput(data)
+}
 func (s *ThemeSelectorComponent) Render(width int) ([]string, error) {
+	if s.list == nil {
+		return s.Container.Render(width)
+	}
 	lines, err := s.list.Render(width)
 	border := strings.Repeat("─", max(0, width))
 	return append(append([]string{border}, lines...), border), err

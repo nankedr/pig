@@ -21,7 +21,7 @@ COLORTERM 的 truecolor/24bit 及已知终端标识决定真彩色；不支持�
 - `theme-runtime.json`：固定 Pi 公开解析器和 ThemeSelector 的输入、输出。
 - `themes-cli.json`：真实 Pi CLI 子进程 PTY，在 truecolor/256color 下修改本地主题、预览取消、保存并检查草稿/历史与终端恢复。Pig 使用同一 harness；settings 顶层菜单定位按现有 UI 做适配。
 - `issue120_themes_test.go`：公开 SDK、文件失败恢复、重复切换和 Watch 取消。
-- `issue120_interactive_test.go`：公开 InteractiveMode 加 PTY，检查 scheme 优先级、通知改变草稿/对话框颜色和退出清理。
+- `issue120_interactive_test.go`：公开 InteractiveMode 加 PTY，检查 scheme 优先级、通知改变草稿/对话框颜色、固定转自动时重新探测、主题失效的 Session 替换及退出清理。
 
 执行 `go test -race ./codingagent -run '120'`、`PIG_TEST_RACE=1 go test -race ./cmd/pig -run 120`。Oracle 用 `make m6-themes-oracle PIG_PI_ORACLE_CHECKOUT=/path/to/locked/pi` 复核，普通测试只读锁定 fixture，离线运行。
 

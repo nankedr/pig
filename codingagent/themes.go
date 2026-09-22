@@ -26,14 +26,7 @@ func LoadThemeFromPath(path string, modes ...ColorMode) (*Theme, error) {
 	if err != nil {
 		return nil, err
 	}
-	info, err := os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-	if !info.Mode().IsRegular() {
-		return nil, fmt.Errorf("theme path is not a regular file: %s", path)
-	}
-	data, err := os.ReadFile(path)
+	data, err := readThemeFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -43,6 +36,17 @@ func LoadThemeFromPath(path string, modes ...ColorMode) (*Theme, error) {
 	}
 	theme.SourcePath = path
 	return theme, nil
+}
+
+func readThemeFile(path string) ([]byte, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+	if !info.Mode().IsRegular() {
+		return nil, fmt.Errorf("theme path is not a regular file: %s", path)
+	}
+	return os.ReadFile(path)
 }
 
 func LoadBuiltinTheme(name string, modes ...ColorMode) (*Theme, error) {

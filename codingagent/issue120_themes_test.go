@@ -111,6 +111,21 @@ func TestThemeControllerReload120(t *testing.T) {
 		t.Fatal("reload", updated, err)
 	}
 	good := c.Current().FG("accent", "X")
+	if err = os.Chmod(path, 0); err != nil {
+		t.Fatal(err)
+	}
+	if _, readErr := os.ReadFile(path); readErr != nil {
+		if _, err = c.Refresh(); err == nil || c.Current().FG("accent", "X") != good {
+			t.Fatal("unreadable fallback", err)
+		}
+	}
+	if err = os.Chmod(path, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = c.Refresh(); err != nil {
+		t.Fatal("readability recovery", err)
+	}
+
 	os.WriteFile(path, []byte("invalid"), 0600)
 	if _, err = c.Refresh(); err == nil || c.Current().FG("accent", "X") != good {
 		t.Fatal("invalid fallback", err)
@@ -122,6 +137,13 @@ func TestThemeControllerReload120(t *testing.T) {
 	os.WriteFile(path, changed, 0600)
 	if _, err = c.Refresh(); err != nil {
 		t.Fatal("recovery", err)
+	}
+	if err = c.SetTheme("light"); err != nil {
+		t.Fatal(err)
+	}
+	os.WriteFile(path, data, 0600)
+	if err = c.SetTheme("local"); err != nil || c.Current().FG("accent", "X") != original {
+		t.Fatal("inactive theme edit was lost", err)
 	}
 	if err = c.SetTheme("light"); err != nil {
 		t.Fatal(err)

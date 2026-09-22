@@ -44,6 +44,8 @@ SetAutocompleteProvider func(*tui.TextUI, tui.AutocompleteProvider) error
 SetDialog func(*tui.TextUI, tui.Component) error
 SetEditorText func(*tui.TextUI, string, bool) error
 SetMode func(*tui.TextUI, tui.TUIMode) error
+SetStyles func(*tui.TextUI, tui.TextStyleFunc, tui.TextStyleFunc)
+SetTerminalColorHandler func(*tui.TextUI, func(string))
 SetTurn func(*tui.TextUI, uint64)
 Start func(*tui.TextUI) error
 Stop func(*tui.TextUI) error

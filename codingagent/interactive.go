@@ -22,6 +22,8 @@ type InteractiveMode struct {
 	themeCancel                   context.CancelFunc
 	themeDone                     chan struct{}
 	colorReports                  chan string
+	themeQueries                  chan string
+	themeContext                  context.Context
 	runtime                       *AgentSessionRuntime
 	options                       InteractiveModeOptions
 	ui                            *tui.TextUI
