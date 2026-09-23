@@ -52,6 +52,7 @@ func TestInteractiveThemeNotifications120(t *testing.T) {
 	if err := awaitInteractive(t, done); err != nil {
 		t.Fatal(err)
 	}
+	tty.Wait(t, "\x1b[?2031l")
 	if !strings.Contains(tty.Output(), "\x1b[?2031l") || !tty.Restored(t) {
 		t.Fatal("notification/terminal cleanup")
 	}
