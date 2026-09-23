@@ -19,6 +19,7 @@ Mode tui.TUIMode
 Scrollbar tui.ScrollViewScrollbar
 PreserveScreen bool
 type tui.TextInput
+Bash uint64
 Turn uint64
 Text string
 Action tui.Keybinding
@@ -71,6 +72,7 @@ ScrollToBottom func(*tui.TextUI) error
 ScrollToTop func(*tui.TextUI) error
 SetAutocompleteMaxVisible func(*tui.TextUI, int) error
 SetAutocompleteProvider func(*tui.TextUI, tui.AutocompleteProvider) error
+SetBash func(*tui.TextUI, uint64)
 SetDialog func(*tui.TextUI, tui.Component) error
 SetEditorText func(*tui.TextUI, string, bool) error
 SetMode func(*tui.TextUI, tui.TUIMode) error

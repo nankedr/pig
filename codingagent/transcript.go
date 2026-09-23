@@ -1,7 +1,7 @@
 package codingagent
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/nankedr/pig/agent"
 	"github.com/nankedr/pig/ai"
 	"github.com/nankedr/pig/tui"
@@ -15,6 +15,7 @@ type Transcript struct {
 	outputPad              int
 	mu                     sync.Mutex
 	messages               []agent.AgentMessage
+	bashes                 []*BashExecutionComponent
 	current                int
 	tools                  map[string]*ToolExecutionComponent
 	expanded, hideThinking bool
@@ -41,6 +42,17 @@ func (t *Transcript) SetHideThinkingBlock(v bool) error {
 func (t *Transcript) SetMessages(messages []agent.AgentMessage) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	remaining := t.bashes[:0]
+	for _, c := range t.bashes {
+		c.mu.Lock()
+		discard := c.complete && !c.failed
+		c.mu.Unlock()
+		if !discard {
+			remaining = append(remaining, c)
+		}
+	}
+	clear(t.bashes[len(remaining):])
+	t.bashes = remaining
 	t.messages = nil
 	t.tools = make(map[string]*ToolExecutionComponent)
 	t.current = -1
@@ -135,6 +147,15 @@ func (t *Transcript) Render(width int) ([]string, error) {
 		return err
 	}
 	for _, message := range t.messages {
+		if raw, ok := message.(interface{ RawJSON() json.RawMessage }); ok && message.MessageRole() == "bashExecution" {
+			var bash agent.BashExecutionMessage
+			if err := json.Unmarshal(raw.RawJSON(), &bash); err != nil {
+				return nil, err
+			}
+			fields, _ := decodeJSONObject(raw.RawJSON())
+			bash.ExitCodeSet = len(fields["exitCode"]) != 0 && string(fields["exitCode"]) != "null"
+			message = bash
+		}
 		var component tui.Component
 		switch m := message.(type) {
 		case ai.UserMessage:
@@ -158,26 +179,17 @@ func (t *Transcript) Render(width int) ([]string, error) {
 		case agent.BranchSummaryMessage:
 			component = tui.NewMarkdown("Branch summary\n\n"+m.Summary, 0, 1, theme, nil)
 		case agent.BashExecutionMessage:
-			text := "$ " + m.Command + "\n" + m.Output
-			if m.Cancelled {
-				text += "\n(command cancelled)"
-			} else if m.ExitCodeSet && m.ExitCode != 0 {
-				text += fmt.Sprintf("\nCommand exited with code %d", m.ExitCode)
+			c := NewBashExecutionComponent(m.Command, m.ExcludeFromContext)
+			c.theme = t.theme
+			_ = c.AppendOutput(m.Output)
+			var code *int
+			if m.ExitCodeSet {
+				value := m.ExitCode
+				code = &value
 			}
-			if m.Truncated && m.FullOutputPath != "" {
-				text += "\n[Output truncated. Full output: " + m.FullOutputPath + "]"
-			}
-			part, err := tui.WrapTextWithANSI(text, max(1, width))
-			if err != nil {
-				return nil, err
-			}
-			if t.theme != nil {
-				for i, line := range part {
-					part[i] = t.theme.FG("toolOutput", line)
-				}
-			}
-			lines = append(lines, append([]string{""}, part...)...)
-			continue
+			_ = c.SetComplete(code, m.Cancelled, &TruncationResult{Truncated: m.Truncated}, &m.FullOutputPath)
+			_ = c.SetExpanded(t.expanded)
+			component = c
 		case agent.CustomMessage:
 			if m.Display {
 				var style *tui.DefaultTextStyle
@@ -203,6 +215,17 @@ func (t *Transcript) Render(width int) ([]string, error) {
 				}
 			}
 		}
+	}
+	for _, c := range t.bashes {
+		c.mu.Lock()
+		c.theme = t.theme
+		c.mu.Unlock()
+		_ = c.SetExpanded(t.expanded)
+		part, err := c.Render(width)
+		if err != nil {
+			return nil, err
+		}
+		lines = append(lines, part...)
 	}
 	for i, s := range lines {
 		lines[i] = strings.TrimRight(s, " ")

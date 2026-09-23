@@ -278,3 +278,7 @@ m6-themes-oracle: m0-node-preflight
 m6-settings-oracle: m0-node-preflight
 	node parity/oracle/settings-selector.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/settings-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+.PHONY: m6-bash-oracle
+m6-bash-oracle: m0-node-preflight
+	node parity/oracle/bash-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

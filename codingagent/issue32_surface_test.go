@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1656, catalog.StatusInventoried: 726, catalog.StatusPartial: 143, catalog.StatusImplemented: 75}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1649, catalog.StatusInventoried: 724, catalog.StatusPartial: 152, catalog.StatusImplemented: 75}); !reflect.DeepEqual(gotByStatus, want) {
 
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}
@@ -734,7 +734,7 @@ func TestIssue32InheritedTUIMemberProjectionsResolve(t *testing.T) {
 	}
 	wantByCarrier := map[string]int{
 		"Box":                18,
-		"Container":          107,
+		"Container":          106,
 		"Editor":             20,
 		"KeybindingsManager": 7,
 	}
@@ -1451,6 +1451,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 		issue111PromoteRuntimeEntry(&entries[i])
 		issue112PromoteRuntimeEntry(&entries[i])
 		issue120PromoteRuntimeEntry(&entries[i])
+		issue122PromoteRuntimeEntry(&entries[i])
 		if strings.Contains(entries[i].ID, "core/package-manager.ts#DefaultPackageManager") || strings.Contains(entries[i].ID, "core/package-manager.ts#PackageManager") {
 			entries[i].Notes += " ADR-0034 / issue #99 defers executable Pi package ecosystem behavior beyond M5; see deferred-package-ecosystem. This row preserves its static surface evidence and original M5 attribution, not a current delivery promise; shared local-resource metadata remains available to M5."
 		}
@@ -1460,7 +1461,7 @@ func issue32ExpectedCatalogEntries(symbols []surface.Symbol) ([]catalog.Entry, e
 }
 
 func issue32PromoteRuntimeEntry(entry *catalog.Entry) {
-	if issue120PromoteRuntimeEntry(entry) || issue112PromoteRuntimeEntry(entry) || issue111PromoteRuntimeEntry(entry) || issue109PromoteRuntimeEntry(entry) || issue106PromoteRuntimeEntry(entry) || issue105PromoteRuntimeEntry(entry) || issue104PromoteRuntimeEntry(entry) || issue103PromoteRuntimeEntry(entry) || issue102PromoteRuntimeEntry(entry) || issue101PromoteRuntimeEntry(entry) || issue100PromoteRuntimeEntry(entry) || issue97PromoteRuntimeEntry(entry) || issue96PromoteRuntimeEntry(entry) || issue95PromoteRuntimeEntry(entry) || issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
+	if issue122PromoteRuntimeEntry(entry) || issue120PromoteRuntimeEntry(entry) || issue112PromoteRuntimeEntry(entry) || issue111PromoteRuntimeEntry(entry) || issue109PromoteRuntimeEntry(entry) || issue106PromoteRuntimeEntry(entry) || issue105PromoteRuntimeEntry(entry) || issue104PromoteRuntimeEntry(entry) || issue103PromoteRuntimeEntry(entry) || issue102PromoteRuntimeEntry(entry) || issue101PromoteRuntimeEntry(entry) || issue100PromoteRuntimeEntry(entry) || issue97PromoteRuntimeEntry(entry) || issue96PromoteRuntimeEntry(entry) || issue95PromoteRuntimeEntry(entry) || issue92PromoteRuntimeEntry(entry) || issue94PromoteRuntimeEntry(entry) || issue90PromoteRuntimeEntry(entry) || issue88PromoteRuntimeEntry(entry) || issue89PromoteRuntimeEntry(entry) || issue91PromoteRuntimeEntry(entry) || issue93PromoteRuntimeEntry(entry) {
 
 		return
 	}
@@ -2463,7 +2464,7 @@ var issue32ContainerMembers = map[string]string{
 // set means the subtype inherits all six Container members.
 var issue32ContainerProjectionSymbols = map[string]map[string]bool{
 	"AssistantMessageComponent":    {"invalidate": true, "render": true},
-	"BashExecutionComponent":       {"invalidate": true},
+	"BashExecutionComponent":       {"invalidate": true, "render": true},
 	"BorderedLoader":               nil,
 	"CustomMessageComponent":       {"invalidate": true},
 	"ExtensionEditorComponent":     nil,

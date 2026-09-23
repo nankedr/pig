@@ -43,8 +43,6 @@ var (
 )
 
 func TestDeferredUIGettersReturnStructuredErrors(t *testing.T) {
-	assertDeferredGetter(t, "BashExecutionComponent.GetCommand", new(BashExecutionComponent).GetCommand)
-	assertDeferredGetter(t, "BashExecutionComponent.GetOutput", new(BashExecutionComponent).GetOutput)
 	assertDeferredGetter(t, "ModelSelectorComponent.GetSearchInput", new(ModelSelectorComponent).GetSearchInput)
 	assertDeferredGetter(t, "SessionSelectorComponent.GetSessionList", new(SessionSelectorComponent).GetSessionList)
 	assertDeferredGetter(t, "SettingsSelectorComponent.GetSettingsList", new(SettingsSelectorComponent).GetSettingsList)

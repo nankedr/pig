@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/interactive-mode.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/interactive/bash-cli",
+    "catalog_id": "contract:codingagent/interactive-bash",
+    "surface": "cli",
+    "input": {
+      "steps": [
+        "included/excluded stdout/stderr and exit",
+        "Bash during generation and follow-up",
+        "cancel with partial output",
+        "truncate with full output file",
+        "subsequent Provider context",
+        "exit"
+      ],
+      "terminal": {
+        "rows": 40,
+        "columns": 120
+      }
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "bash": [
+        {
+          "command": "printf 'IN_%s\\n' CONTEXT; printf 'ERR_%s\\n' STREAM >&2; exit 7",
+          "output": "IN_CONTEXT\nERR_STREAM\n",
+          "exit": 7,
+          "cancelled": false,
+          "truncated": false,
+          "excluded": false
+        },
+        {
+          "command": "printf 'OUT_%s\\n' CONTEXT",
+          "output": "OUT_CONTEXT\n",
+          "exit": 0,
+          "cancelled": false,
+          "truncated": false,
+          "excluded": true
+        },
+        {
+          "command": "printf 'DURING_%s\\n' AGENT",
+          "output": "DURING_AGENT\n",
+          "exit": 0,
+          "cancelled": false,
+          "truncated": false,
+          "excluded": false
+        },
+        {
+          "command": "printf 'CANCEL_%s\\n' PART; exec sleep 30",
+          "output": "CANCEL_PART\n",
+          "exit": null,
+          "cancelled": true,
+          "truncated": false,
+          "excluded": false
+        },
+        {
+          "command": "i=0; while [ $i -lt 2100 ]; do printf 'LINE_%s\\n' $i; i=$((i+1)); done",
+          "output": "TAIL",
+          "exit": 0,
+          "cancelled": false,
+          "truncated": true,
+          "excluded": false
+        }
+      ],
+      "context_included": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "context_excluded": true,
+      "deferred_context": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "cancel_in_context": true,
+      "queued": true,
+      "mutual_exclusion": true,
+      "full_output": true,
+      "exit_code": 0,
+      "restored": true
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:594a0a21fc4726263e694e732b04161fbbc2f3f7bcb6c0456f7bafd37f2488a5",
+  "observation_hash": "sha256:33ea2dbe9470c6e63ea5a9cda6bd5df2e340737315d4ff9f923d6257ad37d6a0",
+  "execution_method": "node parity/oracle/bash-cli.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "terminal": "xterm-256color",
+    "transport": "real child process + PTY; offline controlled SSE and real Bash"
+  }
+}

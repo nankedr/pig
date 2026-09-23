@@ -178,7 +178,9 @@ func TestPinnedCoreUIOperationsRemainStructuredStubs(t *testing.T) {
 	if err := new(codingagent.AssistantMessageComponent).UpdateContent(ai.AssistantMessage{}); err != nil {
 		t.Fatal(err)
 	}
-	assertCodingAgentUIStub(t, "BashExecutionComponent.SetComplete", new(codingagent.BashExecutionComponent).SetComplete(nil, false, nil, nil))
+	if err := new(codingagent.BashExecutionComponent).SetComplete(nil, false, nil, nil); err != nil {
+		t.Fatal(err)
+	}
 
 	toolResult := codingagent.ToolExecutionResult{
 		Content: []ai.ToolResultContent{ai.TextContent{Type: ai.ContentTypeText, Text: "partial output"}},

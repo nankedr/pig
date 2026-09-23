@@ -1,0 +1,16 @@
+func(string, ...bool) *codingagent.BashExecutionComponent
+func(*codingagent.BashExecutionComponent, string) error
+func(*codingagent.BashExecutionComponent, *int, bool, *agent.TruncationResult, *string) error
+func(*codingagent.BashExecutionComponent, bool) error
+func(*codingagent.BashExecutionComponent, int) ([]string, error)
+func(*codingagent.BashExecutionComponent) (string, error)
+func(*codingagent.BashExecutionComponent) (string, error)
+func(*codingagent.AgentSession, context.Context, string, ...codingagent.ExecuteBashOptions) (codingagent.BashResult, error)
+func(*codingagent.AgentSession) error
+func(*tui.TextUI, uint64)
+type codingagent.TextInput struct
+fields:
+- Bash uint64 tag=""
+- Turn uint64 tag=""
+- Text string tag=""
+- Action tui.Keybinding tag=""

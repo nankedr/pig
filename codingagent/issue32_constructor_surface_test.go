@@ -42,7 +42,7 @@ var issue32ConstructorMappings = map[string]issue32ConstructorMapping{
 
 	"ArminComponent":                    {target: "ArminComponent", status: catalog.StatusInventoried},
 	"AssistantMessageComponent":         {target: "NewAssistantMessageComponent", status: catalog.StatusScaffolded},
-	"BashExecutionComponent":            {target: "BashExecutionComponent", status: catalog.StatusInventoried},
+	"BashExecutionComponent":            {target: "NewBashExecutionComponent", status: catalog.StatusScaffolded},
 	"BorderedLoader":                    {target: "BorderedLoader", status: catalog.StatusInventoried},
 	"BranchSummaryMessageComponent":     {target: "BranchSummaryMessageComponent", status: catalog.StatusInventoried},
 	"CompactionSummaryMessageComponent": {target: "CompactionSummaryMessageComponent", status: catalog.StatusInventoried},
@@ -153,8 +153,8 @@ func TestIssue32ConstructorTargetsResolve(t *testing.T) {
 		}
 	}
 	sort.Strings(names)
-	if scaffolded != 18 || inventoried != 20 {
-		t.Fatalf("constructor status counts = scaffolded %d, inventoried %d; want 18, 20; names=%v", scaffolded, inventoried, names)
+	if scaffolded != 19 || inventoried != 19 {
+		t.Fatalf("constructor status counts = scaffolded %d, inventoried %d; want 19, 19; names=%v", scaffolded, inventoried, names)
 	}
 	if constructor, static := issue32ConstructorMappings["KeybindingsManager"].target, issue32StaticMemberTargetExceptions["KeybindingsManager.create"]; constructor == static {
 		t.Fatalf("KeybindingsManager constructor target %q conflates the distinct static create target", constructor)

@@ -21,6 +21,7 @@ type TextUI struct {
 	dialog                   Component
 	inputs                   []TextInput
 	turn                     uint64
+	bash                     uint64
 	ready                    chan struct{}
 	done                     chan struct{}
 	err                      error
@@ -44,6 +45,7 @@ type TextUI struct {
 }
 
 type TextInput struct {
+	Bash   uint64
 	Turn   uint64
 	Text   string
 	Action Keybinding
@@ -96,7 +98,7 @@ func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
 	u.editor.OnSubmit = func(text string) {
 		if text != "" {
 			u.editor.AddToHistory(text)
-			u.inputs = append(u.inputs, TextInput{Text: text, Turn: u.turn})
+			u.inputs = append(u.inputs, TextInput{Text: text, Turn: u.turn, Bash: u.bash})
 			select {
 			case u.ready <- struct{}{}:
 			default:
@@ -277,6 +279,13 @@ func (u *TextUI) ClearEditor() error {
 	defer u.mu.Unlock()
 	_ = u.editor.SetText("")
 	return u.render()
+}
+
+// SetBash tags interrupts with the independent Bash execution identity.
+func (u *TextUI) SetBash(bash uint64) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.bash = bash
 }
 
 // SetTurn tags subsequent inputs so delayed delivery cannot submit into another turn.
@@ -501,7 +510,7 @@ func (u *TextUI) input(data string) {
 		u.editor.cancelAutocomplete()
 	case match("app.interrupt"):
 		now := time.Now()
-		if u.turn == 0 && u.editor.GetText() == "" && u.interaction.DoubleEscapeAction != "none" && u.interaction.DoubleEscapeAction != "" {
+		if u.turn == 0 && u.bash == 0 && u.editor.GetText() == "" && u.interaction.DoubleEscapeAction != "none" && u.interaction.DoubleEscapeAction != "" {
 			if now.Sub(u.lastEscape) < 500*time.Millisecond {
 				u.lastEscape = time.Time{}
 				u.enqueueAction(Keybinding("app.session."+u.interaction.DoubleEscapeAction), "")
@@ -540,7 +549,7 @@ func (u *TextUI) input(data string) {
 		} else {
 			_ = u.editor.SetText("")
 		}
-		u.inputs = append(u.inputs, TextInput{Action: action, Turn: u.turn})
+		u.inputs = append(u.inputs, TextInput{Action: action, Turn: u.turn, Bash: u.bash})
 		select {
 		case u.ready <- struct{}{}:
 		default:
@@ -669,7 +678,7 @@ func (u *TextUI) ScrollToBottom() error {
 }
 
 func (u *TextUI) enqueueAction(action Keybinding, text string) {
-	u.inputs = append(u.inputs, TextInput{Action: action, Text: text, Turn: u.turn})
+	u.inputs = append(u.inputs, TextInput{Action: action, Text: text, Turn: u.turn, Bash: u.bash})
 	select {
 	case u.ready <- struct{}{}:
 	default:

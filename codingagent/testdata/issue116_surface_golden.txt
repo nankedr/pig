@@ -10,6 +10,7 @@ func(*tui.TextUI, uint64)
 func(*tui.TextUI, context.Context) (tui.TextInput, error)
 type codingagent.TextInput struct
 fields:
+- Bash uint64 tag=""
 - Turn uint64 tag=""
 - Text string tag=""
 - Action tui.Keybinding tag=""

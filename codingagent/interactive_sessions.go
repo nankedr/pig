@@ -189,6 +189,9 @@ func (m *InteractiveMode) sessionChanged(status string) error {
 			history = append(history, sessionUserText(message))
 		}
 	}
+	m.transcript.mu.Lock()
+	m.transcript.bashes = nil
+	m.transcript.mu.Unlock()
 	if err = m.transcript.SetMessages(messages); err != nil {
 		return err
 	}

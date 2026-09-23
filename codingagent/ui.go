@@ -26,28 +26,6 @@ type ArminComponent struct{ inertComponent }
 
 func (*ArminComponent) Dispose() error { return notImplemented("ArminComponent.Dispose") }
 
-type BashExecutionComponent struct{ tui.Container }
-
-func (*BashExecutionComponent) Invalidate() error {
-	return notImplemented("BashExecutionComponent.Invalidate")
-}
-
-func (*BashExecutionComponent) AppendOutput(string) error {
-	return notImplemented("BashExecutionComponent.AppendOutput")
-}
-func (*BashExecutionComponent) GetCommand() (string, error) {
-	return "", notImplemented("BashExecutionComponent.GetCommand")
-}
-func (*BashExecutionComponent) GetOutput() (string, error) {
-	return "", notImplemented("BashExecutionComponent.GetOutput")
-}
-func (*BashExecutionComponent) SetComplete(*int, bool, *TruncationResult, *string) error {
-	return notImplemented("BashExecutionComponent.SetComplete")
-}
-func (*BashExecutionComponent) SetExpanded(bool) error {
-	return notImplemented("BashExecutionComponent.SetExpanded")
-}
-
 type BorderedLoader struct{ tui.Container }
 
 func (*BorderedLoader) Dispose() error           { return notImplemented("BorderedLoader.Dispose") }

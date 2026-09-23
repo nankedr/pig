@@ -176,7 +176,7 @@ func TestInheritedUIOverrideBehavior(t *testing.T) {
 		renderOverride     bool
 	}{
 		{name: "AssistantMessageComponent", component: new(codingagent.AssistantMessageComponent), invalidateOverride: true, renderOverride: true},
-		{name: "BashExecutionComponent", component: new(codingagent.BashExecutionComponent), invalidateOverride: true},
+		{name: "BashExecutionComponent", component: new(codingagent.BashExecutionComponent), invalidateOverride: true, renderOverride: true},
 		{name: "BorderedLoader", component: new(codingagent.BorderedLoader)},
 		{name: "CustomMessageComponent", component: new(codingagent.CustomMessageComponent), invalidateOverride: true},
 		{name: "ExtensionEditorComponent", component: new(codingagent.ExtensionEditorComponent)},
@@ -198,7 +198,7 @@ func TestInheritedUIOverrideBehavior(t *testing.T) {
 
 	for _, testCase := range containerCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			if testCase.name == "AssistantMessageComponent" || testCase.name == "ToolExecutionComponent" || testCase.name == "UserMessageComponent" {
+			if testCase.name == "BashExecutionComponent" || testCase.name == "AssistantMessageComponent" || testCase.name == "ToolExecutionComponent" || testCase.name == "UserMessageComponent" {
 				if err := testCase.component.Invalidate(); err != nil {
 					t.Fatal(err)
 				}

@@ -328,6 +328,9 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 			}
 		}
 	}()
+	var bashDone chan error
+	var bashCancel context.CancelFunc
+	var bashID uint64
 	var turnDone chan error
 	var turnCancel context.CancelFunc
 	var turnContext context.Context
@@ -335,6 +338,12 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 	var turnID uint64
 	defer func() {
 		cancel()
+		if bashCancel != nil {
+			bashCancel()
+		}
+		if bashDone != nil {
+			<-bashDone
+		}
 		if turnCancel != nil {
 			turnCancel()
 		}
@@ -367,7 +376,25 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		}
 		return m.ui.Refresh()
 	}
+	finishBash := func(bashErr error) error {
+		bashCancel()
+		bashCancel, bashDone = nil, nil
+		m.ui.SetBash(0)
+		if turnDone == nil {
+			_ = m.transcript.SetMessages(m.transcriptMessages())
+		}
+		if bashErr != nil {
+			return m.ShowError("Bash command failed: " + bashErr.Error())
+		}
+		return m.ui.Refresh()
+	}
 	m.settleSession = func() error {
+		if bashDone != nil {
+			bashCancel()
+			if e := finishBash(<-bashDone); e != nil {
+				return e
+			}
+		}
 		if turnDone == nil {
 			return nil
 		}
@@ -395,6 +422,11 @@ loop:
 			case <-runCtx.Done():
 				err = runCtx.Err()
 				break loop
+			case bashErr := <-bashDone:
+				if err = finishBash(bashErr); err != nil {
+					break loop
+				}
+				continue
 			case promptErr := <-turnDone:
 				if err = finishTurn(promptErr); err != nil {
 					break loop
@@ -406,6 +438,15 @@ loop:
 				}
 				continue
 			case input = <-inputs:
+			}
+		}
+		if bashDone != nil {
+			select {
+			case bashErr := <-bashDone:
+				if err = finishBash(bashErr); err != nil {
+					break loop
+				}
+			default:
 			}
 		}
 		// Settle a completed worker before deciding whether idle input starts a new turn.
@@ -449,7 +490,7 @@ loop:
 			}
 			continue
 		case "app.interrupt":
-			if input.Turn != 0 && input.Turn == turnID && turnDone != nil {
+			if input.Turn != 0 && input.Turn == turnID && turnDone != nil && turnContext.Err() == nil {
 				if retrying, _ := session.IsRetrying(); retrying {
 					session.AbortRetry()
 				} else {
@@ -458,6 +499,8 @@ loop:
 						_ = m.ShowError(err.Error())
 					}
 				}
+			} else if input.Bash != 0 && input.Bash == bashID && bashDone != nil {
+				bashCancel()
 			}
 			continue
 		case "app.session.fork":
@@ -470,6 +513,48 @@ loop:
 			input.Text = "/resume"
 		}
 
+		if !literalPrompt && strings.HasPrefix(strings.TrimSpace(input.Text), "!") {
+			text := strings.TrimSpace(input.Text)
+			excluded := strings.HasPrefix(text, "!!")
+			prefix := 1
+			if excluded {
+				prefix = 2
+			}
+			command := strings.TrimSpace(text[prefix:])
+			if command != "" {
+				running, _ := session.IsBashRunning()
+				if bashDone != nil || running {
+					_ = m.ui.PrependEditor(input.Text)
+					_ = m.ShowWarning("A bash command is already running. Press " + m.interruptHint() + " to cancel it first.")
+					continue
+				}
+				bashID++
+				m.ui.SetBash(bashID)
+				bashCtx, stop := context.WithCancel(runCtx)
+				bashCancel = stop
+				bashDone = make(chan error, 1)
+				component := NewBashExecutionComponent(command, excluded)
+				component.cancelHint = m.interruptHint()
+				m.transcript.mu.Lock()
+				m.transcript.bashes = append(m.transcript.bashes, component)
+				m.transcript.mu.Unlock()
+				_ = m.ui.Refresh()
+				go func(done chan<- error) {
+					result, e := session.ExecuteBash(bashCtx, command, ExecuteBashOptions{ExcludeFromContext: excluded, OnChunk: func(chunk string) {
+						_ = component.AppendOutput(chunk)
+						if m.ui.Refresh() != nil {
+							stop()
+						}
+					}})
+					component.mu.Lock()
+					component.failed = e != nil
+					component.mu.Unlock()
+					_ = component.SetComplete(result.ExitCode, result.Cancelled, &TruncationResult{Truncated: result.Truncated}, result.FullOutputPath)
+					done <- e
+				}(bashDone)
+				continue
+			}
+		}
 		if !literalPrompt {
 			revision := m.sessionRevision
 			if handled, commandErr := m.handleCommand(runCtx, input.Text); handled {

@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9691
+- Total entries: 9692
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5149 |
-| scaffolded | 3627 |
-| partial | 612 |
+| inventoried | 5147 |
+| scaffolded | 3620 |
+| partial | 622 |
 | implemented | 133 |
 | verified | 167 |
 | deferred | 3 |
@@ -5419,7 +5419,6 @@
 | constructor:codingagent/src/core/extensions/runner.ts#ExtensionRunner | inventoried | M7 | contract | github.com/nankedr/pig/codingagent.ExtensionRunner | coding-agent |
 | constructor:codingagent/src/core/model-runtime.ts#CredentialSynchronizationError | inventoried | M3 | contract | github.com/nankedr/pig/codingagent.CredentialSynchronizationError | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/armin.ts#ArminComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent | coding-agent |
-| constructor:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.BorderedLoader | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/branch-summary-message.ts#BranchSummaryMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.BranchSummaryMessageComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/compaction-summary-message.ts#CompactionSummaryMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.CompactionSummaryMessageComponent | coding-agent |
@@ -5959,7 +5958,6 @@
 | member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.children | inventoried | M6 | contract | github.com/nankedr/pig/tui.Container.Children | coding-agent |
 | member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.clear | inventoried | M6 | contract | github.com/nankedr/pig/tui.Container.Clear | coding-agent |
 | member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.removeChild | inventoried | M6 | contract | github.com/nankedr/pig/tui.Container.RemoveChild | coding-agent |
-| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.render | inventoried | M6 | contract | github.com/nankedr/pig/tui.Container.Render | coding-agent |
 | member:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader.addChild | inventoried | M6 | contract | github.com/nankedr/pig/tui.Container.AddChild | coding-agent |
 | member:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader.children | inventoried | M6 | contract | github.com/nankedr/pig/tui.Container.Children | coding-agent |
 | member:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader.clear | inventoried | M6 | contract | github.com/nankedr/pig/tui.Container.Clear | coding-agent |
@@ -7253,12 +7251,6 @@
 | member:codingagent/src/modes/interactive/components/armin.ts#ArminComponent.dispose | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent.Dispose | coding-agent |
 | member:codingagent/src/modes/interactive/components/armin.ts#ArminComponent.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent.Invalidate | coding-agent |
 | member:codingagent/src/modes/interactive/components/armin.ts#ArminComponent.render | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.ArminComponent.Render | coding-agent |
-| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.appendOutput | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.AppendOutput | coding-agent |
-| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.getCommand | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.GetCommand | coding-agent |
-| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.getOutput | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.GetOutput | coding-agent |
-| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.Invalidate | coding-agent |
-| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.setComplete | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.SetComplete | coding-agent |
-| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.setExpanded | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.SetExpanded | coding-agent |
 | member:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader.dispose | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BorderedLoader.Dispose | coding-agent |
 | member:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader.handleInput | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BorderedLoader.HandleInput | coding-agent |
 | member:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader.onAbort | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.BorderedLoader.OnAbort | coding-agent |
@@ -7752,7 +7744,6 @@
 | symbol:codingagent/src/core/trust-manager.ts#hasTrustRequiringProjectResources | scaffolded | M3 | symbol | github.com/nankedr/pig/codingagent.HasTrustRequiringProjectResources | coding-agent |
 | symbol:codingagent/src/main.ts#MainOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.MainOptions | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/armin.ts#ArminComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ArminComponent | coding-agent |
-| symbol:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.BashExecutionComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/bordered-loader.ts#BorderedLoader | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.BorderedLoader | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/branch-summary-message.ts#BranchSummaryMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.BranchSummaryMessageComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/compaction-summary-message.ts#CompactionSummaryMessageComponent | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.CompactionSummaryMessageComponent | coding-agent |
@@ -7805,6 +7796,7 @@
 | constructor:codingagent/src/core/keybindings.ts#KeybindingsManager | partial | M6 | contract | github.com/nankedr/pig/codingagent.KeybindingsManager | coding-agent |
 | constructor:codingagent/src/core/resource-loader.ts#DefaultResourceLoader | partial | M5 | contract | github.com/nankedr/pig/codingagent.NewDefaultResourceLoader | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | partial | M6 | contract | github.com/nankedr/pig/codingagent.NewAssistantMessageComponent | coding-agent |
+| constructor:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent | partial | M6 | contract | github.com/nankedr/pig/codingagent.NewBashExecutionComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent | partial | M6 | contract | github.com/nankedr/pig/codingagent.NewToolExecutionComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | partial | M6 | contract | github.com/nankedr/pig/codingagent.NewUserMessageComponent | coding-agent |
 | contract:cli/pig/args | partial | M3 | contract | github.com/nankedr/pig/codingagent.RunCLI | coding-agent |
@@ -7821,6 +7813,7 @@
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
+| contract:codingagent/interactive-bash | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-branches | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-queues | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-settings | partial | M6 | contract | github.com/nankedr/pig/codingagent.SettingsSelectorComponent | coding-agent |
@@ -7925,6 +7918,13 @@
 | member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.setHideThinkingBlock | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.SetHideThinkingBlock | coding-agent |
 | member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.setOutputPad | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.SetOutputPad | coding-agent |
 | member:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent.updateContent | partial | M6 | contract | github.com/nankedr/pig/codingagent.AssistantMessageComponent.UpdateContent | coding-agent |
+| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.appendOutput | partial | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.AppendOutput | coding-agent |
+| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.getCommand | partial | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.GetCommand | coding-agent |
+| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.getOutput | partial | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.GetOutput | coding-agent |
+| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.invalidate | partial | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.Invalidate | coding-agent |
+| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.render | partial | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.Render | coding-agent |
+| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.setComplete | partial | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.SetComplete | coding-agent |
+| member:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent.setExpanded | partial | M6 | contract | github.com/nankedr/pig/codingagent.BashExecutionComponent.SetExpanded | coding-agent |
 | member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.invalidate | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.Invalidate | coding-agent |
 | member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.markExecutionStarted | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.MarkExecutionStarted | coding-agent |
 | member:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent.render | partial | M6 | contract | github.com/nankedr/pig/codingagent.ToolExecutionComponent.Render | coding-agent |
@@ -7979,6 +7979,7 @@
 | symbol:codingagent/src/core/skills.ts#loadSkillsFromDir | partial | M5 | symbol | github.com/nankedr/pig/codingagent.LoadSkillsFromDir | coding-agent |
 | symbol:codingagent/src/main.ts#main | partial | M1 | symbol | github.com/nankedr/pig/codingagent.Main | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/assistant-message.ts#AssistantMessageComponent | partial | M6 | symbol | github.com/nankedr/pig/codingagent.AssistantMessageComponent | coding-agent |
+| symbol:codingagent/src/modes/interactive/components/bash-execution.ts#BashExecutionComponent | partial | M6 | symbol | github.com/nankedr/pig/codingagent.BashExecutionComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/diff.ts#renderDiff | partial | M6 | symbol | github.com/nankedr/pig/codingagent.RenderDiff | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/tool-execution.ts#ToolExecutionComponent | partial | M6 | symbol | github.com/nankedr/pig/codingagent.ToolExecutionComponent | coding-agent |
 | symbol:codingagent/src/modes/interactive/components/user-message.ts#UserMessageComponent | partial | M6 | symbol | github.com/nankedr/pig/codingagent.UserMessageComponent | coding-agent |

@@ -134,6 +134,7 @@ ScrollToBottom func(*tui.TextUI) error
 ScrollToTop func(*tui.TextUI) error
 SetAutocompleteMaxVisible func(*tui.TextUI, int) error
 SetAutocompleteProvider func(*tui.TextUI, tui.AutocompleteProvider) error
+SetBash func(*tui.TextUI, uint64)
 SetDialog func(*tui.TextUI, tui.Component) error
 SetEditorText func(*tui.TextUI, string, bool) error
 SetMode func(*tui.TextUI, tui.TUIMode) error
