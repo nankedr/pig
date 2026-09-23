@@ -1,0 +1,294 @@
+{
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "items": [
+    {
+      "id": "autocompact",
+      "label": "Auto-compact",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "show-images",
+      "label": "Show images",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "image-width-cells",
+      "label": "Image width",
+      "values": [
+        "60",
+        "80",
+        "120"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "auto-resize-images",
+      "label": "Auto-resize images",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "block-images",
+      "label": "Block images",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "skill-commands",
+      "label": "Skill commands",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "show-hardware-cursor",
+      "label": "Show hardware cursor",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "editor-padding",
+      "label": "Editor padding",
+      "values": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "output-padding",
+      "label": "Output padding",
+      "values": [
+        "0",
+        "1"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "autocomplete-max-visible",
+      "label": "Autocomplete max items",
+      "values": [
+        "3",
+        "5",
+        "7",
+        "10",
+        "15",
+        "20"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "clear-on-shrink",
+      "label": "Clear on shrink",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "terminal-progress",
+      "label": "Terminal progress",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "steering-mode",
+      "label": "Steering mode",
+      "values": [
+        "one-at-a-time",
+        "all"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "follow-up-mode",
+      "label": "Follow-up mode",
+      "values": [
+        "one-at-a-time",
+        "all"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "transport",
+      "label": "Transport",
+      "values": [
+        "sse",
+        "websocket",
+        "websocket-cached",
+        "auto"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "http-idle-timeout",
+      "label": "HTTP idle timeout",
+      "values": [
+        "30 sec",
+        "1 min",
+        "2 min",
+        "5 min",
+        "disabled"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "hide-thinking",
+      "label": "Hide thinking",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "mermaid-rendering",
+      "label": "Mermaid diagrams",
+      "values": [
+        "off",
+        "final",
+        "streaming"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "cache-miss-notices",
+      "label": "Cache miss notices",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "collapse-changelog",
+      "label": "Collapse changelog",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "quiet-startup",
+      "label": "Quiet startup",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "install-telemetry",
+      "label": "Install telemetry",
+      "values": [
+        "true",
+        "false"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "default-project-trust",
+      "label": "Default project trust",
+      "values": [
+        "Ask",
+        "Always trust",
+        "Never trust"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "double-escape-action",
+      "label": "Double-escape action",
+      "values": [
+        "tree",
+        "fork",
+        "none"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "tree-filter-mode",
+      "label": "Tree filter mode",
+      "values": [
+        "default",
+        "no-tools",
+        "user-only",
+        "labeled-only",
+        "all"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "warnings",
+      "label": "Warnings",
+      "values": [],
+      "submenu": true
+    },
+    {
+      "id": "thinking",
+      "label": "Thinking level",
+      "values": [],
+      "submenu": true
+    },
+    {
+      "id": "tui-mode",
+      "label": "TUI mode",
+      "values": [
+        "regular",
+        "fullscreen"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "fullscreen-exit-output",
+      "label": "Fullscreen exit output",
+      "values": [
+        "transcript",
+        "resume-hint"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "fullscreen-scrollbar",
+      "label": "Fullscreen scrollbar",
+      "values": [
+        "auto",
+        "always",
+        "hidden"
+      ],
+      "submenu": false
+    },
+    {
+      "id": "theme",
+      "label": "Theme",
+      "values": [],
+      "submenu": true
+    }
+  ]
+}

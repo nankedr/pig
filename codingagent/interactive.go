@@ -160,6 +160,9 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 	if err := m.initThemes(ctx); err != nil {
 		return err
 	}
+	if err := m.applyInteractionSettings("init"); err != nil {
+		return err
+	}
 	if err := m.ui.Start(); err != nil {
 		return err
 	}
@@ -173,6 +176,12 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 	}
 	if err := m.detectTheme(ctx); err != nil {
 		return err
+	}
+	quiet, _ := m.runtime.Session().SettingsManager().GetQuietStartup()
+	if !quiet {
+		if err := m.ui.Append("pig · /settings · /hotkeys\n"); err != nil {
+			return err
+		}
 	}
 	m.initialized = true
 	return nil
@@ -582,6 +591,15 @@ func (m *InteractiveMode) Stop(_ ...bool) error {
 			_ = m.ui.Terminal().Write("\x1b[?2031l")
 		}
 		m.stopErr = m.ui.Stop()
+		if initialized && m.ui.Mode() == tui.TUIModeFullscreen {
+			if output, _ := m.runtime.Session().SettingsManager().GetFullscreenExitOutput(); output == FullscreenExitOutputResumeHint {
+				if path := m.runtime.Session().SessionManager().GetSessionFile(); path != nil {
+					if info, err := os.Stat(*path); err == nil && info.Mode().IsRegular() {
+						m.stopErr = errors.Join(m.stopErr, m.ui.Terminal().Write(fmt.Sprintf("\r\nResume this session with: pig --session %q\r\n", *path)))
+					}
+				}
+			}
+		}
 		if initialized {
 			if terminal, ok := m.ui.Terminal().(interface{ Done() <-chan struct{} }); ok {
 				<-terminal.Done()

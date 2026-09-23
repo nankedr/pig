@@ -26,6 +26,8 @@ type TextUI struct {
 	err                      error
 	started, stopped         bool
 	lastInterrupt            time.Time
+	lastEscape               time.Time
+	interaction              TextUIInteractionOptions
 	keybindings              *KeybindingsManager
 	onInterrupt              func()
 	generation               uint64
@@ -57,7 +59,7 @@ type TextUIOptions struct {
 }
 
 func NewTextUI(terminal Terminal, options ...TextUIOptions) *TextUI {
-	u := &TextUI{terminal: terminal, ready: make(chan struct{}, 1), done: make(chan struct{}), editor: NewEditor(nil, EditorTheme{})}
+	u := &TextUI{interaction: TextUIInteractionOptions{ShowHardwareCursor: true}, terminal: terminal, ready: make(chan struct{}, 1), done: make(chan struct{}), editor: NewEditor(nil, EditorTheme{})}
 	if len(options) > 0 {
 		u.keybindings = options[0].Keybindings
 		u.onInterrupt = options[0].OnInterrupt
@@ -201,6 +203,9 @@ func (u *TextUI) Stop() error {
 	u.mu.Unlock()
 	if started && u.terminal != nil {
 		var screenErr error
+		if u.interaction.ShowTerminalProgress {
+			screenErr = u.terminal.Write("\x1b]9;4;0;\x07")
+		}
 		if u.mode == TUIModeFullscreen {
 			screenErr = u.terminal.Write(leaveAltScreen)
 			if u.exitTranscript && u.renderTranscript != nil {
@@ -279,6 +284,9 @@ func (u *TextUI) SetTurn(turn uint64) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	u.turn = turn
+	if u.started && !u.stopped && u.interaction.ShowTerminalProgress {
+		_ = u.terminal.Write(u.progressSequence())
+	}
 }
 
 func (u *TextUI) PrependEditor(text string) error {
@@ -408,9 +416,9 @@ func (u *TextUI) render() error {
 	var output string
 	var state TUIMainScreenRenderState
 	if u.mode == TUIModeRegular {
-		output, state, _ = mainScreenFrame(u.mainState, visible, columns, rows, true, false)
+		output, state, _ = mainScreenFrame(u.mainState, visible, columns, rows, u.interaction.ShowHardwareCursor, u.interaction.ClearOnShrink)
 	} else {
-		output, state, _ = screenFrame(u.altState, visible, columns, rows, true)
+		output, state, _ = screenFrame(u.altState, visible, columns, rows, u.interaction.ShowHardwareCursor)
 	}
 	if err = u.terminal.Write(output); err != nil {
 		u.finish(err)
@@ -467,6 +475,9 @@ func (u *TextUI) input(data string) {
 			}
 		}
 	}
+	if !match("app.interrupt") {
+		u.lastEscape = time.Time{}
+	}
 	switch {
 	case strings.HasPrefix(data, "\x1b[200~"):
 		_ = u.editor.HandleInput(data)
@@ -489,6 +500,17 @@ func (u *TextUI) input(data string) {
 	case (u.editor.completion.list != nil || u.editor.completion.pending != nil) && match(KeybindingSelectCancel):
 		u.editor.cancelAutocomplete()
 	case match("app.interrupt"):
+		now := time.Now()
+		if u.turn == 0 && u.editor.GetText() == "" && u.interaction.DoubleEscapeAction != "none" && u.interaction.DoubleEscapeAction != "" {
+			if now.Sub(u.lastEscape) < 500*time.Millisecond {
+				u.lastEscape = time.Time{}
+				u.enqueueAction(Keybinding("app.session."+u.interaction.DoubleEscapeAction), "")
+				break
+			}
+			u.lastEscape = now
+		} else {
+			u.lastEscape = time.Time{}
+		}
 		if u.onInterrupt != nil {
 			u.onInterrupt()
 		} else {

@@ -1,0 +1,544 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/components/settings-selector.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "sdk/interactive/settings-selector",
+    "catalog_id": "contract:codingagent/interactive-settings",
+    "surface": "go-sdk",
+    "input": {
+      "config": {
+        "autoCompact": true,
+        "enableSkillCommands": true,
+        "steeringMode": "one-at-a-time",
+        "followUpMode": "one-at-a-time",
+        "hideThinkingBlock": false,
+        "showHardwareCursor": false,
+        "editorPaddingX": 0,
+        "outputPad": 1,
+        "autocompleteMaxVisible": 5,
+        "clearOnShrink": false,
+        "showTerminalProgress": false,
+        "quietStartup": false,
+        "defaultProjectTrust": "ask",
+        "doubleEscapeAction": "tree",
+        "treeFilterMode": "default",
+        "thinkingLevel": "off",
+        "availableThinkingLevels": [
+          "off",
+          "low",
+          "high"
+        ],
+        "tuiMode": "regular",
+        "fullscreenExitOutput": "transcript",
+        "fullscreenScrollbar": "auto",
+        "currentTheme": "dark",
+        "terminalTheme": "dark",
+        "availableThemes": [
+          "dark",
+          "light"
+        ],
+        "transport": "auto",
+        "httpIdleTimeoutMs": 300000,
+        "mermaidRenderingMode": "streaming",
+        "warnings": {},
+        "autoResizeImages": true,
+        "imageWidthCells": 60
+      },
+      "cases": [
+        {
+          "label": "Auto-compact",
+          "callback": "onAutoCompactChange",
+          "keys": [
+            "Auto-compact",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Skill commands",
+          "callback": "onEnableSkillCommandsChange",
+          "keys": [
+            "Skill commands",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Show hardware cursor",
+          "callback": "onShowHardwareCursorChange",
+          "keys": [
+            "Show hardware cursor",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Editor padding",
+          "callback": "onEditorPaddingXChange",
+          "keys": [
+            "Editor padding",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Output padding",
+          "callback": "onOutputPadChange",
+          "keys": [
+            "Output padding",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Autocomplete max items",
+          "callback": "onAutocompleteMaxVisibleChange",
+          "keys": [
+            "Autocomplete max items",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Clear on shrink",
+          "callback": "onClearOnShrinkChange",
+          "keys": [
+            "Clear on shrink",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Terminal progress",
+          "callback": "onShowTerminalProgressChange",
+          "keys": [
+            "Terminal progress",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Steering mode",
+          "callback": "onSteeringModeChange",
+          "keys": [
+            "Steering mode",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Follow-up mode",
+          "callback": "onFollowUpModeChange",
+          "keys": [
+            "Follow-up mode",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Hide thinking",
+          "callback": "onHideThinkingBlockChange",
+          "keys": [
+            "Hide thinking",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Quiet startup",
+          "callback": "onQuietStartupChange",
+          "keys": [
+            "Quiet startup",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Default project trust",
+          "callback": "onDefaultProjectTrustChange",
+          "keys": [
+            "Default project trust",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Double-escape action",
+          "callback": "onDoubleEscapeActionChange",
+          "keys": [
+            "Double-escape action",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Tree filter mode",
+          "callback": "onTreeFilterModeChange",
+          "keys": [
+            "Tree filter mode",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "TUI mode",
+          "callback": "onTuiModeChange",
+          "keys": [
+            "TUI mode",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Fullscreen exit output",
+          "callback": "onFullscreenExitOutputChange",
+          "keys": [
+            "Fullscreen exit output",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "Fullscreen scrollbar",
+          "callback": "onFullscreenScrollbarChange",
+          "keys": [
+            "Fullscreen scrollbar",
+            "\r",
+            "\r",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "thinking-cancel",
+          "callback": "onThinkingLevelChange",
+          "keys": [
+            "Thinking level",
+            "\r",
+            "\u001b[B",
+            "\u001b",
+            "\u001b"
+          ]
+        },
+        {
+          "label": "thinking-select",
+          "callback": "onThinkingLevelChange",
+          "keys": [
+            "Thinking level",
+            "\r",
+            "\u001b[B",
+            "\r",
+            "\u001b"
+          ]
+        }
+      ]
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": [
+      {
+        "label": "Auto-compact",
+        "events": [
+          {
+            "callback": "onAutoCompactChange",
+            "value": false
+          },
+          {
+            "callback": "onAutoCompactChange",
+            "value": true
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Skill commands",
+        "events": [
+          {
+            "callback": "onEnableSkillCommandsChange",
+            "value": false
+          },
+          {
+            "callback": "onEnableSkillCommandsChange",
+            "value": true
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Show hardware cursor",
+        "events": [
+          {
+            "callback": "onShowHardwareCursorChange",
+            "value": true
+          },
+          {
+            "callback": "onShowHardwareCursorChange",
+            "value": false
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Editor padding",
+        "events": [
+          {
+            "callback": "onEditorPaddingXChange",
+            "value": 1
+          },
+          {
+            "callback": "onEditorPaddingXChange",
+            "value": 2
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Output padding",
+        "events": [
+          {
+            "callback": "onOutputPadChange",
+            "value": 0
+          },
+          {
+            "callback": "onOutputPadChange",
+            "value": 1
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Autocomplete max items",
+        "events": [
+          {
+            "callback": "onAutocompleteMaxVisibleChange",
+            "value": 7
+          },
+          {
+            "callback": "onAutocompleteMaxVisibleChange",
+            "value": 10
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Clear on shrink",
+        "events": [
+          {
+            "callback": "onClearOnShrinkChange",
+            "value": true
+          },
+          {
+            "callback": "onClearOnShrinkChange",
+            "value": false
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Terminal progress",
+        "events": [
+          {
+            "callback": "onShowTerminalProgressChange",
+            "value": true
+          },
+          {
+            "callback": "onShowTerminalProgressChange",
+            "value": false
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Steering mode",
+        "events": [
+          {
+            "callback": "onSteeringModeChange",
+            "value": "all"
+          },
+          {
+            "callback": "onSteeringModeChange",
+            "value": "one-at-a-time"
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Follow-up mode",
+        "events": [
+          {
+            "callback": "onFollowUpModeChange",
+            "value": "all"
+          },
+          {
+            "callback": "onFollowUpModeChange",
+            "value": "one-at-a-time"
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Hide thinking",
+        "events": [
+          {
+            "callback": "onHideThinkingBlockChange",
+            "value": true
+          },
+          {
+            "callback": "onHideThinkingBlockChange",
+            "value": false
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Quiet startup",
+        "events": [
+          {
+            "callback": "onQuietStartupChange",
+            "value": true
+          },
+          {
+            "callback": "onQuietStartupChange",
+            "value": false
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Default project trust",
+        "events": [
+          {
+            "callback": "onDefaultProjectTrustChange",
+            "value": "always"
+          },
+          {
+            "callback": "onDefaultProjectTrustChange",
+            "value": "never"
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Double-escape action",
+        "events": [
+          {
+            "callback": "onDoubleEscapeActionChange",
+            "value": "fork"
+          },
+          {
+            "callback": "onDoubleEscapeActionChange",
+            "value": "none"
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Tree filter mode",
+        "events": [
+          {
+            "callback": "onTreeFilterModeChange",
+            "value": "no-tools"
+          },
+          {
+            "callback": "onTreeFilterModeChange",
+            "value": "user-only"
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "TUI mode",
+        "events": [
+          {
+            "callback": "onTuiModeChange",
+            "value": "fullscreen"
+          },
+          {
+            "callback": "onTuiModeChange",
+            "value": "regular"
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Fullscreen exit output",
+        "events": [
+          {
+            "callback": "onFullscreenExitOutputChange",
+            "value": "resume-hint"
+          },
+          {
+            "callback": "onFullscreenExitOutputChange",
+            "value": "transcript"
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "Fullscreen scrollbar",
+        "events": [
+          {
+            "callback": "onFullscreenScrollbarChange",
+            "value": "always"
+          },
+          {
+            "callback": "onFullscreenScrollbarChange",
+            "value": "hidden"
+          }
+        ],
+        "cancelled": true
+      },
+      {
+        "label": "thinking-cancel",
+        "events": [],
+        "cancelled": true
+      },
+      {
+        "label": "thinking-select",
+        "events": [
+          {
+            "callback": "onThinkingLevelChange",
+            "value": "low"
+          }
+        ],
+        "cancelled": true
+      }
+    ],
+    "side_effects": []
+  },
+  "input_hash": "sha256:e32aae1a65e649a2d5522d9497ecbc4639f4faabc6fbb633b51692e98e757892",
+  "observation_hash": "sha256:b84fe72046601dea173d5cf0fdbdf4329ab17370d88b0568733100e9d74e0273",
+  "execution_method": "node parity/oracle/settings-selector.mjs <locked-pi-checkout>",
+  "platform": "any",
+  "environment": {
+    "terminal": "text; no image protocol"
+  }
+}

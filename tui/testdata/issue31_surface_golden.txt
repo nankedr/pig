@@ -488,6 +488,7 @@ func (s *SettingsList) Invalidate() error
 func (s *SettingsList) Render(width int) ([]string, error)
 func (s *SettingsList) SetKeybindings(kb *KeybindingsManager)
 func (s *SettingsList) SetTheme(theme SettingsListTheme)
+func (s *SettingsList) UpdateDescription(id, description string)
 func (s *SettingsList) UpdateValue(id, value string) error
 
 ## symbol:tui/src/components/settings-list.ts#SettingsListOptions

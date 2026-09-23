@@ -12,6 +12,7 @@ import (
 // Transcript projects Session messages and events into text without changing model context.
 type Transcript struct {
 	theme                  *Theme
+	outputPad              int
 	mu                     sync.Mutex
 	messages               []agent.AgentMessage
 	current                int
@@ -20,6 +21,7 @@ type Transcript struct {
 }
 
 func (t *Transcript) SetTheme(theme *Theme) { t.mu.Lock(); defer t.mu.Unlock(); t.theme = theme }
+func (t *Transcript) SetOutputPad(pad int)  { t.mu.Lock(); defer t.mu.Unlock(); t.outputPad = pad }
 func NewTranscript() *Transcript {
 	return &Transcript{current: -1, tools: make(map[string]*ToolExecutionComponent)}
 }
@@ -138,11 +140,13 @@ func (t *Transcript) Render(width int) ([]string, error) {
 		case ai.UserMessage:
 			c := NewUserMessageComponent("user: " + sessionUserText(m))
 			c.theme = t.theme
+			c.SetOutputPad(t.outputPad != 0)
 			component = c
 		case ai.AssistantMessage:
 			c := NewAssistantMessageComponent(m)
 			c.theme = t.theme
 			c.SetHideThinkingBlock(t.hideThinking)
+			c.SetOutputPad(t.outputPad != 0)
 			component = c
 		case ai.ToolResultMessage:
 			if err := toolLines(m.ToolCallID); err != nil {
@@ -180,7 +184,7 @@ func (t *Transcript) Render(width int) ([]string, error) {
 				if t.theme != nil {
 					style = &tui.DefaultTextStyle{Color: func(s string) string { return t.theme.FG("customMessageText", s) }, BGColor: func(s string) string { return t.theme.BG("customMessageBg", s) }}
 				}
-				component = tui.NewMarkdown("["+m.CustomType+"]\n\n"+sessionUserText(ai.UserMessage{Content: m.Content}), 0, 1, theme, style)
+				component = tui.NewMarkdown("["+m.CustomType+"]\n\n"+sessionUserText(ai.UserMessage{Content: m.Content}), t.outputPad, 1, theme, style)
 			}
 		}
 		if component != nil {

@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9690
+- Total entries: 9691
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5150 |
-| scaffolded | 3626 |
-| partial | 611 |
+| inventoried | 5149 |
+| scaffolded | 3627 |
+| partial | 612 |
 | implemented | 133 |
 | verified | 167 |
 | deferred | 3 |
@@ -5432,7 +5432,6 @@
 | constructor:codingagent/src/modes/interactive/components/footer.ts#FooterComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.FooterComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/login-dialog.ts#LoginDialogComponent | inventoried | M11 | contract | github.com/nankedr/pig/codingagent.LoginDialogComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/oauth-selector.ts#OAuthSelectorComponent | inventoried | M11 | contract | github.com/nankedr/pig/codingagent.OAuthSelectorComponent | coding-agent |
-| constructor:codingagent/src/modes/interactive/components/settings-selector.ts#SettingsSelectorComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.SettingsSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/show-images-selector.ts#ShowImagesSelectorComponent | inventoried | M12 | contract | github.com/nankedr/pig/codingagent.ShowImagesSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/skill-invocation-message.ts#SkillInvocationMessageComponent | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.SkillInvocationMessageComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/theme/theme.ts#Theme | inventoried | M6 | contract | github.com/nankedr/pig/codingagent.Theme | coding-agent |
@@ -6153,6 +6152,7 @@
 | constructor:codingagent/src/core/trust-manager.ts#ProjectTrustStore | scaffolded | M3 | contract | github.com/nankedr/pig/codingagent.NewProjectTrustStore | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/model-selector.ts#ModelSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewModelSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/session-selector.ts#SessionSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewSessionSelectorComponent | coding-agent |
+| constructor:codingagent/src/modes/interactive/components/settings-selector.ts#SettingsSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewSettingsSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/theme-selector.ts#ThemeSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewThemeSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/thinking-selector.ts#ThinkingSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewThinkingSelectorComponent | coding-agent |
 | constructor:codingagent/src/modes/interactive/components/tree-selector.ts#TreeSelectorComponent | scaffolded | M6 | contract | github.com/nankedr/pig/codingagent.NewTreeSelectorComponent | coding-agent |
@@ -7823,6 +7823,7 @@
 | contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
 | contract:codingagent/interactive-branches | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-queues | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
+| contract:codingagent/interactive-settings | partial | M6 | contract | github.com/nankedr/pig/codingagent.SettingsSelectorComponent | coding-agent |
 | contract:codingagent/interactive-text | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/local-extensions | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetExtensionDiscovery | coding-agent |
 | contract:codingagent/local-resources | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |

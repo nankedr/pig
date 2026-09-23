@@ -36,4 +36,5 @@ Invalidate func(*tui.SettingsList) error
 Render func(*tui.SettingsList, int) ([]string, error)
 SetKeybindings func(*tui.SettingsList, *tui.KeybindingsManager)
 SetTheme func(*tui.SettingsList, tui.SettingsListTheme)
+UpdateDescription func(*tui.SettingsList, string, string)
 UpdateValue func(*tui.SettingsList, string, string) error

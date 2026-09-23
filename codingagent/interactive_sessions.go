@@ -158,6 +158,9 @@ func (m *InteractiveMode) newSession(ctx context.Context) error {
 	return m.sessionChanged("Started new session")
 }
 func (m *InteractiveMode) sessionChanged(status string) error {
+	if err := m.applyInteractionSettings("session"); err != nil {
+		return err
+	}
 	session := m.runtime.Session()
 	m.renderSession.Store(session)
 	provider, err := NewSessionAutocompleteProvider(session, nil)

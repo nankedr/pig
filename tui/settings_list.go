@@ -22,6 +22,14 @@ func (s *SettingsList) UpdateValue(id, value string) error {
 	}
 	return nil
 }
+func (s *SettingsList) UpdateDescription(id, description string) {
+	for i := range s.items {
+		if s.items[i].ID == id {
+			s.items[i].Description = &description
+			return
+		}
+	}
+}
 func (s *SettingsList) Invalidate() error {
 	if s.submenu != nil {
 		return s.submenu.Invalidate()
@@ -112,9 +120,14 @@ func (s *SettingsList) Render(width int) ([]string, error) {
 		lines = append(append(lines, rendered...), "")
 	}
 	hint := func() {
-		text := "  Enter/Space to change · Esc to cancel"
+		confirm, cancel := "Enter", "Esc"
+		if s.keybindings != nil {
+			confirm = SelectionKeyHint(s.keybindings, "tui.select.confirm")
+			cancel = SelectionKeyHint(s.keybindings, "tui.select.cancel")
+		}
+		text := "  " + confirm + "/Space to change · " + cancel + " to cancel"
 		if s.search != nil {
-			text = "  Type to search · Enter/Space to change · Esc to cancel"
+			text = "  Type to search · " + confirm + "/Space to change · " + cancel + " to cancel"
 		}
 		text, _ = TruncateToWidth(styled(s.theme.Hint, text), width)
 		lines = append(lines, "", text)
@@ -173,4 +186,22 @@ func (s *SettingsList) Render(width int) ([]string, error) {
 	}
 	hint()
 	return lines, nil
+}
+
+func SelectionKeyHint(kb *KeybindingsManager, action Keybinding) string {
+	keys, _ := kb.GetKeys(action)
+	parts := make([]string, len(keys))
+	for i, key := range keys {
+		parts[i] = string(key)
+		if key == "enter" {
+			parts[i] = "Enter"
+		}
+		if key == "escape" {
+			parts[i] = "Esc"
+		}
+	}
+	if len(parts) == 0 {
+		return "unbound"
+	}
+	return strings.Join(parts, "/")
 }

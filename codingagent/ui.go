@@ -306,9 +306,16 @@ type SettingsConfig struct {
 	Warnings                                                                                 WarningSettings
 }
 
-type SettingsSelectorComponent struct{ tui.Container }
+type SettingsSelectorComponent struct {
+	tui.Container
+	list        *tui.SettingsList
+	keybindings *tui.KeybindingsManager
+}
 
-func (*SettingsSelectorComponent) GetSettingsList() (*tui.SettingsList, error) {
+func (s *SettingsSelectorComponent) GetSettingsList() (*tui.SettingsList, error) {
+	if s.list != nil {
+		return s.list, nil
+	}
 	return nil, notImplemented("SettingsSelectorComponent.GetSettingsList")
 }
 

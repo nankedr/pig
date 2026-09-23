@@ -24,7 +24,7 @@ func partial117() *catalog.Partial {
 		"Input single-line editing and shared fuzzy ranking, TextUI modal focus with preserved editor draft; existing AgentSession configuration transactions and fallback rules are reused",
 	}, Unsupported: []string{
 		"M10 dynamic catalog refresh and M11 full authentication remain Stub; selector uses the existing local ModelRuntime snapshot and does not trigger network refresh",
-		"Settings menu currently exposes thinking only; full settings UI, exact Pi pixel layout, all Unicode/IME editing branches, extension runtime M7, images M12, package ecosystem #99 and six-platform runtime acceptance M13 remain partial/deferred",
+		"Settings menu is delivered separately by #121; exact Pi pixel layout, all Unicode/IME editing branches, extension runtime M7, images M12, package ecosystem #99 and six-platform runtime acceptance M13 remain partial/deferred",
 	}}
 }
 func TestModelSelectionCatalog117(t *testing.T) {

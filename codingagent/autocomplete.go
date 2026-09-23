@@ -99,8 +99,10 @@ func (m *InteractiveMode) handleCommand(ctx context.Context, prompt string) (boo
 			return true, m.selectModel(ctx, strings.TrimSpace(argument))
 		case "scoped-models":
 			return true, m.selectModelScope(ctx)
+		case "hotkeys":
+			return true, m.showHotkeys()
 		case "settings":
-			return true, m.selectThinking(ctx)
+			return true, m.selectSettings(ctx)
 		case "reload":
 			if err := m.runtime.Session().Reload(ctx); err != nil {
 				return true, err

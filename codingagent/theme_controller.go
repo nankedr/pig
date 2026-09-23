@@ -111,16 +111,16 @@ func (c *ThemeController) Preview(setting string) error {
 func (c *ThemeController) SetTheme(setting string) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	name, auto := resolveThemeSetting(setting, c.terminal)
+	name, _ := resolveThemeSetting(setting, c.terminal)
 	if err := c.load(name); err != nil {
 		return err
 	}
-	if err := c.settings.SetTheme(setting); err != nil {
+	if err := c.settings.saveInteractionSetting("theme", "", setting); err != nil {
 		_ = c.applySettings()
 		return err
 	}
-	c.auto, c.preview = auto, false
-	return nil
+	c.preview = false
+	return c.applySettings()
 }
 func (c *ThemeController) SetTerminalTheme(scheme tui.TerminalColorScheme) error {
 	c.mu.Lock()

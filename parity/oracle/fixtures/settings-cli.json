@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/interactive-mode.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/interactive/settings-cli",
+    "catalog_id": "contract:codingagent/interactive-settings",
+    "surface": "cli",
+    "input": {
+      "steps": [
+        "toggle each delivered interaction setting",
+        "restart",
+        "verify each effective menu value",
+        "exit"
+      ],
+      "terminal": {
+        "rows": 40,
+        "columns": 110
+      }
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "changes": [
+        {
+          "label": "Auto-compact",
+          "value": false
+        },
+        {
+          "label": "Skill commands",
+          "value": false
+        },
+        {
+          "label": "Show hardware cursor",
+          "value": true
+        },
+        {
+          "label": "Editor padding",
+          "value": 1
+        },
+        {
+          "label": "Output padding",
+          "value": 0
+        },
+        {
+          "label": "Autocomplete max items",
+          "value": 7
+        },
+        {
+          "label": "Clear on shrink",
+          "value": true
+        },
+        {
+          "label": "Terminal progress",
+          "value": true
+        },
+        {
+          "label": "Steering mode",
+          "value": "all"
+        },
+        {
+          "label": "Follow-up mode",
+          "value": "all"
+        },
+        {
+          "label": "Hide thinking",
+          "value": true
+        },
+        {
+          "label": "Quiet startup",
+          "value": true
+        },
+        {
+          "label": "Default project trust",
+          "value": "always"
+        },
+        {
+          "label": "Double-escape action",
+          "value": "fork"
+        },
+        {
+          "label": "Tree filter mode",
+          "value": "no-tools"
+        },
+        {
+          "label": "TUI mode",
+          "value": "fullscreen"
+        },
+        {
+          "label": "Fullscreen exit output",
+          "value": "resume-hint"
+        },
+        {
+          "label": "Fullscreen scrollbar",
+          "value": "always"
+        }
+      ],
+      "restart": true,
+      "restored": true
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:312276a5c26ecfa5d04973e7a83dad50efda6caf877669b11d3f8d3e10bb21de",
+  "observation_hash": "sha256:d98525a1355498db798dc0c37bde6e47931b0571817bdbc9f719c9d42f377eb8",
+  "execution_method": "node parity/oracle/settings-cli.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "terminal": "xterm-256color",
+    "transport": "real child process + PTY; offline; no prompts"
+  }
+}

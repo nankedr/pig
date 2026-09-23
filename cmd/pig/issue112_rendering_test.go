@@ -217,12 +217,12 @@ func TestPigPartialFailureAndCancel112(t *testing.T) {
 			frame := ""
 			for time.Now().Before(deadline) {
 				frame = tty.ScreenText()
-				if strings.Contains(frame, expected) {
+				if strings.Contains(strings.Join(strings.Fields(frame), " "), expected) {
 					break
 				}
 				time.Sleep(5 * time.Millisecond)
 			}
-			if !strings.Contains(frame, expected) || !strings.Contains(frame, "PARTIAL_112") {
+			if !strings.Contains(strings.Join(strings.Fields(frame), " "), expected) || !strings.Contains(frame, "PARTIAL_112") {
 				t.Fatalf("partial/failure not preserved: %s", frame)
 			}
 			tty.Send(t, "\x04")
@@ -230,7 +230,7 @@ func TestPigPartialFailureAndCancel112(t *testing.T) {
 				t.Fatal(err)
 			}
 			finalFrame := tty.ScreenText()
-			if !strings.Contains(finalFrame, "PARTIAL_112") || !strings.Contains(finalFrame, expected) {
+			if !strings.Contains(finalFrame, "PARTIAL_112") || !strings.Contains(strings.Join(strings.Fields(finalFrame), " "), expected) {
 				t.Fatalf("settled partial content disappeared: %s", finalFrame)
 			}
 			if !tty.Restored(t) {

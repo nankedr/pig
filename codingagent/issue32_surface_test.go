@@ -646,7 +646,7 @@ func TestIssue32MemberMappingsMatchLockedCodingAgentSurface(t *testing.T) {
 	if !reflect.DeepEqual(gotByMilestone, wantByMilestone) {
 		t.Fatalf("issue #32 milestone row counts = %v, want %v", gotByMilestone, wantByMilestone)
 	}
-	if want := (map[string]int{catalog.StatusScaffolded: 1655, catalog.StatusInventoried: 727, catalog.StatusPartial: 143, catalog.StatusImplemented: 75}); !reflect.DeepEqual(gotByStatus, want) {
+	if want := (map[string]int{catalog.StatusScaffolded: 1656, catalog.StatusInventoried: 726, catalog.StatusPartial: 143, catalog.StatusImplemented: 75}); !reflect.DeepEqual(gotByStatus, want) {
 
 		t.Fatalf("issue #32 status row counts = %v, want %v", gotByStatus, want)
 	}

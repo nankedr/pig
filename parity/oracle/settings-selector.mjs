@@ -1,0 +1,25 @@
+import {execFileSync} from 'node:child_process';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {caseDigest,observationDigest} from './fixture-hash.mjs';
+const pi=resolve(process.argv[2]),lock=JSON.parse(readFileSync('parity/baseline/upstream.lock.json'));
+if(execFileSync('git',['-C',pi,'rev-parse','HEAD'],{encoding:'utf8'}).trim()!==lock.upstream.commit)throw Error('baseline mismatch');
+if(execFileSync('git',['-C',pi,'status','--porcelain','--untracked-files=no'],{encoding:'utf8'}).trim())throw Error('dirty baseline');
+const {SettingsSelectorComponent}=await import(pathToFileURL(`${pi}/packages/coding-agent/dist/modes/interactive/components/settings-selector.js`));
+const {initTheme}=await import(pathToFileURL(`${pi}/packages/coding-agent/dist/modes/interactive/theme/theme.js`));
+const {setCapabilities}=await import(pathToFileURL(`${pi}/packages/tui/dist/terminal-image.js`));
+setCapabilities({images:null,trueColor:false,hyperlinks:false});
+initTheme("dark",false);
+const config={autoCompact:true,enableSkillCommands:true,steeringMode:'one-at-a-time',followUpMode:'one-at-a-time',hideThinkingBlock:false,showHardwareCursor:false,editorPaddingX:0,outputPad:1,autocompleteMaxVisible:5,clearOnShrink:false,showTerminalProgress:false,quietStartup:false,defaultProjectTrust:'ask',doubleEscapeAction:'tree',treeFilterMode:'default',thinkingLevel:'off',availableThinkingLevels:['off','low','high'],tuiMode:'regular',fullscreenExitOutput:'transcript',fullscreenScrollbar:'auto',currentTheme:'dark',terminalTheme:'dark',availableThemes:['dark','light'],transport:'auto',httpIdleTimeoutMs:300000,mermaidRenderingMode:'streaming',warnings:{},autoResizeImages:true,imageWidthCells:60};
+const names={'Auto-compact':'onAutoCompactChange','Skill commands':'onEnableSkillCommandsChange','Show hardware cursor':'onShowHardwareCursorChange','Editor padding':'onEditorPaddingXChange','Output padding':'onOutputPadChange','Autocomplete max items':'onAutocompleteMaxVisibleChange','Clear on shrink':'onClearOnShrinkChange','Terminal progress':'onShowTerminalProgressChange','Steering mode':'onSteeringModeChange','Follow-up mode':'onFollowUpModeChange','Hide thinking':'onHideThinkingBlockChange','Quiet startup':'onQuietStartupChange','Default project trust':'onDefaultProjectTrustChange','Double-escape action':'onDoubleEscapeActionChange','Tree filter mode':'onTreeFilterModeChange','TUI mode':'onTuiModeChange','Fullscreen exit output':'onFullscreenExitOutputChange','Fullscreen scrollbar':'onFullscreenScrollbarChange'};
+const cases=Object.entries(names).map(([label,callback])=>({label,callback,keys:[label,'\r','\r','\x1b']}));
+cases.push({label:'thinking-cancel',callback:'onThinkingLevelChange',keys:['Thinking level','\r','\x1b[B','\x1b','\x1b']},{label:'thinking-select',callback:'onThinkingLevelChange',keys:['Thinking level','\r','\x1b[B','\r','\x1b']});
+const outcome=cases.map(c=>{const events=[];let cancelled=false;const callbacks=new Proxy({onCancel:()=>cancelled=true},{get:(t,k)=>t[k]??(value=>events.push({callback:k,value}))});const menu=new SettingsSelectorComponent(config,callbacks);for(const key of c.keys)menu.getSettingsList().handleInput(key);return {label:c.label,events,cancelled};});
+setCapabilities({images:"kitty",trueColor:false,hyperlinks:false});
+const inventory=new SettingsSelectorComponent(config,{}).getSettingsList().items.map(({id,label,values,submenu})=>({id,label,values:values??[],submenu:!!submenu}));
+const c={schema_version:'1.0.0',id:'sdk/interactive/settings-selector',catalog_id:'contract:codingagent/interactive-settings',surface:'go-sdk',input:{config,cases},observe:['outcome','side_effects']};
+const observation={outcome,side_effects:[]};
+const fixture={schema_version:'1.0.0',deterministic:true,baseline_id:lock.baseline_id,baseline_commit:lock.upstream.commit,upstream:{repository:lock.upstream.repository,commit:lock.upstream.commit,reference:'packages/coding-agent/src/modes/interactive/components/settings-selector.ts'},case:c,observation,input_hash:caseDigest(c),observation_hash:observationDigest(observation),execution_method:'node parity/oracle/settings-selector.mjs <locked-pi-checkout>',platform:'any',environment:{terminal:'text; no image protocol'}};
+for(const [path,data] of [['parity/oracle/fixtures/settings-selector.json',fixture],['parity/interactive-settings-inventory.json',{baseline_commit:lock.upstream.commit,items:inventory}]]){if(process.argv.includes('--check')){if(JSON.stringify(data)!==JSON.stringify(JSON.parse(readFileSync(path))))throw Error('fixture drift: '+path);}else writeFileSync(path,JSON.stringify(data,null,2)+'\n');}
+console.log(outcome);

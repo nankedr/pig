@@ -1,0 +1,20 @@
+func(codingagent.SettingsConfig, codingagent.SettingsCallbacks) *codingagent.SettingsSelectorComponent
+func(*codingagent.SettingsSelectorComponent) (*tui.SettingsList, error)
+func(*codingagent.SettingsSelectorComponent, *tui.KeybindingsManager)
+func(*codingagent.SettingsSelectorComponent, string) error
+func(*codingagent.AgentSession) (codingagent.SettingsConfig, error)
+func(*codingagent.AgentSession, string, string) error
+func(*tui.TextUI, tui.TextUIInteractionOptions) error
+func(*tui.TextUI) bool
+func(*tui.KeybindingsManager, tui.Keybinding) string
+func(*tui.SettingsList, string, string)
+func(*codingagent.Transcript, int)
+HideThinking bool
+ShowHardwareCursor bool
+ClearOnShrink bool
+ShowTerminalProgress bool
+EditorPaddingX int
+AutocompleteMaxVisible int
+DoubleEscapeAction string
+Scrollbar tui.ScrollViewScrollbar
+ExitTranscript bool

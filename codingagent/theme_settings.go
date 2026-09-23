@@ -115,7 +115,7 @@ func (s *ThemeSettingsComponent) selectMenu(title, description, current string, 
 		}
 	}
 	list.SetKeybindings(s.keybindings)
-	content := &themeMenuContent{title: title, description: description, body: list, theme: s.theme, hint: true}
+	content := &themeMenuContent{title: title, description: description, body: list, theme: s.theme, hint: true, keybindings: func() *tui.KeybindingsManager { return s.keybindings }}
 	return content, list
 }
 func (s *ThemeSettingsComponent) showSingle() {
@@ -192,6 +192,7 @@ type themeMenuContent struct {
 	body               tui.Component
 	theme              func() *Theme
 	hint               bool
+	keybindings        func() *tui.KeybindingsManager
 }
 
 func (c *themeMenuContent) HandleInput(data string) error {
@@ -206,7 +207,12 @@ func (c *themeMenuContent) Render(width int) ([]string, error) {
 	body, err := c.body.Render(width)
 	lines = append(lines, body...)
 	if c.hint {
-		hint, _ := tui.WrapTextWithANSI(t.FG("dim", "  Enter to select · Esc to go back"), max(1, width))
+		confirm, cancel := "Enter", "Esc"
+		if c.keybindings != nil && c.keybindings() != nil {
+			confirm = tui.SelectionKeyHint(c.keybindings(), "tui.select.confirm")
+			cancel = tui.SelectionKeyHint(c.keybindings(), "tui.select.cancel")
+		}
+		hint, _ := tui.WrapTextWithANSI(t.FG("dim", "  "+confirm+" to select · "+cancel+" to go back"), max(1, width))
 		lines = append(append(lines, ""), hint...)
 	}
 	return lines, err
