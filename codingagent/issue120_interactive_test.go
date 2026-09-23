@@ -202,3 +202,24 @@ func TestInteractiveThemePreviewFailure120(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestInteractiveThemeRenderAfterStop120(t *testing.T) {
+	tty := terminaltest.Open(t)
+	ui := tui.NewTextUI(tui.NewProcessTerminal(tty.Slave, tty.Slave))
+	if err := ui.Refresh(); err == nil {
+		t.Fatal("refresh before Start should fail")
+	}
+	if err := ui.Start(); err != nil {
+		t.Fatal(err)
+	}
+	defer ui.Stop()
+	if err := ui.Stop(); err != nil {
+		t.Fatal(err)
+	}
+	if err := ui.Refresh(); err != nil {
+		t.Fatal("pending render after successful Stop", err)
+	}
+	if !tty.Restored(t) {
+		t.Fatal("terminal not restored")
+	}
+}

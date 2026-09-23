@@ -24,7 +24,7 @@ func TestInteractiveThemesCatalog120(t *testing.T) {
 		{"oracle", "parity/oracle/fixtures/theme-runtime.json", "node parity/oracle/theme-runtime.mjs <locked-pi-checkout> --check"},
 		{"oracle", "parity/oracle/fixtures/themes-cli.json", "node parity/oracle/themes-cli.mjs <locked-pi-checkout> --check"},
 		{"go-test", "codingagent/issue120_themes_test.go", "go test -race ./codingagent -run 'TestTheme.*120' -count=1"},
-		{"go-test", "codingagent/issue120_interactive_test.go", "go test -race ./codingagent -run 'TestInteractive(ThemeNotifications|FixedToAutomaticTheme|InvalidThemeSessionReplacement|ThemePreviewFailure)120' -count=1"},
+		{"go-test", "codingagent/issue120_interactive_test.go", "go test -race ./codingagent -run 'TestInteractive(ThemeNotifications|FixedToAutomaticTheme|InvalidThemeSessionReplacement|ThemePreviewFailure|ThemeRenderAfterStop)120' -count=1"},
 		{"go-test", "cmd/pig/issue120_themes_test.go", "PIG_TEST_RACE=1 go test -race ./cmd/pig -run 120 -count=1"},
 		{"go-test", "parity/terminal/themes.py", "go test ./cmd/pig -run 120 -count=1"},
 		{"go-test", "codingagent/testdata/issue120_surface_golden.txt", "go test ./codingagent -run TestInteractiveThemesAPISnapshot120 -count=1"},

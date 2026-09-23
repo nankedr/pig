@@ -311,11 +311,11 @@ func (u *TextUI) Append(text string) error {
 func terminalText(text string) string { return SafeTerminalText(text) }
 func (u *TextUI) Refresh() error      { u.mu.Lock(); defer u.mu.Unlock(); return u.render() }
 func (u *TextUI) render() error {
-	if !u.started {
-		return errors.New("text UI is not initialized")
-	}
 	if u.stopped {
 		return u.err
+	}
+	if !u.started {
+		return errors.New("text UI is not initialized")
 	}
 	rows, err := u.terminal.Rows()
 	if err != nil {
