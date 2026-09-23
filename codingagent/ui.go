@@ -477,11 +477,19 @@ func (t *Theme) BG(color ThemeBG, text string) string {
 	return t.background[color] + text + "\x1b[49m"
 }
 func (t *Theme) Bg(color ThemeBG, text string) string { return t.BG(color, text) }
-func (*Theme) Bold(text string) string                { return "\x1b[1m" + text + "\x1b[22m" }
-func (*Theme) Italic(text string) string              { return "\x1b[3m" + text + "\x1b[23m" }
-func (*Theme) Underline(text string) string           { return "\x1b[4m" + text + "\x1b[24m" }
-func (*Theme) Inverse(text string) string             { return "\x1b[7m" + text + "\x1b[27m" }
-func (*Theme) Strikethrough(text string) string       { return "\x1b[9m" + text + "\x1b[29m" }
+func (*Theme) Bold(text string) string {
+	return "\x1b[1m" + strings.ReplaceAll(text, "\x1b[22m", "\x1b[22m\x1b[1m") + "\x1b[22m"
+}
+func (*Theme) Italic(text string) string {
+	return "\x1b[3m" + strings.ReplaceAll(text, "\x1b[23m", "\x1b[23m\x1b[3m") + "\x1b[23m"
+}
+func (*Theme) Underline(text string) string {
+	return "\x1b[4m" + strings.ReplaceAll(text, "\x1b[24m", "\x1b[24m\x1b[4m") + "\x1b[24m"
+}
+func (*Theme) Inverse(text string) string { return "\x1b[7m" + text + "\x1b[27m" }
+func (*Theme) Strikethrough(text string) string {
+	return "\x1b[9m" + strings.ReplaceAll(text, "\x1b[29m", "\x1b[29m\x1b[9m") + "\x1b[29m"
+}
 func (t *Theme) GetFGANSI(color ThemeColor) string {
 	if t == nil {
 		return ""
@@ -527,18 +535,26 @@ func GetLanguageFromPath(path string) string {
 	}
 }
 func GetMarkdownTheme() (tui.MarkdownTheme, error) {
-	style := func(code string) tui.TextStyleFunc {
-		return func(s string) string { return "\x1b[" + code + "m" + s + "\x1b[0m" }
+	theme, err := LoadBuiltinTheme("dark")
+	if err != nil {
+		return tui.MarkdownTheme{}, err
 	}
-	return tui.MarkdownTheme{Heading: style("36"), Link: style("36"), LinkURL: style("2"), Code: style("33"), CodeBlock: style("37"), CodeBlockBorder: style("2"), Quote: style("3"), QuoteBorder: style("2"), HR: style("2"), ListBullet: style("36"), Bold: style("1"), Italic: style("3"), Strikethrough: style("9"), Underline: style("4")}, nil
+	return theme.MarkdownTheme(), nil
 }
 func GetSelectListTheme() (tui.SelectListTheme, error) {
-	return tui.SelectListTheme{}, notImplemented("GetSelectListTheme")
+	theme, err := LoadBuiltinTheme("dark")
+	if err != nil {
+		return tui.SelectListTheme{}, err
+	}
+	accent := func(s string) string { return theme.FG("accent", s) }
+	muted := func(s string) string { return theme.FG("muted", s) }
+	return tui.SelectListTheme{SelectedPrefix: accent, SelectedText: accent, Description: muted, ScrollInfo: muted, NoMatch: muted}, nil
 }
 func GetSettingsListTheme() (tui.SettingsListTheme, error) {
-	return tui.SettingsListTheme{}, notImplemented("GetSettingsListTheme")
-}
-func HighlightCode(string, ...string) ([]string, error) {
-	return nil, notImplemented("HighlightCode")
+	theme, err := LoadBuiltinTheme("dark")
+	if err != nil {
+		return tui.SettingsListTheme{}, err
+	}
+	return settingsListTheme(func() *Theme { return theme }), nil
 }
 func InitTheme(...any) error { return notImplemented("InitTheme") }

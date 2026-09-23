@@ -266,6 +266,8 @@ type MarkdownOptions struct {
 }
 
 type Markdown struct {
+	inlineStyle      TextStyleFunc
+	inlinePrefix     string
 	text             string
 	paddingX         int
 	paddingY         int
@@ -452,12 +454,17 @@ type SettingsListOptions struct {
 }
 
 type SettingsList struct {
-	items      []SettingItem
-	maxVisible int
-	theme      SettingsListTheme
-	onChange   func(id, newValue string)
-	onCancel   func()
-	options    SettingsListOptions
+	filtered    []int
+	selected    int
+	search      *Input
+	submenu     Component
+	keybindings *KeybindingsManager
+	items       []SettingItem
+	maxVisible  int
+	theme       SettingsListTheme
+	onChange    func(id, newValue string)
+	onCancel    func()
+	options     SettingsListOptions
 }
 
 func NewSettingsList(items []SettingItem, maxVisible int, theme SettingsListTheme, onChange func(string, string), onCancel func(), options ...SettingsListOptions) *SettingsList {
@@ -465,16 +472,14 @@ func NewSettingsList(items []SettingItem, maxVisible int, theme SettingsListThem
 	if len(options) != 0 {
 		s.options = options[0]
 	}
+	s.filtered = make([]int, len(items))
+	for i := range items {
+		s.filtered[i] = i
+	}
+	if s.options.EnableSearch != nil && *s.options.EnableSearch {
+		s.search = NewInput()
+	}
 	return s
-}
-
-func (*SettingsList) HandleInput(string) error { return newNotImplemented("SettingsList.handleInput") }
-func (*SettingsList) Invalidate() error        { return nil }
-func (*SettingsList) Render(int) ([]string, error) {
-	return nil, newNotImplemented("SettingsList.render")
-}
-func (*SettingsList) UpdateValue(string, string) error {
-	return newNotImplemented("SettingsList.updateValue")
 }
 
 type Spacer struct{ lines int }

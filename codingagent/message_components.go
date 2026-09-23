@@ -72,12 +72,10 @@ func (c *AssistantMessageComponent) Render(width int) ([]string, error) {
 				style.Color = func(s string) string { return c.theme.FG("thinkingText", s) }
 			}
 		}
-		part, err := tui.NewMarkdown(s, pad, 0, theme, style).Render(width)
 		if c.theme != nil && !thinking {
-			for i, line := range part {
-				part[i] = c.theme.FG("text", line)
-			}
+			style = &tui.DefaultTextStyle{Color: func(s string) string { return c.theme.FG("text", s) }}
 		}
+		part, err := tui.NewMarkdown(s, pad, 0, theme, style).Render(width)
 		lines = append(lines, part...)
 		return err
 	}

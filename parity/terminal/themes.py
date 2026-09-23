@@ -32,8 +32,7 @@ for mode in ['truecolor','256color','auto']:
    output=b'';os.write(master,data);pump()
   def menu():
    send(b'/settings\r')
-   if pig:send(b'\x1b[B')
-   else:send(b'theme')
+   send(b'theme')
    send(b'\r')
   try:
    if mode=='auto':
@@ -55,10 +54,11 @@ for mode in ['truecolor','256color','auto']:
      send(b'\x1b[?997;1n');wait(new)
     send(b'\x03');cancelled=True;saved=json.loads(settings.read_text())['theme']
    else:
-    send(b'\x03');menu();send(b'\x1b[A');send(b'\x1b[27u');send(b'\x1b[27u')
+    send(b'\x03');menu();send(b'\x1b[A');send(b'\x1b[27u');wait(b'Type to search');send(b'\x1b[27u')
     cancelled=json.loads(settings.read_text())['theme']=='local'
     menu();send(b'\x1b[A');send(b'\r');pump(.3)
     saved=json.loads(settings.read_text())['theme']
+    wait(b'Type to search')
    send(b'\x1b[27u');send(b'\x04')
    end=time.monotonic()+8
    while p.poll() is None:

@@ -4,9 +4,11 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"github.com/fsnotify/fsnotify"
 	"github.com/nankedr/pig/tui"
 	"math"
 	"os"
+	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
@@ -24,12 +26,13 @@ type ThemeController struct {
 	terminal      tui.TerminalColorScheme
 	auto, preview bool
 	fingerprint   string
+	watchChanged  chan struct{}
 }
 
 func NewThemeController(settings *SettingsManager, loaded ThemeLoadResult) *ThemeController {
 	scheme, _ := DetectTerminalTheme(os.Getenv("COLORFGBG"))
 	theme, _ := LoadBuiltinTheme(string(scheme))
-	return &ThemeController{settings: settings, loaded: ThemeLoadResult{Themes: slices.Clone(loaded.Themes)}, current: theme, terminal: scheme}
+	return &ThemeController{settings: settings, loaded: ThemeLoadResult{Themes: slices.Clone(loaded.Themes)}, current: theme, terminal: scheme, watchChanged: make(chan struct{})}
 }
 func (c *ThemeController) Current() *Theme { c.mu.Lock(); defer c.mu.Unlock(); return c.current }
 func (c *ThemeController) ReplaceResources(settings *SettingsManager, loaded ThemeLoadResult) error {
@@ -68,6 +71,13 @@ func (c *ThemeController) applySettings() error {
 	return c.load(name)
 }
 func (c *ThemeController) load(name string) error {
+	oldPath := c.current.SourcePath
+	defer func() {
+		if c.current.SourcePath != oldPath {
+			close(c.watchChanged)
+			c.watchChanged = make(chan struct{})
+		}
+	}()
 	theme, err := SelectTheme(name, c.loaded)
 	fingerprint := ""
 	if err == nil && theme.SourcePath != "" {
@@ -158,15 +168,69 @@ func (c *ThemeController) Refresh() (bool, error) {
 	return true, nil
 }
 func (c *ThemeController) Watch(ctx context.Context, changed func(error)) {
-	ticker := time.NewTicker(100 * time.Millisecond)
-	defer ticker.Stop()
+	notify := func(err error) {
+		if changed != nil {
+			changed(err)
+		}
+	}
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		notify(err)
+		return
+	}
+	defer watcher.Close()
+	timer := time.NewTimer(time.Hour)
+	timer.Stop()
+	defer timer.Stop()
+	var pending <-chan time.Time
+	var path, directory string
+	var rebound <-chan struct{}
+	bind := func() {
+		timer.Stop()
+		pending = nil
+		c.mu.Lock()
+		path, rebound = c.current.SourcePath, c.watchChanged
+		c.mu.Unlock()
+		next := ""
+		if path != "" {
+			next = filepath.Dir(path)
+		}
+		if next != directory {
+			if directory != "" {
+				_ = watcher.Remove(directory)
+			}
+			directory = next
+			if directory != "" {
+				if err := watcher.Add(directory); err != nil {
+					notify(err)
+				}
+			}
+		}
+	}
+	bind()
 	for {
 		select {
 		case <-ctx.Done():
 			return
-		case <-ticker.C:
-			if ok, err := c.Refresh(); (ok || err != nil) && changed != nil {
-				changed(err)
+		case <-rebound:
+			bind()
+		case event, ok := <-watcher.Events:
+			if !ok {
+				return
+			}
+			if event.Name == path {
+				timer.Reset(100 * time.Millisecond)
+				pending = timer.C
+			}
+		case err, ok := <-watcher.Errors:
+			if !ok {
+				return
+			}
+			notify(err)
+		case <-pending:
+			pending = nil
+			if ok, err := c.Refresh(); ok || err != nil {
+				notify(err)
 			}
 		}
 	}

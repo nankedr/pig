@@ -123,25 +123,45 @@ func (m *InteractiveMode) selectThinking(ctx context.Context) error {
 	if err := m.configurationReady(); err != nil {
 		return err
 	}
-	done, finish := selectorSignal()
+	var finish func()
 	choice := ""
-	menu := tui.NewSelectDialog("Settings", []tui.SelectItem{{Value: "thinking", Label: "Thinking level"}, {Value: "theme", Label: "Theme"}}, func(item tui.SelectItem) { choice = item.Value; finish() }, finish)
-	menu.List.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
-	if err := m.waitSelector(ctx, menu, done); err != nil {
-		return err
+	themeDescription, thinkingDescription := "Color theme for the interface", "Reasoning depth for thinking-capable models"
+	enabled := true
+	menu := tui.NewSettingsList([]tui.SettingItem{
+		{ID: "thinking", Label: "Thinking level", Description: &thinkingDescription, Values: []string{"open"}},
+		{ID: "theme", Label: "Theme", Description: &themeDescription, Values: []string{"open"}},
+	}, 10, settingsListTheme(m.themes.Current), func(id, value string) { choice = id; finish() }, func() { choice = ""; finish() }, tui.SettingsListOptions{EnableSearch: &enabled})
+	menu.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
+	for {
+		done, complete := selectorSignal()
+		finish = complete
+		setting, _ := m.runtime.Session().SettingsManager().GetThemeSetting()
+		_ = menu.UpdateValue("theme", setting)
+		_ = menu.UpdateValue("thinking", string(m.runtime.Session().ThinkingLevel()))
+		if err := m.waitSelector(ctx, &themeSettingsFrame{body: menu, theme: m.themes.Current}, done); err != nil {
+			return err
+		}
+		if choice == "" {
+			return nil
+		}
+		if choice == "theme" {
+			if err := m.selectTheme(ctx); err != nil {
+				return err
+			}
+		} else {
+			if err := m.selectThinkingLevel(ctx); err != nil {
+				return err
+			}
+		}
 	}
-	if choice == "theme" {
-		return m.selectTheme(ctx)
-	}
-	if choice == "" {
-		return nil
-	}
+}
+func (m *InteractiveMode) selectThinkingLevel(ctx context.Context) error {
 	s := m.runtime.Session()
 	levels, err := s.GetAvailableThinkingLevels()
 	if err != nil {
 		return err
 	}
-	done, finish = selectorSignal()
+	done, finish := selectorSignal()
 	var level agent.ThinkingLevel
 	selector := NewThinkingSelectorComponent(s.ThinkingLevel(), levels, func(value agent.ThinkingLevel) { level = value; finish() }, finish)
 	selector.list.SetKeybindings(&m.options.Keybindings.KeybindingsManager)

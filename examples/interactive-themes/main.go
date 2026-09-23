@@ -22,6 +22,10 @@ func main() {
 	saved, err := settings.GetThemeSetting()
 	must(err)
 	fmt.Println("saved:", saved)
+	language := "go"
+	for _, line := range controller.Current().MarkdownTheme().HighlightCode("func main() { println(42) }", &language) {
+		fmt.Println(line)
+	}
 }
 func must(err error) {
 	if err != nil {

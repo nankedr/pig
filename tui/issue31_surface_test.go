@@ -165,8 +165,8 @@ func TestIssue31MemberMappingsMatchLockedTUISurface(t *testing.T) {
 	if got := issue31CountCatalogStatus(expected, catalog.StatusInventoried); got != 395 {
 		t.Fatalf("issue #31 inherited primitive member rows = %d, want 395", got)
 	}
-	if got := issue31CountCatalogStatus(expected, catalog.StatusScaffolded); got != 640 {
-		t.Fatalf("issue #31 scaffolded symbol/member rows = %d, want 640", got)
+	if got := issue31CountCatalogStatus(expected, catalog.StatusScaffolded); got != 635 {
+		t.Fatalf("issue #31 scaffolded symbol/member rows = %d, want 635", got)
 	}
 	if *updateIssue31Catalog {
 		issue31WriteCatalog(t, root, expected)
@@ -533,7 +533,7 @@ func issue31ExpectedCatalogEntries(symbols []surface.Symbol) []catalog.Entry {
 	}
 	for i := range entries {
 		e := &entries[i]
-		if issue115Promote(e) || issue114Promote(e) || issue113Promote(e) || issue112Promote(e) || issue111Promote(e) || issue110Promote(e) {
+		if issue120Promote(e) || issue115Promote(e) || issue114Promote(e) || issue113Promote(e) || issue112Promote(e) || issue111Promote(e) || issue110Promote(e) {
 			continue
 		}
 		supported := e.ID == "symbol:tui/src/terminal.ts#ProcessTerminal"

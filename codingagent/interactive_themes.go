@@ -4,13 +4,12 @@ import (
 	"context"
 	"github.com/nankedr/pig/tui"
 	"os"
-	"strings"
 	"time"
 )
 
 func (t *Theme) MarkdownTheme() tui.MarkdownTheme {
 	fg := func(color ThemeColor) tui.TextStyleFunc { return func(s string) string { return t.FG(color, s) } }
-	return tui.MarkdownTheme{Heading: fg("mdHeading"), Link: fg("mdLink"), LinkURL: fg("mdLinkUrl"), Code: fg("mdCode"), CodeBlock: fg("mdCodeBlock"), CodeBlockBorder: fg("mdCodeBlockBorder"), Quote: fg("mdQuote"), QuoteBorder: fg("mdQuoteBorder"), HR: fg("mdHr"), ListBullet: fg("mdListBullet"), Bold: t.Bold, Italic: t.Italic, Strikethrough: t.Strikethrough, Underline: t.Underline}
+	return tui.MarkdownTheme{Heading: fg("mdHeading"), Link: fg("mdLink"), LinkURL: fg("mdLinkUrl"), Code: fg("mdCode"), CodeBlock: fg("mdCodeBlock"), CodeBlockBorder: fg("mdCodeBlockBorder"), Quote: fg("mdQuote"), QuoteBorder: fg("mdQuoteBorder"), HR: fg("mdHr"), ListBullet: fg("mdListBullet"), Bold: t.Bold, Italic: t.Italic, Strikethrough: t.Strikethrough, Underline: t.Underline, HighlightCode: t.highlightCode}
 }
 func (m *InteractiveMode) initThemes(ctx context.Context) error {
 	s := m.runtime.Session()
@@ -123,8 +122,17 @@ func (m *InteractiveMode) detectTheme(ctx context.Context) error {
 	m.themeDone = make(chan struct{})
 	go func() {
 		defer close(m.themeDone)
-		ticker := time.NewTicker(100 * time.Millisecond)
-		defer ticker.Stop()
+		watchDone := make(chan struct{})
+		go func() {
+			defer close(watchDone)
+			m.themes.Watch(watchCtx, func(err error) {
+				if err != nil {
+					_ = m.ShowWarning(err.Error())
+				}
+				_ = m.ui.RequestRender()
+			})
+		}()
+		defer func() { cancel(); <-watchDone }()
 		for {
 			select {
 			case <-watchCtx.Done():
@@ -134,14 +142,6 @@ func (m *InteractiveMode) detectTheme(ctx context.Context) error {
 					if err := m.themes.SetTerminalTheme(scheme); err != nil {
 						_ = m.ShowError(err.Error())
 					}
-					_ = m.ui.RequestRender()
-				}
-			case <-ticker.C:
-				changed, err := m.themes.Refresh()
-				if err != nil {
-					_ = m.ShowWarning(err.Error())
-				}
-				if changed {
 					_ = m.ui.RequestRender()
 				}
 			}
@@ -154,82 +154,26 @@ func (m *InteractiveMode) selectTheme(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	setting, _ := m.runtime.Session().SettingsManager().GetThemeSetting()
-	parts := strings.Split(setting, "/")
-	light, dark := m.themes.Current().Name, m.themes.Current().Name
-	automatic := len(parts) == 2 && parts[0] != "" && parts[1] != ""
-	if automatic {
-		light, dark = strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
+	setting, err := m.runtime.Session().SettingsManager().GetThemeSetting()
+	if err != nil {
+		return err
 	}
-	defer func() {
-		if err := m.queryTheme(ctx); err != nil {
-			_ = m.ShowError(err.Error())
-		}
-	}()
-	for {
-		if automatic {
-			done, finish := selectorSignal()
-			choice := ""
-			menu := tui.NewSelectDialog("Automatic Theme", []tui.SelectItem{{Value: "light", Label: "Light theme: " + light}, {Value: "dark", Label: "Dark theme: " + dark}, {Value: "apply", Label: "Apply"}, {Value: "single", Label: "Change mode"}}, func(i tui.SelectItem) { choice = i.Value; finish() }, finish)
-			menu.List.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
-			if err = m.waitSelector(ctx, menu, done); err != nil {
-				return err
-			}
-			switch choice {
-			case "":
-				return nil
-			case "apply":
-				return m.themes.SetTheme(light + "/" + dark)
-			case "single":
-				automatic = false
-				continue
-			}
-			current := light
-			if choice == "dark" {
-				current = dark
-			}
-			selected, e := m.themeChoice(ctx, current, loaded, false, func(name string) { _ = m.themes.Preview(name) })
-			if e != nil {
-				return e
-			}
-			if selected != "" {
-				if choice == "light" {
-					light = selected
-				} else {
-					dark = selected
-				}
-			}
-			_ = m.themes.Preview(light + "/" + dark)
-			continue
-		}
-		selected, e := m.themeChoice(ctx, m.themes.Current().Name, loaded, true, func(name string) {
-			if name == "Automatic" {
-				name = light + "/" + dark
-			}
-			_ = m.themes.Preview(name)
-		})
-		if e != nil {
-			return e
-		}
-		if selected == "" {
-			return nil
-		}
-		if selected == "Automatic" {
-			automatic = true
-			_ = m.themes.Preview(light + "/" + dark)
-			continue
-		}
-		return m.themes.SetTheme(selected)
-	}
-}
-func (m *InteractiveMode) themeChoice(ctx context.Context, current string, loaded ThemeLoadResult, automatic bool, preview func(string)) (string, error) {
+	m.themes.mu.Lock()
+	scheme := m.themes.terminal
+	m.themes.mu.Unlock()
 	done, finish := selectorSignal()
 	selected := ""
-	if automatic {
-		loaded.Themes = append(append([]*Theme(nil), loaded.Themes...), &Theme{Name: "Automatic"})
+	menu := NewThemeSettingsComponent(setting, scheme, loaded, SettingsCallbacks{
+		OnThemePreview: func(value string) { _ = m.themes.Preview(value) },
+		OnThemeChange:  func(value string) { selected = value; finish() }, OnCancel: finish,
+	}, m.themes.Current)
+	menu.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
+	err = m.waitSelector(ctx, &themeSettingsFrame{body: menu, theme: m.themes.Current}, done)
+	if err == nil && selected != "" {
+		err = m.themes.SetTheme(selected)
 	}
-	selector := NewThemeSelectorComponent(current, loaded, func(name string) { selected = name; finish() }, finish, preview)
-	selector.list.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
-	err := m.waitSelector(ctx, selector, done)
-	return selected, err
+	if restoreErr := m.queryTheme(ctx); err == nil {
+		err = restoreErr
+	}
+	return err
 }

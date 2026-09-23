@@ -60,11 +60,6 @@ func TestDeferredThemeHelpersReturnStructuredErrors(t *testing.T) {
 		return new(Theme).GetThinkingBorderColor(agent.ThinkingLevel("high"))
 	})
 
-	assertDeferredGetter(t, "GetSelectListTheme", GetSelectListTheme)
-	assertDeferredGetter(t, "GetSettingsListTheme", GetSettingsListTheme)
-	assertDeferredGetter(t, "HighlightCode", func() ([]string, error) {
-		return HighlightCode("package main", "go")
-	})
 }
 
 func TestRPCClientGetStderrReturnsStructuredError(t *testing.T) {

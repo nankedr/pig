@@ -285,6 +285,8 @@ type DefaultTextStyle struct {
 reference: packages/tui/src/components/markdown.ts#Markdown
 target: github.com/nankedr/pig/tui.Markdown
 type Markdown struct {
+	inlineStyle      TextStyleFunc
+	inlinePrefix     string
 	text             string
 	paddingX         int
 	paddingY         int
@@ -469,17 +471,24 @@ type SettingItem struct {
 reference: packages/tui/src/components/settings-list.ts#SettingsList
 target: github.com/nankedr/pig/tui.SettingsList
 type SettingsList struct {
-	items      []SettingItem
-	maxVisible int
-	theme      SettingsListTheme
-	onChange   func(id, newValue string)
-	onCancel   func()
-	options    SettingsListOptions
+	filtered    []int
+	selected    int
+	search      *Input
+	submenu     Component
+	keybindings *KeybindingsManager
+	items       []SettingItem
+	maxVisible  int
+	theme       SettingsListTheme
+	onChange    func(id, newValue string)
+	onCancel    func()
+	options     SettingsListOptions
 }
-func (*SettingsList) HandleInput(string) error
-func (*SettingsList) Invalidate() error
-func (*SettingsList) Render(int) ([]string, error)
-func (*SettingsList) UpdateValue(string, string) error
+func (s *SettingsList) HandleInput(data string) error
+func (s *SettingsList) Invalidate() error
+func (s *SettingsList) Render(width int) ([]string, error)
+func (s *SettingsList) SetKeybindings(kb *KeybindingsManager)
+func (s *SettingsList) SetTheme(theme SettingsListTheme)
+func (s *SettingsList) UpdateValue(id, value string) error
 
 ## symbol:tui/src/components/settings-list.ts#SettingsListOptions
 reference: packages/tui/src/components/settings-list.ts#SettingsListOptions

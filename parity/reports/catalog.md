@@ -12,9 +12,9 @@
 | Status | Count |
 | --- | --- |
 | inventoried | 5150 |
-| scaffolded | 3634 |
-| partial | 613 |
-| implemented | 123 |
+| scaffolded | 3626 |
+| partial | 611 |
+| implemented | 133 |
 | verified | 167 |
 | deferred | 3 |
 
@@ -7785,9 +7785,6 @@
 | symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveModeOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveModeOptions | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#ThemeColor | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.ThemeColor | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#getLanguageFromPath | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetLanguageFromPath | coding-agent |
-| symbol:codingagent/src/modes/interactive/theme/theme.ts#getSelectListTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetSelectListTheme | coding-agent |
-| symbol:codingagent/src/modes/interactive/theme/theme.ts#getSettingsListTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.GetSettingsListTheme | coding-agent |
-| symbol:codingagent/src/modes/interactive/theme/theme.ts#highlightCode | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.HighlightCode | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#initTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/codingagent.InitTheme | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#PrintModeOptions | scaffolded | M1 | symbol | github.com/nankedr/pig/codingagent.PrintModeOptions | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#ModelInfo | scaffolded | M4 | symbol | github.com/nankedr/pig/codingagent.ModelInfo | coding-agent |
@@ -7827,7 +7824,6 @@
 | contract:codingagent/interactive-branches | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-queues | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-text | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
-| contract:codingagent/interactive-themes | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/local-extensions | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetExtensionDiscovery | coding-agent |
 | contract:codingagent/local-resources | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |
 | contract:codingagent/model-selection | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
@@ -7988,12 +7984,12 @@
 | symbol:codingagent/src/modes/interactive/components/visual-truncate.ts#truncateToVisualLines | partial | M6 | symbol | github.com/nankedr/pig/codingagent.TruncateToVisualLines | coding-agent |
 | symbol:codingagent/src/modes/interactive/interactive-mode.ts#InteractiveMode | partial | M6 | symbol | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | symbol:codingagent/src/modes/interactive/theme/theme.ts#Theme | partial | M6 | symbol | github.com/nankedr/pig/codingagent.Theme | coding-agent |
-| symbol:codingagent/src/modes/interactive/theme/theme.ts#getMarkdownTheme | partial | M6 | symbol | github.com/nankedr/pig/codingagent.GetMarkdownTheme | coding-agent |
 | symbol:codingagent/src/modes/print-mode.ts#runPrintMode | partial | M1 | symbol | github.com/nankedr/pig/codingagent.RunPrintMode | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-client.ts#RpcClient | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RPCClient | coding-agent |
 | symbol:codingagent/src/modes/rpc/rpc-mode.ts#runRpcMode | partial | M4 | symbol | github.com/nankedr/pig/codingagent.RunRPCMode | coding-agent |
 | symbol:codingagent/src/utils/frontmatter.ts#parseFrontmatter | partial | M5 | symbol | github.com/nankedr/pig/codingagent.ParseFrontmatter | coding-agent |
 | symbol:codingagent/src/utils/frontmatter.ts#stripFrontmatter | partial | M5 | symbol | github.com/nankedr/pig/codingagent.StripFrontmatter | coding-agent |
+| contract:codingagent/interactive-themes | implemented | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/session-stats | implemented | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSessionStats | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
@@ -8066,6 +8062,10 @@
 | symbol:codingagent/src/core/agent-session.ts#SessionStats | implemented | M4 | symbol | github.com/nankedr/pig/codingagent.SessionStats | coding-agent |
 | symbol:codingagent/src/core/extensions/types.ts#ContextUsage | implemented | M7 | symbol | github.com/nankedr/pig/codingagent.ContextUsage | coding-agent |
 | symbol:codingagent/src/core/tools/index.ts#createCodingTools | implemented | M4 | symbol | github.com/nankedr/pig/codingagent.CreateCodingTools | coding-agent |
+| symbol:codingagent/src/modes/interactive/theme/theme.ts#getMarkdownTheme | implemented | M6 | symbol | github.com/nankedr/pig/codingagent.GetMarkdownTheme | coding-agent |
+| symbol:codingagent/src/modes/interactive/theme/theme.ts#getSelectListTheme | implemented | M6 | symbol | github.com/nankedr/pig/codingagent.GetSelectListTheme | coding-agent |
+| symbol:codingagent/src/modes/interactive/theme/theme.ts#getSettingsListTheme | implemented | M6 | symbol | github.com/nankedr/pig/codingagent.GetSettingsListTheme | coding-agent |
+| symbol:codingagent/src/modes/interactive/theme/theme.ts#highlightCode | implemented | M6 | symbol | github.com/nankedr/pig/codingagent.HighlightCode | coding-agent |
 | symbol:codingagent/src/modes/json-event.ts#JsonAgentSessionEvent | implemented | M1 | symbol | github.com/nankedr/pig/codingagent.JSONAgentSessionEvent | coding-agent |
 | contract:cli/pig/auth-help | verified | M0 | contract | github.com/nankedr/pig/cmd/pig | coding-agent |
 | contract:session/migration | verified | M3 | contract | github.com/nankedr/pig/codingagent | coding-agent |
@@ -9035,10 +9035,6 @@
 | member:tui/src/components/settings-list.ts#SettingItem.label | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingItem.Label | tui |
 | member:tui/src/components/settings-list.ts#SettingItem.submenu | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingItem.Submenu | tui |
 | member:tui/src/components/settings-list.ts#SettingItem.values | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingItem.Values | tui |
-| member:tui/src/components/settings-list.ts#SettingsList.handleInput | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingsList.HandleInput | tui |
-| member:tui/src/components/settings-list.ts#SettingsList.invalidate | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingsList.Invalidate | tui |
-| member:tui/src/components/settings-list.ts#SettingsList.render | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingsList.Render | tui |
-| member:tui/src/components/settings-list.ts#SettingsList.updateValue | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingsList.UpdateValue | tui |
 | member:tui/src/components/settings-list.ts#SettingsListOptions.enableSearch | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingsListOptions.EnableSearch | tui |
 | member:tui/src/components/settings-list.ts#SettingsListTheme.cursor | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingsListTheme.Cursor | tui |
 | member:tui/src/components/settings-list.ts#SettingsListTheme.description | scaffolded | M6 | contract | github.com/nankedr/pig/tui.SettingsListTheme.Description | tui |
@@ -9424,7 +9420,6 @@
 | symbol:tui/src/components/select-list.ts#SelectListTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SelectListTheme | tui |
 | symbol:tui/src/components/select-list.ts#SelectListTruncatePrimaryContext | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SelectListTruncatePrimaryContext | tui |
 | symbol:tui/src/components/settings-list.ts#SettingItem | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SettingItem | tui |
-| symbol:tui/src/components/settings-list.ts#SettingsList | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SettingsList | tui |
 | symbol:tui/src/components/settings-list.ts#SettingsListOptions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SettingsListOptions | tui |
 | symbol:tui/src/components/settings-list.ts#SettingsListTheme | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.SettingsListTheme | tui |
 | symbol:tui/src/components/spacer.ts#Spacer | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.Spacer | tui |
@@ -9744,6 +9739,11 @@
 | symbol:tui/src/utils.ts#truncateToWidth | partial | M6 | symbol | github.com/nankedr/pig/tui.TruncateToWidth | tui |
 | symbol:tui/src/utils.ts#visibleWidth | partial | M6 | symbol | github.com/nankedr/pig/tui.VisibleWidth | tui |
 | symbol:tui/src/utils.ts#wrapTextWithAnsi | partial | M6 | symbol | github.com/nankedr/pig/tui.WrapTextWithANSI | tui |
+| member:tui/src/components/settings-list.ts#SettingsList.handleInput | implemented | M6 | contract | github.com/nankedr/pig/tui.SettingsList.HandleInput | tui |
+| member:tui/src/components/settings-list.ts#SettingsList.invalidate | implemented | M6 | contract | github.com/nankedr/pig/tui.SettingsList.Invalidate | tui |
+| member:tui/src/components/settings-list.ts#SettingsList.render | implemented | M6 | contract | github.com/nankedr/pig/tui.SettingsList.Render | tui |
+| member:tui/src/components/settings-list.ts#SettingsList.updateValue | implemented | M6 | contract | github.com/nankedr/pig/tui.SettingsList.UpdateValue | tui |
+| symbol:tui/src/components/settings-list.ts#SettingsList | implemented | M6 | symbol | github.com/nankedr/pig/tui.SettingsList | tui |
 
 ## OpenAI Chat Completions capability matrix
 

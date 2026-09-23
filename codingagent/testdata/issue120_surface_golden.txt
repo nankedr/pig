@@ -1,5 +1,10 @@
 func(*codingagent.SettingsManager, codingagent.ThemeLoadResult) *codingagent.ThemeController
 func(string, codingagent.ThemeLoadResult, func(string), func(), func(string)) *codingagent.ThemeSelectorComponent
+func(string, tui.TerminalColorScheme, codingagent.ThemeLoadResult, codingagent.SettingsCallbacks, func() *codingagent.Theme) *codingagent.ThemeSettingsComponent
+func(string, ...string) ([]string, error)
+func() (tui.MarkdownTheme, error)
+func() (tui.SettingsListTheme, error)
+func() (tui.SelectListTheme, error)
 func(string) (tui.TerminalColorScheme, bool)
 func(tui.RGBColor) tui.TerminalColorScheme
 func(*codingagent.Theme) tui.MarkdownTheme
@@ -22,3 +27,13 @@ HandleInput func(*codingagent.ThemeSelectorComponent, string) error
 Invalidate func(*codingagent.ThemeSelectorComponent) error
 RemoveChild func(*codingagent.ThemeSelectorComponent, tui.Component)
 Render func(*codingagent.ThemeSelectorComponent, int) ([]string, error)
+HandleInput func(*codingagent.ThemeSettingsComponent, string) error
+Invalidate func(*codingagent.ThemeSettingsComponent) error
+Render func(*codingagent.ThemeSettingsComponent, int) ([]string, error)
+SetKeybindings func(*codingagent.ThemeSettingsComponent, *tui.KeybindingsManager)
+HandleInput func(*tui.SettingsList, string) error
+Invalidate func(*tui.SettingsList) error
+Render func(*tui.SettingsList, int) ([]string, error)
+SetKeybindings func(*tui.SettingsList, *tui.KeybindingsManager)
+SetTheme func(*tui.SettingsList, tui.SettingsListTheme)
+UpdateValue func(*tui.SettingsList, string, string) error

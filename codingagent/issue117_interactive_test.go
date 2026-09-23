@@ -142,6 +142,8 @@ func TestInteractiveModelBindings117(t *testing.T) {
 	tty.Wait(t, "Thinking Level")
 	tty.Send(t, "\x07")
 	time.Sleep(50 * time.Millisecond)
+	tty.Send(t, "\x07")
+	time.Sleep(50 * time.Millisecond)
 	tty.Send(t, "\x0c")
 	tty.Wait(t, "Select Model")
 	tty.Send(t, "queryz\x11")

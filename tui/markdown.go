@@ -34,24 +34,16 @@ func (m *Markdown) Render(width int) ([]string, error) {
 	}
 	data := []byte(source)
 	root := goldmark.New(goldmark.WithExtensions(extension.Strikethrough, extension.TaskList, extension.Linkify)).Parser().Parse(text.NewReader(data))
-	lines := m.blocks(root, data, available, 0)
+	renderer := *m
+	renderer.inlineStyle = renderer.defaultStyle
+	renderer.inlinePrefix = stylePrefix(renderer.inlineStyle)
+	lines := renderer.blocks(root, data, available, 0)
 	var out []string
 	blank := strings.Repeat(" ", width)
 	for i := 0; i < max(0, m.paddingY); i++ {
 		out = append(out, blank)
 	}
 	for _, line := range lines {
-		if style := m.defaultTextStyle; style != nil {
-			line = styled(style.Color, line)
-			for _, v := range []struct {
-				enabled *bool
-				code    string
-			}{{style.Bold, "1"}, {style.Italic, "3"}, {style.Strikethrough, "9"}, {style.Underline, "4"}} {
-				if v.enabled != nil && *v.enabled {
-					line = "\x1b[" + v.code + "m" + line + "\x1b[0m"
-				}
-			}
-		}
 		wrapped, _ := WrapTextWithANSI(line, available)
 		for _, part := range wrapped {
 			w, _ := VisibleWidth(part)
@@ -69,20 +61,28 @@ func (m *Markdown) Render(width int) ([]string, error) {
 }
 func (m *Markdown) inline(parent ast.Node, data []byte) string {
 	var b strings.Builder
-	for n := parent.FirstChild(); n != nil; n = n.NextSibling() {
+	for node := parent.FirstChild(); node != nil; node = node.NextSibling() {
 		var s string
-		switch n := n.(type) {
+		switch n := node.(type) {
 		case *ast.Text:
 			s = string(n.Segment.Value(data))
+			if n.SoftLineBreak() || n.HardLineBreak() {
+				s += "\n"
+			}
+			for next, ok := node.NextSibling().(*ast.Text); ok; next, ok = node.NextSibling().(*ast.Text) {
+				s += string(next.Segment.Value(data))
+				if next.SoftLineBreak() || next.HardLineBreak() {
+					s += "\n"
+				}
+				node = next
+			}
 			if m.options.PreserveBackslashEscapes == nil || !*m.options.PreserveBackslashEscapes {
 				s = string(util.UnescapePunctuations([]byte(s)))
 			}
 			s = html.UnescapeString(s)
-			if n.SoftLineBreak() || n.HardLineBreak() {
-				s += "\n"
-			}
+			s = m.styleText(s)
 		case *ast.String:
-			s = string(n.Value)
+			s = m.styleText(string(n.Value))
 		case *ast.Emphasis:
 			s = m.inline(n, data)
 			if n.Level == 2 {
@@ -90,8 +90,9 @@ func (m *Markdown) inline(parent ast.Node, data []byte) string {
 			} else {
 				s = styled(m.theme.Italic, s)
 			}
+			s += m.inlinePrefix
 		case *ast.CodeSpan:
-			s = styled(m.theme.Code, string(n.Text(data)))
+			s = styled(m.theme.Code, string(n.Text(data))) + m.inlinePrefix
 		case *ast.Link:
 			s = styled(m.theme.Link, styled(m.theme.Underline, m.inline(n, data)))
 			url := string(n.Destination)
@@ -99,15 +100,16 @@ func (m *Markdown) inline(parent ast.Node, data []byte) string {
 			if label != url && label != strings.TrimPrefix(url, "mailto:") {
 				s += styled(m.theme.LinkURL, " ("+url+")")
 			}
+			s += m.inlinePrefix
 		case *ast.AutoLink:
-			s = styled(m.theme.Link, string(n.Label(data)))
+			s = styled(m.theme.Link, styled(m.theme.Underline, m.styleText(string(n.Label(data))))) + m.inlinePrefix
 		case *ast.RawHTML:
 			for i := 0; i < n.Segments.Len(); i++ {
 				seg := n.Segments.At(i)
-				s += string(seg.Value(data))
+				s += m.styleText(string(seg.Value(data)))
 			}
 		case *ext.Strikethrough:
-			s = styled(m.theme.Strikethrough, m.inline(n, data))
+			s = styled(m.theme.Strikethrough, m.inline(n, data)) + m.inlinePrefix
 		case *ext.TaskCheckBox:
 			if n.IsChecked {
 				s = "[x] "
@@ -119,12 +121,29 @@ func (m *Markdown) inline(parent ast.Node, data []byte) string {
 		}
 		b.WriteString(s)
 	}
-	return b.String()
+	result := b.String()
+	for m.inlinePrefix != "" && strings.HasSuffix(result, m.inlinePrefix) {
+		result = strings.TrimSuffix(result, m.inlinePrefix)
+	}
+	return result
 }
 func (m *Markdown) blocks(parent ast.Node, data []byte, width, depth int) []string {
 	var out []string
 	for n := parent.FirstChild(); n != nil; n = n.NextSibling() {
-		if len(out) > 0 && n.HasBlankPreviousLines() {
+		blankPrevious := n.HasBlankPreviousLines()
+		if _, quote := parent.(*ast.Blockquote); quote && !blankPrevious && n.PreviousSibling() != nil {
+			previous := n.PreviousSibling()
+			first := n
+			for first.Lines().Len() == 0 && first.FirstChild() != nil {
+				first = first.FirstChild()
+			}
+			if previous.Lines().Len() > 0 && first.Lines().Len() > 0 {
+				end := previous.Lines().At(previous.Lines().Len() - 1).Stop
+				start := first.Lines().At(0).Start
+				blankPrevious = start > end && strings.Contains(string(data[end:start]), "\n")
+			}
+		}
+		if len(out) > 0 && blankPrevious {
 			out = append(out, "")
 		}
 		out = append(out, m.block(n, data, width, depth)...)
@@ -135,15 +154,19 @@ func (m *Markdown) block(n ast.Node, data []byte, width, depth int) []string {
 	var out []string
 	switch n := n.(type) {
 	case *ast.Heading:
-		s := m.inline(n, data)
+		heading := *m
+		heading.inlineStyle = func(s string) string {
+			if n.Level == 1 {
+				s = styled(m.theme.Underline, s)
+			}
+			return styled(m.theme.Heading, styled(m.theme.Bold, s))
+		}
+		heading.inlinePrefix = stylePrefix(heading.inlineStyle)
+		s := heading.inline(n, data)
 		if n.Level >= 3 {
-			s = strings.Repeat("#", n.Level) + " " + s
+			s = heading.inlineStyle(strings.Repeat("#", n.Level)+" ") + s
 		}
-		s = styled(m.theme.Bold, s)
-		if n.Level == 1 {
-			s = styled(m.theme.Underline, s)
-		}
-		out = append(out, styled(m.theme.Heading, s))
+		out = append(out, s)
 		if next := n.NextSibling(); next != nil && !next.HasBlankPreviousLines() {
 			out = append(out, "")
 		}
@@ -157,15 +180,19 @@ func (m *Markdown) block(n ast.Node, data []byte, width, depth int) []string {
 	case *ast.List:
 		out = append(out, m.list(n, data, width, depth)...)
 	case *ast.Blockquote:
-		lines := m.blocks(n, data, max(1, width-2), 0)
+		quote := *m
+		quoteStyle := func(s string) string { return styled(m.theme.Quote, styled(m.theme.Italic, s)) }
+		quote.inlineStyle = nil
+		quote.inlinePrefix = stylePrefix(quoteStyle)
+		lines := quote.blocks(n, data, max(1, width-2), 0)
 		for _, line := range lines {
 			wrapped, _ := WrapTextWithANSI(line, max(1, width-2))
 			for _, part := range wrapped {
-				out = append(out, styled(m.theme.QuoteBorder, "│ ")+styled(m.theme.Quote, part))
+				out = append(out, styled(m.theme.QuoteBorder, "│ ")+quoteStyle(strings.ReplaceAll(part, "\x1b[0m", "\x1b[0m"+quote.inlinePrefix)))
 			}
 		}
 	case *ast.ThematicBreak:
-		out = append(out, styled(m.theme.HR, strings.Repeat("─", max(1, width))))
+		out = append(out, styled(m.theme.HR, strings.Repeat("─", min(80, max(1, width)))))
 	default:
 		if n.HasChildren() {
 			out = append(out, m.blocks(n, data, width, depth)...)
@@ -249,4 +276,37 @@ func (m *Markdown) list(n *ast.List, data []byte, width, depth int) []string {
 	}
 
 	return out
+}
+
+func stylePrefix(style TextStyleFunc) string {
+	const sentinel = "\x00"
+	value := styled(style, sentinel)
+	index := strings.Index(value, sentinel)
+	if index < 0 {
+		return ""
+	}
+	return value[:index]
+}
+func (m *Markdown) styleText(s string) string {
+	parts := strings.Split(s, "\n")
+	for i := range parts {
+		parts[i] = styled(m.inlineStyle, parts[i])
+	}
+	return strings.Join(parts, "\n")
+}
+func (m *Markdown) defaultStyle(s string) string {
+	style := m.defaultTextStyle
+	if style == nil {
+		return s
+	}
+	s = styled(style.Color, s)
+	for _, v := range []struct {
+		enabled *bool
+		style   TextStyleFunc
+	}{{style.Bold, m.theme.Bold}, {style.Italic, m.theme.Italic}, {style.Strikethrough, m.theme.Strikethrough}, {style.Underline, m.theme.Underline}} {
+		if v.enabled != nil && *v.enabled {
+			s = styled(v.style, s)
+		}
+	}
+	return s
 }

@@ -150,3 +150,9 @@ Copyright 2022 The Ebitengine Authors.
 Used for CGO-free macOS CoreGraphics modifier-state queries.
 Licensed under the Apache License, Version 2.0; see licenses/purego-LICENSE.
 No Pi native binary is copied or distributed.
+
+## Theme syntax and file notifications
+
+- highlight.js 10.7.3 (BSD-3-Clause): the full language rules used by the locked Pi baseline are bundled in `codingagent/syntax/highlight.js`. Regenerate/check using `node parity/oracle/build-highlight.mjs <locked-pi-checkout> [--check]`. License: `THIRD_PARTY_LICENSES/highlight.js-BSD-3-Clause.txt`.
+- goja (MIT): executes the bundled syntax rules without Node or CGO. Only the bundled module is evaluated; code to highlight is passed as data. License: `THIRD_PARTY_LICENSES/goja-MIT.txt`.
+- fsnotify 1.9.0 (BSD-3-Clause): native filesystem notifications without CGO. License: `THIRD_PARTY_LICENSES/fsnotify-BSD-3-Clause.txt`.

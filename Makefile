@@ -270,5 +270,6 @@ m6-branches-oracle: m0-node-preflight
 
 .PHONY: m6-themes-oracle
 m6-themes-oracle: m0-node-preflight
+	node parity/oracle/build-highlight.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/theme-runtime.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node parity/oracle/themes-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check

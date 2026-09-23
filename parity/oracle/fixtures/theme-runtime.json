@@ -48,6 +48,175 @@
           "\u001b[A",
           "\r"
         ]
+      ],
+      "syntax": [
+        [
+          "go",
+          "package main\n// note\nfunc main() { println(\"hi\", 42) }"
+        ],
+        [
+          "js",
+          "const x = /ab+/g; // note\nfunction f(a) { return true; }"
+        ],
+        [
+          "typescript",
+          "interface User { name: string }\nconst n: number = 1;"
+        ],
+        [
+          "python",
+          "def greet(name):\n    # note\n    return \"hi\" + name"
+        ],
+        [
+          "json",
+          "{\"name\": true, \"count\": 12, \"list\": [null]}"
+        ],
+        [
+          "bash",
+          "echo \"$HOME\" # note"
+        ],
+        [
+          "html",
+          "<div class=\"x\">&amp;</div>"
+        ],
+        [
+          "css",
+          "body { color: #ffffff; }"
+        ],
+        [
+          "rust",
+          "fn main() { let x = 42; }"
+        ],
+        [
+          "java",
+          "public class Hello { int x = 12; }"
+        ],
+        [
+          "c",
+          "#include <stdio.h>\nint main() { return 0; }"
+        ],
+        [
+          "cpp",
+          "std::string s = \"hello\";"
+        ],
+        [
+          "sql",
+          "SELECT * FROM users WHERE name = 'hello';"
+        ],
+        [
+          "yaml",
+          "name: hello\nitems: [true, 42]"
+        ],
+        [
+          "diff",
+          "+added\n-removed"
+        ],
+        [
+          "markdown",
+          "# Header\n**bold** *italic* [link](url)"
+        ],
+        [
+          "ruby",
+          "def hello(name)\n  puts \"hi #{name}\"\nend"
+        ],
+        [
+          "swift",
+          "let name: String = \"hello\""
+        ],
+        [
+          "kotlin",
+          "fun main() { println(\"hello\") }"
+        ],
+        [
+          "",
+          "this is plain code\nand more"
+        ],
+        [
+          "unknown",
+          "if true then false"
+        ],
+        [
+          "go",
+          "/* multiline\ncomment */\nvar s = `multi\nline`"
+        ]
+      ],
+      "menuKeys": [
+        [
+          "\u001b[A",
+          "\u001b"
+        ],
+        [
+          "\u001b[B",
+          "\r"
+        ],
+        [
+          "\u001b[A",
+          "\r",
+          "\r",
+          "\u001b[B",
+          "\r",
+          "\u001b[B",
+          "\u001b[B",
+          "\r"
+        ],
+        [
+          "\u001b[A",
+          "\r",
+          "\u001b[B",
+          "\r",
+          "\u001b[B",
+          "\u001b",
+          "\u001b"
+        ],
+        [
+          "\u001b[A",
+          "\r",
+          "\u001b[B",
+          "\u001b[B",
+          "\u001b[B",
+          "\r",
+          "\u001b"
+        ]
+      ],
+      "markdown": [
+        "# Head `code` tail **bold** end",
+        "## Head *italic* ~~gone~~ tail",
+        "Plain **bold *nested* tail** and `code` after [label](https://example.com) end.",
+        "> Quote **bold** `code` tail\n>\n> - item *italic* tail\n> - second",
+        "- item **bold** `code` tail\n    - nested ~~strike~~ after\n\n1. first\n2. second",
+        "```go\nfunc main() { println(\"hi\", 42) }\n```\n\nAfter code.",
+        "---\n\nEmail <a@example.com> and <https://example.com> tail.",
+        "# Head `code` tail **bold** end",
+        "## Head *italic* ~~gone~~ tail",
+        "Plain **bold *nested* tail** and `code` after [label](https://example.com) end.",
+        "> Quote **bold** `code` tail\n>\n> - item *italic* tail\n> - second",
+        "- item **bold** `code` tail\n    - nested ~~strike~~ after\n\n1. first\n2. second",
+        "```go\nfunc main() { println(\"hi\", 42) }\n```\n\nAfter code.",
+        "---\n\nEmail <a@example.com> and <https://example.com> tail."
+      ],
+      "markdownWidths": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24
+      ],
+      "settingsKeys": [
+        "theme",
+        "\u001b[B",
+        " ",
+        "\r",
+        "\u0015",
+        "absent",
+        "\u001b"
       ]
     },
     "observe": [
@@ -57,6 +226,810 @@
   },
   "observation": {
     "outcome": {
+      "settings": {
+        "events": [
+          "theme:light",
+          "cancel"
+        ],
+        "screens": [
+          [
+            ">",
+            "",
+            "→ Theme        dark",
+            "  Light theme  light",
+            "",
+            "  Color theme for the interface",
+            "",
+            "  Type to search · Enter/Space to change · Esc to cancel"
+          ],
+          [
+            "> theme",
+            "",
+            "→ Theme        dark",
+            "  Light theme  light",
+            "",
+            "  Color theme for the interface",
+            "",
+            "  Type to search · Enter/Space to change · Esc to cancel"
+          ],
+          [
+            "> theme",
+            "",
+            "  Theme        dark",
+            "→ Light theme  light",
+            "",
+            "  Theme for light appearance",
+            "",
+            "  Type to search · Enter/Space to change · Esc to cancel"
+          ],
+          [
+            "> theme",
+            "",
+            "→ Theme        dark",
+            "  Light theme  light",
+            "",
+            "  Color theme for the interface",
+            "",
+            "  Type to search · Enter/Space to change · Esc to cancel"
+          ],
+          [
+            "> theme",
+            "",
+            "→ Theme        light",
+            "  Light theme  light",
+            "",
+            "  Color theme for the interface",
+            "",
+            "  Type to search · Enter/Space to change · Esc to cancel"
+          ],
+          [
+            ">",
+            "",
+            "→ Theme        light",
+            "  Light theme  light",
+            "",
+            "  Color theme for the interface",
+            "",
+            "  Type to search · Enter/Space to change · Esc to cancel"
+          ],
+          [
+            "> absent",
+            "",
+            "  No matching settings",
+            "",
+            "  Type to search · Enter/Space to change · Esc to cancel"
+          ],
+          [
+            "> absent",
+            "",
+            "  No matching settings",
+            "",
+            "  Type to search · Enter/Space to change · Esc to cancel"
+          ]
+        ]
+      },
+      "markdown": {
+        "dark": [
+          [
+            "\u001b[38;2;240;198;116m\u001b[1m\u001b[4mHead \u001b[24m\u001b[22m\u001b[39m\u001b[38;2;138;190;183mcode\u001b[39m\u001b[38;2;240;198;116m\u001b[1m\u001b[4m\u001b[38;2;240;198;116m\u001b[1m\u001b[4m tail \u001b[24m\u001b[22m\u001b[39m\u001b[1m\u001b[38;2;240;198;116m\u001b[1m\u001b[4mbold\u001b[24m\u001b[22m\u001b[1m\u001b[39m\u001b[22m\u001b[38;2;240;198;116m\u001b[1m\u001b[4m\u001b[38;2;240;198;116m\u001b[1m\u001b[4m end\u001b[24m\u001b[22m\u001b[39m                                                         "
+          ],
+          [
+            "\u001b[38;2;240;198;116m\u001b[1mHead \u001b[22m\u001b[39m\u001b[3m\u001b[38;2;240;198;116m\u001b[1mitalic\u001b[22m\u001b[39m\u001b[23m\u001b[38;2;240;198;116m\u001b[1m\u001b[38;2;240;198;116m\u001b[1m \u001b[22m\u001b[39m\u001b[9m\u001b[38;2;240;198;116m\u001b[1mgone\u001b[22m\u001b[39m\u001b[29m\u001b[38;2;240;198;116m\u001b[1m\u001b[38;2;240;198;116m\u001b[1m tail\u001b[22m\u001b[39m                                                           "
+          ],
+          [
+            "\u001b[3m\u001b[38;2;212;212;212mPlain \u001b[39m\u001b[23m\u001b[1m\u001b[3m\u001b[38;2;212;212;212mbold \u001b[39m\u001b[23m\u001b[3m\u001b[3m\u001b[38;2;212;212;212mnested\u001b[39m\u001b[23m\u001b[3m\u001b[23m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m tail\u001b[39m\u001b[23m\u001b[22m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m and \u001b[39m\u001b[23m\u001b[38;2;138;190;183mcode\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m after \u001b[39m\u001b[23m\u001b[38;2;129;162;190m\u001b[4m\u001b[3m\u001b[38;2;212;212;212mlabel\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[38;2;102;102;102m (https://example.com)\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m end.\u001b[39m\u001b[23m          "
+          ],
+          [
+            "\u001b[38;2;128;128;128m│ \u001b[39m\u001b[38;2;128;128;128m\u001b[3mQuote \u001b[1mbold\u001b[22m\u001b[38;2;128;128;128m\u001b[3m \u001b[38;2;138;190;183mcode\u001b[39m\u001b[38;2;128;128;128m\u001b[3m tail\u001b[23m\u001b[39m                                                          ",
+            "\u001b[38;2;128;128;128m│ \u001b[39m\u001b[38;2;128;128;128m\u001b[39m                                                                              ",
+            "\u001b[38;2;128;128;128m│ \u001b[39m\u001b[38;2;128;128;128m\u001b[3m\u001b[38;2;138;190;183m- \u001b[39mitem \u001b[3mitalic\u001b[23m\u001b[3m\u001b[38;2;128;128;128m\u001b[3m tail\u001b[23m\u001b[39m                                                            ",
+            "\u001b[38;2;128;128;128m│ \u001b[39m\u001b[38;2;128;128;128m\u001b[3m\u001b[38;2;138;190;183m- \u001b[39msecond\u001b[23m\u001b[39m                                                                      "
+          ],
+          [
+            "\u001b[38;2;138;190;183m- \u001b[39m\u001b[3m\u001b[38;2;212;212;212mitem \u001b[39m\u001b[23m\u001b[1m\u001b[3m\u001b[38;2;212;212;212mbold\u001b[39m\u001b[23m\u001b[22m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m \u001b[39m\u001b[23m\u001b[38;2;138;190;183mcode\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m tail\u001b[39m\u001b[23m                                                           ",
+            "    \u001b[38;2;138;190;183m- \u001b[39m\u001b[3m\u001b[38;2;212;212;212mnested \u001b[39m\u001b[23m\u001b[9m\u001b[3m\u001b[38;2;212;212;212mstrike\u001b[39m\u001b[23m\u001b[29m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m after\u001b[39m\u001b[23m                                                       ",
+            "                                                                                ",
+            "\u001b[38;2;138;190;183m1. \u001b[39m\u001b[3m\u001b[38;2;212;212;212mfirst\u001b[39m\u001b[23m                                                                        ",
+            "\u001b[38;2;138;190;183m2. \u001b[39m\u001b[3m\u001b[38;2;212;212;212msecond\u001b[39m\u001b[23m                                                                       "
+          ],
+          [
+            "\u001b[38;2;128;128;128m```go\u001b[39m                                                                           ",
+            "  \u001b[38;2;86;156;214mfunc\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mmain\u001b[39m\u001b[38;2;156;220;254m()\u001b[39m { \u001b[38;2;78;201;176mprintln\u001b[39m(\u001b[38;2;206;145;120m\"hi\"\u001b[39m, \u001b[38;2;181;206;168m42\u001b[39m) }                                             ",
+            "\u001b[38;2;128;128;128m```\u001b[39m                                                                             ",
+            "                                                                                ",
+            "\u001b[3m\u001b[38;2;212;212;212mAfter code.\u001b[39m\u001b[23m                                                                     "
+          ],
+          [
+            "\u001b[38;2;128;128;128m────────────────────────────────────────────────────────────────────────────────\u001b[39m",
+            "                                                                                ",
+            "\u001b[3m\u001b[38;2;212;212;212mEmail \u001b[39m\u001b[23m\u001b[38;2;129;162;190m\u001b[4m\u001b[3m\u001b[38;2;212;212;212ma@example.com\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m and \u001b[39m\u001b[23m\u001b[38;2;129;162;190m\u001b[4m\u001b[3m\u001b[38;2;212;212;212mhttps://example.com\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m tail.\u001b[39m\u001b[23m                               "
+          ],
+          [
+            "\u001b[38;2;240;198;116m\u001b[1m\u001b[4mHead \u001b[24m\u001b[22m\u001b[39m\u001b[38;2;138;190;183mcode\u001b[39m\u001b[38;2;240;198;116m\u001b[1m\u001b[4m\u001b[38;2;240;198;116m\u001b[1m\u001b[4m tail \u001b[24m\u001b[22m\u001b[39m\u001b[1m\u001b[38;2;240;198;116m\u001b[1m\u001b[4mbold\u001b[24m\u001b[22m\u001b[1m\u001b[39m\u001b[22m\u001b[38;2;240;198;116m\u001b[1m\u001b[4m\u001b[38;2;240;198;116m\u001b[1m\u001b[4m end\u001b[24m\u001b[22m\u001b[39m "
+          ],
+          [
+            "\u001b[38;2;240;198;116m\u001b[1mHead \u001b[22m\u001b[39m\u001b[3m\u001b[38;2;240;198;116m\u001b[1mitalic\u001b[22m\u001b[39m\u001b[23m\u001b[38;2;240;198;116m\u001b[1m\u001b[38;2;240;198;116m\u001b[1m \u001b[22m\u001b[39m\u001b[9m\u001b[38;2;240;198;116m\u001b[1mgone\u001b[22m\u001b[39m\u001b[29m\u001b[38;2;240;198;116m\u001b[1m\u001b[38;2;240;198;116m\u001b[1m tail\u001b[22m\u001b[39m   "
+          ],
+          [
+            "\u001b[3m\u001b[38;2;212;212;212mPlain \u001b[39m\u001b[23m\u001b[1m\u001b[3m\u001b[38;2;212;212;212mbold \u001b[39m\u001b[23m\u001b[3m\u001b[3m\u001b[38;2;212;212;212mnested\u001b[39m\u001b[23m\u001b[3m\u001b[23m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m tail\u001b[39m\u001b[23m\u001b[22m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m  ",
+            "\u001b[3;38;2;212;212;212mand \u001b[39m\u001b[23m\u001b[38;2;138;190;183mcode\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m after \u001b[39m\u001b[23m\u001b[38;2;129;162;190m\u001b[4m\u001b[3m\u001b[38;2;212;212;212mlabel\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[38;2;102;102;102m    ",
+            "\u001b[38;2;102;102;102m(https://example.com)\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m   ",
+            "\u001b[3;38;2;212;212;212mend.\u001b[39m\u001b[23m                    "
+          ],
+          [
+            "\u001b[38;2;128;128;128m│ \u001b[39m\u001b[38;2;128;128;128m\u001b[3mQuote \u001b[1mbold\u001b[22m\u001b[38;2;128;128;128m\u001b[3m \u001b[38;2;138;190;183mcode\u001b[39m\u001b[38;2;128;128;128m\u001b[3m tail\u001b[23m\u001b[39m  ",
+            "\u001b[38;2;128;128;128m│ \u001b[39m\u001b[38;2;128;128;128m\u001b[39m                      ",
+            "\u001b[38;2;128;128;128m│ \u001b[39m\u001b[38;2;128;128;128m\u001b[3m\u001b[38;2;138;190;183m- \u001b[39mitem \u001b[3mitalic\u001b[23m\u001b[3m\u001b[38;2;128;128;128m\u001b[3m tail\u001b[23m\u001b[39m    ",
+            "\u001b[38;2;128;128;128m│ \u001b[39m\u001b[38;2;128;128;128m\u001b[3m\u001b[38;2;138;190;183m- \u001b[39msecond\u001b[23m\u001b[39m              "
+          ],
+          [
+            "\u001b[38;2;138;190;183m- \u001b[39m\u001b[3m\u001b[38;2;212;212;212mitem \u001b[39m\u001b[23m\u001b[1m\u001b[3m\u001b[38;2;212;212;212mbold\u001b[39m\u001b[23m\u001b[22m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m \u001b[39m\u001b[23m\u001b[38;2;138;190;183mcode\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m tail\u001b[39m\u001b[23m   ",
+            "    \u001b[38;2;138;190;183m- \u001b[39m\u001b[3m\u001b[38;2;212;212;212mnested \u001b[39m\u001b[23m\u001b[9m\u001b[3m\u001b[38;2;212;212;212mstrike\u001b[39m\u001b[23m\u001b[29m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m     ",
+            "      \u001b[3;38;2;212;212;212mafter\u001b[39m\u001b[23m             ",
+            "                        ",
+            "\u001b[38;2;138;190;183m1. \u001b[39m\u001b[3m\u001b[38;2;212;212;212mfirst\u001b[39m\u001b[23m                ",
+            "\u001b[38;2;138;190;183m2. \u001b[39m\u001b[3m\u001b[38;2;212;212;212msecond\u001b[39m\u001b[23m               "
+          ],
+          [
+            "\u001b[38;2;128;128;128m```go\u001b[39m                   ",
+            "  \u001b[38;2;86;156;214mfunc\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mmain\u001b[39m\u001b[38;2;156;220;254m()\u001b[39m {         ",
+            "\u001b[38;2;78;201;176mprintln\u001b[39m(\u001b[38;2;206;145;120m\"hi\"\u001b[39m, \u001b[38;2;181;206;168m42\u001b[39m) }     ",
+            "\u001b[38;2;128;128;128m```\u001b[39m                     ",
+            "                        ",
+            "\u001b[3m\u001b[38;2;212;212;212mAfter code.\u001b[39m\u001b[23m             "
+          ],
+          [
+            "\u001b[38;2;128;128;128m────────────────────────\u001b[39m",
+            "                        ",
+            "\u001b[3m\u001b[38;2;212;212;212mEmail \u001b[39m\u001b[23m\u001b[38;2;129;162;190m\u001b[4m\u001b[3m\u001b[38;2;212;212;212ma@example.com\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m and ",
+            "\u001b[3;38;2;212;212;212m\u001b[39m\u001b[23m\u001b[38;2;129;162;190m\u001b[4m\u001b[3m\u001b[38;2;212;212;212mhttps://example.com\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[3m\u001b[38;2;212;212;212m\u001b[3m\u001b[38;2;212;212;212m     ",
+            "\u001b[3;38;2;212;212;212mtail.\u001b[39m\u001b[23m                   "
+          ]
+        ],
+        "light": [
+          [
+            "\u001b[38;2;154;115;38m\u001b[1m\u001b[4mHead \u001b[24m\u001b[22m\u001b[39m\u001b[38;2;90;128;128mcode\u001b[39m\u001b[38;2;154;115;38m\u001b[1m\u001b[4m\u001b[38;2;154;115;38m\u001b[1m\u001b[4m tail \u001b[24m\u001b[22m\u001b[39m\u001b[1m\u001b[38;2;154;115;38m\u001b[1m\u001b[4mbold\u001b[24m\u001b[22m\u001b[1m\u001b[39m\u001b[22m\u001b[38;2;154;115;38m\u001b[1m\u001b[4m\u001b[38;2;154;115;38m\u001b[1m\u001b[4m end\u001b[24m\u001b[22m\u001b[39m                                                         "
+          ],
+          [
+            "\u001b[38;2;154;115;38m\u001b[1mHead \u001b[22m\u001b[39m\u001b[3m\u001b[38;2;154;115;38m\u001b[1mitalic\u001b[22m\u001b[39m\u001b[23m\u001b[38;2;154;115;38m\u001b[1m\u001b[38;2;154;115;38m\u001b[1m \u001b[22m\u001b[39m\u001b[9m\u001b[38;2;154;115;38m\u001b[1mgone\u001b[22m\u001b[39m\u001b[29m\u001b[38;2;154;115;38m\u001b[1m\u001b[38;2;154;115;38m\u001b[1m tail\u001b[22m\u001b[39m                                                           "
+          ],
+          [
+            "\u001b[3m\u001b[38;2;31;35;40mPlain \u001b[39m\u001b[23m\u001b[1m\u001b[3m\u001b[38;2;31;35;40mbold \u001b[39m\u001b[23m\u001b[3m\u001b[3m\u001b[38;2;31;35;40mnested\u001b[39m\u001b[23m\u001b[3m\u001b[23m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m tail\u001b[39m\u001b[23m\u001b[22m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m and \u001b[39m\u001b[23m\u001b[38;2;90;128;128mcode\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m after \u001b[39m\u001b[23m\u001b[38;2;84;125;167m\u001b[4m\u001b[3m\u001b[38;2;31;35;40mlabel\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[38;2;118;118;118m (https://example.com)\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m end.\u001b[39m\u001b[23m          "
+          ],
+          [
+            "\u001b[38;2;108;108;108m│ \u001b[39m\u001b[38;2;108;108;108m\u001b[3mQuote \u001b[1mbold\u001b[22m\u001b[38;2;108;108;108m\u001b[3m \u001b[38;2;90;128;128mcode\u001b[39m\u001b[38;2;108;108;108m\u001b[3m tail\u001b[23m\u001b[39m                                                          ",
+            "\u001b[38;2;108;108;108m│ \u001b[39m\u001b[38;2;108;108;108m\u001b[39m                                                                              ",
+            "\u001b[38;2;108;108;108m│ \u001b[39m\u001b[38;2;108;108;108m\u001b[3m\u001b[38;2;88;132;88m- \u001b[39mitem \u001b[3mitalic\u001b[23m\u001b[3m\u001b[38;2;108;108;108m\u001b[3m tail\u001b[23m\u001b[39m                                                            ",
+            "\u001b[38;2;108;108;108m│ \u001b[39m\u001b[38;2;108;108;108m\u001b[3m\u001b[38;2;88;132;88m- \u001b[39msecond\u001b[23m\u001b[39m                                                                      "
+          ],
+          [
+            "\u001b[38;2;88;132;88m- \u001b[39m\u001b[3m\u001b[38;2;31;35;40mitem \u001b[39m\u001b[23m\u001b[1m\u001b[3m\u001b[38;2;31;35;40mbold\u001b[39m\u001b[23m\u001b[22m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m \u001b[39m\u001b[23m\u001b[38;2;90;128;128mcode\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m tail\u001b[39m\u001b[23m                                                           ",
+            "    \u001b[38;2;88;132;88m- \u001b[39m\u001b[3m\u001b[38;2;31;35;40mnested \u001b[39m\u001b[23m\u001b[9m\u001b[3m\u001b[38;2;31;35;40mstrike\u001b[39m\u001b[23m\u001b[29m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m after\u001b[39m\u001b[23m                                                       ",
+            "                                                                                ",
+            "\u001b[38;2;88;132;88m1. \u001b[39m\u001b[3m\u001b[38;2;31;35;40mfirst\u001b[39m\u001b[23m                                                                        ",
+            "\u001b[38;2;88;132;88m2. \u001b[39m\u001b[3m\u001b[38;2;31;35;40msecond\u001b[39m\u001b[23m                                                                       "
+          ],
+          [
+            "\u001b[38;2;108;108;108m```go\u001b[39m                                                                           ",
+            "  \u001b[38;2;0;0;255mfunc\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mmain\u001b[39m\u001b[38;2;0;16;128m()\u001b[39m { \u001b[38;2;38;127;153mprintln\u001b[39m(\u001b[38;2;163;21;21m\"hi\"\u001b[39m, \u001b[38;2;9;134;88m42\u001b[39m) }                                             ",
+            "\u001b[38;2;108;108;108m```\u001b[39m                                                                             ",
+            "                                                                                ",
+            "\u001b[3m\u001b[38;2;31;35;40mAfter code.\u001b[39m\u001b[23m                                                                     "
+          ],
+          [
+            "\u001b[38;2;108;108;108m────────────────────────────────────────────────────────────────────────────────\u001b[39m",
+            "                                                                                ",
+            "\u001b[3m\u001b[38;2;31;35;40mEmail \u001b[39m\u001b[23m\u001b[38;2;84;125;167m\u001b[4m\u001b[3m\u001b[38;2;31;35;40ma@example.com\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m and \u001b[39m\u001b[23m\u001b[38;2;84;125;167m\u001b[4m\u001b[3m\u001b[38;2;31;35;40mhttps://example.com\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m tail.\u001b[39m\u001b[23m                               "
+          ],
+          [
+            "\u001b[38;2;154;115;38m\u001b[1m\u001b[4mHead \u001b[24m\u001b[22m\u001b[39m\u001b[38;2;90;128;128mcode\u001b[39m\u001b[38;2;154;115;38m\u001b[1m\u001b[4m\u001b[38;2;154;115;38m\u001b[1m\u001b[4m tail \u001b[24m\u001b[22m\u001b[39m\u001b[1m\u001b[38;2;154;115;38m\u001b[1m\u001b[4mbold\u001b[24m\u001b[22m\u001b[1m\u001b[39m\u001b[22m\u001b[38;2;154;115;38m\u001b[1m\u001b[4m\u001b[38;2;154;115;38m\u001b[1m\u001b[4m end\u001b[24m\u001b[22m\u001b[39m "
+          ],
+          [
+            "\u001b[38;2;154;115;38m\u001b[1mHead \u001b[22m\u001b[39m\u001b[3m\u001b[38;2;154;115;38m\u001b[1mitalic\u001b[22m\u001b[39m\u001b[23m\u001b[38;2;154;115;38m\u001b[1m\u001b[38;2;154;115;38m\u001b[1m \u001b[22m\u001b[39m\u001b[9m\u001b[38;2;154;115;38m\u001b[1mgone\u001b[22m\u001b[39m\u001b[29m\u001b[38;2;154;115;38m\u001b[1m\u001b[38;2;154;115;38m\u001b[1m tail\u001b[22m\u001b[39m   "
+          ],
+          [
+            "\u001b[3m\u001b[38;2;31;35;40mPlain \u001b[39m\u001b[23m\u001b[1m\u001b[3m\u001b[38;2;31;35;40mbold \u001b[39m\u001b[23m\u001b[3m\u001b[3m\u001b[38;2;31;35;40mnested\u001b[39m\u001b[23m\u001b[3m\u001b[23m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m tail\u001b[39m\u001b[23m\u001b[22m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m  ",
+            "\u001b[3;38;2;31;35;40mand \u001b[39m\u001b[23m\u001b[38;2;90;128;128mcode\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m after \u001b[39m\u001b[23m\u001b[38;2;84;125;167m\u001b[4m\u001b[3m\u001b[38;2;31;35;40mlabel\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[38;2;118;118;118m    ",
+            "\u001b[38;2;118;118;118m(https://example.com)\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m   ",
+            "\u001b[3;38;2;31;35;40mend.\u001b[39m\u001b[23m                    "
+          ],
+          [
+            "\u001b[38;2;108;108;108m│ \u001b[39m\u001b[38;2;108;108;108m\u001b[3mQuote \u001b[1mbold\u001b[22m\u001b[38;2;108;108;108m\u001b[3m \u001b[38;2;90;128;128mcode\u001b[39m\u001b[38;2;108;108;108m\u001b[3m tail\u001b[23m\u001b[39m  ",
+            "\u001b[38;2;108;108;108m│ \u001b[39m\u001b[38;2;108;108;108m\u001b[39m                      ",
+            "\u001b[38;2;108;108;108m│ \u001b[39m\u001b[38;2;108;108;108m\u001b[3m\u001b[38;2;88;132;88m- \u001b[39mitem \u001b[3mitalic\u001b[23m\u001b[3m\u001b[38;2;108;108;108m\u001b[3m tail\u001b[23m\u001b[39m    ",
+            "\u001b[38;2;108;108;108m│ \u001b[39m\u001b[38;2;108;108;108m\u001b[3m\u001b[38;2;88;132;88m- \u001b[39msecond\u001b[23m\u001b[39m              "
+          ],
+          [
+            "\u001b[38;2;88;132;88m- \u001b[39m\u001b[3m\u001b[38;2;31;35;40mitem \u001b[39m\u001b[23m\u001b[1m\u001b[3m\u001b[38;2;31;35;40mbold\u001b[39m\u001b[23m\u001b[22m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m \u001b[39m\u001b[23m\u001b[38;2;90;128;128mcode\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m tail\u001b[39m\u001b[23m   ",
+            "    \u001b[38;2;88;132;88m- \u001b[39m\u001b[3m\u001b[38;2;31;35;40mnested \u001b[39m\u001b[23m\u001b[9m\u001b[3m\u001b[38;2;31;35;40mstrike\u001b[39m\u001b[23m\u001b[29m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m     ",
+            "      \u001b[3;38;2;31;35;40mafter\u001b[39m\u001b[23m             ",
+            "                        ",
+            "\u001b[38;2;88;132;88m1. \u001b[39m\u001b[3m\u001b[38;2;31;35;40mfirst\u001b[39m\u001b[23m                ",
+            "\u001b[38;2;88;132;88m2. \u001b[39m\u001b[3m\u001b[38;2;31;35;40msecond\u001b[39m\u001b[23m               "
+          ],
+          [
+            "\u001b[38;2;108;108;108m```go\u001b[39m                   ",
+            "  \u001b[38;2;0;0;255mfunc\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mmain\u001b[39m\u001b[38;2;0;16;128m()\u001b[39m {         ",
+            "\u001b[38;2;38;127;153mprintln\u001b[39m(\u001b[38;2;163;21;21m\"hi\"\u001b[39m, \u001b[38;2;9;134;88m42\u001b[39m) }     ",
+            "\u001b[38;2;108;108;108m```\u001b[39m                     ",
+            "                        ",
+            "\u001b[3m\u001b[38;2;31;35;40mAfter code.\u001b[39m\u001b[23m             "
+          ],
+          [
+            "\u001b[38;2;108;108;108m────────────────────────\u001b[39m",
+            "                        ",
+            "\u001b[3m\u001b[38;2;31;35;40mEmail \u001b[39m\u001b[23m\u001b[38;2;84;125;167m\u001b[4m\u001b[3m\u001b[38;2;31;35;40ma@example.com\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m and ",
+            "\u001b[3;38;2;31;35;40m\u001b[39m\u001b[23m\u001b[38;2;84;125;167m\u001b[4m\u001b[3m\u001b[38;2;31;35;40mhttps://example.com\u001b[39m\u001b[23m\u001b[24m\u001b[39m\u001b[3m\u001b[38;2;31;35;40m\u001b[3m\u001b[38;2;31;35;40m     ",
+            "\u001b[3;38;2;31;35;40mtail.\u001b[39m\u001b[23m                   "
+          ]
+        ]
+      },
+      "menus": [
+        {
+          "events": [
+            "preview:dark/dark",
+            "preview:dark"
+          ],
+          "screens": [
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "  Automatic   Use separate themes for light and dark terminal appearance",
+              "→ dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "→ Automatic   Use separate themes for light and dark terminal appearance",
+              "  dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ]
+          ]
+        },
+        {
+          "events": [
+            "preview:light",
+            "select:light"
+          ],
+          "screens": [
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "  Automatic   Use separate themes for light and dark terminal appearance",
+              "→ dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "  Automatic   Use separate themes for light and dark terminal appearance",
+              "  dark",
+              "→ light",
+              "",
+              "  Enter to select · Esc to go back"
+            ]
+          ]
+        },
+        {
+          "events": [
+            "preview:dark/dark",
+            "preview:dark/dark",
+            "preview:light",
+            "preview:light/dark",
+            "select:light/dark"
+          ],
+          "screens": [
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "  Automatic   Use separate themes for light and dark terminal appearance",
+              "→ dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "→ Automatic   Use separate themes for light and dark terminal appearance",
+              "  dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "→ Light theme  dark",
+              "  Dark theme   dark",
+              "  Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Theme to use in automatic mode when the terminal is light",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "Light Theme",
+              "",
+              "Select the theme to use for light terminal appearance",
+              "",
+              "→ dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "Light Theme",
+              "",
+              "Select the theme to use for light terminal appearance",
+              "",
+              "  dark",
+              "→ light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "→ Light theme  light",
+              "  Dark theme   dark",
+              "  Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Theme to use in automatic mode when the terminal is light",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "  Light theme  light",
+              "→ Dark theme   dark",
+              "  Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Theme to use in automatic mode when the terminal is dark",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "  Light theme  light",
+              "  Dark theme   dark",
+              "→ Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Save and go back",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ]
+          ]
+        },
+        {
+          "events": [
+            "preview:dark/dark",
+            "preview:dark/dark",
+            "preview:light",
+            "preview:dark/dark",
+            "preview:dark"
+          ],
+          "screens": [
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "  Automatic   Use separate themes for light and dark terminal appearance",
+              "→ dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "→ Automatic   Use separate themes for light and dark terminal appearance",
+              "  dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "→ Light theme  dark",
+              "  Dark theme   dark",
+              "  Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Theme to use in automatic mode when the terminal is light",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "  Light theme  dark",
+              "→ Dark theme   dark",
+              "  Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Theme to use in automatic mode when the terminal is dark",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "Dark Theme",
+              "",
+              "Select the theme to use for dark terminal appearance",
+              "",
+              "→ dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "Dark Theme",
+              "",
+              "Select the theme to use for dark terminal appearance",
+              "",
+              "  dark",
+              "→ light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "  Light theme  dark",
+              "→ Dark theme   dark",
+              "  Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Theme to use in automatic mode when the terminal is dark",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ]
+          ]
+        },
+        {
+          "events": [
+            "preview:dark/dark",
+            "preview:dark/dark",
+            "preview:dark",
+            "preview:dark"
+          ],
+          "screens": [
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "  Automatic   Use separate themes for light and dark terminal appearance",
+              "→ dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "→ Automatic   Use separate themes for light and dark terminal appearance",
+              "  dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "→ Light theme  dark",
+              "  Dark theme   dark",
+              "  Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Theme to use in automatic mode when the terminal is light",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "  Light theme  dark",
+              "→ Dark theme   dark",
+              "  Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Theme to use in automatic mode when the terminal is dark",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "  Light theme  dark",
+              "  Dark theme   dark",
+              "→ Apply        save and go back",
+              "  Change mode  switch to single theme",
+              "",
+              "  Save and go back",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Automatic Theme",
+              "",
+              "Choose themes for terminal light and dark appearance.",
+              "Light/dark detection requires terminal support.",
+              "",
+              "  Light theme  dark",
+              "  Dark theme   dark",
+              "  Apply        save and go back",
+              "→ Change mode  switch to single theme",
+              "",
+              "  Switch to one theme for light and dark",
+              "",
+              "  Enter/Space to change · Esc to cancel"
+            ],
+            [
+              "Theme",
+              "",
+              "Select a theme, or choose Automatic to follow terminal appearance.",
+              "",
+              "  Automatic   Use separate themes for light and dark terminal appearance",
+              "→ dark",
+              "  light",
+              "",
+              "  Enter to select · Esc to go back"
+            ]
+          ]
+        }
+      ],
+      "syntax": {
+        "dark": [
+          [
+            "\u001b[38;2;86;156;214mpackage\u001b[39m main",
+            "\u001b[38;2;106;153;85m// note\u001b[39m",
+            "\u001b[38;2;86;156;214mfunc\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mmain\u001b[39m\u001b[38;2;156;220;254m()\u001b[39m { \u001b[38;2;78;201;176mprintln\u001b[39m(\u001b[38;2;206;145;120m\"hi\"\u001b[39m, \u001b[38;2;181;206;168m42\u001b[39m) }"
+          ],
+          [
+            "\u001b[38;2;86;156;214mconst\u001b[39m x = \u001b[38;2;206;145;120m/ab+/g\u001b[39m; \u001b[38;2;106;153;85m// note\u001b[39m",
+            "\u001b[38;2;86;156;214mfunction\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mf\u001b[39m\u001b[38;2;220;220;170m(\u001b[39m\u001b[38;2;156;220;254ma\u001b[39m\u001b[38;2;220;220;170m) \u001b[39m{ \u001b[38;2;86;156;214mreturn\u001b[39m \u001b[38;2;181;206;168mtrue\u001b[39m; }"
+          ],
+          [
+            "\u001b[38;2;86;156;214minterface\u001b[39m User { name: \u001b[38;2;78;201;176mstring\u001b[39m }",
+            "\u001b[38;2;86;156;214mconst\u001b[39m n: \u001b[38;2;78;201;176mnumber\u001b[39m = \u001b[38;2;181;206;168m1\u001b[39m;"
+          ],
+          [
+            "\u001b[38;2;86;156;214mdef\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mgreet\u001b[39m\u001b[38;2;220;220;170m(\u001b[39m\u001b[38;2;156;220;254mname\u001b[39m\u001b[38;2;220;220;170m):\u001b[39m",
+            "    \u001b[38;2;106;153;85m# note\u001b[39m",
+            "    \u001b[38;2;86;156;214mreturn\u001b[39m \u001b[38;2;206;145;120m\"hi\"\u001b[39m + name"
+          ],
+          [
+            "{\u001b[38;2;156;220;254m\"name\"\u001b[39m: \u001b[38;2;181;206;168mtrue\u001b[39m, \u001b[38;2;156;220;254m\"count\"\u001b[39m: \u001b[38;2;181;206;168m12\u001b[39m, \u001b[38;2;156;220;254m\"list\"\u001b[39m: [\u001b[38;2;181;206;168mnull\u001b[39m]}"
+          ],
+          [
+            "\u001b[38;2;78;201;176mecho\u001b[39m \u001b[38;2;206;145;120m\"\u001b[39m\u001b[38;2;156;220;254m$HOME\u001b[39m\u001b[38;2;206;145;120m\"\u001b[39m \u001b[38;2;106;153;85m# note\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;212;212;212m<\u001b[39m\u001b[38;2;86;156;214mdiv\u001b[39m\u001b[38;2;212;212;212m \u001b[39m\u001b[38;2;156;220;254mclass\u001b[39m\u001b[38;2;212;212;212m=\u001b[39m\u001b[38;2;206;145;120m\"x\"\u001b[39m\u001b[38;2;212;212;212m>\u001b[39m&amp;\u001b[38;2;212;212;212m</\u001b[39m\u001b[38;2;86;156;214mdiv\u001b[39m\u001b[38;2;212;212;212m>\u001b[39m"
+          ],
+          [
+            "body { color: \u001b[38;2;181;206;168m#ffffff\u001b[39m; }"
+          ],
+          [
+            "\u001b[38;2;86;156;214mfn\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mmain\u001b[39m() { \u001b[38;2;86;156;214mlet\u001b[39m x = \u001b[38;2;181;206;168m42\u001b[39m; }"
+          ],
+          [
+            "\u001b[38;2;86;156;214mpublic\u001b[39m \u001b[38;2;86;156;214mclass\u001b[39m\u001b[38;2;78;201;176m \u001b[39m\u001b[38;2;220;220;170mHello\u001b[39m\u001b[38;2;78;201;176m \u001b[39m{ \u001b[38;2;86;156;214mint\u001b[39m x = \u001b[38;2;181;206;168m12\u001b[39m; }"
+          ],
+          [
+            "\u001b[38;2;128;128;128m#\u001b[39m\u001b[38;2;128;128;128minclude\u001b[39m\u001b[38;2;128;128;128m \u001b[39m\u001b[38;2;128;128;128m<stdio.h>\u001b[39m",
+            "\u001b[38;2;86;156;214mint\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mmain\u001b[39m\u001b[38;2;156;220;254m()\u001b[39m\u001b[38;2;220;220;170m \u001b[39m{ \u001b[38;2;86;156;214mreturn\u001b[39m \u001b[38;2;181;206;168m0\u001b[39m; }"
+          ],
+          [
+            "std::string s = \u001b[38;2;206;145;120m\"hello\"\u001b[39m;"
+          ],
+          [
+            "\u001b[38;2;86;156;214mSELECT\u001b[39m \u001b[38;2;212;212;212m*\u001b[39m \u001b[38;2;86;156;214mFROM\u001b[39m users \u001b[38;2;86;156;214mWHERE\u001b[39m name \u001b[38;2;212;212;212m=\u001b[39m \u001b[38;2;206;145;120m'hello'\u001b[39m;"
+          ],
+          [
+            "\u001b[38;2;156;220;254mname:\u001b[39m \u001b[38;2;206;145;120mhello\u001b[39m",
+            "\u001b[38;2;156;220;254mitems:\u001b[39m [\u001b[38;2;181;206;168mtrue\u001b[39m, \u001b[38;2;181;206;168m42\u001b[39m]"
+          ],
+          [
+            "\u001b[38;2;181;189;104m+added\u001b[39m",
+            "\u001b[38;2;204;102;102m-removed\u001b[39m"
+          ],
+          [
+            "# Header",
+            "\u001b[1m**bold**\u001b[22m \u001b[3m*italic*\u001b[23m [\u001b[38;2;206;145;120mlink\u001b[39m](\u001b[4murl\u001b[24m)"
+          ],
+          [
+            "\u001b[38;2;86;156;214mdef\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mhello\u001b[39m\u001b[38;2;156;220;254m(name)\u001b[39m",
+            "  puts \u001b[38;2;206;145;120m\"hi \u001b[39m\u001b[38;2;206;145;120m#{name}\u001b[39m\u001b[38;2;206;145;120m\"\u001b[39m",
+            "\u001b[38;2;86;156;214mend\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;86;156;214mlet\u001b[39m name: \u001b[38;2;78;201;176mString\u001b[39m \u001b[38;2;212;212;212m=\u001b[39m \u001b[38;2;206;145;120m\"hello\"\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;86;156;214mfun\u001b[39m\u001b[38;2;220;220;170m \u001b[39m\u001b[38;2;220;220;170mmain\u001b[39m\u001b[38;2;156;220;254m()\u001b[39m { println(\u001b[38;2;206;145;120m\"hello\"\u001b[39m) }"
+          ],
+          [
+            "\u001b[38;2;181;189;104mthis is plain code\u001b[39m",
+            "\u001b[38;2;181;189;104mand more\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;181;189;104mif true then false\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;106;153;85m/* multiline",
+            "comment */\u001b[39m",
+            "\u001b[38;2;86;156;214mvar\u001b[39m s = \u001b[38;2;206;145;120m`multi",
+            "line`\u001b[39m"
+          ]
+        ],
+        "light": [
+          [
+            "\u001b[38;2;0;0;255mpackage\u001b[39m main",
+            "\u001b[38;2;0;128;0m// note\u001b[39m",
+            "\u001b[38;2;0;0;255mfunc\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mmain\u001b[39m\u001b[38;2;0;16;128m()\u001b[39m { \u001b[38;2;38;127;153mprintln\u001b[39m(\u001b[38;2;163;21;21m\"hi\"\u001b[39m, \u001b[38;2;9;134;88m42\u001b[39m) }"
+          ],
+          [
+            "\u001b[38;2;0;0;255mconst\u001b[39m x = \u001b[38;2;163;21;21m/ab+/g\u001b[39m; \u001b[38;2;0;128;0m// note\u001b[39m",
+            "\u001b[38;2;0;0;255mfunction\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mf\u001b[39m\u001b[38;2;121;94;38m(\u001b[39m\u001b[38;2;0;16;128ma\u001b[39m\u001b[38;2;121;94;38m) \u001b[39m{ \u001b[38;2;0;0;255mreturn\u001b[39m \u001b[38;2;9;134;88mtrue\u001b[39m; }"
+          ],
+          [
+            "\u001b[38;2;0;0;255minterface\u001b[39m User { name: \u001b[38;2;38;127;153mstring\u001b[39m }",
+            "\u001b[38;2;0;0;255mconst\u001b[39m n: \u001b[38;2;38;127;153mnumber\u001b[39m = \u001b[38;2;9;134;88m1\u001b[39m;"
+          ],
+          [
+            "\u001b[38;2;0;0;255mdef\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mgreet\u001b[39m\u001b[38;2;121;94;38m(\u001b[39m\u001b[38;2;0;16;128mname\u001b[39m\u001b[38;2;121;94;38m):\u001b[39m",
+            "    \u001b[38;2;0;128;0m# note\u001b[39m",
+            "    \u001b[38;2;0;0;255mreturn\u001b[39m \u001b[38;2;163;21;21m\"hi\"\u001b[39m + name"
+          ],
+          [
+            "{\u001b[38;2;0;16;128m\"name\"\u001b[39m: \u001b[38;2;9;134;88mtrue\u001b[39m, \u001b[38;2;0;16;128m\"count\"\u001b[39m: \u001b[38;2;9;134;88m12\u001b[39m, \u001b[38;2;0;16;128m\"list\"\u001b[39m: [\u001b[38;2;9;134;88mnull\u001b[39m]}"
+          ],
+          [
+            "\u001b[38;2;38;127;153mecho\u001b[39m \u001b[38;2;163;21;21m\"\u001b[39m\u001b[38;2;0;16;128m$HOME\u001b[39m\u001b[38;2;163;21;21m\"\u001b[39m \u001b[38;2;0;128;0m# note\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;0;0;0m<\u001b[39m\u001b[38;2;0;0;255mdiv\u001b[39m\u001b[38;2;0;0;0m \u001b[39m\u001b[38;2;0;16;128mclass\u001b[39m\u001b[38;2;0;0;0m=\u001b[39m\u001b[38;2;163;21;21m\"x\"\u001b[39m\u001b[38;2;0;0;0m>\u001b[39m&amp;\u001b[38;2;0;0;0m</\u001b[39m\u001b[38;2;0;0;255mdiv\u001b[39m\u001b[38;2;0;0;0m>\u001b[39m"
+          ],
+          [
+            "body { color: \u001b[38;2;9;134;88m#ffffff\u001b[39m; }"
+          ],
+          [
+            "\u001b[38;2;0;0;255mfn\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mmain\u001b[39m() { \u001b[38;2;0;0;255mlet\u001b[39m x = \u001b[38;2;9;134;88m42\u001b[39m; }"
+          ],
+          [
+            "\u001b[38;2;0;0;255mpublic\u001b[39m \u001b[38;2;0;0;255mclass\u001b[39m\u001b[38;2;38;127;153m \u001b[39m\u001b[38;2;121;94;38mHello\u001b[39m\u001b[38;2;38;127;153m \u001b[39m{ \u001b[38;2;0;0;255mint\u001b[39m x = \u001b[38;2;9;134;88m12\u001b[39m; }"
+          ],
+          [
+            "\u001b[38;2;108;108;108m#\u001b[39m\u001b[38;2;108;108;108minclude\u001b[39m\u001b[38;2;108;108;108m \u001b[39m\u001b[38;2;108;108;108m<stdio.h>\u001b[39m",
+            "\u001b[38;2;0;0;255mint\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mmain\u001b[39m\u001b[38;2;0;16;128m()\u001b[39m\u001b[38;2;121;94;38m \u001b[39m{ \u001b[38;2;0;0;255mreturn\u001b[39m \u001b[38;2;9;134;88m0\u001b[39m; }"
+          ],
+          [
+            "std::string s = \u001b[38;2;163;21;21m\"hello\"\u001b[39m;"
+          ],
+          [
+            "\u001b[38;2;0;0;255mSELECT\u001b[39m \u001b[38;2;0;0;0m*\u001b[39m \u001b[38;2;0;0;255mFROM\u001b[39m users \u001b[38;2;0;0;255mWHERE\u001b[39m name \u001b[38;2;0;0;0m=\u001b[39m \u001b[38;2;163;21;21m'hello'\u001b[39m;"
+          ],
+          [
+            "\u001b[38;2;0;16;128mname:\u001b[39m \u001b[38;2;163;21;21mhello\u001b[39m",
+            "\u001b[38;2;0;16;128mitems:\u001b[39m [\u001b[38;2;9;134;88mtrue\u001b[39m, \u001b[38;2;9;134;88m42\u001b[39m]"
+          ],
+          [
+            "\u001b[38;2;88;132;88m+added\u001b[39m",
+            "\u001b[38;2;170;85;85m-removed\u001b[39m"
+          ],
+          [
+            "# Header",
+            "\u001b[1m**bold**\u001b[22m \u001b[3m*italic*\u001b[23m [\u001b[38;2;163;21;21mlink\u001b[39m](\u001b[4murl\u001b[24m)"
+          ],
+          [
+            "\u001b[38;2;0;0;255mdef\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mhello\u001b[39m\u001b[38;2;0;16;128m(name)\u001b[39m",
+            "  puts \u001b[38;2;163;21;21m\"hi \u001b[39m\u001b[38;2;163;21;21m#{name}\u001b[39m\u001b[38;2;163;21;21m\"\u001b[39m",
+            "\u001b[38;2;0;0;255mend\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;0;0;255mlet\u001b[39m name: \u001b[38;2;38;127;153mString\u001b[39m \u001b[38;2;0;0;0m=\u001b[39m \u001b[38;2;163;21;21m\"hello\"\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;0;0;255mfun\u001b[39m\u001b[38;2;121;94;38m \u001b[39m\u001b[38;2;121;94;38mmain\u001b[39m\u001b[38;2;0;16;128m()\u001b[39m { println(\u001b[38;2;163;21;21m\"hello\"\u001b[39m) }"
+          ],
+          [
+            "\u001b[38;2;88;132;88mthis is plain code\u001b[39m",
+            "\u001b[38;2;88;132;88mand more\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;88;132;88mif true then false\u001b[39m"
+          ],
+          [
+            "\u001b[38;2;0;128;0m/* multiline",
+            "comment */\u001b[39m",
+            "\u001b[38;2;0;0;255mvar\u001b[39m s = \u001b[38;2;163;21;21m`multi",
+            "line`\u001b[39m"
+          ]
+        ]
+      },
       "reports": [
         {
           "rgb": {
@@ -131,8 +1104,8 @@
     },
     "side_effects": []
   },
-  "input_hash": "sha256:20930557e81f15dba7a52013583987c1a3d7c5dcb3ba32fa2136cf0cbb929d2d",
-  "observation_hash": "sha256:381f3108de2e11f6120c8300c3254a28c299c0ac698462daf7e468c49bd88c45",
+  "input_hash": "sha256:b297b08632d0e5158778d6fd3263399d88c90548f74e67ef5c50b57f78e85be3",
+  "observation_hash": "sha256:a21790bdd702829773cd94ee03857de4e62ff6f8fe5b9e15ae5d746b61ad014e",
   "execution_method": "node parity/oracle/theme-runtime.mjs <locked-pi-checkout>",
   "platform": "any",
   "environment": {}
