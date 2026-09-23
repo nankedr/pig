@@ -27,6 +27,7 @@ type *codingagent.InteractiveMode
 ClearEditor func(*codingagent.InteractiveMode) error
 GetUserInput func(*codingagent.InteractiveMode, context.Context) (string, error)
 Init func(*codingagent.InteractiveMode, context.Context) error
+OpenExternalEditor func(*codingagent.InteractiveMode, context.Context) error
 RenderInitialMessages func(*codingagent.InteractiveMode) error
 Run func(*codingagent.InteractiveMode, context.Context) error
 ShowError func(*codingagent.InteractiveMode, string) error
@@ -47,6 +48,7 @@ KittyProtocolActive func(*tui.ProcessTerminal) (bool, error)
 ModifyOtherKeysActive func(*tui.ProcessTerminal) (bool, error)
 MoveBy func(*tui.ProcessTerminal, int) error
 Rows func(*tui.ProcessTerminal) (int, error)
+RunCommand func(*tui.ProcessTerminal, context.Context, string, ...string) error
 SetProgress func(*tui.ProcessTerminal, bool) error
 SetTitle func(*tui.ProcessTerminal, string) error
 ShowCursor func(*tui.ProcessTerminal) error
@@ -59,6 +61,7 @@ Append func(*tui.TextUI, string) error
 ApplyInteractionOptions func(*tui.TextUI, tui.TextUIInteractionOptions) error
 ClearEditor func(*tui.TextUI) error
 Done func(*tui.TextUI) <-chan struct {}
+EditExternally func(*tui.TextUI, context.Context, func(context.Context, string) (string, error)) error
 Err func(*tui.TextUI) error
 HideThinking func(*tui.TextUI) bool
 Mode func(*tui.TextUI) tui.TUIMode

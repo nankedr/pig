@@ -200,6 +200,11 @@ func (m *InteractiveMode) GetUserInput(ctx context.Context) (string, error) {
 			continue
 		}
 		switch input.Action {
+		case "app.editor.external":
+			if editErr := m.OpenExternalEditor(ctx); editErr != nil {
+				_ = m.ShowError(editErr.Error())
+			}
+			continue
 		case "app.session.fork":
 			if err = m.selectFork(ctx); err != nil {
 				_ = m.ShowError(err.Error())
@@ -479,6 +484,11 @@ loop:
 			continue
 		}
 		switch input.Action {
+		case "app.editor.external":
+			if editErr := m.OpenExternalEditor(runCtx); editErr != nil {
+				_ = m.ShowError(editErr.Error())
+			}
+			continue
 		case "app.suspend":
 			if err = m.ui.Suspend(); err != nil {
 				break loop
@@ -672,10 +682,10 @@ func (m *InteractiveMode) Stop(_ ...bool) error {
 			<-m.themeDone
 		}
 		m.ui.SetTerminalColorHandler(nil)
+		m.stopErr = m.ui.Stop()
 		if initialized {
 			_ = m.ui.Terminal().Write("\x1b[?2031l")
 		}
-		m.stopErr = m.ui.Stop()
 		if initialized && m.ui.Mode() == tui.TUIModeFullscreen {
 			if output, _ := m.runtime.Session().SettingsManager().GetFullscreenExitOutput(); output == FullscreenExitOutputResumeHint {
 				if path := m.runtime.Session().SessionManager().GetSessionFile(); path != nil {

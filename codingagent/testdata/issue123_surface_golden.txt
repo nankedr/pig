@@ -1,0 +1,4 @@
+func(*codingagent.InteractiveMode, context.Context) error
+func(*tui.TextUI, context.Context, func(context.Context, string) (string, error)) error
+func(*tui.ProcessTerminal, context.Context, string, ...string) error
+func(codingagent.SettingsManager) (string, error)

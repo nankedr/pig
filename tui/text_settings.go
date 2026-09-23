@@ -39,7 +39,7 @@ func (u *TextUI) ApplyInteractionOptions(options TextUIInteractionOptions) error
 	_ = u.scroll.SetScrollbar(options.Scrollbar)
 	_ = u.editor.SetPaddingX(options.EditorPaddingX)
 	_ = u.editor.SetAutocompleteMaxVisible(options.AutocompleteMaxVisible)
-	if u.started && !u.stopped {
+	if u.started && !u.stopped && !u.paused {
 		if oldProgress && !options.ShowTerminalProgress {
 			if err := u.terminal.Write("\x1b]9;4;0;\x07"); err != nil {
 				return err

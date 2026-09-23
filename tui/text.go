@@ -26,6 +26,9 @@ type TextUI struct {
 	done                     chan struct{}
 	err                      error
 	started, stopped         bool
+	paused                   bool
+	externalCancel           context.CancelFunc
+	externalDone             chan struct{}
 	lastInterrupt            time.Time
 	lastEscape               time.Time
 	interaction              TextUIInteractionOptions
@@ -200,6 +203,15 @@ func (u *TextUI) Start() error {
 func (u *TextUI) Stop() error {
 	u.mu.Lock()
 	u.finish(nil)
+	if u.externalCancel != nil {
+		u.externalCancel()
+	}
+	done := u.externalDone
+	u.mu.Unlock()
+	if done != nil {
+		<-done
+	}
+	u.mu.Lock()
 	started := u.started
 	u.started = false
 	u.mu.Unlock()
@@ -293,7 +305,7 @@ func (u *TextUI) SetTurn(turn uint64) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	u.turn = turn
-	if u.started && !u.stopped && u.interaction.ShowTerminalProgress {
+	if u.started && !u.stopped && !u.paused && u.interaction.ShowTerminalProgress {
 		_ = u.terminal.Write(u.progressSequence())
 	}
 }
@@ -328,6 +340,9 @@ func (u *TextUI) Append(text string) error {
 func terminalText(text string) string { return SafeTerminalText(text) }
 func (u *TextUI) Refresh() error      { u.mu.Lock(); defer u.mu.Unlock(); return u.render() }
 func (u *TextUI) render() error {
+	if u.paused {
+		return nil
+	}
 	if u.stopped {
 		return u.err
 	}
@@ -442,7 +457,7 @@ func (u *TextUI) render() error {
 func (u *TextUI) input(data string) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
-	if u.stopped {
+	if u.stopped || u.paused {
 		return
 	}
 	if osc, _ := IsOSC11BackgroundColorResponse(data); osc {
@@ -540,6 +555,8 @@ func (u *TextUI) input(data string) {
 				break
 			}
 		}
+	case match("app.editor.external"):
+		u.enqueueAction("app.editor.external", "")
 	case match("app.message.dequeue"):
 		u.enqueueAction("app.message.dequeue", "")
 	case match("app.session.new"), match("app.suspend"):
@@ -560,6 +577,11 @@ func (u *TextUI) input(data string) {
 	_ = u.render()
 }
 func (u *TextUI) watchTerminal() {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+	u.watchTerminalLocked()
+}
+func (u *TextUI) watchTerminalLocked() {
 	source, ok := u.terminal.(interface {
 		Done() <-chan struct{}
 		Err() error
@@ -567,10 +589,8 @@ func (u *TextUI) watchTerminal() {
 	if !ok {
 		return
 	}
-	u.mu.Lock()
 	generation := u.generation
 	done := source.Done()
-	u.mu.Unlock()
 	go func() {
 		select {
 		case <-u.done:
@@ -586,7 +606,7 @@ func (u *TextUI) watchTerminal() {
 }
 func (u *TextUI) Suspend() error {
 	u.mu.Lock()
-	if u.stopped {
+	if u.stopped || u.paused {
 		u.mu.Unlock()
 		return io.EOF
 	}
@@ -636,7 +656,7 @@ func (u *TextUI) SetMode(mode TUIMode) error {
 	if mode == u.mode {
 		return nil
 	}
-	if u.started && !u.stopped {
+	if u.started && !u.stopped && !u.paused {
 		seq := leaveAltScreen
 		if mode == TUIModeFullscreen {
 			seq = enterAltScreen + enableMouse()

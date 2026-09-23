@@ -30,6 +30,7 @@ Append func(*tui.TextUI, string) error
 ApplyInteractionOptions func(*tui.TextUI, tui.TextUIInteractionOptions) error
 ClearEditor func(*tui.TextUI) error
 Done func(*tui.TextUI) <-chan struct {}
+EditExternally func(*tui.TextUI, context.Context, func(context.Context, string) (string, error)) error
 Err func(*tui.TextUI) error
 HideThinking func(*tui.TextUI) bool
 Mode func(*tui.TextUI) tui.TUIMode

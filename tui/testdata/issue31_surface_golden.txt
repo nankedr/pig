@@ -1310,6 +1310,7 @@ func (t *ProcessTerminal) KittyProtocolActive() (bool, error)
 func (t *ProcessTerminal) ModifyOtherKeysActive() (bool, error)
 func (t *ProcessTerminal) MoveBy(lines int) error
 func (t *ProcessTerminal) Rows() (int, error)
+func (t *ProcessTerminal) RunCommand(ctx context.Context, name string, args ...string) (err error)
 func (t *ProcessTerminal) ShowCursor() error
 func (t *ProcessTerminal) Start(onInput func(string), onResize func()) error
 func (t *ProcessTerminal) Stop() error
