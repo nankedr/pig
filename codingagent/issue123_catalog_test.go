@@ -26,6 +26,7 @@ func TestExternalEditorCatalog123(t *testing.T) {
 	for _, item := range []struct{ kind, path, run string }{
 		{"oracle", "parity/oracle/fixtures/external-editor-cli.json", "make m6-external-editor-oracle PIG_PI_ORACLE_CHECKOUT=<locked-pi-checkout>"},
 		{"go-test", "parity/terminal/external-editor.py", "go test ./cmd/pig -run ExternalEditor -count=1"},
+		{"go-test", "tui/issue123_external_test.go", "go test -race ./tui -run ExternalEditor -count=1"},
 		{"go-test", "codingagent/issue123_external_test.go", "go test -race ./codingagent -run 'ExternalEditor.*123' -count=1"},
 		{"go-test", "cmd/pig/issue123_external_editor_test.go", "PIG_TEST_RACE=1 go test -race ./cmd/pig -run ExternalEditor -count=1"},
 		{"go-test", "codingagent/testdata/issue123_surface_golden.txt", "go test ./codingagent -run TestExternalEditorAPISnapshot123 -count=1"},
@@ -36,7 +37,7 @@ func TestExternalEditorCatalog123(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		entry.Evidence = append(entry.Evidence, catalog.Evidence{Kind: item.kind, Ref: item.path, Baseline: issue32BaselineCommit, CaseID: "issue123-" + item.path, InputHash: fmt.Sprintf("sha256:%x", sha256.Sum256(data)), ExecutionMethod: item.run, Expected: "External editor draft round-trip, errors, cancellation and terminal ownership through public SDK and CLI", Actual: "PASS; explicit partial scope", Platform: "any (SDK), darwin/linux (PTY)", CatalogID: entry.ID})
+		entry.Evidence = append(entry.Evidence, catalog.Evidence{Kind: item.kind, Ref: item.path, Baseline: issue32BaselineCommit, CaseID: "issue123-" + item.path, InputHash: fmt.Sprintf("sha256:%x", sha256.Sum256(data)), ExecutionMethod: item.run, Expected: "External editor draft round-trip, errors, cancellation and terminal ownership through public SDK and CLI", Actual: "PASS; explicit partial scope", Platform: "darwin-arm64 (execution); any (API snapshot)", CatalogID: entry.ID})
 	}
 	path := filepath.Join(root, "parity/catalog.jsonl")
 	entries, err := catalog.LoadCatalog(path)

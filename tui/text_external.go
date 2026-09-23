@@ -32,15 +32,23 @@ func (u *TextUI) EditExternally(ctx context.Context, edit func(context.Context, 
 	defer func() {
 		cancel()
 		u.mu.Lock()
+		stopped := u.stopped
+		u.mu.Unlock()
+		var startErr error
+		if !stopped {
+			startErr = u.terminal.Start(u.input, func() { _ = u.Refresh() })
+		}
+		u.mu.Lock()
 		defer u.mu.Unlock()
 		defer close(done)
 		u.externalCancel, u.externalDone = nil, nil
 		u.paused = false
 		if u.stopped {
-			u.started = false
+			if stopped {
+				u.started = false
+			}
 			return
 		}
-		startErr := u.terminal.Start(u.input, func() { _ = u.Refresh() })
 		if startErr == nil && u.mode == TUIModeFullscreen {
 			startErr = u.terminal.Write(enterAltScreen + enableMouse())
 		}

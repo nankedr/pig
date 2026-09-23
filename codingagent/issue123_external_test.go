@@ -103,7 +103,7 @@ func TestExternalEditorStopAndCancel123(t *testing.T) {
 			capture := filepath.Join(root, "temp-path")
 			release := filepath.Join(root, "release")
 			script := filepath.Join(root, "editor")
-			body := fmt.Sprintf("#!/bin/sh\nprintf '%%s' \"$1\" > %q\nprintf 'EXTERNAL_READY\\n'\n(while [ ! -f %q ]; do sleep 0.05; done; touch %q) &\nwait\n", capture, release, marker)
+			body := fmt.Sprintf("#!/bin/sh\nprintf '%%s' \"$1\" > %q\nstty raw -echo\nprintf 'EXTERNAL_READY\\n'\n(while [ ! -f %q ]; do sleep 0.05; done; touch %q) &\nwait\n", capture, release, marker)
 			if err := os.WriteFile(script, []byte(body), 0700); err != nil {
 				t.Fatal(err)
 			}

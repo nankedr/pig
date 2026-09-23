@@ -3,6 +3,7 @@
 package tui
 
 import (
+	"errors"
 	"io"
 	"os"
 	"os/exec"
@@ -10,6 +11,7 @@ import (
 	"syscall"
 
 	"golang.org/x/sys/unix"
+	"golang.org/x/term"
 )
 
 func configureTerminalCommand(cmd *exec.Cmd, input io.Reader) (func() error, error) {
@@ -18,6 +20,11 @@ func configureTerminalCommand(cmd *exec.Cmd, input io.Reader) (func() error, err
 	restore := func() error { return nil }
 	if file, ok := input.(*os.File); ok {
 		fd := int(file.Fd())
+		state, err := term.GetState(fd)
+		if err != nil {
+			return nil, err
+		}
+		restore = func() error { return term.Restore(fd, state) }
 		if group, err := unix.IoctlGetInt(fd, unix.TIOCGPGRP); err == nil {
 			cmd.SysProcAttr.Foreground, cmd.SysProcAttr.Ctty = true, fd
 			restore = func() error {
@@ -27,7 +34,7 @@ func configureTerminalCommand(cmd *exec.Cmd, input io.Reader) (func() error, err
 				if !ignored {
 					signal.Reset(syscall.SIGTTOU)
 				}
-				return err
+				return errors.Join(err, term.Restore(fd, state))
 			}
 		}
 	}
