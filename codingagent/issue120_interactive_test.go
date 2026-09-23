@@ -3,11 +3,14 @@
 package codingagent_test
 
 import (
+	"bytes"
 	"context"
 	"github.com/nankedr/pig/ai"
 	"github.com/nankedr/pig/codingagent"
 	"github.com/nankedr/pig/internal/terminaltest"
 	"github.com/nankedr/pig/tui"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -138,6 +141,64 @@ func TestInteractiveInvalidThemeSessionReplacement120(t *testing.T) {
 	waitSessionScreen118(t, tty, "missing-theme-120", true)
 	tty.Send(t, "\x04")
 	if err = awaitInteractive(t, done); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestInteractiveThemePreviewFailure120(t *testing.T) {
+	dir := t.TempDir()
+	data, err := os.ReadFile("themes/dark.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	data = bytes.Replace(data, []byte(`"name": "dark"`), []byte(`"name": "local"`), 1)
+	path := filepath.Join(dir, "themes", "local.json")
+	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	provider, err := ai.NewFauxProvider()
+	if err != nil {
+		t.Fatal(err)
+	}
+	model, _ := provider.GetModel()
+	created, err := codingagent.CreateAgentSession(context.Background(), codingagent.CreateAgentSessionOptions{CWD: t.TempDir(), AgentDir: dir, Model: &model, Provider: provider.Provider, NoTools: codingagent.NoToolsAll})
+	if err != nil {
+		t.Fatal(err)
+	}
+	runtime := codingagent.NewAgentSessionRuntime(created.Session, codingagent.AgentSessionServices{}, nil, nil, nil)
+	if err := runtime.Session().SettingsManager().SetTheme("dark"); err != nil {
+		t.Fatal(err)
+	}
+	tty := terminaltest.Open(t)
+	mode := codingagent.NewInteractiveMode(runtime, codingagent.InteractiveModeOptions{Terminal: tui.NewProcessTerminal(tty.Slave, tty.Slave)})
+	defer mode.Stop()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- mode.Run(ctx) }()
+	tty.Wait(t, "> ")
+	if err := os.WriteFile(path, []byte("invalid"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	tty.Send(t, "/settings\r")
+	tty.Wait(t, "Thinking level")
+	tty.Send(t, "theme\r")
+	tty.Wait(t, "Select a theme")
+	tty.Send(t, "\x1b[B\x1b[B")
+	waitSessionScreen118(t, tty, "Failed to load theme", true)
+	tty.Send(t, "\x1b[27u")
+	waitSessionScreen118(t, tty, "Type to search", true)
+	if setting, _ := runtime.Session().SettingsManager().GetThemeSetting(); setting != "dark" {
+		t.Fatal("failed preview persisted", setting)
+	}
+	tty.Send(t, "\x1b[27u")
+	waitSessionScreen118(t, tty, "Type to search", false)
+	time.Sleep(100 * time.Millisecond)
+	tty.Send(t, "\x04")
+	if err := awaitInteractive(t, done); err != nil {
 		t.Fatal(err)
 	}
 }

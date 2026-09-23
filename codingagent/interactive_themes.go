@@ -163,12 +163,13 @@ func (m *InteractiveMode) selectTheme(ctx context.Context) error {
 	m.themes.mu.Unlock()
 	done, finish := selectorSignal()
 	selected := ""
+	var previewErr error
 	menu := NewThemeSettingsComponent(setting, scheme, loaded, SettingsCallbacks{
-		OnThemePreview: func(value string) { _ = m.themes.Preview(value) },
+		OnThemePreview: func(value string) { previewErr = m.themes.Preview(value) },
 		OnThemeChange:  func(value string) { selected = value; finish() }, OnCancel: finish,
 	}, m.themes.Current)
 	menu.SetKeybindings(&m.options.Keybindings.KeybindingsManager)
-	err = m.waitSelector(ctx, &themeSettingsFrame{body: menu, theme: m.themes.Current}, done)
+	err = m.waitSelector(ctx, &themeSettingsFrame{body: menu, theme: m.themes.Current, diagnostic: func() error { return previewErr }}, done)
 	if err == nil && selected != "" {
 		err = m.themes.SetTheme(selected)
 	}

@@ -213,8 +213,9 @@ func (c *themeMenuContent) Render(width int) ([]string, error) {
 }
 
 type themeSettingsFrame struct {
-	body  tui.Component
-	theme func() *Theme
+	diagnostic func() error
+	body       tui.Component
+	theme      func() *Theme
 }
 
 func (f *themeSettingsFrame) HandleInput(data string) error {
@@ -226,6 +227,12 @@ func (f *themeSettingsFrame) Render(width int) ([]string, error) {
 		list.SetTheme(settingsListTheme(f.theme))
 	}
 	lines, err := f.body.Render(width)
+	if f.diagnostic != nil {
+		if diagnostic := f.diagnostic(); diagnostic != nil {
+			message, _ := tui.WrapTextWithANSI(f.theme().FG("error", diagnostic.Error()), max(1, width))
+			lines = append(append(lines, ""), message...)
+		}
+	}
 	for i, line := range lines {
 		lines[i] = f.theme().FG("text", line)
 	}

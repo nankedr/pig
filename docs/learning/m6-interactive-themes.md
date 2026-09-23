@@ -21,11 +21,11 @@ COLORTERM 的 truecolor/24bit 及已知终端标识决定真彩色；不支持�
 - `theme-runtime.json`：固定 Pi 公开解析器、ThemeSelector、SettingsSelector/SettingsList、highlightCode 和 Markdown 的输入、输出。
 - `themes-cli.json`：真实 Pi CLI 子进程 PTY，在 truecolor/256color 下修改本地主题、预览取消、保存并检查草稿/历史与终端恢复。Pig 使用同一 harness 和相同的设置搜索操作；确认/取消后验证返回父菜单。
 - `issue120_themes_test.go`：公开 SDK、文件失败恢复、重复切换和 Watch 取消。
-- `issue120_interactive_test.go`：公开 InteractiveMode 加 PTY，检查 scheme 优先级、通知改变草稿/对话框颜色、固定转自动时重新探测、主题失效的 Session 替换及退出清理。
+- `issue120_interactive_test.go`：公开 InteractiveMode 加 PTY，检查 scheme 优先级、通知改变草稿/对话框颜色、固定转自动时重新探测、主题失效的 Session 替换、预览错误即时反馈及退出清理。
 
 执行 `go test -race ./codingagent -run '120'`、`PIG_TEST_RACE=1 go test -race ./cmd/pig -run 120`。Oracle 用 `make m6-themes-oracle PIG_PI_ORACLE_CHECKOUT=/path/to/locked/pi` 复核，普通测试只读锁定 fixture，离线运行。
 
-目录条目 `contract:codingagent/interactive-themes` 记录本票已实现。新增证据：`issue120_menu_test.go` 比较搜索、主题子菜单文案/布局及逐层返回；`issue120_syntax_test.go` 比较 22 个语言/别名、嵌套 token、未知语言和多行样例在两种主题下的 ANSI；`issue120_markdown_test.go` 比较默认样式、标题、引用、列表、代码和链接在 80/24 列下的逐字符颜色与装饰；`issue120_watch_test.go` 验证连续写入 debounce、路径切换及释放。
+目录条目 `contract:codingagent/interactive-themes` 记录本票已实现。新增证据：`issue120_menu_test.go` 比较搜索、主题子菜单文案/布局及逐层返回；`issue120_syntax_test.go` 比较 22 个语言/别名、嵌套 token、未知语言和多行样例在两种主题下的 ANSI；`issue120_markdown_test.go` 比较默认样式、标题、引用、列表、代码和链接在 80/24 列下的逐字符颜色与装饰；`issue120_watch_test.go` 验证连续写入 debounce、启动/跨目录重绑窗口、路径切换及释放。
 
 `NewThemeSettingsComponent` 可在 SDK 中复用主题子菜单；`Theme.MarkdownTheme().HighlightCode` 使用当前主题，`HighlightCode` 等无接收者辅助函数使用内置 dark。高亮规则为内置的 highlight.js 10.7.3，纯 Go 运行，不要求用户安装 Node。生成和版本偏离说明见 ADR-0038。
 

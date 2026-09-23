@@ -206,6 +206,10 @@ func (c *ThemeController) Watch(ctx context.Context, changed func(error)) {
 				}
 			}
 		}
+		if path != "" {
+			timer.Reset(100 * time.Millisecond)
+			pending = timer.C
+		}
 	}
 	bind()
 	for {

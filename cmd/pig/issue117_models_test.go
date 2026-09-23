@@ -40,6 +40,9 @@ func TestPigModelSelection117(t *testing.T) {
 	tty.Wait(t, "Thinking Level")
 	tty.Send(t, "\x1b[A\r")
 	tty.Wait(t, "Thinking: off")
+	waitScreen116(t, tty, func(screen string) bool { return strings.Contains(screen, "Type to search") })
+	tty.Send(t, "\x1b[27u")
+	waitScreen116(t, tty, func(screen string) bool { return !strings.Contains(screen, "Type to search") })
 	tty.Send(t, "question\r")
 	tty.Wait(t, "MODEL_DONE")
 	select {
