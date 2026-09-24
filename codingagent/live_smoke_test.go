@@ -54,9 +54,11 @@ func TestDeepSeekLiveHeadlessReadContinuation(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 	environment := ai.ProviderEnv{"DEEPSEEK_API_KEY": key}
+	system := "Follow the user's test instructions. Use the read tool only for sentinel.txt when requested."
 
 	textOutcome := runLiveHeadless(t, ctx, codingagent.CreateHeadlessSessionOptions{
 		CWD: t.TempDir(), Provider: ai.ProviderIDDeepSeek, Model: "deepseek-v4-flash", Environment: environment,
+		AgentDir: t.TempDir(), SystemPrompt: &system, NoTools: codingagent.NoToolsAll, NoContextFiles: true, NoExtensions: true, NoSkills: true, NoPromptTemplates: true, NoThemes: true,
 	}, "Reply with the single word ok.")
 	if textOutcome.FinalMessage == nil || textOutcome.FinalMessage.StopReason != ai.StopReasonStop ||
 		strings.TrimSpace(strings.Join(textOutcome.Text, "")) == "" {
@@ -70,6 +72,7 @@ func TestDeepSeekLiveHeadlessReadContinuation(t *testing.T) {
 	}
 	runtime, err := codingagent.CreateHeadlessSession(ctx, codingagent.CreateHeadlessSessionOptions{
 		CWD: cwd, Provider: ai.ProviderIDDeepSeek, Model: "deepseek-v4-flash", Environment: environment, Tools: []string{"read"}, SessionManager: codingagent.NewInMemorySessionManager(cwd),
+		AgentDir: t.TempDir(), SystemPrompt: &system, NoContextFiles: true, NoExtensions: true, NoSkills: true, NoPromptTemplates: true, NoThemes: true,
 	})
 	if err != nil {
 		t.Fatal(err)

@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/interactive-mode.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/interactive/m6-workflow/fullscreen",
+    "catalog_id": "contract:codingagent/m6-workflow",
+    "surface": "cli",
+    "input": {
+      "mode": "fullscreen",
+      "steps": [
+        "theme watch retains draft",
+        "settings and selector cancellation",
+        "excluded Bash",
+        "paste and external editor",
+        "session stats",
+        "compact with instructions and continued context",
+        "reload templates skills and context",
+        "HTML export and failure",
+        "compaction failure and cancellation",
+        "continue and exit",
+        "steering and follow-up queue after maintenance",
+        "resize and page navigation"
+      ],
+      "terminal": {
+        "rows": 40,
+        "columns": 120
+      }
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "mode": "fullscreen",
+      "edited_input": true,
+      "theme_reloaded": true,
+      "setting_saved": true,
+      "bash_recorded": true,
+      "stats_visible": true,
+      "summary_visible": true,
+      "compact_context": true,
+      "reload_visible": true,
+      "template_context": true,
+      "context_reloaded": true,
+      "skill_context": true,
+      "exported": true,
+      "compactions": [
+        "SUMMARY_MARKER"
+      ],
+      "commands_not_prompts": true,
+      "queued_in_order": true,
+      "continued": true,
+      "exit_code": 0,
+      "restored": true
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:b29327c25258cbb661359f459e090ce241d1e0e8624c8e025be73daedba4f73b",
+  "observation_hash": "sha256:a9235321c49a262a631b1f9a554ca1175ff2ab6af9ededb43fd5235e3cf0e718",
+  "execution_method": "node parity/oracle/m6-workflow.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "terminal": "xterm-256color",
+    "transport": "real child process + PTY; offline controlled SSE and local resources and HTML"
+  }
+}

@@ -191,6 +191,7 @@ func (m *InteractiveMode) sessionChanged(status string) error {
 	}
 	m.transcript.mu.Lock()
 	m.transcript.bashes = nil
+	m.transcript.notices = nil
 	m.transcript.mu.Unlock()
 	if err = m.transcript.SetMessages(messages); err != nil {
 		return err
@@ -209,7 +210,7 @@ func (m *InteractiveMode) sessionChanged(status string) error {
 	for _, d := range m.runtime.Diagnostics() {
 		_ = m.ShowWarning(d.Message)
 	}
-	return m.ui.Append("\n" + status + " · " + optionalHeadlessString(session.SessionManager().GetSessionName()) + "\n")
+	return m.appendNotice("\n" + status + " · " + optionalHeadlessString(session.SessionManager().GetSessionName()) + "\n")
 }
 func (m *InteractiveMode) prepareSessionSettings(ctx context.Context, cwd string) (*SettingsManager, error) {
 	if cwd == m.runtime.CWD() {

@@ -183,7 +183,7 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 	}
 	quiet, _ := m.runtime.Session().SettingsManager().GetQuietStartup()
 	if !quiet {
-		if err := m.ui.Append("pig · /settings · /hotkeys\n"); err != nil {
+		if err := m.appendNotice("pig · /settings · /hotkeys\n"); err != nil {
 			return err
 		}
 	}
@@ -251,10 +251,10 @@ func (m *InteractiveMode) GetUserInput(ctx context.Context) (string, error) {
 	}
 }
 func (m *InteractiveMode) ShowError(message string) error {
-	return m.ui.Append("\nError: " + message + "\n")
+	return m.appendNotice("\nError: " + message + "\n")
 }
 func (m *InteractiveMode) ShowWarning(message string) error {
-	return m.ui.Append("\nWarning: " + message + "\n")
+	return m.appendNotice("\nWarning: " + message + "\n")
 }
 func (*InteractiveMode) ShowNewVersionNotification(LatestRelease) error {
 	return notImplemented("InteractiveMode.ShowNewVersionNotification")
@@ -815,4 +815,9 @@ func (m *InteractiveMode) interruptHint() string {
 		}
 	}
 	return "interrupt"
+}
+
+func (m *InteractiveMode) appendNotice(text string) error {
+	m.transcript.appendNotice(text)
+	return m.ui.Refresh()
 }
