@@ -34,7 +34,7 @@ with tempfile.TemporaryDirectory(prefix='bash122-') as tmp:
  def wait(check):
   end=time.monotonic()+15
   while not check():
-   if time.monotonic()>end or p.poll()!=None: raise RuntimeError(f'timeout ({p.poll()}): {output[-6000:]!r}')
+   if (time.monotonic()>end or p.poll()!=None) and not check(): raise RuntimeError(f'timeout ({p.poll()}): {output[-6000:]!r}')
    pump(.03)
  def send(data):
   global output
