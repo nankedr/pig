@@ -35,6 +35,7 @@ type InteractiveMode struct {
 	progressMu                    sync.Mutex
 	retry                         *AgentSessionAutoRetryStartEvent
 	retryUntil                    time.Time
+	maintenance                   string
 	setupErr                      error
 	transcript                    *Transcript
 	renderSession                 atomic.Pointer[AgentSession]
@@ -102,6 +103,9 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 		if retry := mode.retry; retry != nil {
 			seconds := max(0, int(time.Until(mode.retryUntil).Seconds()+0.999))
 			lines = append(lines, fmt.Sprintf("Retrying (%d/%d) in %ds... (%s to cancel)", retry.Attempt, retry.MaxAttempts, seconds, mode.interruptHint()))
+		}
+		if mode.maintenance != "" {
+			lines = append(lines, mode.maintenance)
 		}
 		mode.progressMu.Unlock()
 		return lines, nil
@@ -333,6 +337,9 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 			}
 		}
 	}()
+	var maintenanceDone chan maintenanceResult
+	var maintenanceCancel context.CancelFunc
+	var maintenanceName string
 	var bashDone chan error
 	var bashCancel context.CancelFunc
 	var bashID uint64
@@ -343,6 +350,10 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 	var turnID uint64
 	defer func() {
 		cancel()
+		if maintenanceCancel != nil {
+			maintenanceCancel()
+			<-maintenanceDone
+		}
 		if bashCancel != nil {
 			bashCancel()
 		}
@@ -393,6 +404,16 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 		}
 		return m.ui.Refresh()
 	}
+	finishMaintenance := func(result maintenanceResult) error {
+		maintenanceCancel()
+		maintenanceCancel, maintenanceDone = nil, nil
+		m.ui.SetTurn(0)
+		m.progressMu.Lock()
+		m.maintenance = ""
+		m.progressMu.Unlock()
+		return m.finishMaintenance(maintenanceName, result)
+	}
+
 	m.settleSession = func() error {
 		if bashDone != nil {
 			bashCancel()
@@ -417,16 +438,21 @@ loop:
 	for {
 		var input tui.TextInput
 		literalPrompt := false
-		if turnDone == nil && len(pendingPrompts) > 0 {
+		if maintenanceDone == nil && turnDone == nil && len(pendingPrompts) > 0 {
 			input.Text, pendingPrompts = pendingPrompts[0], pendingPrompts[1:]
 			literalPrompt = true
-		} else if turnDone == nil && len(prompts) > 0 {
+		} else if maintenanceDone == nil && turnDone == nil && len(prompts) > 0 {
 			input.Text, prompts = prompts[0], prompts[1:]
 		} else {
 			select {
 			case <-runCtx.Done():
 				err = runCtx.Err()
 				break loop
+			case result := <-maintenanceDone:
+				if err = finishMaintenance(result); err != nil {
+					break loop
+				}
+				continue
 			case bashErr := <-bashDone:
 				if err = finishBash(bashErr); err != nil {
 					break loop
@@ -443,6 +469,15 @@ loop:
 				}
 				continue
 			case input = <-inputs:
+			}
+		}
+		if maintenanceDone != nil {
+			select {
+			case result := <-maintenanceDone:
+				if err = finishMaintenance(result); err != nil {
+					break loop
+				}
+			default:
 			}
 		}
 		if bashDone != nil {
@@ -475,6 +510,17 @@ loop:
 		literalPrompt = literalPrompt || turnDone != nil && input.Action == "app.message.followUp"
 		if !literalPrompt && strings.TrimSpace(input.Text) == "/quit" {
 			break
+		}
+		if maintenanceDone != nil {
+			if input.Action == "app.interrupt" {
+				maintenanceCancel()
+			} else {
+				if input.Text != "" {
+					_ = m.ui.PrependEditor(input.Text)
+				}
+				_ = m.ShowWarning("Wait for " + maintenanceName + " to finish; input restored to editor")
+			}
+			continue
 		}
 		session := m.runtime.Session()
 		if handled, actionErr := m.modelAction(runCtx, input.Action); handled {
@@ -521,6 +567,40 @@ loop:
 			input.Text = "/new"
 		case "app.session.resume":
 			input.Text = "/resume"
+		}
+
+		if !literalPrompt {
+			name, argument, _ := strings.Cut(strings.TrimSpace(input.Text), " ")
+			if name == "/compact" || name == "/reload" {
+				if name == "/reload" && (turnDone != nil || session.IsStreaming()) {
+					_ = m.ShowWarning("Wait for the current response to finish before reloading.")
+					continue
+				}
+				if name == "/compact" && bashDone != nil {
+					_ = m.ShowWarning("Wait for the bash command to finish before compacting.")
+					continue
+				}
+				if name == "/compact" && turnDone != nil {
+					if err = m.settleSession(); err != nil {
+						break loop
+					}
+				}
+				maintenanceName = strings.TrimPrefix(name, "/")
+				maintenanceCtx, stop := context.WithCancel(runCtx)
+				maintenanceCancel = stop
+				maintenanceDone = make(chan maintenanceResult, 1)
+				// Reuse the input generation stamp to ignore interrupts from a previous operation.
+				turnID++
+				m.ui.SetTurn(turnID)
+				m.progressMu.Lock()
+				m.maintenance = maintenanceProgress(maintenanceName) + " (" + m.interruptHint() + " to cancel)"
+				m.progressMu.Unlock()
+				_ = m.ui.Refresh()
+				go func(name, argument string, done chan<- maintenanceResult) {
+					done <- m.runMaintenance(maintenanceCtx, name, argument)
+				}(maintenanceName, argument, maintenanceDone)
+				continue
+			}
 		}
 
 		if !literalPrompt && strings.HasPrefix(strings.TrimSpace(input.Text), "!") {

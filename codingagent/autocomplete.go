@@ -103,11 +103,11 @@ func (m *InteractiveMode) handleCommand(ctx context.Context, prompt string) (boo
 			return true, m.showHotkeys()
 		case "settings":
 			return true, m.selectSettings(ctx)
-		case "reload":
-			if err := m.runtime.Session().Reload(ctx); err != nil {
-				return true, err
-			}
-			return true, m.reloadThemes()
+		case "session":
+			return true, m.showSessionStats()
+		case "export":
+			return true, m.finishMaintenance("export", m.runMaintenance(ctx, "export", argument))
+
 		}
 		if name == "new" {
 			return true, m.newSession(ctx)

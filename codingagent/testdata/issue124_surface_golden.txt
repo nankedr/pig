@@ -1,0 +1,18 @@
+func(*codingagent.AgentSessionRuntime, ...codingagent.InteractiveModeOptions) *codingagent.InteractiveMode
+func(*codingagent.InteractiveMode, context.Context) error
+func(*codingagent.AgentSession, context.Context, ...string) (codingagent.CompactionResult, error)
+func(*codingagent.AgentSession, context.Context) error
+func(*codingagent.AgentSession) (codingagent.SessionStats, error)
+func(*codingagent.AgentSession, context.Context, ...string) (string, error)
+type codingagent.SessionStats struct
+fields:
+- AssistantMessages int tag=""
+- ToolCalls int tag=""
+- ToolResults int tag=""
+- TotalMessages int tag=""
+- UserMessages int tag=""
+- ContextUsage *codingagent.ContextUsage tag=""
+- Cost float64 tag=""
+- SessionFile *string tag=""
+- SessionID string tag=""
+- Tokens ai.Usage tag=""

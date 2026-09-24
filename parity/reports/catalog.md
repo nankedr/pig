@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9693
+- Total entries: 9694
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5147 |
 | scaffolded | 3620 |
-| partial | 623 |
+| partial | 624 |
 | implemented | 133 |
 | verified | 167 |
 | deferred | 3 |
@@ -7816,6 +7816,7 @@
 | contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
 | contract:codingagent/interactive-bash | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-branches | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
+| contract:codingagent/interactive-maintenance | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-queues | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-settings | partial | M6 | contract | github.com/nankedr/pig/codingagent.SettingsSelectorComponent | coding-agent |
 | contract:codingagent/interactive-text | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |

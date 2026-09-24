@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0.0",
+  "deterministic": true,
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "upstream": {
+    "repository": "https://github.com/badlogic/pi-mono",
+    "commit": "936aff00918de1187f085f123c2812d8f2d67745",
+    "reference": "packages/coding-agent/src/modes/interactive/interactive-mode.ts"
+  },
+  "case": {
+    "schema_version": "1.0.0",
+    "id": "cli/interactive/maintenance-cli",
+    "catalog_id": "contract:codingagent/interactive-maintenance",
+    "surface": "cli",
+    "input": {
+      "steps": [
+        "session stats",
+        "compact with instructions and continued context",
+        "reload templates skills and context",
+        "HTML export and failure",
+        "compaction failure and cancellation",
+        "continue and exit"
+      ],
+      "terminal": {
+        "rows": 40,
+        "columns": 120
+      }
+    },
+    "observe": [
+      "outcome",
+      "side_effects"
+    ]
+  },
+  "observation": {
+    "outcome": {
+      "stats_visible": true,
+      "summary_visible": true,
+      "compact_context": true,
+      "reload_visible": true,
+      "template_context": true,
+      "context_reloaded": true,
+      "skill_context": true,
+      "exported": true,
+      "compactions": [
+        "SUMMARY_MARKER"
+      ],
+      "commands_not_prompts": true,
+      "continued": true,
+      "exit_code": 0,
+      "restored": true
+    },
+    "side_effects": []
+  },
+  "input_hash": "sha256:01f2ff8c24d7550e06e9c8736b236065ec7db65976f286390cc167e0671baf40",
+  "observation_hash": "sha256:292f2447b013f2199a584f3125d1999665855c1d6c5bb8119f67066ae6b54088",
+  "execution_method": "node parity/oracle/maintenance-cli.mjs <locked-pi-checkout>",
+  "platform": "posix",
+  "environment": {
+    "terminal": "xterm-256color",
+    "transport": "real child process + PTY; offline controlled SSE and local resources and HTML"
+  }
+}

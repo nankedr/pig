@@ -286,3 +286,7 @@ m6-bash-oracle: m0-node-preflight
 .PHONY: m6-external-editor-oracle
 m6-external-editor-oracle: m0-node-preflight
 	node parity/oracle/external-editor-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+.PHONY: m6-maintenance-oracle
+m6-maintenance-oracle: m0-node-preflight
+	node parity/oracle/maintenance-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
