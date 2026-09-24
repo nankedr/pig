@@ -118,6 +118,8 @@ func TestPigMaintenanceBusyAndDiagnostics124(t *testing.T) {
 
 func TestPigMaintenanceRetryStats124(t *testing.T) {
 	var calls atomic.Int32
+	finish, complete := context.WithCancel(context.Background())
+	defer complete()
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if calls.Add(1) == 1 {
 			w.WriteHeader(http.StatusServiceUnavailable)
@@ -125,7 +127,14 @@ func TestPigMaintenanceRetryStats124(t *testing.T) {
 			return
 		}
 		w.Header().Set("Content-Type", "text/event-stream")
-		fmt.Fprint(w, "data: {\"choices\":[{\"delta\":{\"content\":\"RETRY_RECOVERED\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":120,\"completion_tokens\":20,\"total_tokens\":140}}\n\ndata: [DONE]\n\n")
+		fmt.Fprint(w, "data: {\"choices\":[{\"delta\":{\"content\":\"RETRY_RECOVERED\"}}]}\n\n")
+		w.(http.Flusher).Flush()
+		select {
+		case <-finish.Done():
+		case <-r.Context().Done():
+			return
+		}
+		fmt.Fprint(w, "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":120,\"completion_tokens\":20,\"total_tokens\":140}}\n\ndata: [DONE]\n\n")
 	}))
 	defer server.Close()
 	tty, _, done := startQueues116(t, server.URL, `{"quietStartup":true,"compaction":{"enabled":false},"retry":{"enabled":true,"maxRetries":2,"baseDelayMs":500,"provider":{"maxRetries":0}}}`)
@@ -134,6 +143,16 @@ func TestPigMaintenanceRetryStats124(t *testing.T) {
 	tty.Wait(t, "RETRY_RECOVERED")
 	tty.Send(t, "/session\r")
 	tty.Wait(t, "Session Info")
+	tty.Wait(t, "Input: 0")
+	complete()
+	deadline := time.Now().Add(5 * time.Second)
+	for strings.Contains(tty.ScreenText(), "Retrying (1/2)") {
+		if time.Now().After(deadline) {
+			t.Fatal("retry did not settle")
+		}
+		time.Sleep(5 * time.Millisecond)
+	}
+	tty.Send(t, "/session\r")
 	tty.Wait(t, "Input: 120")
 	tty.Wait(t, "Output: 20")
 	tty.Wait(t, "Total: 140")

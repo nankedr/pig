@@ -35,3 +35,5 @@ API snapshots、Catalog、证据文件的变动必须经过审计后更新 `inte
 用户最新决定为“人工验收先跳过，可以继续更新issue状态，包括父issue”。已同步 #125 和父 #8 的自动验收清单及本轮人工验收跳过状态；[人工步骤](../learning/m6-manual-acceptance.md) 保留。完整 freeze（含受保护 live smoke）、tag/Release 与公开版本安装仍待完成，两张 issue 保持开放；#99/M7/M11/M12/M13 边界不变。本次仅更新验收进度，不改写人工证据或发布脚本的检查结果。
 
 后续授权：用户要求“继续未完成项，直到关闭两个issue”。v0.6.0 允许上述人工验收豁免，其余冻结与公开安装要求不变。最终冻结 commit、日志、发布校验和及公开安装证明以 [Release 附件](https://github.com/nankedr/pig/releases/tag/v0.6.0) 为准；以上表格保留发布前工作区验收历史。
+
+发布冻结中，`TestPigMaintenanceRetryStats124` 暴露测试同步缺口：看到流式回复文本时，用量可能尚未结算，`/session` 返回当时的历史快照。受控 SSE 屏障稳定复现了旧断言失败（13.7s）；测试现分别断言生成中的 Input: 0、重试结束后的 Input: 120 / Output: 20 / Total: 140。保留真实 CLI/PTY 边界和用量断言，不通过延长固定 sleep 或放宽期望掩盖时序问题。
