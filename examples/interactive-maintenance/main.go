@@ -50,7 +50,12 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	created, err := codingagent.CreateAgentSession(ctx, codingagent.CreateAgentSessionOptions{CWD: dir, AgentDir: dir, Model: &model, StreamFunction: stream, SettingsManager: settings, NoTools: codingagent.NoToolsAll})
+	sessionDir := filepath.Join(dir, "sessions")
+	manager, err := codingagent.NewSessionManager(dir, &sessionDir)
+	if err != nil {
+		return err
+	}
+	created, err := codingagent.CreateAgentSession(ctx, codingagent.CreateAgentSessionOptions{CWD: dir, AgentDir: dir, Model: &model, StreamFunction: stream, SettingsManager: settings, SessionManager: manager, NoTools: codingagent.NoToolsAll})
 	if err != nil {
 		return err
 	}
