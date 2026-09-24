@@ -135,5 +135,5 @@ func (m *InteractiveMode) showHotkeys() error {
 		return err
 	}
 	fmt.Fprintf(&out, "Empty editor double %s: %s · TUI: %s · Hide thinking: %t\nSteering: %s · Follow-up: %s\n/settings: change interaction settings\n", m.bindingHint("app.interrupt"), c.DoubleEscapeAction, m.ui.Mode(), m.ui.HideThinking(), c.SteeringMode, c.FollowUpMode)
-	return m.ui.Append(out.String())
+	return m.appendNotice(out.String())
 }

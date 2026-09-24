@@ -19,7 +19,7 @@ func (m *InteractiveMode) configurationReady() error {
 }
 func (m *InteractiveMode) modelStatus() error {
 	s := m.runtime.Session()
-	return m.ui.Append(fmt.Sprintf("\nModel: %s [%s] · Thinking: %s\n", s.Model().ID, s.Model().Provider, s.ThinkingLevel()))
+	return m.appendNotice(fmt.Sprintf("\nModel: %s [%s] · Thinking: %s\n", s.Model().ID, s.Model().Provider, s.ThinkingLevel()))
 }
 func (m *InteractiveMode) modelAction(ctx context.Context, action tui.Keybinding) (bool, error) {
 	s := m.runtime.Session()

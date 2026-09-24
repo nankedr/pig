@@ -13,7 +13,7 @@ func (m *InteractiveMode) selectFork(ctx context.Context) error {
 		return err
 	}
 	if len(messages) == 0 {
-		return m.ui.Append("\nNo messages to fork from\n")
+		return m.appendNotice("\nNo messages to fork from\n")
 	}
 	selected := ""
 	done, finish := selectorSignal()
@@ -46,7 +46,7 @@ func (m *InteractiveMode) selectTree(ctx context.Context) error {
 			return err
 		}
 		if len(tree) == 0 {
-			return m.ui.Append("\nNo entries in session\n")
+			return m.appendNotice("\nNo entries in session\n")
 		}
 		mode, err := s.SettingsManager().GetTreeFilterMode()
 		if err != nil {
@@ -79,7 +79,7 @@ func (m *InteractiveMode) selectTree(ctx context.Context) error {
 			return err
 		}
 		if selected == optionalHeadlessString(manager.GetLeafID()) {
-			return m.ui.Append("\nAlready at this point\n")
+			return m.appendNotice("\nAlready at this point\n")
 		}
 		initial = selected
 		options, back, err := m.branchSummaryOptions(ctx)
@@ -99,7 +99,7 @@ func (m *InteractiveMode) selectTree(ctx context.Context) error {
 		}
 		result, err := m.navigateTree(ctx, selected, options)
 		if result.Aborted {
-			_ = m.ui.Append("\nBranch summarization cancelled\n")
+			_ = m.appendNotice("\nBranch summarization cancelled\n")
 			if ctx.Err() != nil {
 				return ctx.Err()
 			}
@@ -109,7 +109,7 @@ func (m *InteractiveMode) selectTree(ctx context.Context) error {
 			return err
 		}
 		if result.Cancelled {
-			return m.ui.Append("\nNavigation cancelled\n")
+			return m.appendNotice("\nNavigation cancelled\n")
 		}
 		m.sessionRevision++
 		if err = m.sessionChanged("Navigated to selected point"); err != nil {

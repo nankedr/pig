@@ -1,5 +1,7 @@
 # Pig
 
+M6/v0.6.0 的组合验收、未完成范围与发布前置条件见 [M6 冻结](docs/learning/m6-freeze.md)；真实终端人工验收按用户授权跳过，发布证据明确记录豁免。
+
 M6.11 的历史消息 fork、树导航、标签和离开分支摘要见 [交互分支导航](docs/learning/m6-interactive-branches.md)与 [源码映射](docs/mappings/typescript-to-go/m6-interactive-branches.md)。
 
 M6.9 的模型搜索、thinking 选择与模型范围配置见 [模型与 thinking](docs/learning/m6-model-selection.md)。
@@ -16,7 +18,7 @@ M4.1 已支持显式 grep 搜索并继续编码任务，见 [grep 学习材料](
 
 Pig 是 Pi 固定版本的 Go 语义兼容实现。v0.5.0 交付 M5 本地资源：Context File、system prompt、模板、Skill、主题及重载，支持继续和恢复同一会话、导出主题 HTML；保留 M1–M4 的工具、编排与 JSONL RPC 能力。
 
-当前推进 [M6 Interactive](https://github.com/nankedr/pig/issues/8)。Pi 包生态兼容按 [ADR-0034](docs/adr/0034-defer-package-ecosystem.md) 延期，由 [#99](https://github.com/nankedr/pig/issues/99) 保留 V1 未完成范围，尚未排期。
+M6 Interactive 的验收与发布状态见 [M6 Interactive](https://github.com/nankedr/pig/issues/8)。Pi 包生态兼容按 [ADR-0034](docs/adr/0034-defer-package-ecosystem.md) 延期，由 [#99](https://github.com/nankedr/pig/issues/99) 保留 V1 未完成范围，尚未排期。
 
 M3.8 支持显式 write 创建/覆盖文件并继续对话，见 [write 与回读](docs/learning/m3-write-tool.md)。
 M3.9 支持显式 edit 精确/模糊多区域替换、准确 diff 和回读，见 [edit 与回读](docs/learning/m3-edit-tool.md)及 [TypeScript → Go](docs/mappings/typescript-to-go/m3-edit-tool.md)。

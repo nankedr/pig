@@ -290,3 +290,32 @@ m6-external-editor-oracle: m0-node-preflight
 .PHONY: m6-maintenance-oracle
 m6-maintenance-oracle: m0-node-preflight
 	node parity/oracle/maintenance-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+.PHONY: m6-gate m6-repeat m6-oracle m6-clean m6-manual m6-freeze
+.NOTPARALLEL: m6-gate m6-freeze m6-oracle
+
+m6-gate: m5-gate m6-repeat
+	python3 scripts/m6-audit.py
+
+m6-repeat:
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent ./tui -run 'Test(InteractiveSDK|InteractiveMaintenanceStop|ExternalEditorStopAndCancel|InteractiveBash|InteractiveThemeRenderAfterStop|ThemeWatch|InteractiveQueueTake)' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT PIG_TEST_RACE=1 go test -race ./cmd/pig ./internal/m6gate -run 'Test(PigM6Workflow|M6SDKWorkflow|Pig.*(111|116|123|124|125))' -count=3 -shuffle=on
+
+m6-oracle: m5-oracle m6-keys-oracle m6-text-oracle m6-queues-oracle m6-sessions-oracle m6-branches-oracle m6-themes-oracle m6-settings-oracle m6-bash-oracle m6-external-editor-oracle m6-maintenance-oracle
+	node parity/oracle/interactive.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/editor.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/editor-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/layout-scrolling.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/layout-scrolling-cli.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/trust-dialog.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node parity/oracle/m6-workflow.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+
+m6-clean:
+	@set -eu; state=$$(git status --porcelain=v1 --untracked-files=all); \
+		test -z "$$state" || (echo "M6 freeze requires a clean Pig checkout" >&2; exit 2)
+
+m6-manual:
+	python3 scripts/m6-evidence.py "$(PIG_M6_MANUAL_EVIDENCE)"
+
+m6-freeze: m6-clean m6-manual m3-node-preflight m6-gate m6-oracle m4-html-browser m0-source-drift m1-live-smoke
+	@$(MAKE) --no-print-directory m6-clean m6-manual

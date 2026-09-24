@@ -11,10 +11,7 @@ import (
 	"testing"
 )
 
-func TestM5ReleaseVersion(t *testing.T) {
-	if codingagent.Version != "0.5.0" {
-		t.Fatalf("SDK version = %s", codingagent.Version)
-	}
+func TestM5CLIAndSDKVersion(t *testing.T) {
 	for _, flag := range []string{"--version", "-v"} {
 		result, err := codingagent.RunCLI(context.Background(), codingagent.CLIInvocation{Arguments: []string{flag}})
 		if err != nil || result.Stdout != codingagent.Version+"\n" || result.Stderr != "" {

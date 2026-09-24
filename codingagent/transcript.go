@@ -15,10 +15,22 @@ type Transcript struct {
 	outputPad              int
 	mu                     sync.Mutex
 	messages               []agent.AgentMessage
+	notices                []transcriptNotice
 	bashes                 []*BashExecutionComponent
 	current                int
 	tools                  map[string]*ToolExecutionComponent
 	expanded, hideThinking bool
+}
+
+type transcriptNotice struct {
+	before int
+	text   string
+}
+
+func (t *Transcript) appendNotice(text string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.notices = append(t.notices, transcriptNotice{len(t.messages), tui.SafeTerminalText(text)})
 }
 
 func (t *Transcript) SetTheme(theme *Theme) { t.mu.Lock(); defer t.mu.Unlock(); t.theme = theme }
@@ -53,6 +65,9 @@ func (t *Transcript) SetMessages(messages []agent.AgentMessage) error {
 	}
 	clear(t.bashes[len(remaining):])
 	t.bashes = remaining
+	for i := range t.notices {
+		t.notices[i].before = min(t.notices[i].before, len(messages))
+	}
 	t.messages = nil
 	t.tools = make(map[string]*ToolExecutionComponent)
 	t.current = -1
@@ -146,7 +161,21 @@ func (t *Transcript) Render(width int) ([]string, error) {
 		lines = append(lines, part...)
 		return err
 	}
-	for _, message := range t.messages {
+	notice := 0
+	appendNotices := func(before int) {
+		for notice < len(t.notices) && t.notices[notice].before <= before {
+			part, _ := tui.WrapTextWithANSI(t.notices[notice].text, width)
+			if t.theme != nil {
+				for i := range part {
+					part[i] = t.theme.FG("text", part[i])
+				}
+			}
+			lines = append(lines, part...)
+			notice++
+		}
+	}
+	for i, message := range t.messages {
+		appendNotices(i)
 		if raw, ok := message.(interface{ RawJSON() json.RawMessage }); ok && message.MessageRole() == "bashExecution" {
 			var bash agent.BashExecutionMessage
 			if err := json.Unmarshal(raw.RawJSON(), &bash); err != nil {
@@ -216,6 +245,7 @@ func (t *Transcript) Render(width int) ([]string, error) {
 			}
 		}
 	}
+	appendNotices(len(t.messages))
 	for _, c := range t.bashes {
 		c.mu.Lock()
 		c.theme = t.theme

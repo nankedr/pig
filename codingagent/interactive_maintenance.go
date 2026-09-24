@@ -68,14 +68,14 @@ func (m *InteractiveMode) finishMaintenance(name string, result maintenanceResul
 		if err := m.transcript.SetMessages(m.transcriptMessages()); err != nil {
 			return err
 		}
-		return m.ui.Append(fmt.Sprintf("\nCompacted from %d tokens\n%s\n", result.compaction.TokensBefore, result.compaction.Summary))
+		return m.appendNotice(fmt.Sprintf("\nCompacted from %d tokens\n%s\n", result.compaction.TokensBefore, result.compaction.Summary))
 	case "reload":
 		if err := m.refreshResources(); err != nil {
 			return m.ShowError("Reload failed: " + err.Error())
 		}
-		return m.ui.Append("\nReloaded keybindings, skills, prompts, themes, and context files\n")
+		return m.appendNotice("\nReloaded keybindings, skills, prompts, themes, and context files\n")
 	case "export":
-		return m.ui.Append("\nSession exported to: " + result.path + "\n")
+		return m.appendNotice("\nSession exported to: " + result.path + "\n")
 	}
 	return nil
 }
@@ -153,5 +153,5 @@ func (m *InteractiveMode) showSessionStats() error {
 		fmt.Fprintf(&b, "Tokens: %d / %d (%.1f%%)\n", *c.Tokens, c.ContextWindow, *c.Percent)
 	}
 	fmt.Fprintf(&b, "\nFull history\nMessages: %d (User: %d, Assistant: %d, Tools: %d calls, %d results)\nInput: %d\nOutput: %d\nCache read: %d\nCache write: %d\nTotal: %d\nCost: $%.6f\n", stats.TotalMessages, stats.UserMessages, stats.AssistantMessages, stats.ToolCalls, stats.ToolResults, stats.Tokens.Input+stats.Tokens.CacheRead+stats.Tokens.CacheWrite, stats.Tokens.Output, stats.Tokens.CacheRead, stats.Tokens.CacheWrite, stats.Tokens.TotalTokens, stats.Cost)
-	return m.ui.Append(b.String())
+	return m.appendNotice(b.String())
 }

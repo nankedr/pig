@@ -7,13 +7,13 @@
 
 ## Summary
 
-- Total entries: 9694
+- Total entries: 9695
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5147 |
 | scaffolded | 3620 |
-| partial | 624 |
+| partial | 625 |
 | implemented | 133 |
 | verified | 167 |
 | deferred | 3 |
@@ -7822,6 +7822,7 @@
 | contract:codingagent/interactive-text | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/local-extensions | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader.GetExtensionDiscovery | coding-agent |
 | contract:codingagent/local-resources | partial | M5 | contract | github.com/nankedr/pig/codingagent.DefaultResourceLoader | coding-agent |
+| contract:codingagent/m6-workflow | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/model-selection | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/prompt-templates | partial | M5 | contract | github.com/nankedr/pig/codingagent.AgentSession.PromptTemplates | coding-agent |
 | contract:codingagent/read-tool | partial | M1 | contract | github.com/nankedr/pig/codingagent.CreateReadTool | coding-agent |
