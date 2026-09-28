@@ -1,10 +1,12 @@
 # Pig 架构
 
+交付范围以 [ADR-0043](../adr/0043-versioned-delivery-and-gates.md) 为准：V1 保留 M0–M6 并完成 DeepSeek Responses/图片输入；剩余能力归 V2。下文 M 编号用于历史范围映射，技术语义保持有效，不能从旧编号推导当前排期。
+
 ## 目标与边界
 
-Pig 是 Pi 固定快照在已批准原生 Go 兼容面内的完整复刻，不是功能精简版，也不是基于 Pi 思路重新设计的产品。V1 的主目标是完整复刻三个 Core Module：`ai`、`agent`、`coding-agent`；为了保持它们的真实分层和运行语义，同时完整复刻四个 Supporting Module：`telemetry`、`tui`、`protocol`、`client`。Pi 的 browser/Worker/WASM 表面是已明确排除并登记的范围偏离，不能计入 native parity，也不能因此缩减七个模块的原生能力。
+Pig 是 Pi 固定快照在已批准原生 Go 兼容面内的完整复刻，不是功能精简版，也不是基于 Pi 思路重新设计的产品。V2 完成时的最终目标是完整复刻三个 Core Module：`ai`、`agent`、`coding-agent`；为了保持它们的真实分层和运行语义，同时完整复刻四个 Supporting Module：`telemetry`、`tui`、`protocol`、`client`。Pi 的 browser/Worker/WASM 表面是已明确排除并登记的范围偏离，不能计入 native parity，也不能因此缩减七个模块的原生能力。
 
-V1 不包含 Pi 的 `server`、`evals` 和 `session-backends/sqlite-node`。`protocol`、`client` 与远程会话仍需实现，并通过固定 server package 的测试 host/受控 service 和 fake server 验证互操作，但不能据此宣称 Pig 已提供 Server 或假设上游存在 standalone Coding Agent Server。
+V1/V2 均不包含 Pi 的 `server`、`evals` 和 `session-backends/sqlite-node`。V2 的 `protocol`、`client` 与远程会话仍需实现，并通过固定 server package 的测试 host/受控 service 和 fake server 验证互操作，但不能据此宣称 Pig 已提供 Server 或假设上游存在 standalone Coding Agent Server。
 
 ## 单一 Go module
 
@@ -138,7 +140,7 @@ Capability Stub 统一返回结构化 `NotImplementedError{Module, Operation}`�
 
 ## 运行与发布边界
 
-Pig 使用 Go 1.24，依赖由 `go.mod` 和 `go.sum` 固定。Core Module 保持 CGO-free，平台能力隔离在明确 helper 中。M0 和 M1 只要求本机 `darwin-arm64`；macOS、Linux、Windows 的 amd64/arm64 构建和原生行为，以及 Termux 安装支持，在 M13 成为门禁。V1 不支持 browser 或 WebAssembly。
+Pig 使用 Go 1.24，依赖由 `go.mod` 和 `go.sum` 固定。Core Module 保持 CGO-free，平台能力隔离在明确 helper 中。V1 发布验证只要求本机 `darwin-arm64`；macOS、Linux、Windows 的 amd64/arm64 构建和原生行为，以及 Termux 安装支持，在 V2（原 M13）成为门禁。V1 不支持 browser 或 WebAssembly。
 
 Pig 使用 `~/.pig`、项目 `.pig` 和 `PIG_*`，不与 Pi 的活动目录共享状态。运行时默认不依赖 Pi、Node 或 Pi 运营的服务；在 M7 另行决定扩展运行时前，Node 只出现在 Oracle/M0 提取流程，或用户明确触发的包工作流中。
 

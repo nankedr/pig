@@ -33,7 +33,7 @@ _Avoid_: 字节完全一致、宽松近似解析
 _Avoid_: 仅能编译的 Stub、伪成功演示
 
 **核心模块（Core Module）**:
-Pig V1 主要完整复刻的 `ai`、`agent`、`coding-agent` 模块。
+Pig 最终完整复刻的 `ai`、`agent`、`coding-agent` 模块。
 _Avoid_: 目标包
 
 **支撑模块（Supporting Module）**:
@@ -89,7 +89,7 @@ _Avoid_: Parity Ledger、人工 Checklist、生成报告
 _Avoid_: 在线模型目录、生成的 Go 源码
 
 **能力状态（Capability Status）**:
-一个对等目录条目的证据化生命周期：`inventoried`、`scaffolded`、`partial`、`implemented`、`verified` 或显式 `deferred`。
+独立于 V1/V2 交付版本，一个对等目录条目的证据化生命周期：`inventoried`、`scaffolded`、`partial`、`implemented`、`verified` 或显式 `deferred`。
 _Avoid_: 完成百分比、单一 done 标记
 
 **Headless Coding Agent**:

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-29",
+  "sources": {
+    "deepseek_guide": "https://api-docs.deepseek.com/guides/responses_api/",
+    "deepseek_reference": "https://api-docs.deepseek.com/api/create-response/",
+    "vision": "https://api-docs.deepseek.com/guides/vision/",
+    "openai_state": "https://developers.openai.com/api/docs/guides/conversation-state"
+  },
+  "model_config": {
+    "source": "current-official-docs",
+    "base_url": "https://api.deepseek.com",
+    "api": "openai-responses",
+    "credential_env": "DEEPSEEK_API_KEY",
+    "text_models": [
+      "deepseek-flash",
+      "deepseek-v4-pro"
+    ],
+    "vision_models": [
+      "deepseek-flash"
+    ],
+    "smoke_model": "deepseek-flash",
+    "smoke_verified": false,
+    "note": "仅登记文档支持配置，尚非 Pig 运行支持或 live smoke 证据。不得覆盖历史 snapshot/fixture；旧别名不作为新视觉验收配置。"
+  },
+  "pig_status_source": "parity/catalog.jsonl#catalog_id；本矩阵不维护第二份 Capability Status。共享条目升级前须拆成逐字段/行为条目并逐行绑定证据。",
+  "pi_behavior_rule": "固定 Pi no-op/ignore 必须由源码和 Oracle 证明，不能从 DeepSeek 忽略行为推导；其余未实现非默认调用仍是显式 Stub。服务新增能力不冒充固定 Pi 证据。",
+  "rows": [
+    {
+      "id": "text",
+      "standard": "POST /responses；model、instructions、input；message 内容及角色",
+      "deepseek_support": "supported",
+      "deepseek_behavior": "文本支持；developer 按 user 处理，是服务差异。",
+      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages",
+      "version": "V1",
+      "issue": 131,
+      "verification": "请求/角色转换本地 fixture；Pi 共同语义 Oracle；文本 live smoke"
+    },
+    {
+      "id": "stream",
+      "standard": "语义 SSE，output item/content/delta 和终态",
+      "deepseek_support": "supported",
+      "deepseek_behavior": "使用 completed/incomplete/failed 结束，无 [DONE]；sequence_number 递增。",
+      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#processResponsesStream",
+      "version": "V1",
+      "issue": 131,
+      "verification": "分片/断流/失败/取消、usage 与 partial outcome；不得将异常 EOF 判成功"
+    },
+    {
+      "id": "function-tools",
+      "standard": "function 工具、tool_choice、function_call、function_call_output 与 call_id",
+      "deepseek_support": "supported",
+      "deepseek_behavior": "支持函数工具与结果回传。",
+      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesTools",
+      "version": "V1",
+      "issue": 132,
+      "verification": "参数逐字节前缀、多个 tool call、call_id 关联和真实 continuation"
+    },
+    {
+      "id": "reasoning",
+      "standard": "reasoning options 与输出 item、历史重放",
+      "deepseek_support": "partial",
+      "deepseek_behavior": "effort 与明文 reasoning 可用；summary 不产摘要，encrypted_content 不支持。",
+      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages",
+      "version": "V1",
+      "issue": 132,
+      "verification": "thinking 事件、工具前后 reasoning、本地持久化恢复；服务差异与 Pi 共同语义分开"
+    },
+    {
+      "id": "history",
+      "standard": "完整 input 重放或 previous_response_id/conversation 服务端状态",
+      "deepseek_support": "partial",
+      "deepseek_behavior": "仅本地完整历史；previous_response_id/conversation 不提供续接，传入时服务忽略。",
+      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages",
+      "version": "V1",
+      "issue": 132,
+      "verification": "跨轮/跨进程恢复、分支/压缩；不能靠 response ID 冒充历史"
+    },
+    {
+      "id": "images",
+      "standard": "input_image 与工具结果中的图片内容",
+      "deepseek_support": "supported",
+      "deepseek_behavior": "deepseek-flash 支持 user/developer 与工具 output 图片；system/assistant 图片报 400。",
+      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages",
+      "version": "V1",
+      "issue": 134,
+      "verification": "图片真实进入上下文、工具 continuation、恢复/展示；受保护视觉 smoke"
+    },
+    {
+      "id": "parallel-limits",
+      "standard": "parallel_tool_calls、max_tool_calls",
+      "deepseek_support": "ignored",
+      "deepseek_behavior": "并行始终启用；这两个控制参数不起作用。",
+      "catalog_id": "symbol:ai/src/api/openai-responses.ts#stream",
+      "version": "V1",
+      "issue": 132,
+      "verification": "显式登记服务限制；不能把 false/limit 宣称有效；本地调度语义不变"
+    },
+    {
+      "id": "storage-background",
+      "standard": "store、background、metadata、include 等选项",
+      "deepseek_support": "unsupported",
+      "deepseek_behavior": "不提供持久化/后台能力；服务可接受并忽略，store 始终 false。",
+      "catalog_id": "symbol:ai/src/api/openai-responses.ts#stream",
+      "version": "V2",
+      "issue": 129,
+      "verification": "V1 必须明确能力边界；忽略不等于 Pig 实现，也不等于固定 Pi no-op"
+    },
+    {
+      "id": "format-sampling",
+      "standard": "text.format、text.verbosity、temperature、top_p、max_output_tokens",
+      "deepseek_support": "partial",
+      "deepseek_behavior": "format 可用，verbosity 忽略；sampling 随 thinking 模式变化，详见官方参数表。",
+      "catalog_id": "symbol:ai/src/api/openai-responses.ts#stream",
+      "version": "V2",
+      "issue": 129,
+      "verification": "基础输出上限属 #131；其余高级参数逐字段取证，不从服务接受推导 Pig 已支持"
+    },
+    {
+      "id": "custom-tools",
+      "standard": "custom_tool_call/custom_tool_call_output",
+      "deepseek_support": "partial",
+      "deepseek_behavior": "仅 apply_patch custom 工具受支持，其他名称报 400。",
+      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesTools",
+      "version": "V2",
+      "issue": 129,
+      "verification": "单独实现/验证 custom 分支；V1 函数工具通过不覆盖本行"
+    },
+    {
+      "id": "hosted-tools",
+      "standard": "web_search/file_search/code_interpreter/computer_use/mcp 等",
+      "deepseek_support": "ignored",
+      "deepseek_behavior": "这些工具类型被忽略，不提供对应服务能力。",
+      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesTools",
+      "version": "V2",
+      "issue": 129,
+      "verification": "不得回报工具成功；历史特殊 item 的服务转换单列 fixture"
+    },
+    {
+      "id": "other-options",
+      "standard": "prompt、truncation、service_tier、cache 控制、context_management、stream_options 等",
+      "deepseek_support": "unsupported",
+      "deepseek_behavior": "不支持的顶层参数可被静默忽略；上下文超限报 400，缓存由服务自动管理。",
+      "catalog_id": "symbol:ai/src/api/openai-responses.ts#stream",
+      "version": "V2",
+      "issue": 129,
+      "verification": "不隐式丢弃 Pig 尚未支持的非默认分支；服务差异通过独立 fixture 验证"
+    }
+  ]
+}

@@ -1,17 +1,19 @@
 # 对等验证规范
 
+交付范围以 [ADR-0043](../adr/0043-versioned-delivery-and-gates.md) 为准：V1 保留 M0–M6 并完成 DeepSeek Responses/图片输入；剩余能力归 V2。下文 M 编号用于历史范围映射，技术语义保持有效，不能从旧编号推导当前排期。
+
 ## 目的
 
 本规范定义 Pig 如何证明自己与固定版本 Pi 对等。实现数量、测试通过率或人工印象都不能单独证明完成；每个结论必须能追溯到固定 Parity Baseline、Parity Catalog 和验证证据。
 
 ## 固定基线
 
-Pig V1 的 Parity Baseline 有两个独立来源：
+Pig V1/V2 的 Parity Baseline 有两个独立来源：
 
 1. Code Baseline：Pi 源码 commit `936aff00918de1187f085f123c2812d8f2d67745`；
 2. Catalog Baseline：Pi v0.84.1 官方 source tar，来源 commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，包含 39 个 Provider、1220 个 chat model，artifact SHA-256 为 `294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7`。
 
-`53fa77c` 是 `936aff0` 的祖先，两者相差 40 个 commit。Code Baseline 当次生成的目录 artifact 已过期且没有可恢复发布副本，已知日志和 hash 不能重建响应体；因此 V1 选择最近的较早官方不可变发布物，而不使用实时抓取。这是双来源基线，不是 fixed-run parity：代码、API、行为和 Pi Oracle 以 Code Baseline 为准，模型目录内容以 Catalog Baseline 为准。
+`53fa77c` 是 `936aff0` 的祖先，两者相差 40 个 commit。Code Baseline 当次生成的目录 artifact 已过期且没有可恢复发布副本，已知日志和 hash 不能重建响应体；因此双来源决策选择最近的较早官方不可变发布物，而不使用实时抓取。这是双来源基线，不是 fixed-run parity：代码、API、行为和 Pi Oracle 以 Code Baseline 为准，模型目录内容以 Catalog Baseline 为准。
 
 仓库分别提交 upstream lock 与 Catalog Snapshot manifest，记录 URL、commit、许可证和校验信息；Parity Catalog 的 `contract:baseline/catalog-snapshot` 与 `contract:baseline/image-catalog-snapshot` 条目分别将 chat、image 制品绑定到各自来源 commit 和完整 evidence。普通门禁只离线重放已提交 fixture；专门的 differential/freeze 门禁才验证用户显式提供的 prepared Oracle checkout 与 pristine source checkout 恰好位于 Code Baseline，且不会自动 fetch、install 或 build。Pi 不是 submodule、复制进来的源码树或 Pig 运行时依赖。
 
@@ -38,6 +40,8 @@ M0 Freeze Gate 前建立以下 canonical artifact；版本号写入 schema 与 m
 parity/catalog.jsonl
 parity/catalog.schema.json
 parity/catalog.manifest.json
+parity/delivery-scope.json      # 交付版本与分支归属，不存储完成状态
+parity/responses-matrix.json    # 标准协议/DeepSeek 服务行为；状态引用 catalog_id
 parity/reports/                 # 非权威生成视图
 ```
 
@@ -59,7 +63,7 @@ inventoried -> scaffolded -> partial -> implemented -> verified
 - `verified`：已绑定可重复证据并通过当前门禁。
 - `deferred`：仅用于明确决策，必须指向 ADR 和目标阶段。
 
-状态不能由源码扫描自动推断为完成，也不能只凭一个单元测试升级为 `verified`。V1 最终不允许无解释的 `partial` 或 `deferred`；固定快照明确未实现的 Harness 操作可以保留，并必须验证相同的未实现结果。
+状态不能由源码扫描自动推断为完成，也不能只凭一个单元测试升级为 `verified`。V1 范围内不得有未解释的缺口；V2 全量验收不允许无解释的 `partial` 或 `deferred`；固定快照明确未实现的 Harness 操作可以保留，并必须验证相同的未实现结果。
 
 ## Chat Completions 逐字段 matrix
 
@@ -76,7 +80,7 @@ matrix 至少覆盖，并明确区分“上游公开 API”与“仅供 adapter 
 - absent、null、false、零值、空数组和默认值的差异；
 - Pi 来源符号/字段、Go 名称/类型、适用方向、目标阶段、Capability Status 和证据。
 
-阶段责任固定如下：
+历史阶段责任如下；当前交付版本由 ADR-0043 与 Catalog 版本范围映射：
 
 | 阶段 | 要求 |
 | --- | --- |
@@ -130,10 +134,10 @@ Oracle 流程：
 | faux Provider | Agent Loop、Tool、事件和失败注入 | 否 |
 | Pi Oracle differential | 固定快照语义比较和 fixture 审计 | 否，首次获取 Oracle 除外 |
 | conformance | Telemetry、Provider、Transport、Store 等可替换契约 | 否 |
-| DeepSeek live smoke | M1 真实流式文本和一次 Tool continuation | 是，受保护密钥 |
+| DeepSeek live smoke | V1 文本流、Tool continuation 与视觉闭环（保留 M1 回归） | 是，受保护密钥 |
 | 原生平台/人工 TUI | 终端、信号、剪贴板、视觉和平台命令 | 按 case 声明 |
 
-普通 PR 不使用真实 Provider 密钥。`DEEPSEEK_API_KEY` 只存在于本地或受保护 CI；M1 Freeze Gate 与 release 必须执行受限 token 的 live smoke。模型协议的确定性细节由本地假服务验证。
+普通 PR 不使用真实 Provider 密钥。`DEEPSEEK_API_KEY` 只存在于本地或受保护 CI；V1 Freeze Gate 与 release 必须执行受限 token 的文本、工具 continuation 和视觉 live smoke，缺凭证必须失败；M1 历史入口仅覆盖文本/工具，不能代替 V1 视觉验收。模型协议的确定性细节由本地假服务验证。
 
 ## 关键不变量
 
@@ -161,4 +165,4 @@ DeepSeek live smoke 属于不可逆 `smoke` 证据：因为真实响应不确定
 - 没有未声明的网络、密钥或平台依赖；
 - `partial` 与 Capability Stub 准确描述，不冒充成功。
 
-Catalog 仍有未覆盖 artifact、无证据的 `implemented`、无 ADR 的 `deferred` 或未解释 `partial` 时，不得宣布 V1 完成。
+V1 按 [版本验收](versioned-release.md) 关闭范围内分支、回归已交付能力并验证 V2 Stub；全量 Catalog 的其余缺口阻塞 V2，不隐式阻塞 V1。V2 仍有未覆盖 artifact、无证据的 `implemented`、无 ADR 的 `deferred` 或未解释 `partial` 时，不得宣布完整对等。

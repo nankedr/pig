@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "decision": "docs/adr/0043-versioned-delivery-and-gates.md",
+  "frontier": "V1 Responses",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "catalog_baseline_commit": "53fa77ccd8a279eb87e92294ef3687b03ff80112",
+  "default_remaining_version": "V2",
+  "default_remaining_issue": 127,
+  "semantics": "按分支归属，不按整条 Catalog 状态筛选。catalog_ids 是契约锚点，包含其映射子表面；重叠锚点必须按 branch 区分。所有既有已交付行为均须回归；未被 V1 分支覆盖的约定范围内剩余能力归 V2。M 编号和 Capability Status 不推导版本。",
+  "excluded": [
+    "server",
+    "evals",
+    "session-backends/sqlite-node",
+    "browser",
+    "Worker",
+    "WASM"
+  ],
+  "excluded_catalog_ids": [
+    "deferred-pig-server"
+  ],
+  "scopes": [
+    {
+      "id": "retained",
+      "version": "V1",
+      "issues": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "branch": "仅 M0–M6 已交付并有证据的分支和公开契约；保留全部历史回归，不将整条 partial 视为完成。未实现分支按以下专项或 V2 默认范围处理。",
+      "catalog_ids": [
+        "contract:agent/events",
+        "contract:agent/legacy-queues",
+        "contract:agent/messages",
+        "contract:agent/proxy",
+        "contract:agent/runtime",
+        "contract:agent/state-and-queues",
+        "contract:agent/tools",
+        "contract:ai/api-adapter",
+        "contract:ai/auth",
+        "contract:ai/compat",
+        "contract:ai/content",
+        "contract:ai/context-overflow",
+        "contract:ai/deferred-tools",
+        "contract:ai/event-stream",
+        "contract:ai/faux-provider",
+        "contract:ai/faux-provider/core-stream",
+        "contract:ai/message",
+        "contract:ai/message-handoff",
+        "contract:ai/model",
+        "contract:ai/model-catalog",
+        "contract:ai/models-runtime",
+        "contract:ai/models-store",
+        "contract:ai/options",
+        "contract:ai/provider",
+        "contract:ai/providers-all",
+        "contract:ai/tool",
+        "contract:baseline/catalog-snapshot",
+        "contract:baseline/image-catalog-snapshot",
+        "contract:cli/pig/args",
+        "contract:cli/pig/auth-help",
+        "contract:cli/pig/exit-codes",
+        "contract:cli/pig/experimental",
+        "contract:codingagent/agent-session",
+        "contract:codingagent/bash-tool",
+        "contract:codingagent/branch-summary",
+        "contract:codingagent/compaction",
+        "contract:codingagent/context-files",
+        "contract:codingagent/default-coding-tools",
+        "contract:codingagent/edit-tool",
+        "contract:codingagent/external-editor",
+        "contract:codingagent/find-ls",
+        "contract:codingagent/grep-tool",
+        "contract:codingagent/headless",
+        "contract:codingagent/html-export",
+        "contract:codingagent/interactive-bash",
+        "contract:codingagent/interactive-branches",
+        "contract:codingagent/interactive-maintenance",
+        "contract:codingagent/interactive-queues",
+        "contract:codingagent/interactive-settings",
+        "contract:codingagent/interactive-text",
+        "contract:codingagent/interactive-themes",
+        "contract:codingagent/local-extensions",
+        "contract:codingagent/local-resources",
+        "contract:codingagent/m6-workflow",
+        "contract:codingagent/model-selection",
+        "contract:codingagent/prompt-templates",
+        "contract:codingagent/read-tool",
+        "contract:codingagent/session-bash",
+        "contract:codingagent/session-configuration",
+        "contract:codingagent/session-messages",
+        "contract:codingagent/session-reload",
+        "contract:codingagent/session-selection",
+        "contract:codingagent/session-stats",
+        "contract:codingagent/session-tree-navigation",
+        "contract:codingagent/skills",
+        "contract:codingagent/system-prompts",
+        "contract:codingagent/text-rendering",
+        "contract:codingagent/themes",
+        "contract:codingagent/turn-retry",
+        "contract:codingagent/write-tool",
+        "contract:config/auth-json",
+        "contract:config/models-json",
+        "contract:config/settings",
+        "contract:migration/auth-and-layout",
+        "contract:model-runtime/basic",
+        "contract:release/m5-local-workflow",
+        "contract:rpc/command-union",
+        "contract:rpc/jsonl-transport",
+        "contract:rpc/session-control",
+        "contract:rpc/session-lifecycle",
+        "contract:security/project-trust",
+        "contract:session/migration",
+        "contract:session/v3-jsonl",
+        "contract:telemetry/memory",
+        "contract:tui/autocomplete",
+        "contract:tui/dialogs-trust",
+        "contract:tui/layout-scrolling",
+        "contract:tui/multiline-editor",
+        "contract:tui/terminal-keys",
+        "contract:codingagent/transcript-projection"
+      ]
+    },
+    {
+      "id": "responses",
+      "version": "V1",
+      "issues": [
+        12,
+        131,
+        132,
+        133
+      ],
+      "branch": "DeepSeek Responses 文本/工具/reasoning/本地完整历史重放及 SDK、headless、Interactive、JSONL RPC；服务差异以 responses-matrix.json 为准。",
+      "catalog_ids": [
+        "contract:ai/api-entrypoints",
+        "contract:ai/provider-factories",
+        "symbol:ai/src/api/openai-responses.ts#stream",
+        "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages",
+        "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesTools",
+        "symbol:ai/src/api/openai-responses-shared.ts#processResponsesStream",
+        "contract:codingagent/agent-session",
+        "contract:rpc/session-control"
+      ]
+    },
+    {
+      "id": "image-input",
+      "version": "V1",
+      "issues": [
+        14,
+        134,
+        135,
+        136
+      ],
+      "branch": "DeepSeek 用户/工具图片输入、处理、上下文、持久化/恢复、附件交互、终端预览及导出；仅 production v3 本地链路。",
+      "catalog_ids": [
+        "contract:ai/images",
+        "contract:ai/content",
+        "contract:codingagent/read-tool",
+        "contract:agent/tools",
+        "contract:session/v3-jsonl",
+        "contract:codingagent/html-export",
+        "contract:codingagent/interactive-text",
+        "matrix:ai/openai-completions/content/image-content-data",
+        "matrix:ai/openai-completions/content/image-content-mime-type",
+        "matrix:ai/openai-completions/content/image-content-type",
+        "matrix:ai/openai-completions/content/tool-result-message-content-image",
+        "matrix:ai/openai-completions/content/user-message-content-image",
+        "matrix:ai/openai-completions/message/conversion-history-unsupported-tool-images",
+        "matrix:ai/openai-completions/message/conversion-history-unsupported-user-images",
+        "matrix:ai/openai-completions/message/conversion-tool-result-image-placeholder",
+        "matrix:ai/openai-completions/message/conversion-tool-result-images",
+        "matrix:ai/openai-completions/message/conversion-user-image",
+        "matrix:ai/openai-completions/request/model-input"
+      ]
+    },
+    {
+      "id": "v1-release",
+      "version": "V1",
+      "issues": [
+        16
+      ],
+      "branch": "darwin-arm64 的 V1 范围发布验证，全部已交付能力回归、受保护文本/工具/视觉 smoke、V2 Stub；不承担完整目录/其他 Provider/全平台对等。",
+      "catalog_ids": [
+        "cmd-pig",
+        "module-ai",
+        "module-agent",
+        "module-codingagent",
+        "module-tui",
+        "module-telemetry"
+      ]
+    },
+    {
+      "id": "openai-catalog",
+      "version": "V2",
+      "issues": [
+        129
+      ],
+      "branch": "OpenAI 官方/Azure/Codex、剩余协议与 compat/options、完整模型目录和生成/缓存/overlay；保留已交付通用能力。",
+      "catalog_ids": [
+        "contract:ai/api-entrypoints",
+        "contract:ai/model-catalog",
+        "contract:ai/models-runtime",
+        "contract:ai/models-store",
+        "contract:config/models-json"
+      ]
+    },
+    {
+      "id": "providers-auth",
+      "version": "V2",
+      "issues": [
+        13
+      ],
+      "branch": "其他 Provider、API key/OAuth/ambient auth、pig-ai 和完整厂商兼容矩阵。",
+      "catalog_ids": [
+        "contract:ai/providers-all",
+        "contract:ai/provider-factories",
+        "contract:ai/auth-entrypoints",
+        "contract:auth/pig-ai/login-cli",
+        "cmd-pig-ai"
+      ]
+    },
+    {
+      "id": "image-remaining",
+      "version": "V2",
+      "issues": [
+        128
+      ],
+      "branch": "图片生成/编辑、image model 和剩余跨 Provider 多模态；Harness/Remote/平台/扩展分别承担自身集成。",
+      "catalog_ids": [
+        "contract:ai/images",
+        "contract:baseline/image-catalog-snapshot"
+      ]
+    },
+    {
+      "id": "harness",
+      "version": "V2",
+      "issues": [
+        10
+      ],
+      "branch": "固定 Pi Harness v4 底座及相同未实现结果，含自身图片集成。",
+      "catalog_ids": [
+        "contract:session/v4-harness"
+      ]
+    },
+    {
+      "id": "remote",
+      "version": "V2",
+      "issues": [
+        11
+      ],
+      "branch": "Remote Protocol/Client、framing/schema/lease/snapshot/RemoteSession 与图片路径。",
+      "catalog_ids": [
+        "module-protocol",
+        "module-client",
+        "contract:protocol/cbor",
+        "contract:protocol/frame",
+        "contract:protocol/schema-codec",
+        "contract:protocol/version",
+        "contract:client/request-cancellation"
+      ]
+    },
+    {
+      "id": "packages",
+      "version": "V2",
+      "issues": [
+        99
+      ],
+      "branch": "Pi package manifest、本地资源包、npm/git 管理、依赖及 lifecycle；已交付本地资源继续属于 V1。",
+      "catalog_ids": [
+        "deferred-package-ecosystem",
+        "contract:codingagent/local-resources"
+      ]
+    },
+    {
+      "id": "platforms",
+      "version": "V2",
+      "issues": [
+        15
+      ],
+      "branch": "六个原生目标和 Termux 的构建、原生行为、剪贴板、安装更新及图片平台集成。",
+      "catalog_ids": [
+        "cmd-pig",
+        "module-tui"
+      ]
+    },
+    {
+      "id": "extensions",
+      "version": "V2",
+      "issues": [
+        9
+      ],
+      "branch": "最后功能阶段；运行时研究/grilling/ADR 先于 ABI，包含完整扩展面、图片和 RPC 分支摘要导航。",
+      "catalog_ids": [
+        "deferred-extension-runtime",
+        "contract:codingagent/local-extensions",
+        "contract:codingagent/branch-summary"
+      ]
+    },
+    {
+      "id": "full-parity",
+      "version": "V2",
+      "issues": [
+        127
+      ],
+      "branch": "所有剩余固定基线对等、跨模块全链路、目录、许可与发布证据。",
+      "catalog_ids": [
+        "module-ai",
+        "module-agent",
+        "module-codingagent",
+        "module-tui",
+        "module-telemetry",
+        "module-protocol",
+        "module-client"
+      ]
+    }
+  ]
+}

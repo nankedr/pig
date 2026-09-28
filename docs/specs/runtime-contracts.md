@@ -1,5 +1,7 @@
 # 运行时契约
 
+交付范围以 [ADR-0043](../adr/0043-versioned-delivery-and-gates.md) 为准：V1 保留 M0–M6 并完成 DeepSeek Responses/图片输入；剩余能力归 V2。下文 M 编号用于历史范围映射，技术语义保持有效，不能从旧编号推导当前排期。
+
 ## 1. 地位与兼容基线
 
 本文是 `ai`、`agent`、`codingagent` 包及 `pig`、`pig-ai` 命令的规范性运行时契约。兼容基线固定为 Pi 提交 `936aff00918de1187f085f123c2812d8f2d67745`；上游当前分支、未来文档或设想中的 Harness API 不得覆盖该快照的实际代码语义。
@@ -146,8 +148,8 @@ Telemetry schema 在运行时以动态 schema 注册和验证，同时由同一�
 - M1：Faux、DeepSeek + OpenAI Chat Completions、`complete`、完整接口、完整 `read` 和确定性测试工具、内存 Session；`text`/`json` 可完整运行。
 - M3：落地生产 v3 Session 语义。
 - M4：本地 JSONL RPC。
-- M7：才执行 extension；此前只发现/盘点入口并返回显式 stub。
-- M8：固定快照的 Harness v4。
-- M9：Remote Protocol Client；以固定 server package 的测试 host/受控 service 与 fake server 做互操作，V1 不提供 Pig Server。
+- V2 最后功能阶段（原 M7）：才执行 extension；此前只发现/盘点入口并返回显式 stub。
+- V2（原 M8）：固定快照的 Harness v4。
+- V2（原 M9）：Remote Protocol Client；以固定 server package 的测试 host/受控 service 与 fake server 做互操作，V1 不提供 Pig Server。
 
 安全、网络、CLI、存储和平台边界分别以 [security-and-network.md](security-and-network.md) 与 [cli-storage-and-platform.md](cli-storage-and-platform.md) 为准。

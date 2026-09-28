@@ -28,14 +28,14 @@ M4.4 支持 Provider 错误后的整轮重试，见 [重试与取消](learning/m
 
 Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学习与证据”组织。阅读代码或设计任务前，先确认固定 Parity Baseline 和当前 Milestone Frontier。
 
-当前 Milestone Frontier：**M6**。M3.5 的项目信任见 [Project Trust](learning/m3-project-trust.md) 和 [源码导航](mappings/typescript-to-go/m3-project-trust.md)。M3.4 的全局 settings 驱动启动见 [全局设置](learning/m3-global-settings.md) 和 [源码导航](mappings/typescript-to-go/m3-global-settings.md)。M3.1 的 Session 创建、持久化与重开见 [v3 Session 持久化](learning/m3-session-persistence.md) 和 [源码导航](mappings/typescript-to-go/m3-session-persistence.md)；M2/v0.2.0 的公共行为与证据边界见 [M2 集成与冻结](learning/m2-freeze.md) 和 [M2 源码导航](mappings/typescript-to-go/m2-freeze.md)；M1 首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)。
+当前 Milestone Frontier：**V1 Responses**，M0–M6 已关闭。当前规则见 [ADR-0043](adr/0043-versioned-delivery-and-gates.md)、[Responses 矩阵](specs/responses.md)与[版本验收](specs/versioned-release.md)。M3.5 的项目信任见 [Project Trust](learning/m3-project-trust.md) 和 [源码导航](mappings/typescript-to-go/m3-project-trust.md)。M3.4 的全局 settings 驱动启动见 [全局设置](learning/m3-global-settings.md) 和 [源码导航](mappings/typescript-to-go/m3-global-settings.md)。M3.1 的 Session 创建、持久化与重开见 [v3 Session 持久化](learning/m3-session-persistence.md) 和 [源码导航](mappings/typescript-to-go/m3-session-persistence.md)；M2/v0.2.0 的公共行为与证据边界见 [M2 集成与冻结](learning/m2-freeze.md) 和 [M2 源码导航](mappings/typescript-to-go/m2-freeze.md)；M1 首个产品级执行路径见 [M1 Headless text 与 JSON](learning/m1-headless-text.md)。
 
 ## 首次阅读
 
 1. [领域术语与范围](../CONTEXT.md)：统一 Pi、Pig、Parity、Compatibility Surface、Parity Catalog、Capability Stub 等术语。
 2. [总体架构](design/architecture.md)：七个包、单一 Go module、依赖方向、双 Agent 和接口冻结规则。
 3. [兼容性设计](design/compatibility.md)：语义兼容、Wire Identifier、兼容怪癖和批准偏离。
-4. [V1 路线图](roadmap.md)：M0 至 M14 的 Milestone Frontier 与共同门禁。
+4. [V1/V2 路线图](roadmap.md)：当前前沿、版本范围与共同门禁。
 
 ## 规范
 
@@ -45,7 +45,7 @@ Pig 文档按“术语与范围 -> 决策 -> 设计与规范 -> 路线图 -> 学
 - [安全与网络契约](specs/security-and-network.md)：Project Trust、无 sandbox 的宿主模型、凭证、Offline 和外联边界。
 - [模型目录规范](specs/model-catalog.md)：双来源 Catalog Baseline、Snapshot 校验、运行时 overlay 和生成管线。
 - [扩展系统规范](specs/extensions.md)：Extension Surface、早期 Stub、M5 本地资源边界、包生态延期和 M7 ABI 决策门禁。
-- [M5 包生态延期决策](adr/0034-defer-package-ecosystem.md)：本地资源优先，包生态保留 V1 范围并另行排期。
+- [M5 包生态延期决策](adr/0034-defer-package-ecosystem.md)：本地资源优先，历史决定；包生态现按 ADR-0043 归 V2。
 
 ## 决策记录
 

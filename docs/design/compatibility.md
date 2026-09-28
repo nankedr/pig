@@ -1,5 +1,7 @@
 # 兼容性设计
 
+交付范围以 [ADR-0043](../adr/0043-versioned-delivery-and-gates.md) 为准：V1 保留 M0–M6 并完成 DeepSeek Responses/图片输入；剩余能力归 V2。下文 M 编号用于历史范围映射，技术语义保持有效，不能从旧编号推导当前排期。
+
 ## 兼容目标
 
 Pig 的“1:1 复刻”指可证明的功能与语义对等，不是逐行翻译 TypeScript，也不是复制 JavaScript 的表面语法。发生冲突时按以下顺序裁决：
@@ -22,7 +24,7 @@ Pig 的“1:1 复刻”指可证明的功能与语义对等，不是逐行翻译
 | 协议 | JSON/JSONL/CBOR/RPC 的值、顺序、校验和状态转换兼容；framing 的规定字节精确兼容 |
 | 运行时 | 事件顺序、取消、重试、并发、Tool 结果、资源冲突和失败路径兼容 |
 | 平台 | 复刻探测顺序、外部命令、降级、错误和最终六目标行为 |
-| 扩展 | V1 最终要求能力对等；源码语言和 ABI 尚未承诺 |
+| 扩展 | V2 最终要求能力对等；源码语言和 ABI 尚未承诺 |
 
 ## 语义兼容而非字节相同
 
@@ -117,4 +119,4 @@ Pig 保持并发、顺序、取消、timeout、retry、容量、截断和算法�
 
 ## 验收原则
 
-“代码看起来相似”不构成兼容证据。每项兼容声明必须指向 Parity Catalog 中的 upstream mapping、Parity Case 与测试结果。Catalog 尚有未解释的 `partial`、`deferred` 或缺失项时，不能宣布 V1 对等完成；唯一例外是固定快照本身明确未实现的 Harness 操作。
+“代码看起来相似”不构成兼容证据。每项兼容声明必须指向 Parity Catalog 中的 upstream mapping、Parity Case 与测试结果。V1 只对版本范围内的分支要求完整证据，并回归已交付能力与 V2 Stub 边界；V2 才要求全量 Catalog 对等。延期不改变 Capability Status。固定快照本身明确未实现的 Harness 操作必须验证相同未实现语义。

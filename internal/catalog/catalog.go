@@ -165,6 +165,8 @@ type Manifest struct {
 	SurfaceManifest         string         `json:"surface_manifest"`
 	CatalogSnapshotManifest string         `json:"catalog_snapshot_manifest"`
 	GeneratedReport         string         `json:"generated_report"`
+	DeliveryScope           string         `json:"delivery_scope,omitempty"`
+	ResponsesMatrix         string         `json:"responses_matrix,omitempty"`
 	EntryCount              int            `json:"entry_count"`
 	StatusCounts            map[string]int `json:"status_counts"`
 }
@@ -875,6 +877,8 @@ type ManifestPaths struct {
 	SurfaceManifest         string
 	CatalogSnapshotManifest string
 	GeneratedReport         string
+	DeliveryScope           string
+	ResponsesMatrix         string
 }
 
 // DefaultManifestPaths are the committed relative paths under parity/.
@@ -885,6 +889,8 @@ var DefaultManifestPaths = ManifestPaths{
 	SurfaceManifest:         "surface/manifest.json",
 	CatalogSnapshotManifest: "baseline/snapshot.manifest.json",
 	GeneratedReport:         "reports/catalog.md",
+	DeliveryScope:           "delivery-scope.json",
+	ResponsesMatrix:         "responses-matrix.json",
 }
 
 // BuildManifest derives the catalog manifest from entries. status_counts always
@@ -913,6 +919,8 @@ func BuildManifest(entries []Entry, baselineCommit string, paths ManifestPaths) 
 		SurfaceManifest:         paths.SurfaceManifest,
 		CatalogSnapshotManifest: paths.CatalogSnapshotManifest,
 		GeneratedReport:         paths.GeneratedReport,
+		DeliveryScope:           paths.DeliveryScope,
+		ResponsesMatrix:         paths.ResponsesMatrix,
 		EntryCount:              len(entries),
 		StatusCounts:            counts,
 	}

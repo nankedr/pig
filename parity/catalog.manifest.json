@@ -9,6 +9,8 @@
   "surface_manifest": "surface/manifest.json",
   "catalog_snapshot_manifest": "baseline/snapshot.manifest.json",
   "generated_report": "reports/catalog.md",
+  "delivery_scope": "delivery-scope.json",
+  "responses_matrix": "responses-matrix.json",
   "entry_count": 9695,
   "status_counts": {
     "deferred": 3,

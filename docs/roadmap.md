@@ -1,28 +1,36 @@
-# Pig V1 路线图
+# Pig V1/V2 路线图
 
-Pig V1 使用双来源对等基线：Code Baseline 是 Pi `936aff00918de1187f085f123c2812d8f2d67745`，Catalog Baseline 是 Pi v0.84.1 官方 source tar（commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model）。两者相差 40 个 commit，因此这不是 fixed-run parity；详见 ADR-0014。主学习路线一次只推进一个里程碑前沿；并行支线必须重新集成到持续可运行的 `pig`。
+依据 [ADR-0043](adr/0043-versioned-delivery-and-gates.md)，最终完整复刻固定 Pi 基线，V1 交付完整语义的明确子集，V2 关闭剩余兼容缺口。Code Baseline 为 `936aff00918de1187f085f123c2812d8f2d67745`；Catalog Baseline 为 v0.84.1 source tar（`53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model）。两者相差 40 个 commit，仍按 ADR-0014 解释双来源。
 
-当前 Milestone Frontier：**M5**。#108/v0.5.0 的本地资源交付与冻结入口见 [M5 集成与冻结](learning/m5-freeze.md)；父 #7 关闭及前沿推进由维护者另行决定。M4/v0.4.0 已完成 Headless 编排、JSONL RPC 和安全 HTML export；范围与证据见 [M4 集成与冻结](learning/m4-freeze.md)。M5 按 [ADR-0034](adr/0034-defer-package-ecosystem.md) 先交付本地资源，包生态延期但保留 V1 范围。逐符号状态仍以 Parity Catalog 为准，明确说明范围的 `partial` 不代表全量 Pi 对等。
+当前 Milestone Frontier：**V1 Responses**。#130 同步范围后执行 #12；M0–M6（#2–#8）全部已关闭，v0.6.0 是已交付文本 TUI 的历史版本。新范围归属见 [Catalog 版本范围](../parity/delivery-scope.json)，状态和证据仍从 Catalog 读取。
 
-| 阶段 | 可验收产物 |
-| --- | --- |
-| M0 | 锁定源码与 Catalog Snapshot；生成 Parity Catalog；建立七个包、命令、公开契约、Capability Stub、Oracle 和基础测试骨架；声明完整 Chat Completions 类型/options 与分阶段能力矩阵 |
-| M1 / v0.1.0 | 实现能力矩阵中的 faux + DeepSeek/OpenAI Chat Completions 核心路径；完整 EventStream、SSE、partial JSON、Provider retry、Tool 参数管线、并行/串行顺序与 listener/update barrier；内存 AgentSession；text/json；完整 read |
-| M2 / v0.2.0 | 扩展 legacy AI/Agent 未触达分支：thinking/signature、deferred、跨 Provider 转换、usage/cost/overflow/cache、Agent steering/follow-up 队列、proxy、Telemetry、compat/deprecated API |
-| M3 / v0.3.0 | 本地持久化 Coding Agent：v3 JSONL、恢复/fork、全局 settings、最小 Project Trust 后的项目 settings、基础 model/auth runtime、完整 read/bash/edit/write |
-| M4 / v0.4.0 | Coding Agent Headless 编排：grep/find/ls、用户消息投递与 steer/follow-up 集成、整轮 Provider error retry、压缩、分支、树导航、stats、model/tool 切换、JSONL RPC 模式、HTML export |
-| M5 / v0.5.0 | 本地资源：Context File、system prompt、templates、skills、themes、项目信任、来源优先级、冲突诊断和重载；本地扩展 entry 仅发现并明确未实现；包生态按 ADR-0034 延期 |
-| M6 / v0.6.0 | 文本 TUI 与 Interactive 模式：布局、编辑器、按键、滚动、主题、对话框、session/model selectors |
-| M7 / v0.7.0 | 扩展系统：先专项设计并冻结运行时/ABI，再让 M5 已发现的扩展 entry 与完整 Extension Surface 可运行 |
-| M8 / v0.8.0 | 忠实复刻 AgentHarness v4：memory/JSONL、reducer、compaction substrate、工具及上游相同的未实现操作 |
-| M9 / v0.9.0 | Protocol/Client：CBOR、framing、transport、lease、snapshot、RemoteSession；Pig Client 与固定 server package 测试 host/受控 service、fake server 互操作，不实现 Pig Server |
-| M10 / v0.10.0 | OpenAI 系与 Catalog：Responses、Azure、Codex；补齐不依赖图片体系的 Chat Completions Provider compat flags、高级 options 与剩余协议分支；生成器、校验、remote cache/overlay |
-| M11 / v0.11.0 | 其余 Chat API、40 个 Provider、API key、OAuth、ambient auth、`pig-ai` 登录 CLI 与完整模型兼容矩阵 |
-| M12 / v0.12.0 | 图片体系：image model/generation、消息图片、工具结果图片、处理与终端显示 |
-| M13 / v0.13.0 | 平台与发布闭环：六目标构建、原生行为、剪贴板、外部命令、资产、安装包、更新与第三方声明 |
-| M14 / v1.0.0 | 只关闭对等缺口：全量 Parity Catalog、测试、示例、文档、许可和发布门禁，不新增功能 |
+| 版本与顺序 | Issue | 可验收产物 |
+| --- | --- | --- |
+| V1 范围同步 | #130 | ADR、规范、Catalog 归属与验收规则一致 |
+| V1 Responses | #12，#131–#133 | DeepSeek 文本流与终态、工具 continuation、reasoning/历史重放、可恢复 SDK/headless/TUI/RPC；保留 Chat Completions |
+| V1 图片输入 | #14，#134–#136 | 用户/工具图片、处理与上下文、持久化恢复、附件交互、终端预览及导出 |
+| V1 收口 / v1.0.0 | #16 | V1 范围完整闭环、全部已交付能力回归、V2 Stub 边界、darwin-arm64 发布与受保护文本/工具/视觉 smoke |
+| V2 OpenAI 与目录 | #129 | OpenAI 官方/Azure/Codex、剩余协议和 Chat Completions compat、高级 options、完整目录生成/校验/overlay/cache |
+| V2 Provider 与认证 | #13 | 其余厂商、API key/OAuth/ambient auth、pig-ai 与兼容矩阵 |
+| V2 图片剩余路径 | #128 | 图片生成/编辑、image model、剩余多模态兼容 |
+| V2 Harness | #10 | 固定基线 v4 底座及相同未实现操作，承担自身图片集成 |
+| V2 Remote | #11 | Protocol/Client、CBOR/framing、lease/snapshot、RemoteSession 及图片集成；不实现 Pig Server |
+| V2 包生态 | #99 | manifest、本地资源包、npm/git、依赖及 lifecycle |
+| V2 平台 | #15 | macOS/Linux/Windows amd64/arm64 与 Termux 的完整发布闭环 |
+| V2 最后功能阶段 | #9 | 扩展运行时研究/grilling/ADR 先于 ABI；完整 Extension Surface，含 #96 转入的 RPC 分支摘要导航和图片集成 |
+| V2 收口 / v2.0.0 | #127 | 关闭固定基线全量 Catalog 缺口与全链路集成，不新增功能 |
 
-V1 未排期范围：[包生态兼容 #99](https://github.com/nankedr/pig/issues/99)，包含 package manifest、本地资源包、npm/git 管理、依赖及 lifecycle。它不阻塞调整后的 M5/M6，也不自动归入 M7/M14；出现明确包需求、团队版本管理需求或扩展分发需求时重新排期，完整 V1 验收仍要求关闭该缺口。
+V2 以 #16 为版本排期门，内部依真实依赖拆分，不沿用 M7→M14 串行依赖或旧 v0.7.0–v0.13.0 绑定。共享图片先交付，各模块负责自己的后续集成，避免“扩展最后”与图片完整性互相阻塞。
+
+## 当前冻结与发布规则
+
+[V1/V2 验收规范](specs/versioned-release.md) 是当前发布规则。V1 只承诺 DeepSeek 和 darwin-arm64；协议适配、可编译或图片输入成功均不等于其他厂商、平台或图片生成已完成。V2 缺口继续保留原语义和未完成状态，不能隐式阻塞 V1，也不能计入已完成。
+
+新能力必须同步 CLI、SDK、示例、中文学习资料、TypeScript → Go 导航、API snapshot 和 Catalog 证据。改变范围、顺序或冻结接口须另行决策；两版都不得降低错误、取消、并发、顺序、恢复和验证要求。
+
+## M0–M6 历史门禁与复现入口
+
+以下是已交付阶段的复现说明。旧 M10/M12 等编号只表示历史范围映射，当前交付归属以 ADR-0043 为准；旧“父 Issue 另行推进”等备注是当时状态，不是当前前沿。历史 release、验证记录和绑定版本的豁免不重写，也不自动迁移为 V1/V2 新验收结论。
 
 M0 的普通集成入口是纯离线的 `make m0-gate`，只重放已提交 fixture，不读取 Pi checkout。完整冻结使用 `make m0-freeze PIG_PI_ORACLE_CHECKOUT=/path/to/prepared/pi PIG_PI_SOURCE_CHECKOUT=/path/to/pristine/pi`；前者预装依赖并构建 `dist`，后者必须没有 tracked、untracked 或 ignored 状态，不能互相复用。准备命令见 [M0 兼容骨架](learning/m0-compatibility-skeleton.md#冻结门禁)。
 
@@ -34,7 +42,7 @@ M1 必须在冻结首批接口前完整验证本阶段触达的核心契约：
 - 本地 OpenAI Chat Completions 假服务覆盖请求、SSE 分片、partial JSON、可重试与不可重试错误、取消和超时。
 - Tool 参数严格经过 `raw JSON -> prepareArguments -> coercion/validation -> typed decode -> Execute`。
 - 文本到 Tool、ToolResult、继续生成的完整闭环可运行；并行/串行顺序、listener barrier 与 Tool update barrier 有确定性测试。
-- DeepSeek 真实冒烟覆盖基础流式回复和一次 Tool continuation；普通 PR 不需要真实密钥。普通 PR 缺 `DEEPSEEK_API_KEY` 时 `make m1-live-smoke` 明确 skip；`make m1-freeze`（含 `PIG_REQUIRE_LIVE=1`）缺密钥时必须失败。
+- DeepSeek 真实冒烟覆盖基础流式回复和一次 Tool continuation；普通 PR 不需要真实密钥。普通 Go 测试缺 `DEEPSEEK_API_KEY` 时明确 skip；`make m1-live-smoke` 强制要求密钥；`make m1-freeze`（含 `PIG_REQUIRE_LIVE=1`）缺密钥时必须失败。
 - `read` 对真实文本文件完整可用；另有仅用于确定性测试的 Tool。
 - 内存 AgentSession 的 text/json 两种 Headless 路径端到端可运行，其他未实现路径返回结构化 `ErrNotImplemented`。
 - Pi Oracle 语义差分、`go test -race` 和本机 darwin-arm64 编译通过；不包含 browser、WebAssembly 或其他平台门禁。
@@ -102,12 +110,6 @@ Issue #62 通过公开 Faux、Provider 和 Models API 完成提交、pending/fin
 - 学习文档与 TypeScript 到 Go 导航已更新。
 - 对应 CLI 能力、Go SDK 能力和所属示例同步完成。
 - 未声明的联网、凭证和平台依赖均视为失败。
-
-## 调整规则
-
-可以拆分里程碑或子任务，但不能通过移出 V1、隐藏 Capability Stub 或降低验收标准来完成阶段。改变功能顺序、Freeze Gate 或公开承诺前必须重新决策。M7 必须先完成扩展运行时专项调查、grilling 与 ADR，再冻结扩展 ABI。
-
-GitHub 以一个 V1 roadmap Issue 管理 M0～M14 子 Issue，并用原生 sub-issue 和 dependency 表达顺序。阶段内部只按可独立验收的子系统继续拆分；文件、符号和测试级进度仅进入 Parity Catalog。
 
 ## M2.5 Telemetry 门禁
 

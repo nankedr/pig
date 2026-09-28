@@ -1,5 +1,7 @@
 # 模型目录规范
 
+交付范围以 [ADR-0043](../adr/0043-versioned-delivery-and-gates.md) 为准：V1 保留 M0–M6 并完成 DeepSeek Responses/图片输入；剩余能力归 V2。下文 M 编号用于历史范围映射，技术语义保持有效，不能从旧编号推导当前排期。
+
 ## 基线与 Catalog 不可混淆
 
 - **Parity Catalog**：所有源码能力、映射、状态和证据的唯一权威。
@@ -13,9 +15,9 @@ Chat 与 image Snapshot 分别由 Parity Catalog 的 `contract:baseline/catalog-
 
 Code Baseline `936aff00918de1187f085f123c2812d8f2d67745` 没有提交完整的 chat model 真实数据；发布过程会通过网络生成模型 shard。只锁定源码无法重现 Provider、model ID、API、价格、context window、max tokens 和 compatibility metadata，因此 Parity Baseline 必须另有 Catalog Baseline。
 
-V1 的 Catalog Baseline 是 Pi v0.84.1 官方 source tar：来源 commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model，artifact SHA-256 `294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7`。它采用 Pi 根目录 MIT License，保留 `Copyright (c) 2025 Mario Zechner`。
+V1/V2 的 Catalog Baseline 是 Pi v0.84.1 官方 source tar：来源 commit `53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model，artifact SHA-256 `294d8067eb42327be0db4792d3be792daff588d8fc22549270a972ec9e5407e7`。它采用 Pi 根目录 MIT License，保留 `Copyright (c) 2025 Mario Zechner`。
 
-`53fa77c` 比 Code Baseline 早 40 个 commit。Code Baseline 当次生成目录的 artifact 已过期，发布通道也没有保留可恢复副本；日志与 hash 只能证明旧 artifact 存在，不能重建内容。V1 因此选择最近的较早官方不可变发布物，不拿调查当天的实时目录冒充历史结果。
+`53fa77c` 比 Code Baseline 早 40 个 commit。Code Baseline 当次生成目录的 artifact 已过期，发布通道也没有保留可恢复副本；日志与 hash 只能证明旧 artifact 存在，不能重建内容。双来源决策因此选择最近的较早官方不可变发布物，不拿调查当天的实时目录冒充历史结果。
 
 这是双来源 baseline compatibility，不是 fixed-run parity。API、生成算法和运行时行为以 Code Baseline 为准；内嵌目录值以 Catalog Baseline 为准；任何报告都不得声称 `936aff0` 的生成器曾产出 v0.84.1 数据。
 
@@ -37,13 +39,13 @@ Pi 的 MIT notice 覆盖所选官方 release artifact；它不自动授权 Pig �
 
 ## 普通构建与测试
 
-普通 build、test 和 release 只读取已锁定 Snapshot，不隐式刷新，也不要求网络、Node 或 Provider 凭证。M0 必须校验 manifest、hash、Provider 引用、model 唯一性和 schema；校验失败立即终止，不能回退到 live fetch。
+普通 build/test 和 release 的目录输入只读取已锁定 Snapshot 与显式配置，不隐式刷新。普通测试不要求网络、Node 或凭证；freeze/release 的受保护 live smoke 是独立强制门禁。M0 必须校验 manifest、hash、Provider 引用、model 唯一性和 schema；校验失败立即终止，不能回退到 live fetch。
 
 M1 的 faux 与 DeepSeek/OpenAI Chat Completions 路径从 Snapshot 或明确的测试 fixture 获得模型定义。真实 DeepSeek smoke 验证服务连通与基本行为，不更新价格、窗口或 compatibility 基线。
 
-## V1 仍需复刻生成管线
+## V2 完成生成管线
 
-Snapshot 只是早期可复现输入，不能代替 Pi 的模型目录功能。V1 必须用 Go 复刻：
+Snapshot 只是早期可复现输入，不能代替 Pi 的模型目录功能。V2 必须用 Go 复刻：
 
 - chat 与 image 目录抓取器；
 - Provider 数据过滤、修正、合并和派生；
@@ -76,13 +78,21 @@ Offline Mode 开启时，模型目录、版本、包更新和工具下载使用�
 | --- | --- |
 | M0 | 锁定源码与 Snapshot；提交 manifest/hash/来源；生成对应 Parity Catalog 项；离线完整性校验通过 |
 | M1 | faux 与 DeepSeek 使用固定模型定义；Chat Completions 逐字段 matrix 完整；不做后台目录刷新 |
-| M10 | 完成 OpenAI 系、chat 生成器、校验、diff、remote cache/overlay 和剩余 Chat Completions Stub |
-| M11 | 完成其余 Chat API、Provider、认证与完整模型 compatibility matrix |
-| M12 | 完成 image model/generation 目录与消息图片相关行为 |
-| M14 | 所有 Snapshot、生成器、runtime overlay 和许可项均有 verified 证据 |
+| V1 / #12 | DeepSeek Responses 所需配置单独记录来源；保留 Chat Completions 与固定 Snapshot，不冒充 OpenAI Provider 支持 |
+| V1 / #14 | DeepSeek 用户/工具图片输入、处理、恢复与展示；当前模型配置独立于历史 Snapshot |
+| V2 / #129（原 M10） | 完成 OpenAI 系、chat 生成器、校验、diff、remote cache/overlay 和剩余 Chat Completions Stub |
+| V2 / #13（原 M11） | 完成其余 Chat API、Provider、认证与完整模型 compatibility matrix |
+| V2 / #128（原 M12 剩余） | image model/generation/edit 与剩余多模态、各模块集成 |
+| V2 / #127 | 所有 Snapshot、生成器、runtime overlay 和许可项均有 verified 证据 |
 
 模型目录的字段级 compatibility matrix 与 Chat Completions matrix 都属于 Parity Catalog 或其生成视图，不单独维护手工“完成”标记。
 
 ## Baseline 升级
 
 升级 Code Baseline 或 Catalog Baseline 时必须显式记录新的二元组合，更新对应 lock/manifest，并重新运行提取、hash、diff、Oracle case 与许可审查。两者可以独立选择，但不能把不同 revision 写成同一次生成；旧 release 必须仍能定位其对应的两件基线制品。
+
+## 当前 DeepSeek 配置的独立来源
+
+[Responses 矩阵](../../parity/responses-matrix.json) 记录官方资料查阅日期、endpoint、模型 ID 和适用能力，供 V1 实施和 smoke 选择；这不是内嵌模型目录，也不是已验证的运行配置。当前文档中的 `deepseek-flash` 与 `deepseek-v4-pro` 不静默覆盖历史 `deepseek-v4-flash` 等记录。启用新配置时必须显式记录来源、API、图片/工具/reasoning 能力、参数和凭证变量；未知价格/限制不得从旧模型猜测继承。
+
+固定 Snapshot、其 hash、上游 lock 和既有发布 fixture 不变。当前服务的行为使用独立协议 fixture/conformance 和受保护 smoke；只有固定基线共同语义才能称为 Pi Oracle 对等。V1 不因完整生成器、动态目录或其他 Provider 尚未交付而失败；这些缺口由 V2 #129/#13/#128 保留。

@@ -1,5 +1,7 @@
 # CLI、存储与平台契约
 
+交付范围以 [ADR-0043](../adr/0043-versioned-delivery-and-gates.md) 为准：V1 保留 M0–M6 并完成 DeepSeek Responses/图片输入；剩余能力归 V2。下文 M 编号用于历史范围映射，技术语义保持有效，不能从旧编号推导当前排期。
+
 ## 1. 身份与兼容原则
 
 用户可见命令为 `pig`、`pig-ai`，状态目录为 `~/.pig`，项目目录为 `.pig`，Pig 自有环境变量使用 `PIG_*`。普通运行和默认路径不得读写 `~/.pi`、项目 `.pi`、Pi 的临时文件前缀或 `PI_*`；只有用户显式 import/export 时才可把指定 Pi 路径当迁移源。Provider 行业标准变量（例如 `DEEPSEEK_API_KEY`、`OPENAI_API_KEY`）不改名。
@@ -40,7 +42,7 @@ Remote Protocol 与 RPC 是两个 package、两套 wire format。它先对 plain
 
 协议承载 attach/detach、request/response、Session snapshot/revision 等远程生命周期。Server snapshot/response snapshot 是权威状态；客户端忽略旧 revision。Client request 默认无 timeout；作为已批准的 Go 偏离，调用方 context 可取消本地 waiter，request ID 保留 tombstone 直至迟到 response 到达或断线。shared/exclusive lease 只表达同一 Client 内的资源生命周期与占用，不是跨客户端身份、授权或所有权证明。
 
-V1 只实现 Pig Client，并与固定快照的 server package 测试 host/受控 service 及 fake server 做互操作，不假设上游存在 standalone Coding Agent Server，也不实现 Pig Server。ByteTransport 的认证、加密、访问控制、流控和 remote ownership 由接入方显式提供，协议库不得暗示已解决。
+V2 实现 Pig Client，并与固定快照的 server package 测试 host/受控 service 及 fake server 做互操作，不假设上游存在 standalone Coding Agent Server，也不实现 Pig Server。ByteTransport 的认证、加密、访问控制、流控和 remote ownership 由接入方显式提供，协议库不得暗示已解决。
 
 ## 4. 存储布局
 
@@ -75,7 +77,7 @@ V1 只实现 Pig Client，并与固定快照的 server package 测试 host/受�
 
 ## 7. Shell、外部命令与临时文件
 
-Bash 工具先使用用户显式配置的 `shellPath`；未配置时，Unix 依次使用 `/bin/bash`、PATH 中的 bash，最后回退 sh。Windows 最终目标保留配置 shell、Git Bash 常见路径和 PATH 探测顺序；legacy WSL 的 stdin transport 也按固定快照验证。M0/M1 的发布 gate 只要求本机 `darwin-arm64`，但接口不能把本机路径写死。
+Bash 工具先使用用户显式配置的 `shellPath`；未配置时，Unix 依次使用 `/bin/bash`、PATH 中的 bash，最后回退 sh。Windows 最终目标保留配置 shell、Git Bash 常见路径和 PATH 探测顺序；legacy WSL 的 stdin transport 也按固定快照验证。V1 的发布 gate 只要求本机 `darwin-arm64`，但接口不能把本机路径写死。
 
 命令通过 shell 的 `-c` 等价方式执行，默认没有 timeout；只有工具参数或调用方显式设置时才超时。子进程继承完整宿主进程环境，并注入 Pig 身份的 Session、Provider、Model、reasoning 等变量；不得注入旧 `PI_*`。取消或超时要终止进程树，而非只取消读取协程。
 
@@ -87,4 +89,4 @@ Bash 工具先使用用户显式配置的 `shellPath`；未配置时，Unix 依�
 
 项目使用 Go 1.24、单 Go module、顶层按 `ai`、`agent`、`codingagent` 等 package 分层。只实现 native runtime，不提供 browser、JavaScript 或 WASM target。
 
-阶段 gate 为：M0/M1 只关注开发机 `darwin-arm64` 编译和测试；最终 M13 覆盖 macOS、Linux、Windows 的 amd64/arm64，并覆盖 Termux 安装路径。早期可以把未验证平台标记为未支持，但公共接口、路径抽象和 shell abstraction 必须为最终矩阵保留稳定位置。
+阶段 gate 为：V1 只要求发布平台 `darwin-arm64` 编译和测试；V2（原 M13）覆盖 macOS、Linux、Windows 的 amd64/arm64，并覆盖 Termux 安装路径。早期可以把未验证平台标记为未支持，但公共接口、路径抽象和 shell abstraction 必须为最终矩阵保留稳定位置。

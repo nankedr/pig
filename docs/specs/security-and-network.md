@@ -1,5 +1,7 @@
 # 安全与网络契约
 
+交付范围以 [ADR-0043](../adr/0043-versioned-delivery-and-gates.md) 为准：V1 保留 M0–M6 并完成 DeepSeek Responses/图片输入；剩余能力归 V2。下文 M 编号用于历史范围映射，技术语义保持有效，不能从旧编号推导当前排期。
+
 ## 1. 威胁模型与非目标
 
 Pig 是以当前宿主用户权限运行的本地 coding agent。Project trust 只决定是否加载项目提供的配置、资源、package 和 extension；它不是工具逐次授权、文件系统 sandbox、网络 sandbox 或远程认证机制。用户信任项目后，项目 package/extension 应被视为可执行宿主代码。

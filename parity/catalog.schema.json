@@ -3,7 +3,7 @@
   "$id": "https://github.com/nankedr/pig/parity/catalog.schema.json",
   "version": "1.2.0",
   "title": "Parity Catalog Entry",
-  "description": "One Parity Catalog entry. parity/catalog.jsonl holds exactly one object of this shape per line. The catalog is the single machine-readable authority for scope, mapping, capability status, deviation and evidence (docs/specs/parity-verification.md). This document is the human/tooling contract; internal/catalog enforces the rules in Go without a JSON-schema runtime.",
+  "description": "One Parity Catalog entry. parity/catalog.jsonl holds exactly one object of this shape per line. The catalog is the single machine-readable authority for scope, mapping, capability status, deviation and evidence (docs/specs/parity-verification.md). The manifest also links delivery-scope.json (version/branch ownership) and responses-matrix.json (service compatibility referencing entry IDs); these independently versioned Catalog components do not redefine Capability Status. This document is the human/tooling contract; internal/catalog enforces the rules in Go without a JSON-schema runtime.",
   "type": "object",
   "additionalProperties": false,
   "allOf": [
