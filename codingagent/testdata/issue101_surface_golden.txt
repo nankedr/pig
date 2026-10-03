@@ -1,4 +1,5 @@
 type codingagent.CreateHeadlessSessionOptions
+- API ai.API ""
 - ModelRuntime *codingagent.ModelRuntime ""
 - Models []string ""
 - Offline bool ""

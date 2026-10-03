@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-29",
+  "checked_at": "2026-10-03",
   "sources": {
     "deepseek_guide": "https://api-docs.deepseek.com/guides/responses_api/",
     "deepseek_reference": "https://api-docs.deepseek.com/api/create-response/",
@@ -21,7 +21,7 @@
     ],
     "smoke_model": "deepseek-flash",
     "smoke_verified": false,
-    "note": "仅登记文档支持配置，尚非 Pig 运行支持或 live smoke 证据。不得覆盖历史 snapshot/fixture；旧别名不作为新视觉验收配置。"
+    "note": "历史 snapshot 保留。#131 的 deepseek-v4-pro SDK/真实 CLI 文本 smoke 已于 2026-10-03 通过；smoke_verified 继续为 false，尚无 deepseek-flash 视觉 smoke。"
   },
   "pig_status_source": "parity/catalog.jsonl#catalog_id；本矩阵不维护第二份 Capability Status。共享条目升级前须拆成逐字段/行为条目并逐行绑定证据。",
   "pi_behavior_rule": "固定 Pi no-op/ignore 必须由源码和 Oracle 证明，不能从 DeepSeek 忽略行为推导；其余未实现非默认调用仍是显式 Stub。服务新增能力不冒充固定 Pi 证据。",
@@ -31,17 +31,17 @@
       "standard": "POST /responses；model、instructions、input；message 内容及角色",
       "deepseek_support": "supported",
       "deepseek_behavior": "文本支持；developer 按 user 处理，是服务差异。",
-      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages",
+      "catalog_id": "contract:ai/responses-text-input",
       "version": "V1",
       "issue": 131,
       "verification": "请求/角色转换本地 fixture；Pi 共同语义 Oracle；文本 live smoke"
     },
     {
       "id": "stream",
-      "standard": "语义 SSE，output item/content/delta 和终态",
+      "standard": "文本/reasoning SSE output item/content part 与 completed/incomplete/failed 终态；工具输出另见 function-tools",
       "deepseek_support": "supported",
       "deepseek_behavior": "使用 completed/incomplete/failed 结束，无 [DONE]；sequence_number 递增。",
-      "catalog_id": "symbol:ai/src/api/openai-responses-shared.ts#processResponsesStream",
+      "catalog_id": "contract:ai/responses-text-stream",
       "version": "V1",
       "issue": 131,
       "verification": "分片/断流/失败/取消、usage 与 partial outcome；不得将异常 EOF 判成功"
@@ -145,6 +145,26 @@
       "version": "V2",
       "issue": 129,
       "verification": "不隐式丢弃 Pig 尚未支持的非默认分支；服务差异通过独立 fixture 验证"
+    },
+    {
+      "id": "text-helpers-limit",
+      "standard": "Stream/Complete/Simple/Models 与 max_output_tokens",
+      "deepseek_support": "supported",
+      "deepseek_behavior": "Complete 收集同一 SSE Outcome；输出上限包含 reasoning。",
+      "catalog_id": "contract:ai/responses-helpers",
+      "version": "V1",
+      "issue": 131,
+      "verification": "公开 SDK、真实 headless CLI 与受保护文本 smoke 已通过"
+    },
+    {
+      "id": "usage-cache",
+      "standard": "input/output/total 与 cached/cache-write/reasoning token 计数",
+      "deepseek_support": "supported",
+      "deepseek_behavior": "缓存自动管理；reasoning 与可见文本共同计入 output。",
+      "catalog_id": "contract:ai/responses-usage",
+      "version": "V1",
+      "issue": 131,
+      "verification": "固定 Pi 共同计数/cost Oracle；服务明文 reasoning 和失败计数保留单列 evidence"
     }
   ]
 }

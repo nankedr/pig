@@ -78,7 +78,12 @@ func OpenAICompletionsAPI() ProviderStreams {
 }
 
 func OpenAIResponsesAPI() ProviderStreams {
-	return stubAPIEntry(APIOpenAIResponses)
+	streams := NewTypedProviderStreams(streamOpenAIResponses)
+	streams.Stream = func(ctx context.Context, model Model, input Context, options StreamOptions) *AssistantMessageEventStream {
+		return streamOpenAIResponses(ctx, model, input, OpenAIResponsesOptions{StreamOptions: options})
+	}
+	streams.StreamSimple = streamSimpleOpenAIResponses
+	return streams
 }
 
 func PiMessagesAPI() ProviderStreams {

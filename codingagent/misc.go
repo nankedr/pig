@@ -83,6 +83,7 @@ func searchListModels(search string) ListModelsOption {
 // Args is the parsed root-command argument surface. Pointer fields preserve
 // absence independently from explicit false or empty values.
 type Args struct {
+	API                  *string
 	APIKey               *string
 	AppendSystemPrompt   []string
 	Continue             bool
@@ -233,7 +234,7 @@ func ParseArgs(arguments []string) Args {
 					})
 				}
 			}
-		case "--provider", "--model", "--api-key", "--system-prompt", "--name", "-n", "--session", "--session-id", "--fork", "--session-dir", "--export":
+		case "--api", "--provider", "--model", "--api-key", "--system-prompt", "--name", "-n", "--session", "--session-id", "--fork", "--session-dir", "--export":
 			valueFlag := arg
 			if arg == "-n" {
 				valueFlag = "--name"
@@ -244,6 +245,12 @@ func ParseArgs(arguments []string) Args {
 			}
 			v := raw
 			switch arg {
+			case "--api":
+				if v != string(ai.APIOpenAICompletions) && v != string(ai.APIOpenAIResponses) {
+					result.Diagnostics = append(result.Diagnostics, ArgDiagnostic{Type: "error", Message: "Unsupported API: " + v})
+				} else {
+					result.API = &v
+				}
 			case "--provider":
 				result.Provider = &v
 			case "--model":
@@ -516,6 +523,7 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 		}
 	}
 	runtime, err := CreateHeadlessSession(ctx, CreateHeadlessSessionOptions{
+		API:                ai.API(optionalHeadlessString(parsed.API)),
 		CWD:                cwd,
 		Models:             parsed.Models,
 		Offline:            ResolveOffline(parsed.Offline),

@@ -580,7 +580,7 @@ func TestBuiltinProviderCapabilityMatrixMatchesFixedPiBaseline(t *testing.T) {
 			for _, apiID := range allAPIs {
 				model := ai.Model{ID: "capability-probe", Provider: provider.ID(), API: apiID}
 				result, err := provider.Stream(context.Background(), model, ai.Context{}, ai.StreamOptions{}).Result(context.Background())
-				if provider.ID() == ai.ProviderIDDeepSeek && apiID == ai.APIOpenAICompletions {
+				if provider.ID() == ai.ProviderIDDeepSeek && (apiID == ai.APIOpenAICompletions || apiID == ai.APIOpenAIResponses) {
 					if err != nil || result.StopReason != ai.StopReasonError {
 						t.Errorf("DeepSeek live Stream() = (%#v, %v)", result, err)
 					}

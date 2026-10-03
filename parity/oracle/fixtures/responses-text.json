@@ -1,0 +1,592 @@
+{
+  "schema_version": "1.0.0",
+  "baseline_id": "pi-936aff0-catalog-v0.84.1-v1",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "source": "packages/ai/src/api/openai-responses.ts#stream",
+  "observation_scope": "single text output item, terminal state/error, usage/cost and event types; Simple deferred/thinkingBudgets and cache none sessionId no-ops; request has no system prompt; textSignature and timestamps are outside this observation",
+  "input": {
+    "model": {
+      "id": "configured-text-model",
+      "name": "Fixture",
+      "api": "openai-responses",
+      "provider": "deepseek",
+      "baseUrl": "https://local.invalid",
+      "reasoning": false,
+      "input": [
+        "text"
+      ],
+      "cost": {
+        "input": 1,
+        "output": 2,
+        "cacheRead": 0.5,
+        "cacheWrite": 1.5
+      },
+      "contextWindow": 32000,
+      "maxTokens": 512
+    },
+    "context": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "你好",
+          "timestamp": 1
+        }
+      ]
+    }
+  },
+  "input_hash": "ee519a44c9b6ae5612070db2ac3f275520ffb541965d6b85db4e2f2a204c8122",
+  "cases": [
+    {
+      "name": "completed",
+      "simple": false,
+      "options": {},
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5,\"total_tokens\":15,\"input_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"output_tokens_details\":{\"reasoning_tokens\":2}}}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "stop",
+        "rawStopReason": "completed",
+        "errorMessage": null,
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 3,
+          "cacheWrite": 1,
+          "reasoning": 2,
+          "totalTokens": 15,
+          "cost": {
+            "input": 0.000006,
+            "output": 0.000009999999999999999,
+            "cacheRead": 0.0000015,
+            "cacheWrite": 0.0000015,
+            "total": 0.000018999999999999998
+          }
+        }
+      }
+    },
+    {
+      "name": "length",
+      "simple": false,
+      "options": {},
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\ndata: {\"type\":\"response.incomplete\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"incomplete\",\"output\":[{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5,\"total_tokens\":15,\"input_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"output_tokens_details\":{\"reasoning_tokens\":2}},\"incomplete_details\":{\"reason\":\"max_output_tokens\"}}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "length",
+        "rawStopReason": "incomplete.max_output_tokens",
+        "errorMessage": null,
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 3,
+          "cacheWrite": 1,
+          "reasoning": 2,
+          "totalTokens": 15,
+          "cost": {
+            "input": 0.000006,
+            "output": 0.000009999999999999999,
+            "cacheRead": 0.0000015,
+            "cacheWrite": 0.0000015,
+            "total": 0.000018999999999999998
+          }
+        }
+      }
+    },
+    {
+      "name": "filtered",
+      "simple": false,
+      "options": {},
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\ndata: {\"type\":\"response.incomplete\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"incomplete\",\"output\":[{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5,\"total_tokens\":15,\"input_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"output_tokens_details\":{\"reasoning_tokens\":2}},\"incomplete_details\":{\"reason\":\"content_filter\"}}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "error"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "error",
+        "rawStopReason": "incomplete.content_filter",
+        "errorMessage": "Response incomplete: content_filter",
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 3,
+          "cacheWrite": 1,
+          "reasoning": 2,
+          "totalTokens": 15,
+          "cost": {
+            "input": 0.000006,
+            "output": 0.000009999999999999999,
+            "cacheRead": 0.0000015,
+            "cacheWrite": 0.0000015,
+            "total": 0.000018999999999999998
+          }
+        }
+      }
+    },
+    {
+      "name": "failed",
+      "simple": false,
+      "options": {},
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\ndata: {\"type\":\"response.failed\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"failed\",\"output\":[{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}],\"error\":{\"code\":\"bad\",\"message\":\"fixture failure\"}}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "error"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "error",
+        "rawStopReason": "failed",
+        "errorMessage": "bad: fixture failure",
+        "usage": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "totalTokens": 0,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "truncated",
+      "simple": false,
+      "options": {},
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "error"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "error",
+        "rawStopReason": null,
+        "errorMessage": "OpenAI Responses stream ended before a terminal response event",
+        "usage": {
+          "input": 0,
+          "output": 0,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "totalTokens": 0,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "simple deferred",
+      "simple": true,
+      "options": {
+        "deferred": true
+      },
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5,\"total_tokens\":15,\"input_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"output_tokens_details\":{\"reasoning_tokens\":2}}}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "stop",
+        "rawStopReason": "completed",
+        "errorMessage": null,
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 3,
+          "cacheWrite": 1,
+          "reasoning": 2,
+          "totalTokens": 15,
+          "cost": {
+            "input": 0.000006,
+            "output": 0.000009999999999999999,
+            "cacheRead": 0.0000015,
+            "cacheWrite": 0.0000015,
+            "total": 0.000018999999999999998
+          }
+        }
+      }
+    },
+    {
+      "name": "simple deferred window",
+      "simple": true,
+      "options": {
+        "deferred": {
+          "window": "1h"
+        }
+      },
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5,\"total_tokens\":15,\"input_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"output_tokens_details\":{\"reasoning_tokens\":2}}}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "stop",
+        "rawStopReason": "completed",
+        "errorMessage": null,
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 3,
+          "cacheWrite": 1,
+          "reasoning": 2,
+          "totalTokens": 15,
+          "cost": {
+            "input": 0.000006,
+            "output": 0.000009999999999999999,
+            "cacheRead": 0.0000015,
+            "cacheWrite": 0.0000015,
+            "total": 0.000018999999999999998
+          }
+        }
+      }
+    },
+    {
+      "name": "simple thinking budgets",
+      "simple": true,
+      "options": {
+        "thinkingBudgets": {
+          "high": 8192
+        }
+      },
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5,\"total_tokens\":15,\"input_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"output_tokens_details\":{\"reasoning_tokens\":2}}}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "stop",
+        "rawStopReason": "completed",
+        "errorMessage": null,
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 3,
+          "cacheWrite": 1,
+          "reasoning": 2,
+          "totalTokens": 15,
+          "cost": {
+            "input": 0.000006,
+            "output": 0.000009999999999999999,
+            "cacheRead": 0.0000015,
+            "cacheWrite": 0.0000015,
+            "total": 0.000018999999999999998
+          }
+        }
+      }
+    },
+    {
+      "name": "cache none session",
+      "simple": false,
+      "options": {
+        "sessionId": "fixture-session"
+      },
+      "sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"in_progress\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"in_progress\",\"content\":[]}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"你\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"content_index\":0,\"delta\":\"好🙂\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp-fixture\",\"status\":\"completed\",\"output\":[{\"type\":\"message\",\"id\":\"msg-fixture\",\"role\":\"assistant\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"你好🙂\",\"annotations\":[]}]}],\"usage\":{\"input_tokens\":10,\"output_tokens\":5,\"total_tokens\":15,\"input_tokens_details\":{\"cached_tokens\":3,\"cache_write_tokens\":1},\"output_tokens_details\":{\"reasoning_tokens\":2}}}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "configured-text-model",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "你好"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512
+        }
+      },
+      "types": [
+        "start",
+        "text_start",
+        "text_delta",
+        "text_delta",
+        "text_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "text",
+            "text": "你好🙂"
+          }
+        ],
+        "stopReason": "stop",
+        "rawStopReason": "completed",
+        "errorMessage": null,
+        "usage": {
+          "input": 6,
+          "output": 5,
+          "cacheRead": 3,
+          "cacheWrite": 1,
+          "reasoning": 2,
+          "totalTokens": 15,
+          "cost": {
+            "input": 0.000006,
+            "output": 0.000009999999999999999,
+            "cacheRead": 0.0000015,
+            "cacheWrite": 0.0000015,
+            "total": 0.000018999999999999998
+          }
+        }
+      }
+    }
+  ],
+  "observation_hash": "763a89f5eab3d4eb161b1d7590a89b89b6e88343aa06069addaf950b35645159"
+}

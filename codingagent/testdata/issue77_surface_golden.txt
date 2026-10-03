@@ -25,6 +25,7 @@ type codingagent.AgentSessionServices
 - ResourceLoader codingagent.ResourceLoader ""
 - SettingsManager *codingagent.SettingsManager ""
 type codingagent.CreateHeadlessSessionOptions
+- API ai.API ""
 - ModelRuntime *codingagent.ModelRuntime ""
 - Models []string ""
 - Offline bool ""

@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9695
+- Total entries: 9699
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5147 |
+| inventoried | 5144 |
 | scaffolded | 3620 |
-| partial | 625 |
-| implemented | 133 |
+| partial | 628 |
+| implemented | 137 |
 | verified | 167 |
 | deferred | 3 |
 
@@ -4399,12 +4399,9 @@
 | symbol:ai/src/api/openai-responses-shared.ts#ConvertResponsesMessagesOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses-shared.ts#ConvertResponsesToolsOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses-shared.ts#OpenAIResponsesStreamOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses-shared.ts#convertResponsesTools | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/api/openai-responses-shared.ts#processResponsesStream | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses.lazy.ts#openAIResponsesApi | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses.ts#OpenAIResponsesOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/api/openai-responses.ts#stream | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses.ts#streamSimple | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openrouter-images.lazy.ts#openrouterImagesApi | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openrouter-images.ts#generateImages | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
@@ -4998,6 +4995,9 @@
 | matrix:ai/openai-completions/usage/usage-completion-tokens-details-reasoning-tokens | partial | M2 | field | github.com/nankedr/pig/ai/internal/openai.OpenAIUsage.CompletionTokenDetails.ReasoningTokens | ai |
 | member:ai/src/types.ts#ToolResultMessage.addedToolNames | partial | M2 | contract | github.com/nankedr/pig/ai.ToolResultMessage.AddedToolNames | ai |
 | module-ai | partial | M1 | package | github.com/nankedr/pig/ai | ai |
+| symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages | partial | M14 | contract | github.com/nankedr/pig/ai | ai |
+| symbol:ai/src/api/openai-responses-shared.ts#processResponsesStream | partial | M14 | contract | github.com/nankedr/pig/ai | ai |
+| symbol:ai/src/api/openai-responses.ts#stream | partial | M14 | contract | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/transform-messages.ts#transformMessages | partial | M2 | contract | github.com/nankedr/pig/ai.TransformMessages | ai |
 | symbol:ai/src/compat.ts#complete | partial | M2 | symbol | github.com/nankedr/pig/ai.Complete | ai |
 | symbol:ai/src/compat.ts#completeSimple | partial | M2 | symbol | github.com/nankedr/pig/ai.CompleteSimple | ai |
@@ -5021,6 +5021,10 @@
 | symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAICompletions | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleOpenAICompletions | ai |
 | symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAIResponses | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleOpenAIResponses | ai |
 | contract:ai/faux-provider/core-stream | implemented | M1 | contract | github.com/nankedr/pig/ai.CreateFauxCore | ai |
+| contract:ai/responses-helpers | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
+| contract:ai/responses-text-input | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
+| contract:ai/responses-text-stream | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
+| contract:ai/responses-usage | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | symbol:ai/src/compat.ts#ApiProvider | implemented | M2 | symbol | github.com/nankedr/pig/ai.APIProvider | ai |
 | symbol:ai/src/compat.ts#ApiStreamFunction | implemented | M2 | symbol | github.com/nankedr/pig/ai.CompatAPIStreamFunction | ai |
 | symbol:ai/src/compat.ts#ApiStreamSimpleFunction | implemented | M2 | symbol | github.com/nankedr/pig/ai.CompatAPISimpleStreamFunction | ai |

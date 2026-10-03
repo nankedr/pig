@@ -174,7 +174,7 @@ func runtimeAuthOverrides(values []ModelRuntimeAuthOverrides) ai.AuthResolutionO
 }
 
 func checkRuntimeAdapter(model ai.Model) error {
-	if model.Provider != ai.ProviderIDDeepSeek || model.API != ai.APIOpenAICompletions {
+	if model.Provider != ai.ProviderIDDeepSeek || model.API != ai.APIOpenAICompletions && model.API != ai.APIOpenAIResponses {
 		return notImplemented("ModelRuntime.Adapter." + string(model.API))
 	}
 	return nil

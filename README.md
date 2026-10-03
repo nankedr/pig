@@ -4,6 +4,8 @@
 
 M6/v0.6.0 的组合验收、未完成范围与发布前置条件见 [M6 冻结](docs/learning/m6-freeze.md)；真实终端人工验收按用户授权跳过，发布证据明确记录豁免。
 
+#131 已加入 DeepSeek Responses 文本、reasoning/usage 与终态；见 [文本配置与验证](docs/learning/v1-responses-text.md)和[源码映射](docs/mappings/typescript-to-go/v1-responses-text.md)。工具、历史恢复和图片继续由后续票交付。
+
 M6.11 的历史消息 fork、树导航、标签和离开分支摘要见 [交互分支导航](docs/learning/m6-interactive-branches.md)与 [源码映射](docs/mappings/typescript-to-go/m6-interactive-branches.md)。
 
 M6.9 的模型搜索、thinking 选择与模型范围配置见 [模型与 thinking](docs/learning/m6-model-selection.md)。

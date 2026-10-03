@@ -79,7 +79,7 @@ var builtinProviderMetadataByID = map[ProviderID]builtinProviderMetadata{
 	ProviderIDCerebras:                {name: "Cerebras", baseURL: "https://api.cerebras.ai/v1", apis: []API{APIOpenAICompletions}},
 	ProviderIDCloudflareAIGateway:     {name: "Cloudflare AI Gateway", apis: []API{APIAnthropicMessages, APIOpenAICompletions, APIOpenAIResponses}},
 	ProviderIDCloudflareWorkersAI:     {name: "Cloudflare Workers AI", apis: []API{APIOpenAICompletions}},
-	ProviderIDDeepSeek:                {name: "DeepSeek", baseURL: "https://api.deepseek.com", apis: []API{APIOpenAICompletions}},
+	ProviderIDDeepSeek:                {name: "DeepSeek", baseURL: "https://api.deepseek.com", apis: []API{APIOpenAICompletions, APIOpenAIResponses}},
 	ProviderIDFireworks:               {name: "Fireworks", baseURL: "https://api.fireworks.ai/inference", apis: []API{APIAnthropicMessages, APIOpenAICompletions}},
 	ProviderIDGitHubCopilot:           {name: "GitHub Copilot", baseURL: "https://api.individual.githubcopilot.com", apis: []API{APIAnthropicMessages, APIOpenAICompletions, APIOpenAIResponses}},
 	ProviderIDGoogle:                  {name: "Google", baseURL: "https://generativelanguage.googleapis.com/v1beta", apis: []API{APIGoogleGenerativeAI}},
@@ -382,7 +382,9 @@ func newBuiltinProviderAuth(providerID ProviderID) ProviderAuth {
 func newBuiltinProviderAPIs(providerID ProviderID, apiIDs []API) ProviderAPIConfig {
 	streams := make(map[API]ProviderStreams, len(apiIDs))
 	for _, apiID := range apiIDs {
-		if providerID == ProviderIDDeepSeek && apiID == APIOpenAICompletions {
+		if providerID == ProviderIDDeepSeek && apiID == APIOpenAIResponses {
+			streams[apiID] = OpenAIResponsesAPI()
+		} else if providerID == ProviderIDDeepSeek && apiID == APIOpenAICompletions {
 			streams[apiID] = OpenAICompletionsAPI()
 		} else {
 			streams[apiID] = NewStubProviderStreams()

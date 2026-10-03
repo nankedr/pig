@@ -1,5 +1,6 @@
 type codingagent.CreateHeadlessSessionOptions struct
 fields:
+- API ai.API tag=""
 - ModelRuntime *codingagent.ModelRuntime tag=""
 - Models []string tag=""
 - Offline bool tag=""

@@ -143,7 +143,11 @@
         "symbol:ai/src/api/openai-responses-shared.ts#convertResponsesTools",
         "symbol:ai/src/api/openai-responses-shared.ts#processResponsesStream",
         "contract:codingagent/agent-session",
-        "contract:rpc/session-control"
+        "contract:rpc/session-control",
+        "contract:ai/responses-text-input",
+        "contract:ai/responses-text-stream",
+        "contract:ai/responses-helpers",
+        "contract:ai/responses-usage"
       ]
     },
     {

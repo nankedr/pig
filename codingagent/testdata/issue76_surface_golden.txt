@@ -4,6 +4,7 @@ type ai.APIKeyCredential
 - Env ai.ProviderEnv "json:\"env,omitempty\""
 - Extra map[string]json.RawMessage "json:\"-\""
 type codingagent.CreateHeadlessSessionOptions
+- API ai.API ""
 - ModelRuntime *codingagent.ModelRuntime ""
 - Models []string ""
 - Offline bool ""

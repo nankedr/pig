@@ -26,6 +26,7 @@ Options:
   --provider <name>              Provider name (Headless modes currently require deepseek)
   --model <id>                   Exact model ID (required for Headless modes)
   --api-key <key>                Explicit API key (overrides DEEPSEEK_API_KEY)
+  --api <protocol>               openai-completions (default) or openai-responses
   --system-prompt <text>         System prompt (default: coding assistant prompt)
   --append-system-prompt <text>  Append text or file contents to the system prompt (can be used multiple times)
   --mode <mode>                  Output mode: text (default), json, or rpc; see availability below

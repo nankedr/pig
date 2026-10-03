@@ -165,6 +165,25 @@ func stubCompatAPIProvider(api API) APIProvider {
 }
 
 func builtinCompatAPIProvider(api API) APIProvider {
+	if api == APIOpenAIResponses {
+		return APIProvider{API: api, StreamSimple: streamSimpleOpenAIResponses, Stream: func(ctx context.Context, model Model, input Context, options ProviderStreamOptions) *AssistantMessageEventStream {
+			switch value := options.(type) {
+			case OpenAIResponsesOptions:
+				return streamOpenAIResponses(ctx, model, input, value)
+			case *OpenAIResponsesOptions:
+				if value != nil {
+					return streamOpenAIResponses(ctx, model, input, *value)
+				}
+			case StreamOptions:
+				return streamOpenAIResponses(ctx, model, input, OpenAIResponsesOptions{StreamOptions: value})
+			case *StreamOptions:
+				if value != nil {
+					return streamOpenAIResponses(ctx, model, input, OpenAIResponsesOptions{StreamOptions: *value})
+				}
+			}
+			return failedProviderStream(fmt.Errorf("%w: OpenAI Responses options type %T", ErrEventStreamInvariant, options))
+		}}
+	}
 	if api != APIOpenAICompletions {
 		return stubCompatAPIProvider(api)
 	}

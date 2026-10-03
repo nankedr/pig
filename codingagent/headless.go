@@ -2,6 +2,7 @@ package codingagent
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -30,6 +31,7 @@ type HeadlessOutcome struct {
 
 // CreateHeadlessSessionOptions contains the explicit Headless product inputs.
 type CreateHeadlessSessionOptions struct {
+	API                  ai.API
 	ModelRuntime         *ModelRuntime
 	Models               []string
 	Offline              bool
@@ -215,6 +217,12 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			diagnostics = append(diagnostics, AgentSessionRuntimeDiagnostic{Type: "warning", Message: *resolved.Warning})
 		}
 	}
+	if options.API != "" {
+		model.API = options.API
+		if model.API == ai.APIOpenAIResponses {
+			model.Compat = ai.Optional[json.RawMessage]{}
+		}
+	}
 	if options.BaseURL != nil {
 		baseURL := strings.TrimSpace(*options.BaseURL)
 		if baseURL == "" {
@@ -231,6 +239,12 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return nil, err
 	}
 	stream := func(runContext context.Context, requestModel ai.Model, input ai.Context, streamOptions ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
+		if options.API != "" && requestModel.Provider == model.Provider {
+			requestModel.API = options.API
+			if requestModel.API == ai.APIOpenAIResponses {
+				requestModel.Compat = ai.Optional[json.RawMessage]{}
+			}
+		}
 		if options.BaseURL != nil && requestModel.Provider == model.Provider {
 			requestModel.BaseURL = strings.TrimSpace(*options.BaseURL)
 		}
