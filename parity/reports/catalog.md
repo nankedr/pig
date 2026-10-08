@@ -13,8 +13,8 @@
 | --- | --- |
 | inventoried | 5143 |
 | scaffolded | 3620 |
-| partial | 631 |
-| implemented | 140 |
+| partial | 630 |
+| implemented | 141 |
 | verified | 167 |
 | deferred | 3 |
 
@@ -4815,7 +4815,6 @@
 | contract:ai/provider | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/provider-factories | partial | M11 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/providers-all | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
-| contract:ai/responses-local-history | partial | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-service-boundaries | partial | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/tool | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:auth/pig-ai/login-cli | partial | M11 | contract | github.com/nankedr/pig/internal/pigaicli | ai |
@@ -5025,6 +5024,7 @@
 | contract:ai/faux-provider/core-stream | implemented | M1 | contract | github.com/nankedr/pig/ai.CreateFauxCore | ai |
 | contract:ai/responses-function-tools | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-helpers | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
+| contract:ai/responses-local-history | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-reasoning-replay | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-text-input | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-text-stream | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
