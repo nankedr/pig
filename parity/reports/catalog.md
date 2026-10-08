@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9699
+- Total entries: 9703
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5144 |
+| inventoried | 5143 |
 | scaffolded | 3620 |
-| partial | 628 |
-| implemented | 137 |
+| partial | 631 |
+| implemented | 139 |
 | verified | 167 |
 | deferred | 3 |
 
@@ -4399,7 +4399,6 @@
 | symbol:ai/src/api/openai-responses-shared.ts#ConvertResponsesMessagesOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses-shared.ts#ConvertResponsesToolsOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses-shared.ts#OpenAIResponsesStreamOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
-| symbol:ai/src/api/openai-responses-shared.ts#convertResponsesTools | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses.lazy.ts#openAIResponsesApi | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses.ts#OpenAIResponsesOptions | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses.ts#streamSimple | inventoried | M14 | package | github.com/nankedr/pig/ai | ai |
@@ -4816,6 +4815,8 @@
 | contract:ai/provider | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/provider-factories | partial | M11 | contract | github.com/nankedr/pig/ai | ai |
 | contract:ai/providers-all | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
+| contract:ai/responses-local-history | partial | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
+| contract:ai/responses-service-boundaries | partial | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/tool | partial | M1 | contract | github.com/nankedr/pig/ai | ai |
 | contract:auth/pig-ai/login-cli | partial | M11 | contract | github.com/nankedr/pig/internal/pigaicli | ai |
 | matrix:ai/openai-completions/compat/open-aicompletions-compat-requires-reasoning-content-on-assistant-messages | partial | M2 | field | github.com/nankedr/pig/ai.OpenAICompletionsCompat.RequiresReasoningContentOnAssistantMessages | ai |
@@ -4996,6 +4997,7 @@
 | member:ai/src/types.ts#ToolResultMessage.addedToolNames | partial | M2 | contract | github.com/nankedr/pig/ai.ToolResultMessage.AddedToolNames | ai |
 | module-ai | partial | M1 | package | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses-shared.ts#convertResponsesMessages | partial | M14 | contract | github.com/nankedr/pig/ai | ai |
+| symbol:ai/src/api/openai-responses-shared.ts#convertResponsesTools | partial | M14 | symbol | github.com/nankedr/pig/ai#StreamOpenAIResponses | ai |
 | symbol:ai/src/api/openai-responses-shared.ts#processResponsesStream | partial | M14 | contract | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/openai-responses.ts#stream | partial | M14 | contract | github.com/nankedr/pig/ai | ai |
 | symbol:ai/src/api/transform-messages.ts#transformMessages | partial | M2 | contract | github.com/nankedr/pig/ai.TransformMessages | ai |
@@ -5021,7 +5023,9 @@
 | symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAICompletions | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleOpenAICompletions | ai |
 | symbol:ai/src/legacy-api-aliases.ts#streamSimpleOpenAIResponses | partial | M2 | symbol | github.com/nankedr/pig/ai.StreamSimpleOpenAIResponses | ai |
 | contract:ai/faux-provider/core-stream | implemented | M1 | contract | github.com/nankedr/pig/ai.CreateFauxCore | ai |
+| contract:ai/responses-function-tools | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-helpers | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
+| contract:ai/responses-reasoning-replay | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-text-input | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-text-stream | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |
 | contract:ai/responses-usage | implemented | M14 | contract | github.com/nankedr/pig/ai#OpenAIResponsesAPI | ai |

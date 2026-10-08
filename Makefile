@@ -1,4 +1,4 @@
-.PHONY: m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze m1-live-smoke m1-freeze m2-gate m2-repeat m2-oracle m2-freeze m2-clean m3-gate m3-repeat m3-oracle m3-clean m3-freeze m3-node-preflight
+.PHONY: responses-tools-live-smoke m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze m1-live-smoke m1-freeze m2-gate m2-repeat m2-oracle m2-freeze m2-clean m3-gate m3-repeat m3-oracle m3-clean m3-freeze m3-node-preflight
 
 .NOTPARALLEL: m0-offline m0-freeze m1-freeze m2-gate m2-freeze m3-gate m3-freeze m3-oracle
 
@@ -62,6 +62,7 @@ m0-offline:
 	go run ./examples/telemetry
 	go run ./examples/message-handoff
 	go run ./examples/context-overflow
+	go run ./examples/responses-tools
 	go run ./examples/agent-proxy
 
 m0-node-preflight:
@@ -130,6 +131,7 @@ m0-oracle: m0-node-preflight
 	node --experimental-strip-types parity/oracle/openai-completions-text.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-sse.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-retry.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
+	node --experimental-strip-types parity/oracle/responses-tools.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-tools.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-tool-result.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
 	node --experimental-strip-types parity/oracle/openai-completions-thinking.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
@@ -151,6 +153,9 @@ m0-source-drift: m0-node-preflight
 		cmp parity/baseline/catalog/image/models.json "$$tmp/image-models.json"
 
 m0-freeze: m0-gate m0-oracle m0-source-drift
+
+responses-tools-live-smoke:
+	PIG_REQUIRE_RESPONSES_TOOLS_LIVE=1 go test ./agent -run '^TestResponsesAgentDeepSeekLiveToolContinuation$$' -count=1
 
 m1-live-smoke:
 	PIG_REQUIRE_LIVE=1 go test ./codingagent -run '^TestDeepSeekLiveHeadlessReadContinuation$$' -count=1

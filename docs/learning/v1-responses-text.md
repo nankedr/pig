@@ -46,4 +46,4 @@ node --experimental-strip-types parity/oracle/responses-text.mjs .upstream/pi --
 PIG_REQUIRE_RESPONSES_LIVE=1 go test ./cmd/pig -run '^TestIssue131DeepSeekResponsesLiveText$' -count=1
 ```
 
-普通门禁离线。受保护 smoke 缺密钥必须失败；自由输出只检查成功与非空，不用作精确 golden。2026-10-03 在 darwin-arm64 上以受保护凭证完成上述 SDK 与真实 CLI 文本 smoke（deepseek-v4-pro，均成功且文本非空）。本票没有完成工具或视觉 smoke，也不代表 V1 freeze/release 已通过。
+普通门禁离线。受保护 smoke 缺密钥必须失败；自由输出只检查成功与非空，不用作精确 golden。2026-10-03 在 darwin-arm64 上以受保护凭证完成上述 SDK 与真实 CLI 文本 smoke（deepseek-v4-pro，均成功且文本非空）。文本票 #131 没有完成工具或视觉 smoke；后续工具 smoke 见 [#132](v1-responses-tools.md)，V1 freeze/release 尚待整体验收。

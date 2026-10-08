@@ -1,5 +1,7 @@
 # Pig 文档导航
 
+V1 Responses 工具与本地历史重放见 [工具学习文档](learning/v1-responses-tools.md)与[源码映射](mappings/typescript-to-go/v1-responses-tools.md)。
+
 M6/v0.6.0 的组合验收、未完成范围与发布前置条件见 [M6 冻结](learning/m6-freeze.md)；真实终端人工验收按用户授权跳过，发布证据明确记录豁免。
 
 M6.11 的历史消息 fork、树导航、标签和离开分支摘要见 [交互分支导航](learning/m6-interactive-branches.md)与 [源码映射](mappings/typescript-to-go/m6-interactive-branches.md)。

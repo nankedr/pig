@@ -147,7 +147,11 @@
         "contract:ai/responses-text-input",
         "contract:ai/responses-text-stream",
         "contract:ai/responses-helpers",
-        "contract:ai/responses-usage"
+        "contract:ai/responses-usage",
+        "contract:ai/responses-function-tools",
+        "contract:ai/responses-reasoning-replay",
+        "contract:ai/responses-local-history",
+        "contract:ai/responses-service-boundaries"
       ]
     },
     {

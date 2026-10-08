@@ -1,0 +1,788 @@
+{
+  "schema_version": "1.0.0",
+  "baseline_commit": "936aff00918de1187f085f123c2812d8f2d67745",
+  "deterministic": true,
+  "source": "packages/ai/src/api/openai-responses.ts#stream",
+  "observation_scope": "function tools, call_id|item_id, arguments delta/done suffix, multiple calls, truncated partial, tool history and choices; DeepSeek plain reasoning and strict protocol validation are separate service conformance",
+  "model": {
+    "id": "fixture",
+    "name": "Fixture",
+    "api": "openai-responses",
+    "provider": "deepseek",
+    "baseUrl": "https://local.invalid",
+    "reasoning": false,
+    "input": [
+      "text"
+    ],
+    "cost": {
+      "input": 0,
+      "output": 0,
+      "cacheRead": 0,
+      "cacheWrite": 0
+    },
+    "contextWindow": 32000,
+    "maxTokens": 512
+  },
+  "cases": [
+    {
+      "name": "single",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "lookup",
+            "timestamp": 1
+          }
+        ],
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Look up a value",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          }
+        ]
+      },
+      "options": {},
+      "sse": "data: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"\"}}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":0,\"delta\":\"{\\\"query\\\":\"}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":0,\"delta\":\"\\\"hello\\\"}\"}\n\ndata: {\"type\":\"response.function_call_arguments.done\",\"output_index\":0,\"arguments\":\"{\\\"query\\\":\\\"hello\\\"}\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"{\\\"query\\\":\\\"hello\\\"}\"}}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"output\":[]}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "fixture",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "lookup"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512,
+          "tools": [
+            {
+              "type": "function",
+              "name": "lookup",
+              "description": "Look up a value",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "types": [
+        "start",
+        "toolcall_start",
+        "toolcall_delta",
+        "toolcall_delta",
+        "toolcall_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "a|fc_a",
+            "name": "lookup",
+            "arguments": {
+              "query": "hello"
+            }
+          }
+        ],
+        "stopReason": "toolUse"
+      }
+    },
+    {
+      "name": "batch",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "lookup",
+            "timestamp": 1
+          }
+        ],
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Look up a value",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          }
+        ]
+      },
+      "options": {},
+      "sse": "data: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"\"}}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":0,\"delta\":\"{\\\"query\\\":\"}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":0,\"delta\":\"\\\"hello\\\"}\"}\n\ndata: {\"type\":\"response.function_call_arguments.done\",\"output_index\":0,\"arguments\":\"{\\\"query\\\":\\\"hello\\\"}\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"{\\\"query\\\":\\\"hello\\\"}\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":1,\"item\":{\"type\":\"function_call\",\"id\":\"fc_b\",\"call_id\":\"b\",\"name\":\"lookup\",\"arguments\":\"\"}}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":1,\"delta\":\"{\\\"query\\\":\"}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":1,\"delta\":\"\\\"hello\\\"}\"}\n\ndata: {\"type\":\"response.function_call_arguments.done\",\"output_index\":1,\"arguments\":\"{\\\"query\\\":\\\"hello\\\"}\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":1,\"item\":{\"type\":\"function_call\",\"id\":\"fc_b\",\"call_id\":\"b\",\"name\":\"lookup\",\"arguments\":\"{\\\"query\\\":\\\"hello\\\"}\"}}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"output\":[]}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "fixture",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "lookup"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512,
+          "tools": [
+            {
+              "type": "function",
+              "name": "lookup",
+              "description": "Look up a value",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "types": [
+        "start",
+        "toolcall_start",
+        "toolcall_delta",
+        "toolcall_delta",
+        "toolcall_end",
+        "toolcall_start",
+        "toolcall_delta",
+        "toolcall_delta",
+        "toolcall_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "a|fc_a",
+            "name": "lookup",
+            "arguments": {
+              "query": "hello"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "b|fc_b",
+            "name": "lookup",
+            "arguments": {
+              "query": "hello"
+            }
+          }
+        ],
+        "stopReason": "toolUse"
+      }
+    },
+    {
+      "name": "arguments done suffix",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "lookup",
+            "timestamp": 1
+          }
+        ],
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Look up a value",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          }
+        ]
+      },
+      "options": {},
+      "sse": "data: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"\"}}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":0,\"delta\":\"{\\\"query\\\":\\\"hel\"}\n\ndata: {\"type\":\"response.function_call_arguments.done\",\"output_index\":0,\"arguments\":\"{\\\"query\\\":\\\"hello\\\"}\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"{\\\"query\\\":\\\"hello\\\"}\"}}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"output\":[]}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "fixture",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "lookup"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512,
+          "tools": [
+            {
+              "type": "function",
+              "name": "lookup",
+              "description": "Look up a value",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "types": [
+        "start",
+        "toolcall_start",
+        "toolcall_delta",
+        "toolcall_delta",
+        "toolcall_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "a|fc_a",
+            "name": "lookup",
+            "arguments": {
+              "query": "hello"
+            }
+          }
+        ],
+        "stopReason": "toolUse"
+      }
+    },
+    {
+      "name": "partial truncated",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "lookup",
+            "timestamp": 1
+          }
+        ],
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Look up a value",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          }
+        ]
+      },
+      "options": {},
+      "sse": "data: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"\"}}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":0,\"delta\":\"{\\\"query\\\":\\\"hel\"}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "fixture",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "lookup"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512,
+          "tools": [
+            {
+              "type": "function",
+              "name": "lookup",
+              "description": "Look up a value",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "types": [
+        "start",
+        "toolcall_start",
+        "toolcall_delta",
+        "error"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "a|fc_a",
+            "name": "lookup",
+            "arguments": {
+              "query": "hel"
+            }
+          }
+        ],
+        "stopReason": "error"
+      }
+    },
+    {
+      "name": "partial length",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "lookup",
+            "timestamp": 1
+          }
+        ],
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Look up a value",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          }
+        ]
+      },
+      "options": {},
+      "sse": "data: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"\"}}\n\ndata: {\"type\":\"response.function_call_arguments.delta\",\"output_index\":0,\"delta\":\"{\\\"query\\\":\\\"hel\"}\n\ndata: {\"type\":\"response.function_call_arguments.done\",\"output_index\":0,\"arguments\":\"{\\\"query\\\":\\\"hel\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"function_call\",\"id\":\"fc_a\",\"call_id\":\"a\",\"name\":\"lookup\",\"arguments\":\"{\\\"query\\\":\\\"hel\",\"status\":\"incomplete\"}}\n\ndata: {\"type\":\"response.incomplete\",\"response\":{\"status\":\"incomplete\",\"incomplete_details\":{\"reason\":\"max_output_tokens\"},\"output\":[]}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "fixture",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "lookup"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512,
+          "tools": [
+            {
+              "type": "function",
+              "name": "lookup",
+              "description": "Look up a value",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "types": [
+        "start",
+        "toolcall_start",
+        "toolcall_delta",
+        "toolcall_end",
+        "done"
+      ],
+      "outcome": {
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "a|fc_a",
+            "name": "lookup",
+            "arguments": {
+              "query": "hel"
+            }
+          }
+        ],
+        "stopReason": "length"
+      }
+    },
+    {
+      "name": "history replay",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "lookup",
+            "timestamp": 1
+          },
+          {
+            "role": "assistant",
+            "api": "openai-responses",
+            "provider": "deepseek",
+            "model": "fixture",
+            "stopReason": "toolUse",
+            "timestamp": 2,
+            "usage": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "totalTokens": 0,
+              "cost": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "total": 0
+              }
+            },
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "a|fc_a",
+                "name": "lookup",
+                "arguments": {
+                  "query": "hello"
+                }
+              }
+            ]
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "a|fc_a",
+            "toolName": "lookup",
+            "content": [
+              {
+                "type": "text",
+                "text": "result"
+              }
+            ],
+            "isError": false,
+            "timestamp": 3
+          }
+        ],
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Look up a value",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          }
+        ]
+      },
+      "options": {},
+      "sse": "data: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"output\":[]}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "fixture",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "lookup"
+                }
+              ]
+            },
+            {
+              "type": "function_call",
+              "id": "fc_a",
+              "call_id": "a",
+              "name": "lookup",
+              "arguments": "{\"query\":\"hello\"}"
+            },
+            {
+              "type": "function_call_output",
+              "call_id": "a",
+              "output": "result"
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512,
+          "tools": [
+            {
+              "type": "function",
+              "name": "lookup",
+              "description": "Look up a value",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "types": [
+        "start",
+        "done"
+      ],
+      "outcome": {
+        "content": [],
+        "stopReason": "stop"
+      }
+    },
+    {
+      "name": "choice none",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "lookup",
+            "timestamp": 1
+          }
+        ],
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Look up a value",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          }
+        ]
+      },
+      "options": {
+        "toolChoice": "none"
+      },
+      "sse": "data: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"output\":[]}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "fixture",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "lookup"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512,
+          "tools": [
+            {
+              "type": "function",
+              "name": "lookup",
+              "description": "Look up a value",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          ],
+          "tool_choice": "none"
+        }
+      },
+      "types": [
+        "start",
+        "done"
+      ],
+      "outcome": {
+        "content": [],
+        "stopReason": "stop"
+      }
+    },
+    {
+      "name": "choice function",
+      "context": {
+        "messages": [
+          {
+            "role": "user",
+            "content": "lookup",
+            "timestamp": 1
+          }
+        ],
+        "tools": [
+          {
+            "name": "lookup",
+            "description": "Look up a value",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "query"
+              ]
+            }
+          }
+        ]
+      },
+      "options": {
+        "toolChoice": {
+          "type": "function",
+          "name": "lookup"
+        }
+      },
+      "sse": "data: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"output\":[]}}\n\n",
+      "request": {
+        "url": "https://local.invalid/responses",
+        "body": {
+          "model": "fixture",
+          "input": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "input_text",
+                  "text": "lookup"
+                }
+              ]
+            }
+          ],
+          "stream": true,
+          "store": false,
+          "max_output_tokens": 512,
+          "tools": [
+            {
+              "type": "function",
+              "name": "lookup",
+              "description": "Look up a value",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "query"
+                ]
+              }
+            }
+          ],
+          "tool_choice": {
+            "type": "function",
+            "name": "lookup"
+          }
+        }
+      },
+      "types": [
+        "start",
+        "done"
+      ],
+      "outcome": {
+        "content": [],
+        "stopReason": "stop"
+      }
+    }
+  ],
+  "observation_hash": "c4846b5f7263e7f48867d21e4816f9f0be9bf336a120ed6d7a87f2a03bde1965"
+}

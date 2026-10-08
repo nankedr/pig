@@ -18,7 +18,7 @@ func streamOpenAIResponses(ctx context.Context, model Model, input Context, opti
 	if model.API != APIOpenAIResponses {
 		return failedProviderStream(fmt.Errorf("%w: model API %q is not %q", ErrEventStreamInvariant, model.API, APIOpenAIResponses))
 	}
-	if options.ReasoningSummary.IsSet() || options.ServiceTier.IsSet() || !isNilRuntimeValue(options.ToolChoice) || len(input.Tools) > 0 {
+	if options.ReasoningSummary.IsSet() || options.ServiceTier.IsSet() {
 		return failedProviderStream(newNotImplemented("OpenAIResponses.AdvancedOptions"))
 	}
 	cacheDisabled := options.CacheRetention != nil && *options.CacheRetention == CacheRetentionNone
@@ -32,7 +32,22 @@ func streamOpenAIResponses(ctx context.Context, model Model, input Context, opti
 	if err != nil {
 		return failedProviderStream(err)
 	}
+	tools, err := responsesTools(input.Tools)
+	if err != nil {
+		return failedProviderStream(err)
+	}
 	payload := map[string]any{"model": model.ID, "input": items, "stream": true, "store": false}
+	if len(tools) > 0 {
+		payload["tools"] = tools
+	}
+	if !isNilRuntimeValue(options.ToolChoice) {
+		switch options.ToolChoice.(type) {
+		case OpenAIResponsesToolChoiceMode, *OpenAIResponsesToolChoiceMode, OpenAIResponsesToolChoiceFunction, *OpenAIResponsesToolChoiceFunction:
+			payload["tool_choice"] = options.ToolChoice
+		default:
+			return failedProviderStream(newNotImplemented("OpenAIResponses.ToolChoice"))
+		}
+	}
 	if instructions, ok := input.SystemPrompt.Value(); ok {
 		payload["instructions"] = sanitizeOpenAIText(instructions)
 	}
@@ -79,6 +94,7 @@ func responsesInput(model Model, input Context) ([]any, error) {
 		return nil, err
 	}
 	items := make([]any, 0, len(messages))
+	calls, results := map[string]bool{}, map[string]bool{}
 	for _, message := range messages {
 		switch m := message.(type) {
 		case UserMessage:
@@ -103,20 +119,84 @@ func responsesInput(model Model, input Context) ([]any, error) {
 			}
 		case AssistantMessage:
 			for _, block := range m.Content {
-				if p, ok := block.(*TextContent); ok && p != nil {
-					block = *p
+				switch block := replayContentValue(block).(type) {
+				case TextContent:
+					items = append(items, map[string]any{"type": "message", "role": "assistant", "status": "completed", "content": []any{map[string]any{"type": "output_text", "text": sanitizeOpenAIText(block.Text), "annotations": []any{}}}})
+				case ThinkingContent:
+					if redacted, _ := block.Redacted.Value(); redacted {
+						return nil, newNotImplemented("OpenAIResponses.Input.EncryptedReasoning")
+					}
+					item := map[string]any{"type": "reasoning", "content": []any{map[string]any{"type": "reasoning_text", "text": sanitizeOpenAIText(block.Thinking)}}}
+					if signature, ok := block.ThinkingSignature.Value(); ok {
+						var metadata struct {
+							ID string `json:"id"`
+						}
+						if json.Unmarshal([]byte(signature), &metadata) == nil && metadata.ID != "" {
+							item["id"] = metadata.ID
+						}
+					}
+					items = append(items, item)
+				case ToolCall:
+					callID, itemID, _ := strings.Cut(block.ID, "|")
+					if callID == "" || calls[callID] {
+						return nil, errors.New("Responses history has empty or duplicate call_id")
+					}
+					calls[callID] = true
+					args, err := json.Marshal(block.Arguments)
+					if err != nil {
+						return nil, err
+					}
+					item := map[string]any{"type": "function_call", "call_id": callID, "name": block.Name, "arguments": string(args)}
+					if itemID != "" {
+						item["id"] = itemID
+					}
+					items = append(items, item)
 				}
-				text, ok := block.(TextContent)
-				if !ok {
-					return nil, newNotImplemented("OpenAIResponses.Input.History")
-				}
-				items = append(items, map[string]any{"type": "message", "role": "assistant", "status": "completed", "content": []any{map[string]any{"type": "output_text", "text": sanitizeOpenAIText(text.Text), "annotations": []any{}}}})
 			}
+		case ToolResultMessage:
+			callID, _, _ := strings.Cut(m.ToolCallID, "|")
+			if !calls[callID] || results[callID] {
+				return nil, errors.New("Responses history has orphan or duplicate function_call_output")
+			}
+			results[callID] = true
+			var texts []string
+			for _, block := range m.Content {
+				text, ok := replayContentValue(block).(TextContent)
+				if !ok {
+					return nil, newNotImplemented("OpenAIResponses.Input.ToolResultImage")
+				}
+				texts = append(texts, sanitizeOpenAIText(text.Text))
+			}
+			items = append(items, map[string]any{"type": "function_call_output", "call_id": callID, "output": strings.Join(texts, "\n")})
 		default:
 			return nil, newNotImplemented("OpenAIResponses.Input.ToolResult")
 		}
 	}
 	return items, nil
+}
+
+func responsesTools(tools []Tool) ([]any, error) {
+	out := make([]any, 0, len(tools))
+	seen := map[string]bool{}
+	for _, tool := range tools {
+		if tool.Name == "" || len(tool.Name) > 128 || sanitizeOpenAIToolCallIDPart(tool.Name) != tool.Name || seen[tool.Name] {
+			return nil, fmt.Errorf("invalid or duplicate Responses function name %q", tool.Name)
+		}
+		seen[tool.Name] = true
+		if !isNilRuntimeValue(tool.ConstrainedSampling) {
+			switch tool.ConstrainedSampling.(type) {
+			case ConstrainedSamplingDisabled, *ConstrainedSamplingDisabled:
+			default:
+				return nil, newNotImplemented("OpenAIResponses.Tools.ConstrainedSampling")
+			}
+		}
+		item := map[string]any{"type": "function", "name": tool.Name, "description": tool.Description}
+		if len(tool.Parameters) > 0 {
+			item["parameters"] = tool.Parameters
+		}
+		out = append(out, item)
+	}
+	return out, nil
 }
 
 func runOpenAIResponses(ctx context.Context, stream *AssistantMessageEventStream, model Model, options OpenAIResponsesOptions, payload map[string]any) {
@@ -147,10 +227,13 @@ type responsesPart struct {
 }
 
 type responsesItem struct {
-	ID      string          `json:"id"`
-	Type    string          `json:"type"`
-	Content []responsesPart `json:"content"`
-	Summary []responsesPart `json:"summary"`
+	ID        string          `json:"id"`
+	CallID    string          `json:"call_id"`
+	Name      string          `json:"name"`
+	Arguments string          `json:"arguments"`
+	Type      string          `json:"type"`
+	Status    string          `json:"status"`
+	Content   []responsesPart `json:"content"`
 }
 
 type responsesResponse struct {
@@ -184,9 +267,10 @@ type responsesEvent struct {
 	Sequence     *int64             `json:"sequence_number"`
 	OutputIndex  int                `json:"output_index"`
 	ContentIndex int                `json:"content_index"`
-	SummaryIndex int                `json:"summary_index"`
 	Delta        string             `json:"delta"`
 	Text         string             `json:"text"`
+	Arguments    string             `json:"arguments"`
+	ItemID       string             `json:"item_id"`
 	Code         string             `json:"code"`
 	Message      string             `json:"message"`
 	Item         responsesItem      `json:"item"`
@@ -196,6 +280,13 @@ type responsesEvent struct {
 
 type responsesContent struct {
 	index int
+	ended bool
+}
+
+type responsesToolState struct {
+	index int
+	item  responsesItem
+	raw   string
 	ended bool
 }
 
@@ -238,6 +329,7 @@ func executeOpenAIResponses(ctx context.Context, stream *AssistantMessageEventSt
 	}
 	stream.Push(AssistantMessageStartEvent{Type: AssistantMessageEventTypeStart, Partial: *output})
 	parts := map[[3]int]*responsesContent{}
+	reasoningIDs := map[int]string{}
 	var partOrder [][3]int
 	appendPart := func(item, part, kind int, text string, full, end bool) error {
 		key := [3]int{item, part, kind}
@@ -250,7 +342,12 @@ func executeOpenAIResponses(ctx context.Context, stream *AssistantMessageEventSt
 				output.Content = append(output.Content, TextContent{Type: ContentTypeText})
 				stream.Push(AssistantMessageTextStartEvent{Type: AssistantMessageEventTypeTextStart, ContentIndex: state.index, Partial: *output})
 			} else {
-				output.Content = append(output.Content, ThinkingContent{Type: ContentTypeThinking})
+				block := ThinkingContent{Type: ContentTypeThinking}
+				if id := reasoningIDs[item]; id != "" {
+					metadata, _ := json.Marshal(map[string]string{"id": id, "type": "reasoning"})
+					block.ThinkingSignature = Some(string(metadata))
+				}
+				output.Content = append(output.Content, block)
 				stream.Push(AssistantMessageThinkingStartEvent{Type: AssistantMessageEventTypeThinkingStart, ContentIndex: state.index, Partial: *output})
 			}
 		}
@@ -295,7 +392,78 @@ func executeOpenAIResponses(ctx context.Context, stream *AssistantMessageEventSt
 		}
 		return nil
 	}
+	tools := map[int]*responsesToolState{}
+	var toolOrder []int
+	callIDs := map[string]int{}
+	if items, ok := payload["input"].([]any); ok {
+		for _, raw := range items {
+			if item, ok := raw.(map[string]any); ok && item["type"] == "function_call" {
+				if id, ok := item["call_id"].(string); ok {
+					callIDs[id] = -1
+				}
+			}
+		}
+	}
+	appendTool := func(index int, item responsesItem, text string, full, end bool) error {
+		state := tools[index]
+		if state == nil {
+			if item.CallID == "" || item.Name == "" {
+				return errors.New("Responses function call missing call_id or name")
+			}
+			if _, exists := callIDs[item.CallID]; exists {
+				return errors.New("Responses duplicate function call_id")
+			}
+			callIDs[item.CallID] = index
+			state = &responsesToolState{index: len(output.Content), item: item}
+			tools[index] = state
+			toolOrder = append(toolOrder, index)
+			output.Content = append(output.Content, ToolCall{Type: ContentTypeToolCall, ID: item.CallID + "|" + item.ID, Name: item.Name, Arguments: map[string]any{}})
+			stream.Push(AssistantMessageToolCallStartEvent{Type: AssistantMessageEventTypeToolCallStart, ContentIndex: state.index, Partial: *output})
+		}
+		if item.CallID != "" && item.CallID != state.item.CallID || item.Name != "" && item.Name != state.item.Name || item.ID != "" && state.item.ID != "" && item.ID != state.item.ID {
+			return errors.New("Responses function call identity changed")
+		}
+		if full {
+			if !strings.HasPrefix(text, state.raw) {
+				return errors.New("Responses final arguments disagree with deltas")
+			}
+			text = strings.TrimPrefix(text, state.raw)
+		}
+		if state.ended {
+			if text != "" {
+				return errors.New("Responses arguments changed after done")
+			}
+			return nil
+		}
+		state.raw += text
+		call := output.Content[state.index].(ToolCall)
+		call.Arguments = ParseStreamingJSONObject(state.raw)
+		output.Content[state.index] = call
+		if text != "" {
+			stream.Push(AssistantMessageToolCallDeltaEvent{Type: AssistantMessageEventTypeToolCallDelta, ContentIndex: state.index, Delta: text, Partial: *output})
+		}
+		if end {
+			var args map[string]any
+			if item.Status != "incomplete" {
+				if err := json.Unmarshal([]byte(state.raw), &args); err != nil || args == nil {
+					return errors.New("Responses function arguments are not a complete JSON object")
+				}
+				call.Arguments = args
+			}
+			output.Content[state.index] = call
+			state.ended = true
+			stream.Push(AssistantMessageToolCallEndEvent{Type: AssistantMessageEventTypeToolCallEnd, ContentIndex: state.index, ToolCall: call, Partial: *output})
+		}
+		return nil
+	}
 	applyItem := func(index int, item responsesItem, end bool) error {
+		if item.Type == "function_call" {
+			return appendTool(index, item, item.Arguments, true, end)
+		}
+		if item.Type == "reasoning" && item.ID != "" {
+			reasoningIDs[index] = item.ID
+		}
+
 		if item.Type != "message" && item.Type != "reasoning" {
 			return newNotImplemented("OpenAIResponses.Output." + item.Type)
 		}
@@ -312,9 +480,14 @@ func executeOpenAIResponses(ctx context.Context, stream *AssistantMessageEventSt
 				return err
 			}
 		}
-		for p, part := range item.Summary {
-			if err := appendPart(index, p, 2, part.Text, true, end); err != nil {
-				return err
+		if item.Type == "reasoning" && item.ID != "" {
+			metadata, _ := json.Marshal(map[string]string{"id": item.ID, "type": "reasoning"})
+			for p := range item.Content {
+				if state := parts[[3]int{index, p, 1}]; state != nil {
+					block := output.Content[state.index].(ThinkingContent)
+					block.ThinkingSignature = Some(string(metadata))
+					output.Content[state.index] = block
+				}
 			}
 		}
 		return nil
@@ -353,37 +526,43 @@ func executeOpenAIResponses(ctx context.Context, stream *AssistantMessageEventSt
 			}
 		}
 		switch event.Type {
+		case "response.function_call_arguments.delta", "response.function_call_arguments.done":
+			state := tools[event.OutputIndex]
+			if state == nil {
+				return false, errors.New("Responses arguments before function call item")
+			}
+			if event.ItemID != "" && event.ItemID != state.item.ID {
+				return false, errors.New("Responses argument item_id mismatch")
+			}
+			text, done := event.Delta, event.Type == "response.function_call_arguments.done"
+			if done {
+				text = event.Arguments
+			}
+			return false, appendTool(event.OutputIndex, responsesItem{}, text, done, false)
+		case "response.reasoning_summary_part.added", "response.reasoning_summary_part.done", "response.reasoning_summary_text.delta", "response.reasoning_summary_text.done":
+			return false, nil
 		case "response.output_item.added", "response.output_item.done":
 			return false, applyItem(event.OutputIndex, event.Item, event.Type == "response.output_item.done")
-		case "response.content_part.added", "response.content_part.done", "response.reasoning_summary_part.added", "response.reasoning_summary_part.done":
+		case "response.content_part.added", "response.content_part.done":
 			kind, index := 0, event.ContentIndex
 			if event.Part.Type == "reasoning_text" {
 				kind = 1
-			}
-			if strings.Contains(event.Type, "summary") {
-				kind, index = 2, event.SummaryIndex
 			}
 			text := event.Part.Text
 			if event.Part.Type == "refusal" {
 				text = event.Part.Refusal
 			}
 			return false, appendPart(event.OutputIndex, index, kind, text, true, strings.HasSuffix(event.Type, ".done"))
-		case "response.output_text.delta", "response.refusal.delta", "response.reasoning_text.delta", "response.reasoning_summary_text.delta":
+		case "response.output_text.delta", "response.refusal.delta", "response.reasoning_text.delta":
 			kind, index := 0, event.ContentIndex
 			if event.Type == "response.reasoning_text.delta" {
 				kind = 1
 			}
-			if event.Type == "response.reasoning_summary_text.delta" {
-				kind, index = 2, event.SummaryIndex
-			}
 			return false, appendPart(event.OutputIndex, index, kind, event.Delta, false, false)
-		case "response.output_text.done", "response.reasoning_text.done", "response.reasoning_summary_text.done":
+		case "response.output_text.done", "response.reasoning_text.done":
 			kind, index := 0, event.ContentIndex
 			if event.Type == "response.reasoning_text.done" {
 				kind = 1
-			}
-			if event.Type == "response.reasoning_summary_text.done" {
-				kind, index = 2, event.SummaryIndex
 			}
 			return false, appendPart(event.OutputIndex, index, kind, event.Text, true, true)
 		case "response.completed", "response.incomplete", "response.failed":
@@ -396,6 +575,9 @@ func executeOpenAIResponses(ctx context.Context, stream *AssistantMessageEventSt
 				return false, errors.New("Responses terminal status disagrees with event")
 			}
 			for i, item := range r.Output {
+				if status != "completed" {
+					item.Status = "incomplete"
+				}
 				if err := applyItem(i, item, true); err != nil {
 					return false, err
 				}
@@ -403,6 +585,19 @@ func executeOpenAIResponses(ctx context.Context, stream *AssistantMessageEventSt
 			terminal = true
 			output.RawStopReason = Some(status)
 			output.StopReason = StopReasonStop
+			if status == "completed" && len(tools) > 0 {
+				for _, index := range toolOrder {
+					state := tools[index]
+					var args map[string]any
+					if err := json.Unmarshal([]byte(state.raw), &args); err != nil || args == nil {
+						return false, errors.New("Responses function arguments are not a complete JSON object")
+					}
+					if err := appendTool(index, responsesItem{}, state.raw, true, true); err != nil {
+						return false, err
+					}
+				}
+				output.StopReason = StopReasonToolUse
+			}
 			if status == "incomplete" {
 				if r.Incomplete == nil {
 					return true, errors.New("Response incomplete without a provider reason")
