@@ -52,9 +52,8 @@ func TestPrintModeRejectsImageInputInsteadOfSilentlyDroppingIt(t *testing.T) {
 	_, err := codingagent.RunPrintMode(context.Background(), runtime, codingagent.PrintModeOptions{
 		InitialImages: []ai.ImageContent{{Type: ai.ContentTypeImage, Data: "synthetic", MIMEType: "image/png"}},
 	})
-	var unavailable *codingagent.NotImplementedError
-	if !errors.As(err, &unavailable) || unavailable.Operation != "mode.print.images" {
-		t.Fatalf("RunPrintMode() error = %#v, want mode.print.images Capability Stub", err)
+	if err == nil || !strings.Contains(err.Error(), "image base64") {
+		t.Fatalf("invalid image must fail: %v", err)
 	}
 }
 

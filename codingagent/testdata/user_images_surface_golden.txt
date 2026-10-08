@@ -1,0 +1,22 @@
+type codingagent.HeadlessRunOptions struct
+fields:
+- InitialImages []ai.ImageContent tag=""
+- InitialMessage *string tag=""
+- Messages []string tag=""
+- OnEvent codingagent.AgentSessionEventListener tag=""
+type codingagent.CreateModelRuntimeOptions struct
+fields:
+- DeepSeekVision bool tag=""
+- Offline bool tag=""
+- AllowModelNetwork bool tag=""
+- AuthPath string tag=""
+- CatalogBaseURL string tag=""
+- Credentials ai.CredentialStore tag=""
+- ModelRefreshTimeoutMS int64 tag=""
+- ModelsPath ai.Optional[string] tag=""
+- ModelsStore ai.ModelsStore tag=""
+- ModelsStorePath string tag=""
+- RefreshOnCreate *bool tag=""
+func(string) (ai.ImageContent, error)
+func(ai.ImageContent) error
+func() ai.Model

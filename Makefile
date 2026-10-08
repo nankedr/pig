@@ -8,8 +8,8 @@ PI_TYPESCRIPT_VERSION := 5.9.3
 m0-gate: m0-offline
 
 m0-offline:
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test ./... -count=1
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./... -count=1
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test ./... -count=1
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./... -count=1
 	go vet ./...
 	CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build ./...
 	go run ./examples/model-selection
@@ -185,8 +185,8 @@ m2-freeze: m2-clean m2-gate m2-oracle m0-source-drift m1-live-smoke
 m3-gate: m2-gate m3-repeat
 
 m3-repeat:
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test(WriteToolQueueCancellationAndFailure|WriteToolSessionAbortWaitsForMutation|EditToolMixedMutationQueue|EditToolSessionAbortWaitsForMutation|BashToolSessionAbortKillsProcessTree|BashToolTimeoutKillsProcessTree|SessionRuntimeReplacementLifecycle|SessionDiscoveryDefaultDirectoriesAndCancellation)$$' -count=20 -shuffle=on
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent ./cmd/pig -run 'Test(SettingsConcurrentProcessesPreserveUnrelatedFields|ProjectTrustStoreConcurrentProcessesAndPermissions|Credential76CrossProcess|PigDefaultCodingTaskResumeAndFork|PigBashShutdownSignalsKillProcessTree|PigUntrustedProjectHasNoSensitiveReadsOrEffects)$$' -count=5 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test(WriteToolQueueCancellationAndFailure|WriteToolSessionAbortWaitsForMutation|EditToolMixedMutationQueue|EditToolSessionAbortWaitsForMutation|BashToolSessionAbortKillsProcessTree|BashToolTimeoutKillsProcessTree|SessionRuntimeReplacementLifecycle|SessionDiscoveryDefaultDirectoriesAndCancellation)$$' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent ./cmd/pig -run 'Test(SettingsConcurrentProcessesPreserveUnrelatedFields|ProjectTrustStoreConcurrentProcessesAndPermissions|Credential76CrossProcess|PigDefaultCodingTaskResumeAndFork|PigBashShutdownSignalsKillProcessTree|PigUntrustedProjectHasNoSensitiveReadsOrEffects)$$' -count=5 -shuffle=on
 
 m3-node-preflight: m0-node-preflight
 	@test "$$(node -p 'process.versions.unicode')" = "16.0" || (echo "M3 freeze requires Node with Unicode 16.0 (for example Node 24.4.1)" >&2; exit 2)
@@ -216,8 +216,8 @@ m4-gate: m4-tools-preflight m3-gate m4-repeat
 	go run ./examples/find-ls-read
 
 m4-repeat:
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test((SessionMessages|TurnRetry|SessionConfiguration|SessionStats|ManualCompaction|AutoCompaction|SessionTreeNavigation|BranchSummary|SessionBash).*(Concurrent|Cancel|Abort|Busy|Ownership|WaitForIdle|WaitAndQueued|LastTurnAdmission|IdleQueueCallbacks|PreservesQueuedMessages|Settlement|RunningReads|EventsAndAvailableCycle)|GrepToolSessionProcessCleanup|FindLsSessionAbortReapsFD|FindLsFDCancellationKillsTree|Issue96Replacement)' -count=20 -shuffle=on
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./cmd/pig ./internal/m4gate -run 'Test(RPC9[45678]|M4Workflow|PigM4)' -count=5 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test((SessionMessages|TurnRetry|SessionConfiguration|SessionStats|ManualCompaction|AutoCompaction|SessionTreeNavigation|BranchSummary|SessionBash).*(Concurrent|Cancel|Abort|Busy|Ownership|WaitForIdle|WaitAndQueued|LastTurnAdmission|IdleQueueCallbacks|PreservesQueuedMessages|Settlement|RunningReads|EventsAndAvailableCycle)|GrepToolSessionProcessCleanup|FindLsSessionAbortReapsFD|FindLsFDCancellationKillsTree|Issue96Replacement)' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./cmd/pig ./internal/m4gate -run 'Test(RPC9[45678]|M4Workflow|PigM4)' -count=5 -shuffle=on
 
 m4-oracle: m3-oracle
 	node --experimental-strip-types parity/oracle/export-html.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
@@ -237,8 +237,8 @@ m5-gate: m4-gate m5-repeat
 	go run ./examples/local-extensions
 
 m5-repeat:
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test(SessionReload|ContextFilesReloadAndOwnership|PromptTemplatesTrustReloadAndOwnership|SkillsTrustReloadAndOwnership|ThemesTrustReloadAndOwnership|LocalExtensionsReloadAndStubBoundaries|LocalExtensionsNoSensitiveReads)' -count=20 -shuffle=on
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./cmd/pig ./internal/m5gate -run 'Test(PigM5|M5Workflow|PigLocalExtensions)' -count=5 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent -run 'Test(SessionReload|ContextFilesReloadAndOwnership|PromptTemplatesTrustReloadAndOwnership|SkillsTrustReloadAndOwnership|ThemesTrustReloadAndOwnership|LocalExtensionsReloadAndStubBoundaries|LocalExtensionsNoSensitiveReads)' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./cmd/pig ./internal/m5gate -run 'Test(PigM5|M5Workflow|PigLocalExtensions)' -count=5 -shuffle=on
 
 m5-oracle: m4-oracle
 
@@ -308,8 +308,8 @@ m6-gate: m5-gate m6-repeat
 	python3 scripts/m6-audit.py
 
 m6-repeat:
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent ./tui -run 'Test(InteractiveSDK|InteractiveMaintenanceStop|ExternalEditorStopAndCancel|InteractiveBash|InteractiveThemeRenderAfterStop|ThemeWatch|InteractiveQueueTake)' -count=20 -shuffle=on
-	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT PIG_TEST_RACE=1 go test -race ./cmd/pig ./internal/m6gate -run 'Test(PigM6Workflow|M6SDKWorkflow|Pig.*(111|116|123|124|125))' -count=3 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT go test -race ./codingagent ./tui -run 'Test(InteractiveSDK|InteractiveMaintenanceStop|ExternalEditorStopAndCancel|InteractiveBash|InteractiveThemeRenderAfterStop|ThemeWatch|InteractiveQueueTake)' -count=20 -shuffle=on
+	env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT PIG_TEST_RACE=1 go test -race ./cmd/pig ./internal/m6gate -run 'Test(PigM6Workflow|M6SDKWorkflow|Pig.*(111|116|123|124|125))' -count=3 -shuffle=on
 
 m6-oracle: m5-oracle m6-keys-oracle m6-text-oracle m6-queues-oracle m6-sessions-oracle m6-branches-oracle m6-themes-oracle m6-settings-oracle m6-bash-oracle m6-external-editor-oracle m6-maintenance-oracle
 	node parity/oracle/interactive.mjs "$(abspath $(PIG_PI_ORACLE_CHECKOUT))" --check
@@ -329,3 +329,10 @@ m6-manual:
 
 m6-freeze: m6-clean m6-manual m3-node-preflight m6-gate m6-oracle m4-html-browser m0-source-drift m1-live-smoke
 	@$(MAKE) --no-print-directory m6-clean m6-manual
+
+.PHONY: user-images-oracle vision-live-smoke
+user-images-oracle:
+	node --experimental-strip-types parity/oracle/user-images.mjs "$(PIG_PI_ORACLE_CHECKOUT)" --check
+
+vision-live-smoke:
+	PIG_REQUIRE_VISION_LIVE=1 go test ./codingagent -run '^TestUserImagesDeepSeekLiveRestore$$' -count=1

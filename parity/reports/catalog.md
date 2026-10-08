@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9704
+- Total entries: 9705
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5143 |
 | scaffolded | 3620 |
 | partial | 630 |
-| implemented | 141 |
+| implemented | 142 |
 | verified | 167 |
 | deferred | 3 |
 
@@ -8006,6 +8006,7 @@
 | contract:codingagent/responses-runtime | implemented | M14 | contract | github.com/nankedr/pig/codingagent.AgentSession | coding-agent |
 | contract:codingagent/session-stats | implemented | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSessionStats | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
+| contract:codingagent/user-images | implemented | M12 | contract | github.com/nankedr/pig/codingagent#AgentSession.Prompt.Images | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortBash | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortBash | coding-agent |
 | member:codingagent/src/core/agent-session.ts#AgentSession.abortRetry | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSession.AbortRetry | coding-agent |

@@ -2,10 +2,12 @@ package codingagent
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -715,9 +717,10 @@ func (s *AgentSession) Prompt(ctx context.Context, text string, options ...Promp
 	}
 	if len(options) > 0 {
 		option := options[0]
-		switch {
-		case len(option.Images) != 0:
+		if len(option.Images) > 0 && !slices.Contains(s.Model().Input, ai.ModelInputImage) {
 			return notImplemented("AgentSession.Prompt.Images")
+		}
+		switch {
 		case option.PreflightResult != nil:
 			return notImplemented("AgentSession.Prompt.PreflightResult")
 		case option.Source != "":
@@ -759,6 +762,11 @@ func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, rea
 		return fmt.Errorf("AgentSession is busy delivering configuration notifications or compacting")
 	}
 	if s.active {
+		if len(options) > 0 && len(options[0].Images) > 0 {
+			s.mu.Unlock()
+			cancel(nil)
+			return notImplemented("AgentSession.Queue.Images")
+		}
 		var delivery UserMessageDelivery
 		if len(options) > 0 {
 			delivery = UserMessageDelivery(options[0].StreamingBehavior)
@@ -782,12 +790,44 @@ func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, rea
 		cancel(nil)
 		return fmt.Errorf("AgentSession is delivering queue notifications; start a new run after callbacks return")
 	}
+	var images []ai.ImageContent
+	if len(options) > 0 {
+		images = append(images, options[0].Images...)
+	}
+	total := 0
+	for _, image := range images {
+		total += len(image.Data)
+	}
+	if len(images) > 64 || total > base64.StdEncoding.EncodedLen(16<<20) {
+		s.mu.Unlock()
+		cancel(nil)
+		return fmt.Errorf("user images exceed 16 MiB total or 64 images per request")
+	}
+	for _, image := range images {
+		if !slices.Contains(s.agent.State().Model.Input, ai.ModelInputImage) {
+			s.mu.Unlock()
+			cancel(nil)
+			return notImplemented("AgentSession.Prompt.Images")
+		}
+		if err := ai.ValidateUserImage(image); err != nil {
+			s.mu.Unlock()
+			cancel(nil)
+			return err
+		}
+	}
 	if err := s.flushPendingBashMessagesLocked(); err != nil {
 		s.mu.Unlock()
 		cancel(nil)
 		return err
 	}
 	message := s.userMessageLocked(text)
+	if len(images) > 0 {
+		blocks, _ := message.Content.Blocks()
+		for _, image := range images {
+			blocks = append(blocks, image)
+		}
+		message.Content = ai.UserBlocks(blocks...)
+	}
 	s.active = true
 	s.deferBashMessages = true
 	s.lastAssistant = nil

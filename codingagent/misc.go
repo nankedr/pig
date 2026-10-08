@@ -469,6 +469,14 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 			return err
 		}
 	}
+	var images []ai.ImageContent
+	for _, path := range parsed.FileArgs {
+		value, err := ai.LoadImageFile(path)
+		if err != nil {
+			return err
+		}
+		images = append(images, value)
+	}
 	if parsed.Name != nil {
 		if _, err := manager.AppendSessionInfo(*parsed.Name); err != nil {
 			return err
@@ -577,6 +585,7 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 	}
 	_, err = RunPrintMode(ctx, runtime, PrintModeOptions{
 		InitialMessage: initialMessage,
+		InitialImages:  images,
 		Messages:       messages,
 		Mode:           parsed.Mode,
 	})
@@ -585,7 +594,7 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 
 func unsupportedHeadlessOperation(parsed Args) string {
 	switch {
-	case len(parsed.FileArgs) != 0:
+	case len(parsed.FileArgs) != 0 && (!parsed.Print && parsed.Mode != ModeJSON):
 		return "headless.file-arguments"
 	case len(parsed.Extensions) != 0:
 		return "headless.resources"

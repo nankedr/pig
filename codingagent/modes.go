@@ -119,9 +119,6 @@ func RunPrintMode(ctx context.Context, runtime *AgentSessionRuntime, options Pri
 	if runtime == nil || runtime.Session() == nil {
 		return 1, fmt.Errorf("Print mode requires an AgentSession runtime")
 	}
-	if len(options.InitialImages) != 0 {
-		return 1, notImplemented("mode.print.images")
-	}
 	defer runtime.Dispose(context.WithoutCancel(ctx))
 
 	if options.Mode == ModeJSON {
@@ -130,6 +127,7 @@ func RunPrintMode(ctx context.Context, runtime *AgentSessionRuntime, options Pri
 
 	outcome, err := RunHeadless(ctx, runtime, HeadlessRunOptions{
 		InitialMessage: options.InitialMessage,
+		InitialImages:  options.InitialImages,
 		Messages:       options.Messages,
 	})
 	if err != nil {
@@ -195,6 +193,7 @@ func runJSONPrintMode(ctx context.Context, runtime *AgentSessionRuntime, options
 
 	outcome, err := RunHeadless(ctx, runtime, HeadlessRunOptions{
 		InitialMessage: options.InitialMessage,
+		InitialImages:  options.InitialImages,
 		Messages:       options.Messages,
 		OnEvent: func(event AgentSessionEvent) {
 			projected, projectionErr := projectJSONAgentSessionEvent(event)

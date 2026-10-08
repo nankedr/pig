@@ -158,6 +158,9 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 		}
 		return nil, err
 	}
+	if err := validateUserImages(input); err != nil {
+		return nil, err
+	}
 	for _, message := range transformed {
 		switch value := message.(type) {
 		case UserMessage:
@@ -208,15 +211,11 @@ func appendOpenAIUserMessage(messages *[]json.RawMessage, message UserMessage) e
 		blocks, _ := message.Content.Blocks()
 		parts := make([]map[string]any, 0, len(blocks))
 		for _, block := range blocks {
-			switch value := block.(type) {
+			switch value := replayContentValue(block).(type) {
 			case TextContent:
 				parts = append(parts, map[string]any{"type": "text", "text": sanitizeOpenAIText(value.Text)})
-			case *TextContent:
-				if value != nil {
-					parts = append(parts, map[string]any{"type": "text", "text": sanitizeOpenAIText(value.Text)})
-				}
-			case ImageContent, *ImageContent:
-				return newNotImplemented("OpenAICompletions.ConvertMessages.Image")
+			case ImageContent:
+				parts = append(parts, map[string]any{"type": "image_url", "image_url": map[string]any{"url": "data:" + value.MIMEType + ";base64," + value.Data}})
 			default:
 				return fmt.Errorf("unsupported user content %T", block)
 			}

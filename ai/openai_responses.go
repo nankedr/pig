@@ -93,6 +93,9 @@ func responsesInput(model Model, input Context) ([]any, error) {
 	if err != nil {
 		return nil, err
 	}
+	if err := validateUserImages(input); err != nil {
+		return nil, err
+	}
 	items := make([]any, 0, len(messages))
 	calls, results := map[string]bool{}, map[string]bool{}
 	for _, message := range messages {
@@ -104,14 +107,14 @@ func responsesInput(model Model, input Context) ([]any, error) {
 			} else {
 				blocks, _ := m.Content.Blocks()
 				for _, block := range blocks {
-					if p, ok := block.(*TextContent); ok && p != nil {
-						block = *p
+					switch block := replayContentValue(block).(type) {
+					case TextContent:
+						parts = append(parts, map[string]any{"type": "input_text", "text": sanitizeOpenAIText(block.Text)})
+					case ImageContent:
+						parts = append(parts, map[string]any{"type": "input_image", "detail": "auto", "image_url": "data:" + block.MIMEType + ";base64," + block.Data})
+					default:
+						return nil, fmt.Errorf("invalid user content")
 					}
-					text, ok := block.(TextContent)
-					if !ok {
-						return nil, newNotImplemented("OpenAIResponses.Input.Image")
-					}
-					parts = append(parts, map[string]any{"type": "input_text", "text": sanitizeOpenAIText(text.Text)})
 				}
 			}
 			if len(parts) > 0 {

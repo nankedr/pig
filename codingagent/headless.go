@@ -15,6 +15,7 @@ import (
 // HeadlessRunOptions contains the prompts and optional event observer shared
 // by the text and JSON Headless Coding Agent modes.
 type HeadlessRunOptions struct {
+	InitialImages  []ai.ImageContent
 	InitialMessage *string
 	Messages       []string
 	OnEvent        AgentSessionEventListener
@@ -121,8 +122,22 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			environment = ai.ProviderEnv{}
 		}
 		requestCredentials := &headlessCredentials{CredentialStore: credentials}
+		vision := options.Model == "deepseek-flash" || options.Model == "deepseek/deepseek-flash"
+		if options.Model == "" {
+			id, err := settings.GetDefaultModel()
+			if err != nil {
+				return nil, err
+			}
+			vision = id == "deepseek-flash"
+			if options.SessionManager != nil {
+				saved := options.SessionManager.BuildSessionContext()
+				if saved.Model != nil {
+					vision = saved.Model.Provider == "deepseek" && saved.Model.ModelID == "deepseek-flash"
+				}
+			}
+		}
 		refresh := false
-		models, err = newModelRuntime(ctx, CreateModelRuntimeOptions{Offline: ResolveOffline(options.Offline), Credentials: requestCredentials, RefreshOnCreate: &refresh}, environment)
+		models, err = newModelRuntime(ctx, CreateModelRuntimeOptions{DeepSeekVision: vision, Offline: ResolveOffline(options.Offline), Credentials: requestCredentials, RefreshOnCreate: &refresh}, environment)
 		if err != nil {
 			return nil, err
 		}
@@ -508,8 +523,15 @@ func RunHeadless(ctx context.Context, runtime *AgentSessionRuntime, options Head
 	}
 	prompts = append(prompts, options.Messages...)
 
-	for _, prompt := range prompts {
-		if err := session.Prompt(ctx, prompt); err != nil {
+	if len(prompts) == 0 && len(options.InitialImages) > 0 {
+		prompts = append(prompts, "")
+	}
+	for i, prompt := range prompts {
+		var images []ai.ImageContent
+		if i == 0 {
+			images = options.InitialImages
+		}
+		if err := session.Prompt(ctx, prompt, PromptOptions{Images: images}); err != nil {
 			outcome := session.headlessOutcome()
 			if cause := context.Cause(ctx); (cause != nil && errors.Is(err, cause)) || errors.Is(err, context.Canceled) {
 				outcome.Canceled = true

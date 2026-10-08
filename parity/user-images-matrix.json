@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-08",
+  "source": "https://api-docs.deepseek.com/guides/vision/",
+  "catalog_id": "contract:codingagent/user-images",
+  "model_config": {
+    "id": "deepseek-flash",
+    "source": "current-official-docs",
+    "historical_snapshot_changed": false,
+    "configuration": "ai.DeepSeekVisionModel; limits/thinking/cost estimates inherit historical Flash, current prices unverified"
+  },
+  "live_smoke": {
+    "required": "make vision-live-smoke",
+    "verified": true,
+    "result": "PASS 2026-10-08 darwin-arm64; deepseek-flash Responses local PNG red/blue semantic identification and v3 restore after source deletion"
+  },
+  "rows": [
+    {
+      "id": "responses-user",
+      "version": "V1",
+      "result": "input_image detail=auto; fake wire and fixed Pi Oracle"
+    },
+    {
+      "id": "chat-user",
+      "version": "V1",
+      "result": "image_url; fake wire and fixed Pi Oracle"
+    },
+    {
+      "id": "local-file",
+      "version": "V1",
+      "result": "@FILE print/JSON; LoadImageFile/Prompt.Images/InitialImages"
+    },
+    {
+      "id": "inline-base64",
+      "version": "V1",
+      "result": "validated ImageContent; SDK direct Context and Session"
+    },
+    {
+      "id": "formats",
+      "version": "V1",
+      "result": "JPEG PNG GIF static WebP; actual decoder, MIME mismatch fails; GIF all-frame validation, 64 frames/40 million decoded pixels total"
+    },
+    {
+      "id": "limits",
+      "version": "V1",
+      "result": "8 MiB/image; 40 million pixels/image; 16 MiB user images/request; 64 images/request"
+    },
+    {
+      "id": "orientation-scale",
+      "version": "V1",
+      "result": "preserve bytes/dimensions/EXIF; no local rotation/resize; over-limit fails; processing #135"
+    },
+    {
+      "id": "restore-fork-tree",
+      "version": "V1",
+      "result": "production v3 inline; missing/corrupt data fails; source file deletion harmless"
+    },
+    {
+      "id": "nonvision",
+      "version": "V1",
+      "result": "explicit failure, no image wire or placeholder"
+    },
+    {
+      "id": "tool-images",
+      "version": "V1",
+      "result": "Stub; #135"
+    },
+    {
+      "id": "interactive-rpc",
+      "version": "V1",
+      "result": "attachment Stub; #136"
+    },
+    {
+      "id": "url",
+      "version": "V2",
+      "result": "Stub; no http(s) input"
+    },
+    {
+      "id": "files-api",
+      "version": "V2",
+      "result": "Stub; no file_id input"
+    },
+    {
+      "id": "animated-webp",
+      "version": "V2",
+      "result": "decoder unsupported, explicit error"
+    },
+    {
+      "id": "other-providers-generation-edit",
+      "version": "V2",
+      "result": "Stub"
+    }
+  ]
+}

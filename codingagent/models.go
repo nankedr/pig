@@ -36,6 +36,7 @@ type ResolveCliModelOptions struct {
 }
 
 type CreateModelRuntimeOptions struct {
+	DeepSeekVision        bool
 	Offline               bool
 	AllowModelNetwork     bool
 	AuthPath              string

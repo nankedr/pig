@@ -326,9 +326,21 @@ func loadSessionFile(path string) ([]FileEntry, int64, error) {
 		return nil, 0, err
 	}
 	var entries []FileEntry
+	strictImages := false
 	reader := bufio.NewReader(file)
 	for {
 		line, err := reader.ReadString('\n')
+
+		var identity struct {
+			Type, Provider, ModelID string
+			Message                 struct{ Provider, Model string }
+		}
+		if json.Unmarshal([]byte(line), &identity) == nil && (identity.Type == "model_change" && identity.Provider == "deepseek" && identity.ModelID == "deepseek-flash" || identity.Message.Provider == "deepseek" && identity.Message.Model == "deepseek-flash") {
+			strictImages = true
+		}
+		if imageErr := validateSessionUserImages([]byte(line), strictImages); imageErr != nil {
+			return nil, 0, fmt.Errorf("session %q image attachment: %w", path, imageErr)
+		}
 		for _, entry := range ParseSessionEntries(line) {
 			if entry.Header == nil && entry.Entry == nil {
 				var value any
@@ -1356,4 +1368,44 @@ func cloneSessionEntries(in []SessionEntry) []SessionEntry {
 		out[i] = cloneSessionEntry(in[i])
 	}
 	return out
+}
+
+func validateSessionUserImages(record []byte, strict bool) error {
+	var entry struct {
+		Message struct {
+			Role    string
+			Content json.RawMessage
+		}
+	}
+	if err := json.Unmarshal(record, &entry); err != nil {
+		if bytes.Contains(record, []byte(`"image"`)) {
+			return fmt.Errorf("malformed image record: %w", err)
+		}
+		return nil
+	}
+	if entry.Message.Role != "user" {
+		return nil
+	}
+	var blocks []json.RawMessage
+	if json.Unmarshal(entry.Message.Content, &blocks) != nil {
+		return nil
+	}
+	for _, raw := range blocks {
+		var block struct{ Type string }
+		if json.Unmarshal(raw, &block) != nil || block.Type != "image" {
+			continue
+		}
+
+		content, err := ai.UnmarshalContent(raw)
+		if err != nil {
+			return fmt.Errorf("invalid image block: %w", err)
+		}
+		if strict {
+			if err := ai.ValidateUserImage(content.(ai.ImageContent)); err != nil {
+				return err
+			}
+		}
+
+	}
+	return nil
 }

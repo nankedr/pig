@@ -46,6 +46,10 @@ func newModelRuntime(ctx context.Context, options CreateModelRuntimeOptions, env
 	if err := installCatalogSnapshot(r.models); err != nil {
 		return nil, err
 	}
+	if options.DeepSeekVision {
+		provider, _ := r.models.GetProvider(ai.ProviderIDDeepSeek)
+		r.models.SetProvider(snapshotProvider{Provider: provider, models: append(provider.GetModels(), ai.DeepSeekVisionModel())})
+	}
 	if options.RefreshOnCreate == nil || *options.RefreshOnCreate {
 		_, err := r.GetAvailable(ctx)
 		if ctx.Err() != nil {

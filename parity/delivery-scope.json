@@ -183,7 +183,8 @@
         "matrix:ai/openai-completions/message/conversion-tool-result-image-placeholder",
         "matrix:ai/openai-completions/message/conversion-tool-result-images",
         "matrix:ai/openai-completions/message/conversion-user-image",
-        "matrix:ai/openai-completions/request/model-input"
+        "matrix:ai/openai-completions/request/model-input",
+        "contract:codingagent/user-images"
       ]
     },
     {
@@ -241,7 +242,8 @@
       "branch": "图片生成/编辑、image model 和剩余跨 Provider 多模态；Harness/Remote/平台/扩展分别承担自身集成。",
       "catalog_ids": [
         "contract:ai/images",
-        "contract:baseline/image-catalog-snapshot"
+        "contract:baseline/image-catalog-snapshot",
+        "contract:codingagent/user-images"
       ]
     },
     {
