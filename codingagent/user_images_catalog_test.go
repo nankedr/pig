@@ -28,7 +28,7 @@ func TestUserImagesCatalog(t *testing.T) {
 		{"go-test", "cmd/pig/user_images_process_test.go", "PIG_TEST_RACE=1 go test -race ./cmd/pig -run '^TestUserImagesCLI' -count=1", "actual @FILE CLI wire and cross-process restore/fork"},
 		{"go-test", "internal/parity/user_images_test.go", "go test ./internal/parity -run '^TestUserImagesFixedPiOracle$' -count=1", "public Go SDK legal vision image wire matches pinned Pi fixture in both APIs"},
 		{"fixture", "parity/oracle/fixtures/user-images.json", "node --experimental-strip-types parity/oracle/user-images.mjs /locked/pi --check", "fixed Pi mixed/only inline user image wire; separate from current DeepSeek service"},
-		{"go-test", "codingagent/testdata/user_images_surface_golden.txt", "go test ./codingagent -run '^TestUserImagesAPISnapshot$' -count=1", "LoadImageFile, ValidateUserImage, DeepSeekVisionModel and InitialImages public surface"},
+		{"go-test", "codingagent/testdata/user_images_surface_golden.txt", "go test ./codingagent -run '^TestUserImagesAPISnapshot$' -count=1", "LoadImageFile, ValidateUserImage(s), DeepSeekVisionModel and InitialImages public surface"},
 		{"go-test", "codingagent/user_images_live_test.go", "PIG_REQUIRE_VISION_LIVE=1 go test ./codingagent -run '^TestUserImagesDeepSeekLiveRestore$' -count=1", "protected real local PNG red/blue semantic identification, v3 reopen after original deletion and same image re-question"},
 	} {
 		data, err := os.ReadFile(filepath.Join(root, item.path))
@@ -102,7 +102,7 @@ func TestUserImagesCatalog(t *testing.T) {
 
 func TestUserImagesAPISnapshot(t *testing.T) {
 	got := issue71TypeSnapshot("HeadlessRunOptions", reflect.TypeOf(codingagent.HeadlessRunOptions{})) + "\n" + issue71TypeSnapshot("CreateModelRuntimeOptions", reflect.TypeOf(codingagent.CreateModelRuntimeOptions{})) + "\n"
-	for _, fn := range []any{ai.LoadImageFile, ai.ValidateUserImage, ai.DeepSeekVisionModel} {
+	for _, fn := range []any{ai.LoadImageFile, ai.ValidateUserImage, ai.ValidateUserImages, ai.DeepSeekVisionModel} {
 		got += reflect.TypeOf(fn).String() + "\n"
 	}
 	path := "testdata/user_images_surface_golden.txt"

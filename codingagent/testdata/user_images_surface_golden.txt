@@ -19,4 +19,5 @@ fields:
 - RefreshOnCreate *bool tag=""
 func(string) (ai.ImageContent, error)
 func(ai.ImageContent) error
+func(ai.Context) error
 func() ai.Model

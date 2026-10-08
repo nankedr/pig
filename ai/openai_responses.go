@@ -93,7 +93,7 @@ func responsesInput(model Model, input Context) ([]any, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := validateUserImages(input); err != nil {
+	if err := ValidateUserImages(input); err != nil {
 		return nil, err
 	}
 	items := make([]any, 0, len(messages))

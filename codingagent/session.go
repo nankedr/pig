@@ -2,7 +2,6 @@ package codingagent
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -794,31 +793,10 @@ func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, rea
 	if len(options) > 0 {
 		images = append(images, options[0].Images...)
 	}
-	total := 0
-	for _, image := range images {
-		total += len(image.Data)
-	}
-	if len(images) > 64 || total > base64.StdEncoding.EncodedLen(16<<20) {
+	if len(images) > 0 && (!slices.Contains(s.agent.State().Model.Input, ai.ModelInputImage) || s.agent.State().Model.Provider != ai.ProviderIDDeepSeek) {
 		s.mu.Unlock()
 		cancel(nil)
-		return fmt.Errorf("user images exceed 16 MiB total or 64 images per request")
-	}
-	for _, image := range images {
-		if !slices.Contains(s.agent.State().Model.Input, ai.ModelInputImage) {
-			s.mu.Unlock()
-			cancel(nil)
-			return notImplemented("AgentSession.Prompt.Images")
-		}
-		if err := ai.ValidateUserImage(image); err != nil {
-			s.mu.Unlock()
-			cancel(nil)
-			return err
-		}
-	}
-	if err := s.flushPendingBashMessagesLocked(); err != nil {
-		s.mu.Unlock()
-		cancel(nil)
-		return err
+		return notImplemented("AgentSession.Prompt.Images")
 	}
 	message := s.userMessageLocked(text)
 	if len(images) > 0 {
@@ -827,6 +805,17 @@ func (s *AgentSession) promptWithPreflight(ctx context.Context, text string, rea
 			blocks = append(blocks, image)
 		}
 		message.Content = ai.UserBlocks(blocks...)
+	}
+	requestMessages := append(s.agent.State().Messages, message)
+	if err := ai.ValidateUserImages(ai.Context{Messages: ConvertToLLM(requestMessages)}); err != nil {
+		s.mu.Unlock()
+		cancel(nil)
+		return err
+	}
+	if err := s.flushPendingBashMessagesLocked(); err != nil {
+		s.mu.Unlock()
+		cancel(nil)
+		return err
 	}
 	s.active = true
 	s.deferBashMessages = true

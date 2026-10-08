@@ -158,20 +158,20 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 		}
 		return nil, err
 	}
-	if err := validateUserImages(input); err != nil {
+	if err := ValidateUserImages(input); err != nil {
 		return nil, err
 	}
 	for _, message := range transformed {
 		switch value := message.(type) {
 		case UserMessage:
-			if err := appendOpenAIUserMessage(&messages, value); err != nil {
+			if err := appendOpenAIUserMessage(&messages, model, value); err != nil {
 				return nil, err
 			}
 		case *UserMessage:
 			if value == nil {
 				return nil, fmt.Errorf("nil user message")
 			}
-			if err := appendOpenAIUserMessage(&messages, *value); err != nil {
+			if err := appendOpenAIUserMessage(&messages, model, *value); err != nil {
 				return nil, err
 			}
 		case AssistantMessage:
@@ -203,7 +203,7 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 	return messages, nil
 }
 
-func appendOpenAIUserMessage(messages *[]json.RawMessage, message UserMessage) error {
+func appendOpenAIUserMessage(messages *[]json.RawMessage, model Model, message UserMessage) error {
 	var content any
 	if text, ok := message.Content.Text(); ok {
 		content = sanitizeOpenAIText(text)
@@ -215,6 +215,9 @@ func appendOpenAIUserMessage(messages *[]json.RawMessage, message UserMessage) e
 			case TextContent:
 				parts = append(parts, map[string]any{"type": "text", "text": sanitizeOpenAIText(value.Text)})
 			case ImageContent:
+				if model.Provider != ProviderIDDeepSeek {
+					return newNotImplemented("OpenAICompletions.ConvertMessages.Image.Provider." + string(model.Provider))
+				}
 				parts = append(parts, map[string]any{"type": "image_url", "image_url": map[string]any{"url": "data:" + value.MIMEType + ";base64," + value.Data}})
 			default:
 				return fmt.Errorf("unsupported user content %T", block)

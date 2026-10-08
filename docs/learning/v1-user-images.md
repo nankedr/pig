@@ -29,3 +29,5 @@ pig --fork /absolute/path/session.jsonl --no-tools -p "在新分支继续看图"
 `go test ./ai ./codingagent ./cmd/pig ./internal/parity -run '^TestUserImages'` 不使用真实服务。fixture 服务会检查实际 wire；真实 CLI 在删除原文件后启动新进程继续及 fork。`make user-images-oracle PIG_PI_ORACLE_CHECKOUT=/locked/pi` 重现固定 Pi 共同 wire fixture，保守校验策略不在该对等投影内。
 
 `make vision-live-smoke` 必须使用受保护 `DEEPSEEK_API_KEY`。它验证当前 `deepseek-flash` 对本地双色 PNG 的识别及 v3 重开后同图提问，按颜色语义而非逐字 golden 验收。普通测试跳过；受保护 gate 缺密钥必须失败。2026-10-08 已在 darwin-arm64 通过 `deepseek-flash` Responses 用户 PNG/v3 恢复真实视觉 smoke；不外推到工具图片、UI、其他格式服务行为或 V1 freeze。
+
+`ai.ValidateUserImages(context)` 统一校验历史及本次用户图片的总配额，`AgentSession.Prompt` 在写入消息前使用同一策略。正式恢复先检查整个含图用户消息的结构，再按选中分支的最终模型校验当前上下文图片；其他分支的模型变化不会改变当前分支的 codec 语义。

@@ -60,6 +60,11 @@ func TestUserImagesSDKWire(t *testing.T) {
 			if err != nil || out.StopReason != ai.StopReasonStop || calls.Load() != 1 {
 				t.Fatalf("outcome: %+v %v calls=%d", out, err, calls.Load())
 			}
+			model.Provider = ai.ProviderIDOpenAI
+			if _, err := ai.Complete(context.Background(), model, input, ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{APIKey: &key}}); err == nil || calls.Load() != 1 {
+				t.Fatal("V2 provider image reached transport")
+			}
+			model.Provider = ai.ProviderIDDeepSeek
 			model.Input = []ai.ModelInput{ai.ModelInputText}
 			out, err = ai.Complete(context.Background(), model, input, ai.StreamOptions{ProviderRequestOptions: ai.ProviderRequestOptions{APIKey: &key}})
 			if err == nil || calls.Load() != 1 {

@@ -122,7 +122,8 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 			environment = ai.ProviderEnv{}
 		}
 		requestCredentials := &headlessCredentials{CredentialStore: credentials}
-		vision := options.Model == "deepseek-flash" || options.Model == "deepseek/deepseek-flash"
+		selector, _, _ := strings.Cut(options.Model, ":")
+		vision := selector == "deepseek-flash" || selector == "deepseek/deepseek-flash"
 		if options.Model == "" {
 			id, err := settings.GetDefaultModel()
 			if err != nil {

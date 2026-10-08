@@ -100,7 +100,8 @@ func userImageFormat(data []byte) (string, error) {
 	return "image/" + format, nil
 }
 
-func validateUserImages(input Context) error {
+// ValidateUserImages checks all user attachments and the aggregate request limit.
+func ValidateUserImages(input Context) error {
 	var total, count int
 	for _, message := range input.Messages {
 		if m, ok := message.(*UserMessage); ok && m != nil {

@@ -205,3 +205,87 @@ func TestUserImagesModelRuntimeConfigurationIsolation(t *testing.T) {
 		t.Fatal("vision configuration ownership leaked")
 	}
 }
+
+func TestUserImagesRestoreValidationUsesSelectedPath(t *testing.T) {
+	_, image := imageFile134(t)
+	for _, test := range []struct {
+		name, content, suffix string
+		wantError             bool
+	}{
+		{"bad-before-flash", `[{"type":"image","data":"aGk=","mimeType":"image/png"}]`, `{"type":"model_change","id":"flash","parentId":"image","provider":"deepseek","modelId":"deepseek-flash"}`, true},
+		{"object-container", `{"type":"image","data":"` + image.Data + `","mimeType":"image/png"}`, ``, true},
+		{"bad-discriminator", `[{"type":"imag","data":"` + image.Data + `","mimeType":"image/png"}]`, ``, true},
+		{"bad-message", `[{"type":"image","data":"` + image.Data + `","mimeType":"image/png"}]`, ``, true},
+		{"bad-neighbor", `[{"type":"image","data":"` + image.Data + `","mimeType":"image/png"},{"type":"text","text":5}]`, ``, true},
+		{"inactive-flash", `[{"type":"image","data":"aW1hZ2U=","mimeType":"image/png"}]`, `{"type":"model_change","id":"text","parentId":"image","provider":"deepseek","modelId":"deepseek-v4-flash"}`, false},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			file := filepath.Join(t.TempDir(), "session.jsonl")
+			data := `{"type":"session","version":3,"id":"images","timestamp":"2026-10-08T00:00:00Z"}` + "\n" +
+				`{"type":"message","id":"image","parentId":null,"message":{"role":"user","content":` + test.content + `,"timestamp":1}}` + "\n" + test.suffix + "\n"
+			if test.name == "bad-message" {
+				data = strings.Replace(data, `"timestamp":1`, `"timestamp":"bad"`, 1)
+			}
+			if test.name == "inactive-flash" {
+				data = strings.Replace(data, `{"type":"message"`, `{"type":"model_change","id":"flash","parentId":null,"provider":"deepseek","modelId":"deepseek-flash"}`+"\n"+`{"type":"message"`, 1)
+			}
+			if err := os.WriteFile(file, []byte(data), 0600); err != nil {
+				t.Fatal(err)
+			}
+			manager, err := codingagent.OpenSessionManager(file, nil, nil)
+			if test.wantError {
+				if err == nil || !strings.Contains(err.Error(), "image") {
+					t.Fatalf("damaged image silently accepted: %v", err)
+				}
+			} else if err != nil || len(manager.BuildSessionContext().Messages) != 1 {
+				t.Fatalf("inactive branch polluted codec restore: %v", err)
+			}
+		})
+	}
+}
+
+func TestUserImagesHistoryQuotaRejectionDoesNotPersist(t *testing.T) {
+	_, image := imageFile134(t)
+	var calls atomic.Int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		w.Header().Set("Content-Type", "text/event-stream")
+		fmt.Fprint(w, `data: {"type":"response.completed","response":{"status":"completed"}}`+"\n\n")
+	}))
+	defer server.Close()
+	key := "offline"
+	runtime, err := codingagent.CreateHeadlessSession(context.Background(), codingagent.CreateHeadlessSessionOptions{CWD: t.TempDir(), AgentDir: t.TempDir(), Model: "deepseek-flash", API: ai.APIOpenAIResponses, APIKey: &key, BaseURL: &server.URL, NoTools: codingagent.NoToolsAll, NoContextFiles: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer runtime.Dispose(context.Background())
+	images := make([]ai.ImageContent, 64)
+	for i := range images {
+		images[i] = image
+	}
+	if err := runtime.Session().Prompt(context.Background(), "full", codingagent.PromptOptions{Images: images}); err != nil {
+		t.Fatal(err)
+	}
+	before, _ := json.Marshal(runtime.Session().SessionManager().GetEntries())
+	if err := runtime.Session().Prompt(context.Background(), "over", codingagent.PromptOptions{Images: []ai.ImageContent{image}}); err == nil {
+		t.Fatal("history quota accepted")
+	}
+	after, _ := json.Marshal(runtime.Session().SessionManager().GetEntries())
+	if string(before) != string(after) || calls.Load() != 1 {
+		t.Fatal("over-quota prompt persisted or reached transport")
+	}
+}
+
+func TestUserImagesHeadlessThinkingSelector(t *testing.T) {
+	for _, selector := range []string{"deepseek-flash:high", "deepseek/deepseek-flash:high"} {
+		key := "offline"
+		runtime, err := codingagent.CreateHeadlessSession(context.Background(), codingagent.CreateHeadlessSessionOptions{CWD: t.TempDir(), AgentDir: t.TempDir(), Model: selector, APIKey: &key, NoTools: codingagent.NoToolsAll, NoContextFiles: true})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if model := runtime.Session().Model(); model.ID != "deepseek-flash" || len(model.Input) != 2 {
+			t.Fatal("vision selector lost current model")
+		}
+		runtime.Dispose(context.Background())
+	}
+}
