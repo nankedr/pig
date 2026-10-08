@@ -49,11 +49,12 @@ func TestHeadlessRunnerReturnsFinalAssistantText(t *testing.T) {
 
 func TestPrintModeRejectsImageInputInsteadOfSilentlyDroppingIt(t *testing.T) {
 	runtime := newHeadlessFauxRuntime(t, nil, nil, nil)
+	_, image := imageFile134(t)
 	_, err := codingagent.RunPrintMode(context.Background(), runtime, codingagent.PrintModeOptions{
-		InitialImages: []ai.ImageContent{{Type: ai.ContentTypeImage, Data: "synthetic", MIMEType: "image/png"}},
+		InitialImages: []ai.ImageContent{image},
 	})
-	if err == nil || !strings.Contains(err.Error(), "image base64") {
-		t.Fatalf("invalid image must fail: %v", err)
+	if !errors.Is(err, codingagent.ErrNotImplemented) || !strings.Contains(err.Error(), "Images") {
+		t.Fatalf("out-of-scope vision input must fail: %v", err)
 	}
 }
 
