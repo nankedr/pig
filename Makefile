@@ -336,3 +336,11 @@ user-images-oracle:
 
 vision-live-smoke:
 	PIG_REQUIRE_VISION_LIVE=1 go test ./codingagent -run '^TestUserImagesDeepSeekLiveRestore$$' -count=1
+
+.PHONY: tool-images-oracle tool-vision-live-smoke
+tool-images-oracle:
+	node --experimental-strip-types parity/oracle/tool-images.mjs "$(PIG_PI_ORACLE_CHECKOUT)" --check
+	node parity/oracle/read-images.mjs "$(PIG_PI_ORACLE_CHECKOUT)" --check
+
+tool-vision-live-smoke:
+	PIG_REQUIRE_TOOL_VISION_LIVE=1 go test ./codingagent -run '^TestToolImagesDeepSeekLiveReadAndWrite$$' -count=1

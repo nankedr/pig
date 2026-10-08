@@ -1861,11 +1861,11 @@ func issue32BehaviorOwnerEntries(t *testing.T) []catalog.Entry {
 					"a locked Pi source/dist Oracle verifies the short real-file Agent ToolCall-to-ToolResult-to-Faux continuation slice",
 				},
 				Unsupported: []string{
-					"image payload execution remains an explicit M12 Capability Stub",
+					"V2 image generation, animated WebP and other-provider integration remain Stub; V1 tool images are covered by contract:codingagent/tool-images",
 					"CreateReadToolDefinition remains the explicit M7 Extension ABI Capability Stub",
 				},
 			},
-			Notes: "Issue #54 implements the public M1 text read Tool through real host files and verifies its Agent continuation against locked Pi source and built dist. Image execution remains deferred to M12, and the extension-facing read Tool definition remains deferred to M7.",
+			Notes: "Issue #54 implements the public M1 text read Tool through real host files and verifies its Agent continuation against locked Pi source and built dist. Issue #135 implements V1 image processing and tool continuation under contract:codingagent/tool-images; the extension-facing read Tool definition remains deferred to M7.",
 		},
 		{
 			SchemaVersion: catalog.SchemaVersion, ID: issue32CompactionCatalogID,
@@ -2046,8 +2046,8 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 					Kind: "go-test", Ref: "codingagent/read_tool_test.go#TestReadToolResolvesHostPathsWithoutWorkspaceContainment", Baseline: issue32BaselineCommit,
 					CaseID:          "issue54-codingagent-read-text-behavior",
 					ExecutionMethod: "go test ./codingagent -run '^TestReadTool' -count=1",
-					Expected:        "focused Go tests cover pinned-source path normalization, host path permissions, numeric pagination, deterministic truncation, compatible failure and cancellation ToolResults, and explicit image deferral",
-					Actual:          "PASS; focused Go assertions covered path normalization and fallbacks, relative/absolute/parent/symlink access, numeric offset/limit boundaries, line/byte/long-line truncation details, failures, real cancellation, image deferral and Faux continuation",
+					Expected:        "focused Go tests cover pinned-source path normalization, host path permissions, numeric pagination, deterministic truncation, compatible failure and cancellation ToolResults, and explicit corrupt image omission",
+					Actual:          "PASS; focused Go assertions covered path normalization and fallbacks, relative/absolute/parent/symlink access, numeric offset/limit boundaries, line/byte/long-line truncation details, failures, real cancellation, corrupt image omission and Faux continuation",
 					Platform:        "any", CatalogID: catalogID,
 				},
 			},
@@ -2080,6 +2080,9 @@ func issue32BehaviorEvidenceDescriptors(t *testing.T, catalogID string) []issue3
 		}}
 	default:
 		t.Fatalf("unknown behavior owner %q", catalogID)
+	}
+	if catalogID == issue32ReadToolCatalogID {
+		descriptors = append(descriptors, toolImagesEvidence135(t, catalogID)...)
 	}
 	descriptors = append(descriptors, issue72SessionEvidence(t, catalogID)...)
 	for index := range descriptors {

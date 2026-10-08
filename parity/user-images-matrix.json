@@ -48,7 +48,7 @@
     {
       "id": "orientation-scale",
       "version": "V1",
-      "result": "preserve bytes/dimensions/EXIF; no local rotation/resize; over-limit fails; processing #135"
+      "result": "user files preserve bytes/dimensions/EXIF; read default processes orientation and fits 2000x2000, see parity/tool-images-matrix.json"
     },
     {
       "id": "restore-fork-tree",
@@ -63,7 +63,7 @@
     {
       "id": "tool-images",
       "version": "V1",
-      "result": "Stub; #135"
+      "result": "V1 implemented; read/dual API tool continuation, see parity/tool-images-matrix.json"
     },
     {
       "id": "interactive-rpc",

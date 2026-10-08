@@ -669,10 +669,6 @@ func ConvertToPNG(string, string) (*ConvertedImage, error) {
 	return nil, notImplemented("ConvertToPNG")
 }
 
-func ResizeImage([]byte, string, ...ImageResizeOptions) (*ResizedImage, error) {
-	return nil, notImplemented("ResizeImage")
-}
-
 // FormatDimensionNote is a pure projection and is safe before image runtime
 // support. It mirrors Pi's two-decimal coordinate scaling note.
 func FormatDimensionNote(result ResizedImage) *string {

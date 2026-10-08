@@ -16,11 +16,11 @@ pig --fork /absolute/path/session.jsonl --no-tools -p "在新分支继续看图"
 | 每图大小与尺寸 | 1 byte–8 MiB，最多 40 million pixels；超限明确错误 |
 | 每次请求 | 用户图片最多 64 张、总计 16 MiB；包含重放历史，base64 长度按编码上限检查 |
 | MIME 与编码 | 纯标准 base64；MIME 必须匹配实际格式；不接收完整 data URL/URL |
-| 方向与缩放 | 保留原尺寸和 EXIF；本地不旋转、不缩放，超限失败；处理后续见 #135 |
+| 方向与缩放 | 保留原尺寸和 EXIF；本地不旋转、不缩放，超限失败；read 处理见 [工具图片](v1-tool-images.md) |
 | v3 保存/重开/fork/树重建 | 内联保留图片；原文件可删除；缺失/损坏 data 或 MIME 明确错误 |
 | 不支持视觉的模型 | 明确失败；不产生视觉请求，不生成占位文字 |
 | 运行中队列 / SendUserMessage / Interactive / RPC 附件 | 仍为显式 Stub；后续 #135–#136 |
-| 工具结果图片、终端显示与导出 | 后续 #135–#136，不计入 #134 完成范围 |
+| 工具结果图片 | #135 已实现，见 [工具图片](v1-tool-images.md)；终端显示与导出仍由 #136 处理 |
 | 外部 http(s) URL | V2，未实现 |
 | Files API file_id | V2，未实现 |
 | animated WebP | 当前解码器不支持，明确解码错误；剩余格式处理为 V2 |

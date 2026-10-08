@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-08",
+  "catalog_id": "contract:codingagent/tool-images",
+  "live_smoke": {"required": "make tool-vision-live-smoke", "verified": true, "result": "PASS 2026-10-08 darwin-arm64; deepseek-flash Responses and Chat Completions read red/blue PNG -> vision -> write file"},
+  "rows": [
+    {"id": "responses-tool", "version": "V1", "result": "function_call_output.output input_text then ordered input_image detail=auto; actual wire + fixed Pi Oracle"},
+    {"id": "chat-tool", "version": "V1", "result": "ordered tool text then one user image batch for consecutive tool results; actual wire + fixed Pi Oracle"},
+    {"id": "read-formats", "version": "V1", "result": "actual JPEG/PNG/GIF/static WebP/BMP; BMP -> PNG; offsets ignored; small/unresized supported images retain bytes"},
+    {"id": "orientation-scale", "version": "V1", "result": "default EXIF JPEG/WebP orientation when re-encoding; 2000x2000 and <4.5MiB base64; Go CatmullRom + PNG/JPEG (codec bytes differ from Photon), Pi dimension/coordinate note; all 8 JPEG and 8 WebP orientations plus offset-frame logical GIF canvas fixtures"},
+    {"id": "bounds-failure", "version": "V1", "result": "8MiB/40M pixels source; GIF <=64 frames/40M decoded pixels; decoded MIME mismatch/corrupt/oversize -> explicit omitted; I/O -> tool error; canceled read -> aborted tool result"},
+    {"id": "aggregate", "version": "V1", "result": "user and tool history images jointly <=64 / <=16MiB request; before transport"},
+    {"id": "updates-parallel-retry", "version": "V1", "result": "partial/update event vs terminal context identity; parallel tools, source-order history, cancellation and HTTP retry covered"},
+    {"id": "restore-fork-tree-compaction", "version": "V1", "result": "production v3 inline; source deletion harmless; structural/current selected-model attachment corruption fails; fork isolated; normal tree rebuild; compacted image stays archived, not replayed"},
+    {"id": "nonvision", "version": "V1", "result": "explicit failure before request; original image history preserved; intentional deviation from Pi downgrade"},
+    {"id": "queue-boundary", "version": "V1", "result": "production running Prompt.Images and SendUserMessage image blocks explicit Stub; Steer/FollowUp/TakeQueuedMessages text-only; no silent conversion; underlying Agent queues accept AgentMessage"},
+    {"id": "rpc", "version": "V1", "result": "real subprocess text prompt -> read screenshot -> image context -> write task; get_messages retains image; user RPC attachments remain #136 Stub"},
+    {"id": "user-image-policy", "version": "V1", "result": "#134 direct user images retain original bytes/EXIF; read processing does not change LoadImageFile"},
+    {"id": "unsafe-noresize", "version": "V1", "result": "Pig validates and explicitly omits corrupt image even when autoResize=false; fixed Pi may pass corrupt bytes (documented deviation)"},
+    {"id": "url-files-other-generation", "version": "V2", "result": "URL/Files API/other providers/image generation/edit remain explicit Stub"},
+    {"id": "animated-webp", "version": "V2", "result": "unsupported decoder; read explicit omitted, inline SDK rejects"},
+    {"id": "harness-remote", "version": "V2", "result": "separate v4/Remote image integration remains Stub"}
+  ]
+}

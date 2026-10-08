@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9705
+- Total entries: 9706
 
 | Status | Count |
 | --- | --- |
-| inventoried | 5143 |
-| scaffolded | 3620 |
-| partial | 630 |
-| implemented | 142 |
+| inventoried | 5141 |
+| scaffolded | 3619 |
+| partial | 633 |
+| implemented | 143 |
 | verified | 167 |
 | deferred | 3 |
 
@@ -2176,8 +2176,6 @@
 | matrix:ai/openai-completions/message/conversion-tool-call-id-other-provider | inventoried | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.OtherProviderToolCallID | ai |
 | matrix:ai/openai-completions/message/conversion-tool-result-assistant-bridge | inventoried | M10 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.AssistantBridge | ai |
 | matrix:ai/openai-completions/message/conversion-tool-result-deferred | inventoried | M10 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.DeferredTools | ai |
-| matrix:ai/openai-completions/message/conversion-tool-result-image-placeholder | inventoried | M12 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.ToolResultImagePlaceholder | ai |
-| matrix:ai/openai-completions/message/conversion-tool-result-images | inventoried | M12 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.ToolResultImageBatch | ai |
 | matrix:ai/openai-completions/message/conversion-tool-result-name | inventoried | M10 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.ToolResultName | ai |
 | matrix:ai/openai-completions/message/conversion-user-empty | inventoried | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.UserEmptyOmitted | ai |
 | matrix:ai/openai-completions/message/conversion-user-image | inventoried | M12 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.UserImageParts | ai |
@@ -4745,7 +4743,6 @@
 | matrix:ai/openai-completions/content/image-content-data | scaffolded | M12 | field | github.com/nankedr/pig/ai.ImageContent.Data | ai |
 | matrix:ai/openai-completions/content/image-content-mime-type | scaffolded | M12 | field | github.com/nankedr/pig/ai.ImageContent.MIMEType | ai |
 | matrix:ai/openai-completions/content/image-content-type | scaffolded | M12 | field | github.com/nankedr/pig/ai.ImageContent.Type | ai |
-| matrix:ai/openai-completions/content/tool-result-message-content-image | scaffolded | M12 | behavior | github.com/nankedr/pig/ai.ImageContent | ai |
 | matrix:ai/openai-completions/content/user-message-content-image | scaffolded | M12 | behavior | github.com/nankedr/pig/ai.ImageContent | ai |
 | matrix:ai/openai-completions/error/assistant-message-diagnostic-details | scaffolded | M10 | field | github.com/nankedr/pig/ai.AssistantMessageDiagnostic.Details | ai |
 | matrix:ai/openai-completions/error/assistant-message-diagnostic-error | scaffolded | M10 | field | github.com/nankedr/pig/ai.AssistantMessageDiagnostic.Error | ai |
@@ -4837,6 +4834,7 @@
 | matrix:ai/openai-completions/content/thinking-content-redacted | partial | M2 | field | github.com/nankedr/pig/ai.ThinkingContent.Redacted | ai |
 | matrix:ai/openai-completions/content/thinking-content-thinking | partial | M2 | field | github.com/nankedr/pig/ai.ThinkingContent.Thinking | ai |
 | matrix:ai/openai-completions/content/thinking-content-thinking-signature | partial | M2 | field | github.com/nankedr/pig/ai.ThinkingContent.ThinkingSignature | ai |
+| matrix:ai/openai-completions/content/tool-result-message-content-image | partial | M12 | behavior | github.com/nankedr/pig/ai.ImageContent | ai |
 | matrix:ai/openai-completions/content/user-message-content-string | partial | M1 | behavior | github.com/nankedr/pig/ai.UserMessageContent.Text() | ai |
 | matrix:ai/openai-completions/content/user-message-content-text | partial | M1 | behavior | github.com/nankedr/pig/ai.TextContent | ai |
 | matrix:ai/openai-completions/delta/delta-reasoning | partial | M2 | field | github.com/nankedr/pig/ai/internal/openai.DecodedDelta.Reasoning | ai |
@@ -4919,6 +4917,8 @@
 | matrix:ai/openai-completions/message/conversion-history-cross-model-thinking | partial | M2 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageTransformer.CrossModelThinking | ai |
 | matrix:ai/openai-completions/message/conversion-history-cross-model-thought-signature | partial | M2 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageTransformer.CrossModelThoughtSignature | ai |
 | matrix:ai/openai-completions/message/conversion-system-system | partial | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.SystemRole | ai |
+| matrix:ai/openai-completions/message/conversion-tool-result-image-placeholder | partial | M12 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.ToolResultImagePlaceholder | ai |
+| matrix:ai/openai-completions/message/conversion-tool-result-images | partial | M12 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.ToolResultImageBatch | ai |
 | matrix:ai/openai-completions/message/conversion-user-string | partial | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.UserString | ai |
 | matrix:ai/openai-completions/message/conversion-user-text | partial | M1 | behavior | github.com/nankedr/pig/ai/internal/openai.MessageConverter.UserTextParts | ai |
 | matrix:ai/openai-completions/message/deferred-handle-api | partial | M2 | field | github.com/nankedr/pig/ai.DeferredHandle.API | ai |
@@ -8005,6 +8005,7 @@
 | contract:codingagent/interactive-themes | implemented | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/responses-runtime | implemented | M14 | contract | github.com/nankedr/pig/codingagent.AgentSession | coding-agent |
 | contract:codingagent/session-stats | implemented | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSessionStats | coding-agent |
+| contract:codingagent/tool-images | implemented | M12 | contract | github.com/nankedr/pig/codingagent#CreateReadTool | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | contract:codingagent/user-images | implemented | M12 | contract | github.com/nankedr/pig/codingagent#AgentSession.Prompt.Images | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |
@@ -9977,8 +9978,8 @@ This table is generated from field, entrypoint, and behavior entries in `parity/
 | internal-wire | message | `conversion.toolResult.assistantBridge`<br>`synthetic assistant bridge` | `MessageConverter.AssistantBridge`<br>`OpenAIChatMessage` | request | M10 | inventoried | err-not-implemented | false, value — the exact bridge is inserted after tool results before a following user or image attachment only when required | fixture: fixture proves conversion.toolResult.assistantBridge: the exact bridge is inserted after tool results before a following user or image attachment only when required | `packages/ai/src/api/openai-completions.ts#convertMessages` |
 | internal-wire | message | `conversion.toolResult.deferred`<br>`ToolResultMessage.addedToolNames in Kimi mode` | `MessageConverter.DeferredTools`<br>`[]OpenAIChatTool` | request | M10 | inventoried | err-not-implemented | absent, empty, value — names deduplicate across a result batch and resolve to one content-less system tool message | fixture: fixture proves conversion.toolResult.deferred: names deduplicate across a result batch and resolve to one content-less system tool message | `packages/ai/src/api/openai-completions.ts#convertMessages` |
 | internal-wire | message | `conversion.toolResult.empty`<br>`empty ToolResultMessage.content` | `MessageConverter.ToolResultEmptyPlaceholder`<br>`string` | request | M1 | verified | err-not-implemented | empty — no text and no images emits the exact no-tool-output placeholder | fixture: fixture proves conversion.toolResult.empty: no text and no images emits the exact no-tool-output placeholder | `packages/ai/src/api/openai-completions.ts#convertMessages` |
-| internal-wire | message | `conversion.toolResult.imagePlaceholder`<br>`image-only ToolResultMessage.content` | `MessageConverter.ToolResultImagePlaceholder`<br>`string` | request | M12 | inventoried | err-not-implemented | value — image-only content emits the exact attached-image placeholder before attachment routing | fixture: fixture proves conversion.toolResult.imagePlaceholder: image-only content emits the exact attached-image placeholder before attachment routing | `packages/ai/src/api/openai-completions.ts#convertMessages` |
-| internal-wire | message | `conversion.toolResult.images`<br>`consecutive image ToolResultMessage values` | `MessageConverter.ToolResultImageBatch`<br>`[]OpenAIContentPart` | request | M12 | inventoried | err-not-implemented | absent, empty, value — vision models batch ordered images from consecutive results into one synthetic user message | fixture: fixture proves conversion.toolResult.images: vision models batch ordered images from consecutive results into one synthetic user message | `packages/ai/src/api/openai-completions.ts#convertMessages` |
+| internal-wire | message | `conversion.toolResult.imagePlaceholder`<br>`image-only ToolResultMessage.content` | `MessageConverter.ToolResultImagePlaceholder`<br>`string` | request | M12 | partial | err-not-implemented | value — image-only content emits the exact attached-image placeholder before attachment routing | fixture: fixture proves conversion.toolResult.imagePlaceholder: image-only content emits the exact attached-image placeholder before attachment routing | `packages/ai/src/api/openai-completions.ts#convertMessages` |
+| internal-wire | message | `conversion.toolResult.images`<br>`consecutive image ToolResultMessage values` | `MessageConverter.ToolResultImageBatch`<br>`[]OpenAIContentPart` | request | M12 | partial | err-not-implemented | absent, empty, value — vision models batch ordered images from consecutive results into one synthetic user message | fixture: fixture proves conversion.toolResult.images: vision models batch ordered images from consecutive results into one synthetic user message | `packages/ai/src/api/openai-completions.ts#convertMessages` |
 | internal-wire | message | `conversion.toolResult.name`<br>`ToolResultMessage.toolName` | `MessageConverter.ToolResultName`<br>`*string` | request | M10 | inventoried | err-not-implemented | absent, empty, value — name is emitted only when required and truthy | fixture: fixture proves conversion.toolResult.name: name is emitted only when required and truthy | `packages/ai/src/api/openai-completions.ts#convertMessages` |
 | internal-wire | message | `conversion.toolResult.text`<br>`ToolResultMessage TextContent[]` | `MessageConverter.ToolResultText`<br>`string` | request | M1 | verified | err-not-implemented | empty, value — text blocks join with newlines and bind to the original tool_call_id | fixture: fixture proves conversion.toolResult.text: text blocks join with newlines and bind to the original tool_call_id | `packages/ai/src/api/openai-completions.ts#convertMessages` |
 | internal-wire | message | `conversion.user.empty`<br>`UserMessage.content: []` | `MessageConverter.UserEmptyOmitted`<br>`bool` | request | M1 | inventoried | err-not-implemented | empty — an empty block list emits no user message | fixture: fixture proves conversion.user.empty: an empty block list emits no user message | `packages/ai/src/api/openai-completions.ts#convertMessages` |
@@ -10110,7 +10111,7 @@ This table is generated from field, entrypoint, and behavior entries in `parity/
 | public-api | content | `ThinkingContent.thinking`<br>`string` | `ThinkingContent.Thinking`<br>`string` | bidirectional | M2 | partial | err-not-implemented | empty, value — the ThinkingContent.thinking field preserves empty, value as distinct contract states where applicable | go-test: codec and adapter fixture preserve ThinkingContent.thinking for empty/value without widening its declared union | `packages/ai/src/types.ts#ThinkingContent.thinking` |
 | public-api | content | `ThinkingContent.thinkingSignature`<br>`string \| undefined` | `ThinkingContent.ThinkingSignature`<br>`Optional[string]` | bidirectional | M2 | partial | err-not-implemented | absent, empty, value — the ThinkingContent.thinkingSignature field preserves absent, empty, value as distinct contract states where applicable | go-test: codec and adapter fixture preserve ThinkingContent.thinkingSignature for absent/empty/value without widening its declared union | `packages/ai/src/types.ts#ThinkingContent.thinkingSignature` |
 | public-api | content | `ThinkingContent.type`<br>`"thinking"` | `ThinkingContent.Type`<br>`ContentType` | bidirectional | M2 | verified | err-not-implemented | value — the ThinkingContent.type field preserves value as distinct contract states where applicable | go-test: codec and adapter fixture preserve ThinkingContent.type for value without widening its declared union | `packages/ai/src/types.ts#ThinkingContent.type` |
-| public-api | content | `ToolResultMessage.content.image`<br>`ImageContent` | `ImageContent`<br>`ImageContent` | request | M12 | scaffolded | err-not-implemented | value — tool results accept image blocks and preserve their order for attachment batching | go-test: parity test proves ToolResultMessage.content[].ImageContent: tool results accept image blocks and preserve their order for attachment batching | `packages/ai/src/types.ts#ToolResultMessage.content` |
+| public-api | content | `ToolResultMessage.content.image`<br>`ImageContent` | `ImageContent`<br>`ImageContent` | request | M12 | partial | err-not-implemented | value — tool results accept image blocks and preserve their order for attachment batching | go-test: parity test proves ToolResultMessage.content[].ImageContent: tool results accept image blocks and preserve their order for attachment batching | `packages/ai/src/types.ts#ToolResultMessage.content` |
 | public-api | content | `ToolResultMessage.content.text`<br>`TextContent` | `TextContent`<br>`TextContent` | request | M1 | verified | err-not-implemented | value — tool results accept text blocks and reject assistant-only variants | go-test: parity test proves ToolResultMessage.content[].TextContent: tool results accept text blocks and reject assistant-only variants | `packages/ai/src/types.ts#ToolResultMessage.content` |
 | public-api | content | `UserMessage.content.image`<br>`ImageContent` | `ImageContent`<br>`ImageContent` | request | M12 | scaffolded | err-not-implemented | value — the user block union accepts images and converts them to data-URL image parts | go-test: parity test proves UserMessage.content[].ImageContent: the user block union accepts images and converts them to data-URL image parts | `packages/ai/src/types.ts#UserMessage.content` |
 | public-api | content | `UserMessage.content.string`<br>`string` | `UserMessageContent.Text()`<br>`(string, bool)` | request | M1 | partial | err-not-implemented | empty, value — compact string content remains distinct from a one-element text-block array | go-test: parity test proves UserMessage.content.string: compact string content remains distinct from a one-element text-block array | `packages/ai/src/types.ts#UserMessage.content` |

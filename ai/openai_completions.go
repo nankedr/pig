@@ -161,7 +161,7 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 	if err := ValidateUserImages(input); err != nil {
 		return nil, err
 	}
-	for _, message := range transformed {
+	for index, message := range transformed {
 		switch value := message.(type) {
 		case UserMessage:
 			if err := appendOpenAIUserMessage(&messages, model, value); err != nil {
@@ -198,6 +198,32 @@ func ConvertOpenAICompletionsMessages(model Model, input Context, compat OpenAIC
 			}
 		default:
 			return nil, fmt.Errorf("unsupported message %T", message)
+		}
+		if _, tool := message.(ToolResultMessage); tool && (index+1 == len(transformed) || transformed[index+1].MessageRole() != MessageRoleToolResult) {
+			var parts []map[string]any
+			for start := index; start >= 0 && transformed[start].MessageRole() == MessageRoleToolResult; start-- {
+				// Walk forward below to retain tool and image order.
+				if start > 0 && transformed[start-1].MessageRole() == MessageRoleToolResult {
+					continue
+				}
+				for _, result := range transformed[start : index+1] {
+					for _, block := range result.(ToolResultMessage).Content {
+						if image, ok := replayContentValue(block).(ImageContent); ok {
+							if model.Provider != ProviderIDDeepSeek {
+								return nil, newNotImplemented("OpenAICompletions.ConvertMessages.ToolResultImage.Provider." + string(model.Provider))
+							}
+							parts = append(parts, map[string]any{"type": "image_url", "image_url": map[string]any{"url": "data:" + image.MIMEType + ";base64," + image.Data}})
+						}
+					}
+				}
+				break
+			}
+			if len(parts) > 0 {
+				parts = append([]map[string]any{{"type": "text", "text": "Attached image(s) from tool result:"}}, parts...)
+				if err := appendMessage(map[string]any{"role": "user", "content": parts}); err != nil {
+					return nil, err
+				}
+			}
 		}
 	}
 	return messages, nil
@@ -364,6 +390,7 @@ func appendOpenAIToolResultMessage(messages *[]json.RawMessage, message ToolResu
 		return newNotImplemented("OpenAICompletions.ConvertMessages.ToolResultAddedToolNames")
 	}
 	var text []string
+	hasImages := false
 	for _, block := range message.Content {
 		switch value := block.(type) {
 		case TextContent:
@@ -373,7 +400,7 @@ func appendOpenAIToolResultMessage(messages *[]json.RawMessage, message ToolResu
 				text = append(text, value.Text)
 			}
 		case ImageContent, *ImageContent:
-			return newNotImplemented("OpenAICompletions.ConvertMessages.ToolResultImage")
+			hasImages = true
 		default:
 			return fmt.Errorf("unsupported tool result content %T", block)
 		}
@@ -381,6 +408,9 @@ func appendOpenAIToolResultMessage(messages *[]json.RawMessage, message ToolResu
 	content := strings.Join(text, "\n")
 	if content == "" {
 		content = "(no tool output)"
+		if hasImages {
+			content = "(see attached image)"
+		}
 	}
 	raw, err := json.Marshal(map[string]any{
 		"role": "tool", "content": sanitizeOpenAIText(content), "tool_call_id": message.ToolCallID,

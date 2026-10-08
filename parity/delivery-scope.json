@@ -184,7 +184,8 @@
         "matrix:ai/openai-completions/message/conversion-tool-result-images",
         "matrix:ai/openai-completions/message/conversion-user-image",
         "matrix:ai/openai-completions/request/model-input",
-        "contract:codingagent/user-images"
+        "contract:codingagent/user-images",
+        "contract:codingagent/tool-images"
       ]
     },
     {
@@ -243,7 +244,8 @@
       "catalog_ids": [
         "contract:ai/images",
         "contract:baseline/image-catalog-snapshot",
-        "contract:codingagent/user-images"
+        "contract:codingagent/user-images",
+        "contract:codingagent/tool-images"
       ]
     },
     {

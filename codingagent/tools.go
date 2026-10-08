@@ -540,6 +540,7 @@ func CreateReadTool(cwd string, options ...ReadToolOptions) (agent.ErasedAgentTo
 	if len(options) != 0 {
 		configured = options[0]
 	}
+	autoResize := configured.AutoResizeImages == nil || *configured.AutoResizeImages
 	operations := configured.Operations
 	if operations == nil {
 		operations = localReadOperations{}
@@ -563,7 +564,7 @@ func CreateReadTool(cwd string, options ...ReadToolOptions) (agent.ErasedAgentTo
 			return input
 		},
 		Execute: func(ctx context.Context, _ string, input readToolExecutionInput, _ agent.AgentToolUpdateCallback[*ReadToolDetails]) (agent.AgentToolResult[*ReadToolDetails], error) {
-			return executeReadTool(ctx, cwd, operations, input)
+			return executeReadTool(ctx, cwd, operations, input, autoResize)
 		},
 	})
 }
@@ -877,7 +878,7 @@ func formatReadToolNumber(value float64) string {
 	return mantissa + "e" + sign + exponent
 }
 
-func executeReadTool(ctx context.Context, cwd string, operations ReadOperations, input readToolExecutionInput) (agent.AgentToolResult[*ReadToolDetails], error) {
+func executeReadTool(ctx context.Context, cwd string, operations ReadOperations, input readToolExecutionInput, autoResize bool) (agent.AgentToolResult[*ReadToolDetails], error) {
 	path, err := resolveReadPath(input.Path, cwd)
 	if err != nil {
 		return agent.AgentToolResult[*ReadToolDetails]{}, err
@@ -891,7 +892,15 @@ func executeReadTool(ctx context.Context, cwd string, operations ReadOperations,
 			return agent.AgentToolResult[*ReadToolDetails]{}, err
 		}
 		if mimeType != nil {
-			return agent.AgentToolResult[*ReadToolDetails]{}, notImplemented("ReadTool.Image")
+			data, err := operations.ReadFile(ctx, path)
+			if err != nil {
+				return agent.AgentToolResult[*ReadToolDetails]{}, err
+			}
+			content := readImageContent(data, *mimeType, autoResize)
+			if err := context.Cause(ctx); err != nil {
+				return agent.AgentToolResult[*ReadToolDetails]{}, err
+			}
+			return agent.AgentToolResult[*ReadToolDetails]{Content: content}, nil
 		}
 	}
 	content, err := operations.ReadFile(ctx, path)

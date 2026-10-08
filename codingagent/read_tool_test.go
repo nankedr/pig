@@ -330,7 +330,7 @@ func TestReadToolTurnsContextCancellationIntoCompatibleToolResult(t *testing.T) 
 	}
 }
 
-func TestReadToolLeavesImageReadingExplicitlyUnimplemented(t *testing.T) {
+func TestReadToolExplainsCorruptImageOmission(t *testing.T) {
 	cwd := t.TempDir()
 	image := append([]byte{0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n', 0, 0, 0, 13}, []byte("IHDR")...)
 	if err := os.WriteFile(filepath.Join(cwd, "image.bin"), image, 0o600); err != nil {
@@ -338,7 +338,7 @@ func TestReadToolLeavesImageReadingExplicitlyUnimplemented(t *testing.T) {
 	}
 
 	result := runReadTool(t, context.Background(), cwd, map[string]any{"path": "image.bin"})
-	if !result.IsError || readToolResultText(t, result) != "codingagent.ReadTool.Image: not implemented" {
+	if result.IsError || !strings.Contains(readToolResultText(t, result), "[Image omitted:") {
 		t.Fatalf("image ToolResult = %#v", result)
 	}
 }

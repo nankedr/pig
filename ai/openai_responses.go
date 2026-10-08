@@ -163,14 +163,29 @@ func responsesInput(model Model, input Context) ([]any, error) {
 			}
 			results[callID] = true
 			var texts []string
+			var images []map[string]any
 			for _, block := range m.Content {
-				text, ok := replayContentValue(block).(TextContent)
-				if !ok {
-					return nil, newNotImplemented("OpenAIResponses.Input.ToolResultImage")
+				switch value := replayContentValue(block).(type) {
+				case TextContent:
+					texts = append(texts, sanitizeOpenAIText(value.Text))
+				case ImageContent:
+					images = append(images, map[string]any{"type": "input_image", "detail": "auto", "image_url": "data:" + value.MIMEType + ";base64," + value.Data})
+				default:
+					return nil, fmt.Errorf("invalid tool result content %T", block)
 				}
-				texts = append(texts, sanitizeOpenAIText(text.Text))
 			}
-			items = append(items, map[string]any{"type": "function_call_output", "call_id": callID, "output": strings.Join(texts, "\n")})
+			text := strings.Join(texts, "\n")
+			var output any = text
+			if len(images) > 0 {
+				parts := []map[string]any{}
+				if text != "" {
+					parts = append(parts, map[string]any{"type": "input_text", "text": text})
+				}
+				output = append(parts, images...)
+			} else if text == "" {
+				output = "(no tool output)"
+			}
+			items = append(items, map[string]any{"type": "function_call_output", "call_id": callID, "output": output})
 		default:
 			return nil, newNotImplemented("OpenAIResponses.Input.ToolResult")
 		}

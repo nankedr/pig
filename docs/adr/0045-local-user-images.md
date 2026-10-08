@@ -8,4 +8,4 @@ V1 图片策略是保留原始字节、尺寸和 EXIF 方向元数据，不在�
 
 production v3 使用既有 `image` 块内联保存 data/mimeType，不引入外部附件引用或新版本。删除原文件不影响重开、fork、树上下文重建与完整历史重放。正式 reader 先验证整个含图用户消息的结构，再按选中路径的最终模型，对当前 deepseek-flash 上下文在恢复前验证实际图片块和请求总配额，旧 Pi Session 的合成/原始图片编码保持既有 codec 语义（真正请求时仍进行实际图片校验），缺失或损坏数据返回带 Session 路径的附件错误；宽容 ParseSessionEntries 保留原有导入语义。已压缩掉的图片仍在原始 Session 树中，压缩后的当前上下文只按既有 first-kept 语义重放，不额外复活被压缩历史。
 
-固定 Pi 的合法视觉图片 wire 由独立 Oracle 比较。更严格的本地格式/大小/MIME 校验及非视觉明确失败是 Pig 的显式边界，不把它们作为 Pi 对等证据。运行中的图片队列、SendUserMessage 图片、RPC/Interactive 附件、工具结果图片、旋转/缩放/终端及导出仍由 #135–#136 处理。URL、Files API、其他厂商和图像生成/编辑逐项归入 V2，仍为显式 Stub。
+固定 Pi 的合法视觉图片 wire 由独立 Oracle 比较。更严格的本地格式/大小/MIME 校验及非视觉明确失败是 Pig 的显式边界，不把它们作为 Pi 对等证据。运行中的图片队列、SendUserMessage 图片、RPC/Interactive 附件、工具结果图片与 read 旋转/缩放已由 #135 处理，见 ADR-0046；终端及导出仍由 #136 处理。URL、Files API、其他厂商和图像生成/编辑逐项归入 V2，仍为显式 Stub。

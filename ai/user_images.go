@@ -100,18 +100,32 @@ func userImageFormat(data []byte) (string, error) {
 	return "image/" + format, nil
 }
 
-// ValidateUserImages checks all user attachments and the aggregate request limit.
+// ValidateUserImages checks user and tool attachments and their aggregate request limit.
 func ValidateUserImages(input Context) error {
 	var total, count int
 	for _, message := range input.Messages {
-		if m, ok := message.(*UserMessage); ok && m != nil {
-			message = *m
+		var blocks []Content
+		switch m := message.(type) {
+		case *UserMessage:
+			if m != nil {
+				message = *m
+			}
+		case *ToolResultMessage:
+			if m != nil {
+				message = *m
+			}
 		}
-		m, ok := message.(UserMessage)
-		if !ok {
-			continue
+		switch m := message.(type) {
+		case UserMessage:
+			content, _ := m.Content.Blocks()
+			for _, block := range content {
+				blocks = append(blocks, block)
+			}
+		case ToolResultMessage:
+			for _, block := range m.Content {
+				blocks = append(blocks, block)
+			}
 		}
-		blocks, _ := m.Content.Blocks()
 		for _, block := range blocks {
 			if image, ok := replayContentValue(block).(ImageContent); ok {
 				if err := ValidateUserImage(image); err != nil {
@@ -123,7 +137,7 @@ func ValidateUserImages(input Context) error {
 		}
 	}
 	if total > base64.StdEncoding.EncodedLen(16<<20) || count > 64 {
-		return fmt.Errorf("user images exceed 16 MiB total or 64 images per request")
+		return fmt.Errorf("images exceed 16 MiB total or 64 images per request")
 	}
 	return nil
 }

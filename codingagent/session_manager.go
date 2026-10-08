@@ -337,7 +337,7 @@ func loadSessionFile(path string) ([]FileEntry, int64, error) {
 	for {
 		line, err := reader.ReadString('\n')
 
-		if imageErr := validateSessionUserImages([]byte(line)); imageErr != nil {
+		if imageErr := validateSessionImages([]byte(line)); imageErr != nil {
 			return nil, 0, fmt.Errorf("session %q image attachment: %w", path, imageErr)
 		}
 		for _, entry := range ParseSessionEntries(line) {
@@ -1369,7 +1369,7 @@ func cloneSessionEntries(in []SessionEntry) []SessionEntry {
 	return out
 }
 
-func validateSessionUserImages(record []byte) error {
+func validateSessionImages(record []byte) error {
 	var entry struct{ Message json.RawMessage }
 	if err := json.Unmarshal(record, &entry); err != nil {
 		if bytes.Contains(record, []byte(`"image"`)) {
@@ -1379,7 +1379,7 @@ func validateSessionUserImages(record []byte) error {
 	}
 	fields, _ := decodeJSONObject(entry.Message)
 	role, _ := decodeJSONField[string](fields, "role")
-	if role != "user" {
+	if role != "user" && role != "toolResult" {
 		return nil
 	}
 	content := fields["content"]
@@ -1387,7 +1387,7 @@ func validateSessionUserImages(record []byte) error {
 		return nil
 	}
 	if _, err := ai.UnmarshalMessage(entry.Message); err != nil {
-		return fmt.Errorf("invalid user image message: %w", err)
+		return fmt.Errorf("invalid image message: %w", err)
 	}
 	return nil
 }
