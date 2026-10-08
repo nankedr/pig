@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9703
+- Total entries: 9704
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5143 |
 | scaffolded | 3620 |
 | partial | 631 |
-| implemented | 139 |
+| implemented | 140 |
 | verified | 167 |
 | deferred | 3 |
 
@@ -8003,6 +8003,7 @@
 | symbol:codingagent/src/utils/frontmatter.ts#parseFrontmatter | partial | M5 | symbol | github.com/nankedr/pig/codingagent.ParseFrontmatter | coding-agent |
 | symbol:codingagent/src/utils/frontmatter.ts#stripFrontmatter | partial | M5 | symbol | github.com/nankedr/pig/codingagent.StripFrontmatter | coding-agent |
 | contract:codingagent/interactive-themes | implemented | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
+| contract:codingagent/responses-runtime | implemented | M14 | contract | github.com/nankedr/pig/codingagent.AgentSession | coding-agent |
 | contract:codingagent/session-stats | implemented | M4 | contract | github.com/nankedr/pig/codingagent.AgentSession.GetSessionStats | coding-agent |
 | contract:codingagent/transcript-projection | implemented | M9 | contract | github.com/nankedr/pig/codingagent | coding-agent |
 | member:codingagent/src/core/agent-session-runtime.ts#AgentSessionRuntime.dispose | implemented | M1 | contract | github.com/nankedr/pig/codingagent.AgentSessionRuntime.Dispose | coding-agent |

@@ -2,6 +2,7 @@ package codingagent
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/nankedr/pig/agent"
@@ -98,6 +99,32 @@ func resolveHeadlessModel(ctx context.Context, runtime *ModelRuntime, settings *
 			}
 			return model, thinking, &CLIArgumentError{Message: "No models available with configured authentication. Use --provider and --model with --api-key, or configure credentials."}
 		}
+	}
+	api := options.API
+	restored := false
+	if api == "" && options.SessionManager != nil {
+		saved := options.SessionManager.BuildSessionContext()
+		if len(saved.Messages) > 0 && saved.Model != nil && saved.Model.Provider == string(model.Provider) {
+			api, restored = saved.Model.API, true
+		}
+	}
+	if api == "" && !restored {
+		provider, err := settings.GetDefaultProvider()
+		if err != nil {
+			return model, thinking, err
+		}
+		if provider == string(model.Provider) {
+			api, err = settingsValue[ai.API](*settings, "defaultAPI", "", "")
+			if err != nil {
+				return model, thinking, err
+			}
+		}
+	}
+	if api != "" {
+		model.API = api
+	}
+	if model.API == ai.APIOpenAIResponses {
+		model.Compat = ai.Optional[json.RawMessage]{}
 	}
 	if thinking == "" && options.SessionManager != nil {
 		saved := options.SessionManager.BuildSessionContext()

@@ -87,6 +87,7 @@ type Settings struct {
 	LastChangelogVersion      *string                       `json:"lastChangelogVersion,omitempty"`
 	DefaultProvider           *string                       `json:"defaultProvider,omitempty"`
 	DefaultModel              *string                       `json:"defaultModel,omitempty"`
+	DefaultAPI                *ai.API                       `json:"defaultAPI,omitempty"`
 	DefaultThinkingLevel      *agent.ThinkingLevel          `json:"defaultThinkingLevel,omitempty"`
 	Transport                 *ai.Transport                 `json:"transport,omitempty"`
 	SteeringMode              *agent.QueueMode              `json:"steeringMode,omitempty"`

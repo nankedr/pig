@@ -451,6 +451,7 @@ type AgentSession struct {
 	reloading                          bool
 	resourceVersion                    uint64
 	runtimeStream                      bool
+	modelOverride                      func(ai.Model) ai.Model
 	configurationNotifying             bool
 	compactionCancel                   context.CancelFunc
 	compactionDone                     chan struct{}

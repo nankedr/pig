@@ -15,6 +15,7 @@ fields:
 - ThinkingLevel string tag=""
 - Provider string tag=""
 - ModelID string tag=""
+- API ai.API tag=""
 - Summary string tag=""
 - FirstKeptEntryID string tag=""
 - TokensBefore int64 tag=""

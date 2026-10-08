@@ -2,6 +2,7 @@ package codingagent
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -216,7 +217,11 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 		return CreateAgentSessionResult{}, err
 	}
 	if !hasMessages {
-		if _, err := manager.AppendModelChange(string(config.Model.Provider), config.Model.ID); err != nil {
+		api := ai.API("")
+		if config.Model.API == ai.APIOpenAIResponses {
+			api = config.Model.API
+		}
+		if _, err := manager.appendModelChange(string(config.Model.Provider), config.Model.ID, api); err != nil {
 			return CreateAgentSessionResult{}, err
 		}
 		if _, err := manager.AppendThinkingLevelChange(string(created.State().ThinkingLevel)); err != nil {
@@ -260,6 +265,15 @@ func CreateAgentSession(ctx context.Context, options ...CreateAgentSessionOption
 	})
 	session.allTools = cloneSessionTools(selectAgentTools(config.AgentTools, allowedTools, config.ExcludeTools, ""))
 	session.runtimeStream = runtimePath
+	if runtimePath && config.Model.API == ai.APIOpenAIResponses {
+		provider := config.Model.Provider
+		session.modelOverride = func(model ai.Model) ai.Model {
+			if model.Provider == provider {
+				model.API, model.Compat = ai.APIOpenAIResponses, ai.Optional[json.RawMessage]{}
+			}
+			return model
+		}
+	}
 	if err := configureSessionPrompt(ctx, session, CreateHeadlessSessionOptions{CWD: config.CWD, AgentDir: config.AgentDir, NoContextFiles: config.NoContextFiles}); err != nil {
 		session.Dispose()
 		return CreateAgentSessionResult{}, err

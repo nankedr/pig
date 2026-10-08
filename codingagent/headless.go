@@ -175,6 +175,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if err != nil {
 		return nil, err
 	}
+	selectedAPI := model.API
 	patterns := options.Models
 	if patterns == nil {
 		patterns, err = settings.GetEnabledModels()
@@ -195,6 +196,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		}
 		if options.Model == "" && len(scoped) > 0 && (options.SessionManager == nil || len(options.SessionManager.BuildSessionContext().Messages) == 0) {
 			model = scoped[0].Model
+			model.API = selectedAPI
 			level := options.Thinking
 			if level == "" {
 				level = scoped[0].ThinkingLevel
@@ -238,9 +240,13 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 	if err != nil {
 		return nil, err
 	}
-	stream := func(runContext context.Context, requestModel ai.Model, input ai.Context, streamOptions ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
-		if options.API != "" && requestModel.Provider == model.Provider {
-			requestModel.API = options.API
+	api := options.API
+	if api == "" && model.API == ai.APIOpenAIResponses {
+		api = model.API
+	}
+	overrideModel := func(requestModel ai.Model) ai.Model {
+		if api != "" && requestModel.Provider == model.Provider {
+			requestModel.API = api
 			if requestModel.API == ai.APIOpenAIResponses {
 				requestModel.Compat = ai.Optional[json.RawMessage]{}
 			}
@@ -248,6 +254,9 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		if options.BaseURL != nil && requestModel.Provider == model.Provider {
 			requestModel.BaseURL = strings.TrimSpace(*options.BaseURL)
 		}
+		return requestModel
+	}
+	stream := func(runContext context.Context, requestModel ai.Model, input ai.Context, streamOptions ai.SimpleStreamOptions) *ai.AssistantMessageEventStream {
 		if options.APIKey != nil && *options.APIKey != "" {
 			key := *options.APIKey
 			streamOptions.APIKey = &key
@@ -312,6 +321,7 @@ func CreateHeadlessSession(ctx context.Context, options CreateHeadlessSessionOpt
 		return nil, err
 	}
 	created.Session.runtimeStream = true
+	created.Session.modelOverride = overrideModel
 	factory := func(ctx context.Context, next CreateAgentSessionRuntimeOptions) (CreateAgentSessionRuntimeResult, error) {
 		config := options
 		config.CWD = next.CWD

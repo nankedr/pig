@@ -108,6 +108,7 @@ type SessionEntry struct {
 	ThinkingLevel    string
 	Provider         string
 	ModelID          string
+	API              ai.API
 	Summary          string
 	FirstKeptEntryID string
 	TokensBefore     int64
@@ -131,7 +132,10 @@ type FileEntry struct {
 	// ParseSessionEntries, including values that have no typed Go projection.
 	Raw json.RawMessage `json:"-"`
 }
-type SessionModel struct{ Provider, ModelID string }
+type SessionModel struct {
+	Provider, ModelID string
+	API               ai.API `json:",omitempty"`
+}
 type SessionContext struct {
 	Messages      []agent.AgentMessage
 	ThinkingLevel string
@@ -492,10 +496,14 @@ func (m *SessionManager) AppendThinkingLevelChange(thinkingLevel string) (string
 	return entry.ID, m.appendEntryLocked(entry)
 }
 func (m *SessionManager) AppendModelChange(provider, modelID string) (string, error) {
+	return m.appendModelChange(provider, modelID, "")
+}
+func (m *SessionManager) appendModelChange(provider, modelID string, api ai.API) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	entry := m.newEntryLocked("model_change")
 	entry.Provider, entry.ModelID = provider, modelID
+	entry.API = api
 	return entry.ID, m.appendEntryLocked(entry)
 }
 func (m *SessionManager) AppendBranchSummary(BranchSummaryEntry) error {
@@ -692,7 +700,8 @@ func marshalSessionEntry(entry SessionEntry) ([]byte, error) {
 			Timestamp string  `json:"timestamp"`
 			Provider  string  `json:"provider"`
 			ModelID   string  `json:"modelId"`
-		}{base.Type, base.ID, base.ParentID, base.Timestamp, entry.Provider, entry.ModelID})
+			API       ai.API  `json:"api,omitempty"`
+		}{base.Type, base.ID, base.ParentID, base.Timestamp, entry.Provider, entry.ModelID, entry.API})
 	case "thinking_level_change":
 		return json.Marshal(struct {
 			Type          string  `json:"type"`
@@ -813,6 +822,7 @@ func decodeSessionEntry(data []byte) (SessionEntry, error) {
 	entry.ThinkingLevel, _ = decodeJSONField[string](fields, "thinkingLevel")
 	entry.Provider, _ = decodeJSONField[string](fields, "provider")
 	entry.ModelID, _ = decodeJSONField[string](fields, "modelId")
+	entry.API, _ = decodeJSONField[ai.API](fields, "api")
 	entry.Summary, _ = decodeJSONField[string](fields, "summary")
 	entry.FirstKeptEntryID, _ = decodeJSONField[string](fields, "firstKeptEntryId")
 	entry.TokensBefore, _ = decodeJSONField[int64](fields, "tokensBefore")
@@ -1193,10 +1203,13 @@ func BuildSessionContext(entries []SessionEntry, leafID ...*string) SessionConte
 		case "thinking_level_change":
 			out.ThinkingLevel = e.ThinkingLevel
 		case "model_change":
-			out.Model = &SessionModel{Provider: e.Provider, ModelID: e.ModelID}
+			out.Model = &SessionModel{Provider: e.Provider, ModelID: e.ModelID, API: e.API}
 		case "message":
 			if assistant, ok := sessionAssistantMessage(e.Message); ok {
 				out.Model = &SessionModel{Provider: string(assistant.Provider), ModelID: assistant.Model}
+				if assistant.API == ai.APIOpenAIResponses {
+					out.Model.API = assistant.API
+				}
 			}
 		}
 	}

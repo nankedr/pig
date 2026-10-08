@@ -45,9 +45,15 @@ func (s *AgentSession) persistConfiguration(model *ai.Model, level *agent.Thinki
 		entry := manager.newEntryLocked("model_change")
 		entry.Provider = string(model.Provider)
 		entry.ModelID = model.ID
+		if model.API == ai.APIOpenAIResponses {
+			entry.API = model.API
+		}
 		appendEntry(entry)
 		fields["defaultProvider"], _ = json.Marshal(model.Provider)
 		fields["defaultModel"], _ = json.Marshal(model.ID)
+		if model.API == ai.APIOpenAIResponses || len(settings.settings["defaultAPI"]) > 0 {
+			fields["defaultAPI"], _ = json.Marshal(model.API)
+		}
 	}
 	if level != nil {
 		entry := manager.newEntryLocked("thinking_level_change")

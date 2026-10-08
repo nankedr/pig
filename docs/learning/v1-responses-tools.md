@@ -47,4 +47,4 @@ PIG_REQUIRE_RESPONSES_TOOLS_LIVE=1 go test ./agent -run '^TestResponsesAgentDeep
 
 2026-10-08 使用 `https://api.deepseek.com`、`deepseek-v4-pro`、reasoning low/auto 工具选择，公开 Agent 完成一次本地工具执行、明文 reasoning 回传与模型继续回答。仅检查执行次数、回传结构及成功终态，不把模型自由回答作为精确 golden。`PIG_RESPONSES_SMOKE_MODEL` 可覆盖模型 ID；密钥使用现有 `DEEPSEEK_API_KEY`，不写入 fixture。
 
-#133 继续负责真实 CLI/RPC/TUI 的可恢复 Coding Agent、跨进程/fork/压缩后续接；本票的 Session SDK 重开证据不代表这些入口已验收。公共 API 形状未变化，因此无需改动 API snapshot。
+#133 的真实 CLI/RPC/TUI 与可恢复 Coding Agent 验收见[后续学习文档](v1-responses-codingagent.md)；本票的 Session SDK 重开证据只覆盖本票范围。#132 公共 API 形状未变化，#133 的可选协议恢复字段单独更新 API snapshot。

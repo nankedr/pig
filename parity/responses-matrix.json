@@ -74,7 +74,7 @@
       "catalog_id": "contract:ai/responses-local-history",
       "version": "V1",
       "issue": 132,
-      "verification": "公开 Agent 多轮/取消继续与正式 v3 Session 重开/整轮 retry 不重复副作用通过；#133 跨进程/fork/压缩仍待验收"
+      "verification": "公开 Agent 多轮/取消与正式 v3 Session 重开/整轮 retry 不重复副作用；#133 真实 CLI/RPC/PTY 编码任务、跨进程/fork/SDK 树导航/分支摘要/压缩后续接已通过"
     },
     {
       "id": "images",
@@ -165,6 +165,16 @@
       "version": "V1",
       "issue": 131,
       "verification": "固定 Pi 共同计数/cost Oracle；服务明文 reasoning 和失败计数保留单列 evidence"
+    },
+    {
+      "id": "codingagent-runtime",
+      "standard": "SDK、headless、Interactive TUI、Coding Agent JSONL RPC 与正式 production v3 Session",
+      "deepseek_support": "supported",
+      "deepseek_behavior": "无状态请求从本地完整历史恢复；协议选择、工具 call/item ID、结果及明文 reasoning 可重放。",
+      "catalog_id": "contract:codingagent/responses-runtime",
+      "version": "V1",
+      "issue": 133,
+      "verification": "公开 SDK + 同一编码任务的真实 CLI/RPC/race 子进程/PTY；并发、队列、abort、会话替换、usage/stats、恢复/fork/摘要/压缩；2026-10-08 deepseek-v4-pro 真实 v3 工具/恢复续接 PASS；服务证据不冒充 Pi Oracle，无 freeze 声明"
     }
   ]
 }

@@ -4,7 +4,7 @@
 
 M6/v0.6.0 的组合验收、未完成范围与发布前置条件见 [M6 冻结](docs/learning/m6-freeze.md)；真实终端人工验收按用户授权跳过，发布证据明确记录豁免。
 
-#131 已加入 DeepSeek Responses 文本、reasoning/usage 与终态；见 [文本配置与验证](docs/learning/v1-responses-text.md)和[源码映射](docs/mappings/typescript-to-go/v1-responses-text.md)。工具、历史恢复和图片继续由后续票交付。
+#131–#133 已接通 DeepSeek Responses 文本、reasoning/usage、工具及可恢复 Coding Agent，覆盖 SDK、headless、TUI 和 JSONL RPC；见 [配置与恢复](docs/learning/v1-responses-codingagent.md)和[源码映射](docs/mappings/typescript-to-go/v1-responses-codingagent.md)。图片由后续票交付。
 
 M6.11 的历史消息 fork、树导航、标签和离开分支摘要见 [交互分支导航](docs/learning/m6-interactive-branches.md)与 [源码映射](docs/mappings/typescript-to-go/m6-interactive-branches.md)。
 

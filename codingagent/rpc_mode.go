@@ -326,7 +326,7 @@ func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, out
 		for _, model := range models {
 			if fields["provider"] == string(model.Provider) && fields["modelId"] == model.ID {
 				err = s.SetModel(model)
-				response["data"] = model
+				response["data"] = s.Model()
 				break
 			}
 		}
@@ -335,6 +335,11 @@ func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, out
 		err = listErr
 		if models == nil {
 			models = []ai.Model{}
+		}
+		if s.modelOverride != nil {
+			for i := range models {
+				models[i] = s.modelOverride(models[i])
+			}
 		}
 		response["data"] = map[string]any{"models": models}
 	case "cycle_model":

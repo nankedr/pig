@@ -63,6 +63,7 @@ m0-offline:
 	go run ./examples/message-handoff
 	go run ./examples/context-overflow
 	go run ./examples/responses-tools
+	go run ./examples/responses-session
 	go run ./examples/agent-proxy
 
 m0-node-preflight:
@@ -153,6 +154,10 @@ m0-source-drift: m0-node-preflight
 		cmp parity/baseline/catalog/image/models.json "$$tmp/image-models.json"
 
 m0-freeze: m0-gate m0-oracle m0-source-drift
+
+.PHONY: responses-session-live-smoke
+responses-session-live-smoke:
+	PIG_REQUIRE_RESPONSES_SESSION_LIVE=1 go test ./codingagent -run '^TestResponsesCodingAgentLiveRestore$$' -count=1
 
 responses-tools-live-smoke:
 	PIG_REQUIRE_RESPONSES_TOOLS_LIVE=1 go test ./agent -run '^TestResponsesAgentDeepSeekLiveToolContinuation$$' -count=1

@@ -110,6 +110,9 @@ func (s *AgentSession) setModelLocked(ctx context.Context, model ai.Model, level
 	if s.modelRuntime == nil {
 		return nil, fmt.Errorf("AgentSession has no ModelRuntime")
 	}
+	if s.modelOverride != nil {
+		model = s.modelOverride(model)
+	}
 	if err := validateSessionModel(model); err != nil {
 		return nil, err
 	}

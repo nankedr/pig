@@ -1,0 +1,5 @@
+type codingagent.SessionModel struct
+fields:
+- Provider string tag=""
+- ModelID string tag=""
+- API ai.API tag="json:\",omitempty\""

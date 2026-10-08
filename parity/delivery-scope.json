@@ -151,7 +151,8 @@
         "contract:ai/responses-function-tools",
         "contract:ai/responses-reasoning-replay",
         "contract:ai/responses-local-history",
-        "contract:ai/responses-service-boundaries"
+        "contract:ai/responses-service-boundaries",
+        "contract:codingagent/responses-runtime"
       ]
     },
     {
