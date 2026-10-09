@@ -1,0 +1,26 @@
+{
+  "retained": {
+    "branch": "M0–M6 已交付 supported 分支、静态目录及显式 Stub；只冻结各独立契约的证据范围。旧总条目中的 unsupported 不能覆盖后续独立 contract。",
+    "remaining": "#13/#129 其他 Provider/认证/目录，#10 Harness，#11 Remote，#99 包，#15 平台，#9 扩展，#128 图片剩余分支及 #127 完整对等；inventoried/scaffolded 仅作为映射锚点。",
+    "public_boundary": "公开 CLI/SDK 普通和全屏 PTY 组合、七工具、RPC、Session 持久化/恢复/fork/导航/压缩；make m6-gate 回归所有已交付分支与 V2 Stub 副作用。",
+    "contracts": ["contract:codingagent/m6-workflow", "contract:model-runtime/basic", "contract:rpc/session-control", "contract:rpc/session-lifecycle", "contract:codingagent/local-extensions", "contract:session/migration"]
+  },
+  "responses": {
+    "branch": "DeepSeek openai-responses 文本/SSE、函数工具/reasoning、本地历史/usage、失败/取消/重试；SDK/headless/Interactive/RPC；标准与服务差异按 responses-matrix.json。",
+    "remaining": "#129 OpenAI 官方/Azure/Codex、其他 Responses 参数/服务工具/compat；shared partial 的非 DeepSeek 分支不计完成。",
+    "public_boundary": "公开 SDK 和真实 CLI/RPC/PTY、v3 恢复/fork/树导航/摘要/压缩后 continuation；受保护文本/工具/恢复冒烟。",
+    "contracts": ["contract:codingagent/responses-runtime", "contract:ai/responses-local-history", "contract:ai/responses-service-boundaries"]
+  },
+  "image-input": {
+    "branch": "DeepSeek 双 API 的用户与工具图片、PNG/JPEG/GIF/static WebP 处理、v3 内联持久化/恢复/fork/导航/first-kept 压缩、附件、darwin-arm64 剪贴板、Kitty/Ghostty 预览及安全 HTML。旧字段行的 scaffolded/inventoried 不代替这些公开运行契约。",
+    "remaining": "#128 生成/编辑、其他 Provider/输入、图片队列及 Harness/Remote/扩展；#15 剩余平台/终端协议/剪贴板。非视觉模型显式失败为已验证服务差异。",
+    "public_boundary": "公开 SDK、真实跨进程 CLI/RPC、普通/全屏 PTY、实际 NSPasteboard、独立浏览器与受保护双 API 图片/工具/恢复任务。",
+    "contracts": ["contract:codingagent/user-images", "contract:codingagent/tool-images", "contract:codingagent/image-workflow"]
+  },
+  "v1-release": {
+    "branch": "本次 darwin-arm64 CLI/SDK 构建、安装、signal/外部命令/终端生命周期及 V1 图片入口/展示；module 行仅为范围锚点，不宣称整个 module 已对等。",
+    "remaining": "#127 完整七模块对等和所有 V2 专项；其他目标交叉编译不获得发布支持。M6 历史人工豁免不继承，本次采用原生自动 PTY/剪贴板/浏览器证据。",
+    "public_boundary": "make v1-freeze：固定 Oracle/source/API、全仓离线/race、原生自动行为、受保护文本/工具/视觉；安装后的 CLI/独立 SDK 再执行 PTY/浏览器；tag 后全新 module cache 无 replace 公开安装。",
+    "contracts": ["contract:codingagent/m6-workflow", "contract:codingagent/responses-runtime", "contract:codingagent/image-workflow", "contract:telemetry/memory"]
+  }
+}

@@ -26,7 +26,7 @@ func frame133(value any) string {
 
 func binary133(t *testing.T) string {
 	t.Helper()
-	if os.Getenv("PIG_TEST_RACE") != "1" {
+	if os.Getenv("PIG_BINARY") != "" || os.Getenv("PIG_TEST_RACE") != "1" {
 		return buildPigBinary(t)
 	}
 	binary := filepath.Join(t.TempDir(), "pig")

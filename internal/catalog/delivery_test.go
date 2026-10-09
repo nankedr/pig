@@ -61,7 +61,7 @@ func TestDeliveryScope(t *testing.T) {
 	if scope.SchemaVersion != 1 || scope.BaselineCommit != baselineCommit || scope.CatalogBaselineCommit != catalogBaselineCommit {
 		t.Fatal("delivery scope must retain both fixed baselines")
 	}
-	if scope.DefaultRemainingVersion != "V2" || scope.DefaultRemainingIssue != 127 || scope.Frontier != "V1 Responses" {
+	if scope.DefaultRemainingVersion != "V2" || scope.DefaultRemainingIssue != 127 || scope.Frontier != "V1 release" {
 		t.Fatal("remaining gaps and frontier do not match ADR-0043")
 	}
 	if _, err := os.Stat(filepath.Join(repoRoot(t), scope.Decision)); err != nil {
