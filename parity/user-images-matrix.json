@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-08",
+  "checked_at": "2026-10-09",
   "source": "https://api-docs.deepseek.com/guides/vision/",
   "catalog_id": "contract:codingagent/user-images",
   "model_config": {
@@ -68,7 +68,7 @@
     {
       "id": "interactive-rpc",
       "version": "V1",
-      "result": "attachment Stub; #136"
+      "result": "V1 implemented; Interactive attachments and RPC prompt.images, see parity/image-workflow-matrix.json (#136)"
     },
     {
       "id": "url",
