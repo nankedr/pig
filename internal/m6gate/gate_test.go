@@ -30,7 +30,7 @@ func TestM6CatalogAudit(t *testing.T) {
 }
 
 func TestM6ReleaseVersion(t *testing.T) {
-	if codingagent.Version != "0.6.0" {
+	if codingagent.Version != "1.0.0" {
 		t.Fatalf("SDK version = %s", codingagent.Version)
 	}
 }

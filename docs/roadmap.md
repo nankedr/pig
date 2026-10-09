@@ -2,7 +2,7 @@
 
 依据 [ADR-0043](adr/0043-versioned-delivery-and-gates.md)，最终完整复刻固定 Pi 基线，V1 交付完整语义的明确子集，V2 关闭剩余兼容缺口。Code Baseline 为 `936aff00918de1187f085f123c2812d8f2d67745`；Catalog Baseline 为 v0.84.1 source tar（`53fa77ccd8a279eb87e92294ef3687b03ff80112`，39 个 Provider、1220 个 chat model）。两者相差 40 个 commit，仍按 ADR-0014 解释双来源。
 
-当前 Milestone Frontier：**V1 Responses**。#130 同步范围后执行 #12；M0–M6（#2–#8）全部已关闭，v0.6.0 是已交付文本 TUI 的历史版本。新范围归属见 [Catalog 版本范围](../parity/delivery-scope.json)，状态和证据仍从 Catalog 读取。
+当前 Milestone Frontier：**V1 release**。#130、#12、#14 均已关闭，#16 接通 V1 冻结、安装与发布；M0–M6（#2–#8）全部已关闭，v0.6.0 是已交付文本 TUI 的历史版本。新范围归属见 [Catalog 版本范围](../parity/delivery-scope.json)，状态和证据仍从 Catalog 读取。
 
 | 版本与顺序 | Issue | 可验收产物 |
 | --- | --- | --- |

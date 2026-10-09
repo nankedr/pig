@@ -28,7 +28,7 @@
 
 证据必须记录：commit/tag、平台、执行命令和强制 live 开关、UTC 执行时间、官方文档查阅日期、endpoint、明确 model ID、API、thinking/图片等实际配置，以及文本/工具/视觉分别通过、失败或未执行的结果。不得存储真实 secret、原始 header、用户内容；使用合成输入并记录可复核的语义断言。模型改名、服务变更或参数差异另留 provenance，不修改历史模型快照、fixture、价格或能力标记。
 
-本票 #130 定义规则；#131–#136 实现能力及用例，#16 接通可执行 V1 freeze/release 入口。当前没有 `make v1-freeze` 或 V1 release 成功证据，`make m1-live-smoke` 仅覆盖历史文本/工具，不可冒充新视觉门禁。
+本票 #130 定义规则；#131–#136 实现能力及用例，#16 通过 `make v1-gate`、`make v1-freeze` 和 `scripts/v1-release.py` 接通执行入口。范围及最高层契约关联见 `parity/v1-acceptance.json`；`scripts/v1-live.py` 强制文本/工具/视觉及原生剪贴板并拒绝 skip。完整发布结论以绑定 commit 的 Release 附件为准。复现见 [V1 冻结与安装](../learning/v1-freeze.md)。`make m1-live-smoke` 仅覆盖历史文本/工具，不可冒充新视觉门禁。
 
 ## V2 gate
 

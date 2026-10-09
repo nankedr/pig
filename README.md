@@ -1,6 +1,8 @@
 # Pig
 
-当前前沿为 **V1 Responses**，M0–M6 已关闭。V1 保留已交付能力，新增 DeepSeek Responses 与用户/工具图片闭环，发布平台为 darwin-arm64；V2 完成同一固定 Pi 基线的其余能力。见 [版本决策](docs/adr/0043-versioned-delivery-and-gates.md)、[路线图](docs/roadmap.md)、[Responses 能力矩阵](docs/specs/responses.md)和[版本验收](docs/specs/versioned-release.md)。以下 M 阶段说明与发布证据保留历史范围。
+当前前沿为 **V1 release**，M0–M6 已关闭。V1 保留已交付能力，已交付 DeepSeek Responses 与用户/工具图片闭环，发布平台为 darwin-arm64；V2 完成同一固定 Pi 基线的其余能力。见 [版本决策](docs/adr/0043-versioned-delivery-and-gates.md)、[路线图](docs/roadmap.md)、[Responses 能力矩阵](docs/specs/responses.md)和[版本验收](docs/specs/versioned-release.md)。以下 M 阶段说明与发布证据保留历史范围。
+
+V1 安装：`go install github.com/nankedr/pig/cmd/pig@v1.0.0`；SDK：`go get github.com/nankedr/pig@v1.0.0`。普通离线门禁 `make v1-gate`，受保护完整冻结 `make v1-freeze`；见 [V1 冻结/安装](docs/learning/v1-freeze.md)、[合成 SDK 工作流](examples/v1-workflow/main.go)与[发布矩阵](docs/releases/v1.0.0.md)。
 
 M6/v0.6.0 的组合验收、未完成范围与发布前置条件见 [M6 冻结](docs/learning/m6-freeze.md)；真实终端人工验收按用户授权跳过，发布证据明确记录豁免。
 

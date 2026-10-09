@@ -45,6 +45,9 @@ func TestProcessReportsStdoutWriteFailure(t *testing.T) {
 
 func buildPigBinary(t *testing.T) string {
 	t.Helper()
+	if binary := os.Getenv("PIG_BINARY"); binary != "" {
+		return binary
+	}
 	_, file, _, ok := runtime.Caller(0)
 	if !ok {
 		t.Fatal("locate test source")

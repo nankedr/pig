@@ -1,5 +1,7 @@
 # Pig 文档导航
 
+V1 范围冻结、原生安装及发布见 [V1 冻结](learning/v1-freeze.md)、[源码导航](mappings/typescript-to-go/v1-freeze.md)与[发布矩阵](releases/v1.0.0.md)。
+
 V1 Responses 工具与本地历史重放见 [工具学习文档](learning/v1-responses-tools.md)与[源码映射](mappings/typescript-to-go/v1-responses-tools.md)。
 
 可恢复 Coding Agent 的 SDK、CLI、TUI、RPC 配置与验收见 [#133 学习文档](learning/v1-responses-codingagent.md)、[源码映射](mappings/typescript-to-go/v1-responses-codingagent.md)与 [API 恢复决策](adr/0044-responses-session-api.md)。
