@@ -47,6 +47,8 @@ with tempfile.TemporaryDirectory(prefix='pi-interactive-') as root:
             chunks = turn['chunks']
             for chunk_index, text in enumerate(chunks):
                 os.write(master,text.encode())
+                if text == '\u000e':
+                    wait_for(lambda: b'New session started' in output)
                 time.sleep(.04)
                 if chunk_index == 0 and 'columns' in turn:
                     fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', 32, turn['columns'], 0, 0))
