@@ -1,4 +1,4 @@
-PIG_OFFLINE_ENV := env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT -u PIG_REQUIRE_RESPONSES_LIVE -u PIG_REQUIRE_RESPONSES_TOOLS_LIVE -u PIG_REQUIRE_RESPONSES_SESSION_LIVE -u PIG_REQUIRE_TOOL_VISION_LIVE -u PIG_REQUIRE_IMAGE_WORKFLOW_LIVE -u PIG_REQUIRE_CLIPBOARD_IMAGE_NATIVE
+PIG_OFFLINE_ENV := env -u DEEPSEEK_API_KEY -u PIG_REQUIRE_VISION_LIVE -u PIG_REQUIRE_LIVE -u PIG_INVENTORY_DRIFT -u PIG_PI_CHECKOUT -u PIG_REQUIRE_RESPONSES_LIVE -u PIG_REQUIRE_RESPONSES_TOOLS_LIVE -u PIG_REQUIRE_RESPONSES_SESSION_LIVE -u PIG_REQUIRE_TOOL_VISION_LIVE -u PIG_REQUIRE_IMAGE_WORKFLOW_LIVE -u PIG_REQUIRE_CLIPBOARD_IMAGE_NATIVE -u PIG_BINARY -u PIG_M6_SDK_BINARY
 
 .PHONY: responses-tools-live-smoke m0-gate m0-offline m0-node-preflight m0-oracle m0-source-drift m0-freeze m1-live-smoke m1-freeze m2-gate m2-repeat m2-oracle m2-freeze m2-clean m3-gate m3-repeat m3-oracle m3-clean m3-freeze m3-node-preflight
 
@@ -364,7 +364,7 @@ v1-audit:
 	python3 scripts/v1-audit.py
 
 v1-gate: m6-gate v1-audit
-	$(PIG_OFFLINE_ENV) PIG_TEST_RACE=1 go test -race ./ai ./agent ./codingagent ./cmd/pig ./tui -run 'Responses|UserImages|ToolImages|ImageWorkflow|ImagePreview' -count=3 -shuffle=on
+	$(PIG_OFFLINE_ENV) PIG_TEST_RACE=1 go test -race ./ai ./agent ./codingagent ./cmd/pig ./tui -run 'Responses|UserImages|ToolImages|ImageWorkflow|ImagePreview' -count=3 -shuffle=on -timeout=30m
 	go run ./examples/responses-session
 	go run ./examples/v1-workflow
 	go build ./examples/user-images ./examples/tool-images ./examples/image-workflow

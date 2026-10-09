@@ -50,7 +50,7 @@ def main():
         "code_baseline": "936aff00918de1187f085f123c2812d8f2d67745",
         "catalog_baseline": "53fa77ccd8a279eb87e92294ef3687b03ff80112",
         "command": "make v1-freeze", "exit_code": result.returncode,
-        "native_acceptance": "fresh automated PTY, NSPasteboard and browser; no inherited human waiver",
+        "native_acceptance": {"method": "fresh automated PTY, NSPasteboard and browser; no inherited human waiver", "status": "passed" if result.returncode == 0 else "not-confirmed"},
         "live_evidence": "live-evidence/live.json",
         "clean_checkout_after": not output("git", "status", "--porcelain=v1", "--untracked-files=all"),
         "hashes": {"v1-freeze.log": digest(log)},
@@ -69,7 +69,7 @@ def main():
     (dest / "pig-ai-help.txt").write_text(output(str(bundle / "pig-ai"), "--help") + "\n")
     artifacts = dest / "terminal-artifacts"
     env["PIG_M6_ARTIFACTS"] = str(artifacts)
-    with tempfile.TemporaryDirectory(prefix="pig-m6-sdk-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="pig-v1-sdk-") as temporary:
         sdk = Path(temporary)
         (sdk / "go.mod").write_text(f"module release-check\n\ngo 1.24.0\n\nrequire github.com/nankedr/pig v1.0.0\nreplace github.com/nankedr/pig => {ROOT}\n")
         shutil.copy2(ROOT / "examples/m6-workflow/main.go", sdk / "main.go")
@@ -87,7 +87,7 @@ def main():
         subprocess.run(["node", "parity/export-html/check.mjs"], cwd=ROOT, env={**env, "PIG_BINARY": str(bundle / "pig")}, stdout=stream, stderr=subprocess.STDOUT, check=True)
     with (dest / "installed-v1-workflow.log").open("w") as stream:
         installed = {**env, "PIG_BINARY": str(bundle / "pig")}
-        subprocess.run(["go", "test", "./cmd/pig", "-run", "ImageWorkflow|ResponsesCoding|ResponsesRPC|PigBashShutdownSignals", "-count=1", "-v"], cwd=ROOT, env=installed, stdout=stream, stderr=subprocess.STDOUT, check=True)
+        subprocess.run(["go", "test", "./cmd/pig", "-run", "ImageWorkflow|Responses|PigBashShutdownSignals", "-count=1", "-v"], cwd=ROOT, env=installed, stdout=stream, stderr=subprocess.STDOUT, check=True)
         subprocess.run(["node", "parity/export-html/images.mjs"], cwd=ROOT, env=installed, stdout=stream, stderr=subprocess.STDOUT, check=True)
     for name in ["LICENSE", "THIRD_PARTY_NOTICES", "README.md"]:
         shutil.copy2(ROOT / name, bundle / name)
@@ -148,7 +148,7 @@ def verify_published(dest):
     live = json.loads((dest / "live-evidence/live.json").read_text())
     if live["commit"] != record["commit"] or live["status"] != "passed":
         raise SystemExit("fresh successful live evidence for frozen commit required")
-    with tempfile.TemporaryDirectory(prefix="pig-m6-public-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="pig-v1-public-") as temporary:
         work = Path(temporary)
         sdk, binaries = work / "sdk", work / "bin"
         sdk.mkdir()
@@ -169,7 +169,7 @@ def verify_published(dest):
             shutil.copy2(ROOT / "examples/v1-workflow/main.go", sdk / "main.go")
             run(["go", "run", "."])
             installed_v1 = {**env, "PIG_BINARY": str(binaries / "pig")}
-            subprocess.run(["go", "test", "./cmd/pig", "-run", "ImageWorkflow|ResponsesCoding|ResponsesRPC|PigBashShutdownSignals", "-count=1", "-v"], cwd=ROOT, env=installed_v1, stdout=stream, stderr=subprocess.STDOUT, check=True)
+            subprocess.run(["go", "test", "./cmd/pig", "-run", "ImageWorkflow|Responses|PigBashShutdownSignals", "-count=1", "-v"], cwd=ROOT, env=installed_v1, stdout=stream, stderr=subprocess.STDOUT, check=True)
             subprocess.run(["node", "parity/export-html/images.mjs"], cwd=ROOT, env=installed_v1, stdout=stream, stderr=subprocess.STDOUT, check=True)
             run([str(binaries / "pig-ai"), "--help"])
             version = subprocess.check_output([str(binaries / "pig"), "--version"], env=env, text=True).strip()
