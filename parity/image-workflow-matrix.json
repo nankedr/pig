@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-09",
+  "catalog_id": "contract:codingagent/image-workflow",
+  "rows": [
+    {
+      "id": "pending-attachments",
+      "version": "V1",
+      "result": "CLI @FILE and /image add/list/remove/view/send, mixed text+images; admission failure preserves pending draft"
+    },
+    {
+      "id": "cancel-queues",
+      "version": "V1",
+      "result": "accepted image remains inline on cancellation; new pending images cannot silently enter text-only queues"
+    },
+    {
+      "id": "clipboard",
+      "version": "V1",
+      "result": "darwin-arm64 native NSPasteboard PNG/JPEG/GIF/static WebP/text; each type accepted via Ctrl+V, original full pasteboard restored"
+    },
+    {
+      "id": "terminal",
+      "version": "V1",
+      "result": "darwin-arm64 Kitty/Ghostty native bounded preview; fit/resize/redraw/scroll isolation/close/cancel/own-image delete and terminal restoration harness"
+    },
+    {
+      "id": "fallback",
+      "version": "V1",
+      "result": "unknown/iTerm2/multiplexer/other-platform no graphics sequence, explicit inline MIME/source/index and HTML guidance"
+    },
+    {
+      "id": "rpc",
+      "version": "V1",
+      "result": "real prompt.images dual API wire, message events/get_messages and formal Session persistence; image queues explicit rejection"
+    },
+    {
+      "id": "restore-export",
+      "version": "V1",
+      "result": "regular/fullscreen actual CLI source deletion and cross-process restore; HTML raster user/tool images embedded, CSP data-only, XSS/path validation and modal"
+    },
+    {
+      "id": "oracle",
+      "version": "V1",
+      "result": "fixed Pi Kitty chunk/placement/delete exact fixture; existing user/tool wire/read Oracle; Pig UI/clipboard/strict security differences declared"
+    },
+    {
+      "id": "platforms",
+      "version": "V2",
+      "result": "#15/#128 full helper/TIFF/worker/platform/terminal protocols/cell query/automatic image scrollback and crop matrix remain Stub or unverified"
+    },
+    {
+      "id": "remaining-images",
+      "version": "V2",
+      "result": "#128 queues/URL/Files API/providers/generation/edit; Harness/Remote/extensions integration remain Stub"
+    }
+  ],
+  "live_smoke": {
+    "run": "PIG_REQUIRE_IMAGE_WORKFLOW_LIVE=1 go test ./cmd/pig -run TestImageWorkflowRPCLive136 -v",
+    "result": "PASS 2026-10-09 protected darwin-arm64 current DeepSeek Responses + Chat Completions real RPC user image -> vision -> read image -> write colors -> standalone HTML; not Pi parity"
+  }
+}

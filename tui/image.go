@@ -1,5 +1,13 @@
 package tui
 
+import (
+	"crypto/rand"
+	"encoding/base64"
+	"encoding/binary"
+	"fmt"
+	"strings"
+)
+
 // ImageProtocol identifies a terminal inline-image protocol. The empty value
 // represents a terminal with no supported image protocol.
 type ImageProtocol string
@@ -128,15 +136,74 @@ func IsImageLine(string) (bool, error) {
 }
 
 func AllocateImageID() (uint32, error) {
-	return 0, newNotImplemented("allocateImageId")
+	var bytes [4]byte
+	for {
+		if _, err := rand.Read(bytes[:]); err != nil {
+			return 0, err
+		}
+		if id := binary.LittleEndian.Uint32(bytes[:]); id != 0 {
+			return id, nil
+		}
+	}
 }
 
-func EncodeKitty(string, ...KittyEncodeOptions) (string, error) {
-	return "", newNotImplemented("encodeKitty")
+func EncodeKitty(data string, options ...KittyEncodeOptions) (string, error) {
+	if data == "" || len(data) > base64.StdEncoding.EncodedLen(8<<20) {
+		return "", fmt.Errorf("invalid Kitty image size")
+	}
+	if _, err := base64.StdEncoding.Strict().DecodeString(data); err != nil {
+		return "", err
+	}
+	if strings.ContainsAny(data, "\r\n") {
+		return "", fmt.Errorf("Kitty base64 must not contain newlines")
+	}
+	params := "a=T,f=100,q=2"
+	if len(options) > 0 {
+		o := options[0]
+		if o.MoveCursor != nil && !*o.MoveCursor {
+			params += ",C=1"
+		}
+		if o.Columns != nil {
+			if *o.Columns < 1 || *o.Columns > 10000 {
+				return "", fmt.Errorf("invalid image columns")
+			}
+			params += fmt.Sprintf(",c=%d", *o.Columns)
+		}
+		if o.Rows != nil {
+			if *o.Rows < 1 || *o.Rows > 10000 {
+				return "", fmt.Errorf("invalid image rows")
+			}
+			params += fmt.Sprintf(",r=%d", *o.Rows)
+		}
+		if o.ImageID != nil {
+			params += fmt.Sprintf(",i=%d", *o.ImageID)
+		}
+
+	}
+	var output strings.Builder
+	for offset := 0; offset < len(data); offset += 4096 {
+		end := min(len(data), offset+4096)
+		more := 0
+		if end < len(data) {
+			more = 1
+		}
+		control := fmt.Sprintf("m=%d", more)
+		if offset == 0 {
+			control = params
+			if more == 1 {
+				control += ",m=1"
+			}
+		}
+		fmt.Fprintf(&output, "\x1b_G%s;%s\x1b\\", control, data[offset:end])
+	}
+	return output.String(), nil
 }
 
-func DeleteKittyImage(uint32) (string, error) {
-	return "", newNotImplemented("deleteKittyImage")
+func DeleteKittyImage(id uint32) (string, error) {
+	if id == 0 {
+		return "", fmt.Errorf("image ID must not be zero")
+	}
+	return fmt.Sprintf("\x1b_Ga=d,d=I,i=%d,q=2\x1b\\", id), nil
 }
 
 func DeleteAllKittyImages() (string, error) {

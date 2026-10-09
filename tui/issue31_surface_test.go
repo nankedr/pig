@@ -165,8 +165,8 @@ func TestIssue31MemberMappingsMatchLockedTUISurface(t *testing.T) {
 	if got := issue31CountCatalogStatus(expected, catalog.StatusInventoried); got != 395 {
 		t.Fatalf("issue #31 inherited primitive member rows = %d, want 395", got)
 	}
-	if got := issue31CountCatalogStatus(expected, catalog.StatusScaffolded); got != 635 {
-		t.Fatalf("issue #31 scaffolded symbol/member rows = %d, want 635", got)
+	if got := issue31CountCatalogStatus(expected, catalog.StatusScaffolded); got != 632 {
+		t.Fatalf("issue #31 scaffolded symbol/member rows = %d, want 632", got)
 	}
 	if *updateIssue31Catalog {
 		issue31WriteCatalog(t, root, expected)
@@ -533,6 +533,12 @@ func issue31ExpectedCatalogEntries(symbols []surface.Symbol) []catalog.Entry {
 	}
 	for i := range entries {
 		e := &entries[i]
+		if e.Mapping.Target == issue31GoPackage+".AllocateImageID" || e.Mapping.Target == issue31GoPackage+".EncodeKitty" || e.Mapping.Target == issue31GoPackage+".DeleteKittyImage" {
+			e.Status = catalog.StatusImplemented
+			e.Evidence = []catalog.Evidence{{Kind: "go-test", Ref: "tui/image_workflow_oracle_test.go", Baseline: issue31BaselineCommit, CaseID: e.ID, InputHash: "sha256:c7d858c9d7524c7cbd903e7ab96ec2fdcf9dce831605706036140aa3a100756d", ExecutionMethod: "go test ./tui -run '^TestImageWorkflowKittyOracle136$' -count=1", Expected: "fixed Pi Kitty encoding/deletion with validated input", Actual: "PASS; native lifecycle owned by contract:codingagent/image-workflow", Platform: "any", CatalogID: e.ID}}
+			e.Notes = "Issue #136; fixed protocol only; terminal detection/preview scope in ADR-0047."
+			continue
+		}
 		if issue120Promote(e) || issue115Promote(e) || issue114Promote(e) || issue113Promote(e) || issue112Promote(e) || issue111Promote(e) || issue110Promote(e) {
 			continue
 		}

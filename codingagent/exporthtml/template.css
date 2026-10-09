@@ -1057,3 +1057,8 @@
       body { background: white; color: black; }
       #content { max-width: none; }
     }
+
+.image-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 1000; align-items: center; justify-content: center; }
+.image-modal.visible { display: flex; }
+.image-modal img { max-width: 95vw; max-height: 95vh; object-fit: contain; }
+.message-image, .tool-image { cursor: zoom-in; }

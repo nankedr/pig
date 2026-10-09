@@ -576,7 +576,7 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 				return errors.Join(err, runtime.Dispose(context.WithoutCancel(ctx)))
 			}
 		}
-		mode := NewInteractiveMode(runtime, InteractiveModeOptions{InitialMessages: messages, TUIMode: parsed.TUIMode, ProjectTrustOverride: parsed.ProjectTrustOverride})
+		mode := NewInteractiveMode(runtime, InteractiveModeOptions{InitialImages: images, InitialMessages: messages, TUIMode: parsed.TUIMode, ProjectTrustOverride: parsed.ProjectTrustOverride})
 		err := mode.Run(ctx)
 		if err == context.Canceled && ctx.Err() != nil {
 			return nil
@@ -594,7 +594,7 @@ func runSessionMain(ctx context.Context, arguments []string) error {
 
 func unsupportedHeadlessOperation(parsed Args) string {
 	switch {
-	case len(parsed.FileArgs) != 0 && (!parsed.Print && parsed.Mode != ModeJSON):
+	case len(parsed.FileArgs) != 0 && parsed.Mode == ModeRPC:
 		return "headless.file-arguments"
 	case len(parsed.Extensions) != 0:
 		return "headless.resources"

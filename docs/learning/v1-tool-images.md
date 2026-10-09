@@ -6,7 +6,7 @@ pig --model deepseek-flash --api openai-completions --thinking off -p "用 read 
 pig --session /absolute/path/session.jsonl -p "继续针对同一截图修改"
 ```
 
-`CreateReadTool(cwd, ReadToolOptions{AutoResizeImages: &enabled})` 支持图片。默认缩放开启；自定义 ReadOperations 只有实现可选 ReadImageOperations 才会将返回字节作为图片处理。工具终态可返回交错 `TextContent`/`ImageContent`，Agent 保留原始顺序，按对应 API 的固定 Pi 编码继续请求。公开 SDK 示例：[examples/tool-images/main.go](../../examples/tool-images/main.go)。RPC 从文本 prompt 调用 read，图片在事件和 `get_messages` 中保留；用户 RPC 附件仍为 #136 Stub。
+`CreateReadTool(cwd, ReadToolOptions{AutoResizeImages: &enabled})` 支持图片。默认缩放开启；自定义 ReadOperations 只有实现可选 ReadImageOperations 才会将返回字节作为图片处理。工具终态可返回交错 `TextContent`/`ImageContent`，Agent 保留原始顺序，按对应 API 的固定 Pi 编码继续请求。公开 SDK 示例：[examples/tool-images/main.go](../../examples/tool-images/main.go)。RPC 从文本 prompt 调用 read，图片在事件和 `get_messages` 中保留；用户 RPC 附件、交互预览和导出见 [图片工作流](v1-image-workflow.md)。
 
 read 识别实际 JPEG/PNG/GIF/static WebP/BMP（无关扩展名），BMP 转 PNG。默认尺寸 2000×2000，base64 小于 4.5 MiB；重编码时应用 EXIF 方向，返回原尺寸/显示尺寸/坐标换算说明。小图保留原字节，关闭缩放时保留支持格式原图；损坏、超限、无法处理时给出明确 omitted 提示。格式、请求限额及编码差异详见 [ADR-0046](../adr/0046-tool-image-continuation.md) 和 `parity/tool-images-matrix.json`。
 

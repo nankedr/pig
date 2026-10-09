@@ -9,6 +9,7 @@ import (
 )
 
 var interactiveCommands = []struct{ name, description, hint string }{
+	{"image", "Manage local image attachments", "add <path> | list | remove <n> | view <n> | history <n>"},
 	{"settings", "Open settings menu", ""},
 	{"model", "Select model (opens selector UI)", "<provider/model>"},
 	{"scoped-models", "Enable/disable models for Ctrl+P cycling", ""},

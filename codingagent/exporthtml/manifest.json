@@ -9,26 +9,27 @@
     "Visible M12 Markdown image placeholders; no automatic network resources",
     "Full license and scope disclosure",
     "Escape Bash exit status and validate Bash fields",
-    "Validated theme CSS is generated from built-in or local resources (#104)"
+    "Validated theme CSS is generated from built-in or local resources (#104)",
+    "Validated inline user/tool PNG/JPEG/GIF/WebP with data-only image CSP (#136)"
   ],
   "assets": [
     {
       "path": "template.html",
       "upstream_path": "packages/coding-agent/src/core/export-html/template.html",
       "upstream_sha256": "916782b1184a9597527605ad751e2b3af30fcea23ba2194002969cd217a06881",
-      "sha256": "2b2159758230b1e2275a008521d73f54f5e2b01bdac9626b50301151991d52e7"
+      "sha256": "668ac7b9b8ccb02c4338970c2eac3852aca779664ff40f10f0d4966a834662c9"
     },
     {
       "path": "template.js",
       "upstream_path": "packages/coding-agent/src/core/export-html/template.js",
       "upstream_sha256": "1893cdb77587f592eef5717905391269886d6d7a4dc6a488417a73da374d9226",
-      "sha256": "b5811dd3f95e70da8beb0241cf7036bd95050bcc5a0417085a6e4d8070887bc4"
+      "sha256": "f325af4a904a115610bdf7f744ffefdfa35a882c3d4960f20c082fef26e3c39a"
     },
     {
       "path": "template.css",
       "upstream_path": "packages/coding-agent/src/core/export-html/template.css",
       "upstream_sha256": "28c16e3827c23a62eef8283cac316b478f946e023093adad25ff9c9b891d41af",
-      "sha256": "fe27bdf1b0297befcd8dbee251a89b621a6bbf4f0997d39e1530533c358f0269"
+      "sha256": "d16fe853641136b446399444c6e0ef64ebf21e5d4c9b1c61ab918e5561790b3c"
     },
     {
       "path": "vendor/marked.min.js",

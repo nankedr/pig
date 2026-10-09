@@ -216,9 +216,34 @@ func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, out
 			fail(errors.New(message))
 			return
 		}
-		if images := fields["images"]; images != nil {
-			if values, ok := images.([]any); !ok || len(values) > 0 {
-				fail(notImplemented("AgentSession.Prompt.Images"))
+		var images []ai.ImageContent
+		if value, exists := fields["images"]; exists {
+			values, ok := value.([]any)
+			if !ok {
+				fail(errors.New("images must be an array"))
+				return
+			}
+			if len(values) > 64 {
+				fail(errors.New("images exceed 64 attachment limit"))
+				return
+			}
+			encoded, marshalErr := json.Marshal(values)
+			if marshalErr != nil {
+				fail(marshalErr)
+				return
+			}
+			if decodeErr := json.Unmarshal(encoded, &images); decodeErr != nil {
+				fail(decodeErr)
+				return
+			}
+			for _, image := range images {
+				if imageErr := ai.ValidateUserImage(image); imageErr != nil {
+					fail(imageErr)
+					return
+				}
+			}
+			if len(images) > 0 && command != "prompt" {
+				fail(notImplemented("AgentSession.imageQueue"))
 				return
 			}
 		}
@@ -258,7 +283,7 @@ func rpcCommand(ctx context.Context, s *AgentSession, fields map[string]any, out
 			}
 		}
 		accepted := false
-		err := s.promptWithPreflight(ctx, text, func() { accepted = true; output(response) }, PromptOptions{StreamingBehavior: behavior})
+		err := s.promptWithPreflight(ctx, text, func() { accepted = true; output(response) }, PromptOptions{StreamingBehavior: behavior, Images: images})
 		if err != nil && !accepted {
 			fail(err)
 		}

@@ -901,6 +901,11 @@
         return out;
       }
 
+      function inlineImageSource(img) {
+        if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(img.mimeType) || typeof img.data !== 'string' || !/^[A-Za-z0-9+/]+={0,2}$/.test(img.data)) return '';
+        return 'data:' + img.mimeType + ';base64,' + img.data;
+      }
+
       function renderToolCall(call) {
         const result = findToolResult(call.id);
         const isError = result?.isError || false;
@@ -921,7 +926,7 @@
           const images = getResultImages();
           if (images.length === 0) return '';
           return '<div class="tool-images">' +
-            images.map(img => `<img src="data:${escapeHtml(img.mimeType || 'image/png')};base64,${escapeHtml(img.data || '')}" class="tool-image" />`).join('') +
+            images.map(img => `<img src="${inlineImageSource(img)}" class="tool-image" />`).join('') +
             '</div>';
         };
 
@@ -957,7 +962,7 @@
 
             html += `<div class="tool-header"><span class="tool-name">read</span> <span class="tool-path">${pathHtml}</span></div>`;
             if (result) {
-              html += renderResultImages();
+
               const output = getResultText();
               const lang = filePath ? getLanguageFromPath(filePath) : null;
               if (output) html += formatExpandableOutput(output, 10, lang);
@@ -1058,6 +1063,7 @@
           }
         }
 
+        html += renderResultImages();
         html += '</div>';
         return html;
       }
@@ -1205,7 +1211,7 @@
                 if (images.length > 0) {
                   html += '<div class="message-images">';
                   for (const img of images) {
-                    html += `<img src="data:${escapeHtml(img.mimeType || 'image/png')};base64,${escapeHtml(img.data || '')}" class="message-image" />`;
+                    html += `<img src="${inlineImageSource(img)}" class="message-image" />`;
                   }
                   html += '</div>';
                 }
@@ -1227,7 +1233,7 @@
               if (images.length > 0) {
                 html += '<div class="message-images">';
                 for (const img of images) {
-                  html += `<img src="data:${escapeHtml(img.mimeType || 'image/png')};base64,${escapeHtml(img.data || '')}" class="message-image" />`;
+                  html += `<img src="${inlineImageSource(img)}" class="message-image" />`;
                 }
                 html += '</div>';
               }
@@ -1633,6 +1639,14 @@
       }
 
       document.addEventListener('click', event => {
+        const image = event.target.closest('#messages .message-image, #messages .tool-image');
+        const modal = document.getElementById('image-modal');
+        if (image && image.getAttribute('src')?.startsWith('data:image/')) {
+          document.getElementById('modal-image').src = image.getAttribute('src');
+          modal.classList.add('visible');
+          return;
+        }
+        if (event.target.closest('#image-modal')) modal.classList.remove('visible');
         const download = event.target.closest('[data-action="download-json"]');
         if (download) window.downloadSessionJson();
         const toggle = event.target.closest('[data-toggle]');

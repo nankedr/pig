@@ -1,0 +1,15 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {dirname,join} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+const root=join(dirname(fileURLToPath(import.meta.url)),'../..');
+const checkout=process.argv.slice(2).find(x=>!x.startsWith('--'));
+const lock=JSON.parse(readFileSync(join(root,'parity/baseline/upstream.lock.json')));
+const commit=execFileSync('git',['-C',checkout,'rev-parse','HEAD'],{encoding:'utf8'}).trim();
+if(commit!==lock.upstream.commit)throw Error('wrong Pi baseline');
+const {encodeKitty,deleteKittyImage}=await import(pathToFileURL(join(checkout,'packages/tui/src/terminal-image.ts')));
+const cases=[{data:readFileSync(join(root,'parity/services/user-image.png')).toString('base64'),options:{columns:12,rows:6,imageId:42,moveCursor:false}},{data:'AAAA'.repeat(2050),options:{columns:3,rows:2,imageId:7}}];
+const fixture={baseline_commit:commit,scope:'fixed Pi Kitty chunking/placement/deletion only; terminal detection, clipboard, strict validation and bounded preview are Pig V1 choices',cases:cases.map(x=>({...x,sequence:encodeKitty(x.data,x.options),deletion:deleteKittyImage(x.options.imageId)}))};
+const path=join(root,'parity/oracle/fixtures/image-workflow.json');
+if(process.argv.includes('--check')){if(JSON.stringify(JSON.parse(readFileSync(path)))!==JSON.stringify(fixture))throw Error('Kitty Oracle drift');}else writeFileSync(path,JSON.stringify(fixture,null,2)+'\n');
+console.log('PASS fixed Pi Kitty encoding/deletion');

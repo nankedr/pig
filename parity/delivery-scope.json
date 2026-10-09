@@ -185,7 +185,8 @@
         "matrix:ai/openai-completions/message/conversion-user-image",
         "matrix:ai/openai-completions/request/model-input",
         "contract:codingagent/user-images",
-        "contract:codingagent/tool-images"
+        "contract:codingagent/tool-images",
+        "contract:codingagent/image-workflow"
       ]
     },
     {

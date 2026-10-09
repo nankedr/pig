@@ -18,7 +18,7 @@ func issue109InteractivePartial() *catalog.Partial {
 		"Raw SIGINT preserves signal termination after cleanup; pinned Pi leaves terminal modes active on this path, so cleanup intentionally follows issue109 restoration requirement and is not claimed identical",
 	}, Unsupported: []string{
 		"Full Markdown/layout parity, scrollback, overlays, fullscreen, autocomplete remain partial or explicit stubs; issue110 editor evidence is owned by contract:tui/multiline-editor and issue111 key protocols/actions by contract:tui/terminal-keys",
-		"Image input, extension runtime, package ecosystem, update notifications, terminal-loss/stalled-output emergency exits and six-platform runtime acceptance remain unverified/deferred to their scheduled milestones",
+		"Image input is delivered under contract:codingagent/image-workflow (#136); extension runtime, package ecosystem, update notifications, terminal-loss/stalled-output emergency exits and six-platform runtime acceptance remain unverified/deferred to their scheduled milestones",
 	}}
 }
 func issue109InteractiveCatalogEntry() catalog.Entry {

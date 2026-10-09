@@ -12,12 +12,15 @@ import (
 	"time"
 
 	"github.com/nankedr/pig/agent"
+	"github.com/nankedr/pig/ai"
 	"github.com/nankedr/pig/tui"
 )
 
 // InteractiveMode composes the production AgentSession with tui-owned input and rendering.
 // Run and Stop dispose the supplied runtime; construction performs no terminal I/O.
 type InteractiveMode struct {
+	imagesMu                      sync.Mutex
+	images                        []pendingImage
 	themes                        *ThemeController
 	themeCancel                   context.CancelFunc
 	themeDone                     chan struct{}
@@ -99,6 +102,12 @@ func NewInteractiveMode(runtime *AgentSessionRuntime, options ...InteractiveMode
 				lines = append(lines, wrapped...)
 			}
 		}
+		mode.imagesMu.Lock()
+		for i, image := range mode.images {
+			part, _ := tui.WrapTextWithANSI(tui.SafeTerminalText(fmt.Sprintf("Pending image %d: %s (%s; /image view %d)", i+1, image.name, image.image.MIMEType, i+1)), width)
+			lines = append(lines, part...)
+		}
+		mode.imagesMu.Unlock()
 		mode.progressMu.Lock()
 		if retry := mode.retry; retry != nil {
 			seconds := max(0, int(time.Until(mode.retryUntil).Seconds()+0.999))
@@ -140,8 +149,10 @@ func (m *InteractiveMode) Init(ctx context.Context) (err error) {
 	if m.runtime == nil || m.runtime.Session() == nil {
 		return errors.New("Interactive mode requires an AgentSession runtime")
 	}
-	if len(m.options.InitialImages) > 0 {
-		return notImplemented("InteractiveMode.images")
+	for _, image := range m.options.InitialImages {
+		if err := m.addImage("initial attachment", image); err != nil {
+			return err
+		}
 	}
 
 	fd, _ := findBinary(ctx)
@@ -348,6 +359,9 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 	var turnContext context.Context
 	var settling, pendingPrompts []string
 	var turnID uint64
+	var submitted []pendingImage
+	var submittedPrompt string
+	var imagesAccepted atomic.Bool
 	defer func() {
 		cancel()
 		if maintenanceCancel != nil {
@@ -371,6 +385,18 @@ func (m *InteractiveMode) Run(ctx context.Context) (err error) {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	finishTurn := func(promptErr error) error {
+		if len(submitted) > 0 {
+			if !imagesAccepted.Load() {
+				m.imagesMu.Lock()
+				m.images = append(submitted, m.images...)
+				m.imagesMu.Unlock()
+				_ = m.ui.PrependEditor(submittedPrompt)
+				_ = m.ShowWarning("Attachments not submitted; restored to pending list")
+			} else {
+				_ = m.appendNotice("Attachments submitted and retained inline in session\n")
+			}
+			submitted = nil
+		}
 		if turnContext.Err() != nil {
 			if messages := append(pendingPrompts, settling...); len(messages) > 0 {
 				_ = m.ui.PrependEditor(strings.Join(messages, "\n\n"))
@@ -530,6 +556,11 @@ loop:
 			continue
 		}
 		switch input.Action {
+		case "app.clipboard.pasteImage":
+			if imageErr := m.pasteImage(runCtx); imageErr != nil {
+				_ = m.ShowError(imageErr.Error())
+			}
+			continue
 		case "app.editor.external":
 			if editErr := m.OpenExternalEditor(runCtx); editErr != nil {
 				_ = m.ShowError(editErr.Error())
@@ -645,7 +676,24 @@ loop:
 				continue
 			}
 		}
+		if !literalPrompt && strings.TrimSpace(input.Text) == "/image send" {
+			m.imagesMu.Lock()
+			hasImages := len(m.images) > 0
+			m.imagesMu.Unlock()
+			if !hasImages {
+				_ = m.ShowError("No pending images")
+				continue
+			}
+			input.Text = ""
+			literalPrompt = true
+		}
 		if !literalPrompt {
+			if handled, imageErr := m.imageCommand(runCtx, input.Text); handled {
+				if imageErr != nil {
+					_ = m.ShowError(imageErr.Error())
+				}
+				continue
+			}
 			revision := m.sessionRevision
 			if handled, commandErr := m.handleCommand(runCtx, input.Text); handled {
 				if m.runtime.Session() != session || m.sessionRevision != revision {
@@ -661,6 +709,14 @@ loop:
 			}
 		}
 		if turnDone != nil {
+			m.imagesMu.Lock()
+			hasImages := len(m.images) > 0
+			m.imagesMu.Unlock()
+			if hasImages {
+				_ = m.ui.PrependEditor(input.Text)
+				_ = m.ShowWarning("Images cannot enter text-only queues; attachments remain pending")
+				continue
+			}
 			var queueErr error
 			if input.Action == "app.message.followUp" {
 				queueErr = session.FollowUp(input.Text)
@@ -680,6 +736,15 @@ loop:
 			}
 			continue
 		}
+		m.imagesMu.Lock()
+		submitted, m.images = m.images, nil
+		m.imagesMu.Unlock()
+		submittedPrompt = input.Text
+		imagesAccepted.Store(false)
+		var turnImages []ai.ImageContent
+		for _, item := range submitted {
+			turnImages = append(turnImages, item.image)
+		}
 		turnID++
 		m.ui.SetTurn(turnID)
 		turnCtx, stop := context.WithCancel(runCtx)
@@ -688,7 +753,10 @@ loop:
 		turnDone = make(chan error, 1)
 		started := make(chan struct{}, 1)
 		go func(prompt string, done chan<- error) {
-			_, promptErr := RunHeadless(turnCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, OnEvent: func(event AgentSessionEvent) {
+			_, promptErr := RunHeadless(turnCtx, m.runtime, HeadlessRunOptions{InitialMessage: &prompt, InitialImages: turnImages, OnEvent: func(event AgentSessionEvent) {
+				if e, ok := event.(AgentSessionMessageStartEvent); ok && e.Message.MessageRole() == "user" {
+					imagesAccepted.Store(true)
+				}
 				if event.AgentSessionEventType() == AgentSessionEventTypeAgentStart {
 					select {
 					case started <- struct{}{}:

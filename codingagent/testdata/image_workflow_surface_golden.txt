@@ -1,0 +1,4 @@
+InteractiveModeOptions codingagent.InteractiveModeOptions
+TextUI.PreviewImage func(*tui.TextUI, context.Context, string, tui.ImageDimensions) error
+RPCClient.Prompt func(*codingagent.RPCClient, context.Context, string, ...[]ai.ImageContent) error
+RPCClient.PromptAndWait func(*codingagent.RPCClient, context.Context, string, ...[]ai.ImageContent) ([]codingagent.JSONAgentSessionEvent, error)

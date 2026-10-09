@@ -7,14 +7,14 @@
 
 ## Summary
 
-- Total entries: 9706
+- Total entries: 9707
 
 | Status | Count |
 | --- | --- |
 | inventoried | 5141 |
-| scaffolded | 3619 |
-| partial | 633 |
-| implemented | 143 |
+| scaffolded | 3616 |
+| partial | 634 |
+| implemented | 146 |
 | verified | 167 |
 | deferred | 3 |
 
@@ -7822,6 +7822,7 @@
 | contract:codingagent/grep-tool | partial | M4 | contract | github.com/nankedr/pig/codingagent.CreateGrepTool | coding-agent |
 | contract:codingagent/headless | partial | M1 | contract | github.com/nankedr/pig/codingagent.RunHeadless | coding-agent |
 | contract:codingagent/html-export | partial | M4 | contract | github.com/nankedr/pig/codingagent.ExportFromFile | coding-agent |
+| contract:codingagent/image-workflow | partial | M12 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-bash | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-branches | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
 | contract:codingagent/interactive-maintenance | partial | M6 | contract | github.com/nankedr/pig/codingagent.InteractiveMode | coding-agent |
@@ -9491,16 +9492,13 @@
 | symbol:tui/src/terminal-image.ts#KittyImageMetadata | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KittyImageMetadata | tui |
 | symbol:tui/src/terminal-image.ts#KittyImagePlacement | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.KittyImagePlacement | tui |
 | symbol:tui/src/terminal-image.ts#TerminalCapabilities | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.TerminalCapabilities | tui |
-| symbol:tui/src/terminal-image.ts#allocateImageId | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.AllocateImageID | tui |
 | symbol:tui/src/terminal-image.ts#calculateImageCellSize | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.CalculateImageCellSize | tui |
 | symbol:tui/src/terminal-image.ts#calculateImageRows | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.CalculateImageRows | tui |
 | symbol:tui/src/terminal-image.ts#cropKittyImageLine | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.CropKittyImageLine | tui |
 | symbol:tui/src/terminal-image.ts#deleteAllKittyImages | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.DeleteAllKittyImages | tui |
 | symbol:tui/src/terminal-image.ts#deleteAllKittyPlacements | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.DeleteAllKittyPlacements | tui |
-| symbol:tui/src/terminal-image.ts#deleteKittyImage | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.DeleteKittyImage | tui |
 | symbol:tui/src/terminal-image.ts#detectCapabilities | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.DetectCapabilities | tui |
 | symbol:tui/src/terminal-image.ts#encodeITerm2 | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.EncodeITerm2 | tui |
-| symbol:tui/src/terminal-image.ts#encodeKitty | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.EncodeKitty | tui |
 | symbol:tui/src/terminal-image.ts#getCapabilities | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.GetCapabilities | tui |
 | symbol:tui/src/terminal-image.ts#getCellDimensions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.GetCellDimensions | tui |
 | symbol:tui/src/terminal-image.ts#getGifDimensions | scaffolded | M6 | symbol | github.com/nankedr/pig/tui.GetGIFDimensions | tui |
@@ -9760,6 +9758,9 @@
 | member:tui/src/components/settings-list.ts#SettingsList.render | implemented | M6 | contract | github.com/nankedr/pig/tui.SettingsList.Render | tui |
 | member:tui/src/components/settings-list.ts#SettingsList.updateValue | implemented | M6 | contract | github.com/nankedr/pig/tui.SettingsList.UpdateValue | tui |
 | symbol:tui/src/components/settings-list.ts#SettingsList | implemented | M6 | symbol | github.com/nankedr/pig/tui.SettingsList | tui |
+| symbol:tui/src/terminal-image.ts#allocateImageId | implemented | M6 | symbol | github.com/nankedr/pig/tui.AllocateImageID | tui |
+| symbol:tui/src/terminal-image.ts#deleteKittyImage | implemented | M6 | symbol | github.com/nankedr/pig/tui.DeleteKittyImage | tui |
+| symbol:tui/src/terminal-image.ts#encodeKitty | implemented | M6 | symbol | github.com/nankedr/pig/tui.EncodeKitty | tui |
 
 ## OpenAI Chat Completions capability matrix
 

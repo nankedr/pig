@@ -1163,7 +1163,7 @@ func DeleteAllKittyPlacements() (string, error)
 ## symbol:tui/src/terminal-image.ts#deleteKittyImage
 reference: packages/tui/src/terminal-image.ts#deleteKittyImage
 target: github.com/nankedr/pig/tui.DeleteKittyImage
-func DeleteKittyImage(uint32) (string, error)
+func DeleteKittyImage(id uint32) (string, error)
 
 ## symbol:tui/src/terminal-image.ts#detectCapabilities
 reference: packages/tui/src/terminal-image.ts#detectCapabilities
@@ -1178,7 +1178,7 @@ func EncodeITerm2(string, ...ITerm2EncodeOptions) (string, error)
 ## symbol:tui/src/terminal-image.ts#encodeKitty
 reference: packages/tui/src/terminal-image.ts#encodeKitty
 target: github.com/nankedr/pig/tui.EncodeKitty
-func EncodeKitty(string, ...KittyEncodeOptions) (string, error)
+func EncodeKitty(data string, options ...KittyEncodeOptions) (string, error)
 
 ## symbol:tui/src/terminal-image.ts#getCapabilities
 reference: packages/tui/src/terminal-image.ts#getCapabilities

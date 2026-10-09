@@ -30,9 +30,6 @@ func TestImageAndTextHelpersAreExplicitCapabilityStubs(t *testing.T) {
 			return tui.SetCapabilities(tui.TerminalCapabilities{Images: tui.ImageProtocolKitty, TrueColor: true, Hyperlinks: true})
 		}},
 		{name: "isImageLine", call: func() error { _, err := tui.IsImageLine("plain text"); return err }},
-		{name: "allocateImageId", call: func() error { _, err := tui.AllocateImageID(); return err }},
-		{name: "encodeKitty", call: func() error { _, err := tui.EncodeKitty("AAAA"); return err }},
-		{name: "deleteKittyImage", call: func() error { _, err := tui.DeleteKittyImage(1); return err }},
 		{name: "deleteAllKittyImages", call: func() error { _, err := tui.DeleteAllKittyImages(); return err }},
 		{name: "deleteAllKittyPlacements", call: func() error { _, err := tui.DeleteAllKittyPlacements(); return err }},
 		{name: "encodeITerm2", call: func() error { _, err := tui.EncodeITerm2("AAAA"); return err }},

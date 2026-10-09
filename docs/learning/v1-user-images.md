@@ -19,8 +19,9 @@ pig --fork /absolute/path/session.jsonl --no-tools -p "在新分支继续看图"
 | 方向与缩放 | 保留原尺寸和 EXIF；本地不旋转、不缩放，超限失败；read 处理见 [工具图片](v1-tool-images.md) |
 | v3 保存/重开/fork/树重建 | 内联保留图片；原文件可删除；缺失/损坏 data 或 MIME 明确错误 |
 | 不支持视觉的模型 | 明确失败；不产生视觉请求，不生成占位文字 |
-| 运行中队列 / SendUserMessage / Interactive / RPC 附件 | 仍为显式 Stub；后续 #135–#136 |
-| 工具结果图片 | #135 已实现，见 [工具图片](v1-tool-images.md)；终端显示与导出仍由 #136 处理 |
+| 运行中队列 / SendUserMessage 图片 | 显式 Stub，拒绝而不丢图 |
+| Interactive / RPC prompt 附件 | #136 接通，见 [图片工作流](v1-image-workflow.md) |
+| 工具结果图片 | #135 已实现，见 [工具图片](v1-tool-images.md)；终端预览与导出见 [图片工作流](v1-image-workflow.md) |
 | 外部 http(s) URL | V2，未实现 |
 | Files API file_id | V2，未实现 |
 | animated WebP | 当前解码器不支持，明确解码错误；剩余格式处理为 V2 |

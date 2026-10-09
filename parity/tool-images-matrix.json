@@ -14,7 +14,7 @@
     {"id": "restore-fork-tree-compaction", "version": "V1", "result": "production v3 inline; source deletion harmless; structural/current selected-model attachment corruption fails; fork isolated; normal tree rebuild; compacted image stays archived, not replayed"},
     {"id": "nonvision", "version": "V1", "result": "explicit failure before request; original image history preserved; intentional deviation from Pi downgrade"},
     {"id": "queue-boundary", "version": "V1", "result": "production running Prompt.Images and SendUserMessage image blocks explicit Stub; Steer/FollowUp/TakeQueuedMessages text-only; no silent conversion; underlying Agent queues accept AgentMessage"},
-    {"id": "rpc", "version": "V1", "result": "real subprocess text prompt -> read screenshot -> image context -> write task; get_messages retains image; user RPC attachments remain #136 Stub"},
+    {"id": "rpc", "version": "V1", "result": "real subprocess text prompt -> read screenshot -> image context -> write task; get_messages retains image; user RPC prompt.images/preview/export in parity/image-workflow-matrix.json (#136)"},
     {"id": "user-image-policy", "version": "V1", "result": "#134 direct user images retain original bytes/EXIF; read processing does not change LoadImageFile"},
     {"id": "unsafe-noresize", "version": "V1", "result": "Pig validates and explicitly omits corrupt image even when autoResize=false; fixed Pi may pass corrupt bytes (documented deviation)"},
     {"id": "url-files-other-generation", "version": "V2", "result": "URL/Files API/other providers/image generation/edit remain explicit Stub"},

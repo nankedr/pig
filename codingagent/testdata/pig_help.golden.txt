@@ -68,15 +68,15 @@ Current Headless Availability:
   Requires --provider deepseek and an exact --model ID. Credentials come from
   --api-key or DEEPSEEK_API_KEY. read, bash, edit and write are enabled
   by default; --tools, --exclude-tools and --no-tools control selection. v3 Sessions
-  support resume and fork. Print/JSON accepts @local-image with deepseek-flash,
+  support resume and fork. Print/JSON/Interactive accepts @local-image with deepseek-flash,
   via --api openai-responses or openai-completions. JPEG/PNG/GIF/static WebP,
   up to 8 MiB and 40 million pixels per image; original bytes are saved inline.
-  URL/Files API inputs, interactive/RPC attachments and other Tools/extensions
+  URL/Files API inputs and undelivered Tools/extensions
   remain explicit Capability Stubs. Text output contains only final Assistant text. JSON output
   writes a v3 Session header followed by AgentSessionEvent records, one value per
   line; stdin is prompt input, not RPC commands. SIGINT exits 130.
   RPC uses stdin for JSONL commands and stdout for responses/events;
-  images and commands beyond basic conversation remain unavailable.
+  images can be managed with /image and Ctrl+V on darwin-arm64.
 
 Extension flags:
   Unknown long flags are reserved for the Extension Surface. Until the extension

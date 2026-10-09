@@ -188,7 +188,15 @@ func (t *Transcript) Render(width int) ([]string, error) {
 		var component tui.Component
 		switch m := message.(type) {
 		case ai.UserMessage:
-			c := NewUserMessageComponent("user: " + sessionUserText(m))
+			text := sessionUserText(m)
+			if blocks, ok := m.Content.Blocks(); ok {
+				for _, block := range blocks {
+					if image, ok := block.(ai.ImageContent); ok {
+						text += "\n" + imageDescription(image)
+					}
+				}
+			}
+			c := NewUserMessageComponent("user: " + text)
 			c.theme = t.theme
 			c.SetOutputPad(t.outputPad != 0)
 			component = c

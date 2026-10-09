@@ -344,3 +344,13 @@ tool-images-oracle:
 
 tool-vision-live-smoke:
 	PIG_REQUIRE_TOOL_VISION_LIVE=1 go test ./codingagent -run '^TestToolImagesDeepSeekLiveReadAndWrite$$' -count=1
+
+.PHONY: image-workflow-native-smoke image-workflow-live-smoke image-workflow-oracle
+image-workflow-native-smoke:
+	PIG_REQUIRE_CLIPBOARD_IMAGE_NATIVE=1 go test ./codingagent -run '^TestImageWorkflowNativeClipboard136$$' -count=1 -v
+
+image-workflow-live-smoke:
+	PIG_REQUIRE_IMAGE_WORKFLOW_LIVE=1 go test ./cmd/pig -run '^TestImageWorkflowRPCLive136$$' -count=1 -v
+
+image-workflow-oracle: m0-node-preflight
+	node --experimental-strip-types parity/oracle/image-workflow.mjs "$(PIG_PI_ORACLE_CHECKOUT)" --check

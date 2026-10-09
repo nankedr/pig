@@ -13,6 +13,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/nankedr/pig/ai"
 )
 
 //go:embed exporthtml/* exporthtml/vendor/*
@@ -96,7 +98,7 @@ func writeSessionHTML(ctx context.Context, source string, data htmlSessionData, 
 		h := sha256.Sum256([]byte(script))
 		scriptPolicy += " 'sha256-" + base64.StdEncoding.EncodeToString(h[:]) + "'"
 	}
-	csp := "default-src 'none'; script-src" + scriptPolicy + "; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'"
+	csp := "default-src 'none'; script-src" + scriptPolicy + "; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"
 	themeCSS, err := themeExportCSS(theme)
 	if err != nil {
 		return "", err
@@ -249,6 +251,18 @@ func validateHTMLContent(content any, allowText bool) error {
 		case "text", "thinking":
 			if _, ok := block[typ].(string); !ok {
 				return fmt.Errorf("invalid %s block", typ)
+			}
+		case "image":
+			encoded, err := json.Marshal(block)
+			if err != nil {
+				return err
+			}
+			var image ai.ImageContent
+			if err := json.Unmarshal(encoded, &image); err != nil {
+				return err
+			}
+			if err := ai.ValidateUserImage(image); err != nil {
+				return fmt.Errorf("invalid export image: %w", err)
 			}
 		case "toolCall":
 			if _, ok := block["id"].(string); !ok {

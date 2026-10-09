@@ -116,6 +116,7 @@ func (u *TextUI) SetDialog(dialog Component) error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	u.editor.cancelAutocomplete()
+	u.clearImagePreview()
 	u.dialog = dialog
 	return u.render()
 }
@@ -242,6 +243,7 @@ func (u *TextUI) finish(err error) {
 	if u.stopped {
 		return
 	}
+	u.clearImagePreview()
 	u.stopped = true
 	if !errors.Is(err, io.EOF) {
 		u.err = err
@@ -444,6 +446,7 @@ func (u *TextUI) render() error {
 	} else {
 		output, state, _ = screenFrame(u.altState, visible, columns, rows, u.interaction.ShowHardwareCursor)
 	}
+	output += u.imagePreviewOutput(state, len(visible), len(editorLines))
 	if err = u.terminal.Write(output); err != nil {
 		u.finish(err)
 	} else if u.mode == TUIModeRegular {
@@ -555,6 +558,8 @@ func (u *TextUI) input(data string) {
 				break
 			}
 		}
+	case match("app.clipboard.pasteImage"):
+		u.enqueueAction("app.clipboard.pasteImage", "")
 	case match("app.editor.external"):
 		u.enqueueAction("app.editor.external", "")
 	case match("app.message.dequeue"):

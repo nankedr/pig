@@ -302,7 +302,7 @@ func (c *ToolExecutionComponent) Render(width int) ([]string, error) {
 					output = append(output, p.Text)
 				}
 			case ai.ImageContent:
-				output = append(output, "[image]")
+				output = append(output, imageDescription(p))
 			}
 		}
 		text := strings.Join(output, "\n")

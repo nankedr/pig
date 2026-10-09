@@ -35,6 +35,7 @@ Err func(*tui.TextUI) error
 HideThinking func(*tui.TextUI) bool
 Mode func(*tui.TextUI) tui.TUIMode
 PrependEditor func(*tui.TextUI, string) error
+PreviewImage func(*tui.TextUI, context.Context, string, tui.ImageDimensions) error
 ReadInput func(*tui.TextUI, context.Context) (tui.TextInput, error)
 ReadLine func(*tui.TextUI, context.Context) (string, error)
 Refresh func(*tui.TextUI) error
